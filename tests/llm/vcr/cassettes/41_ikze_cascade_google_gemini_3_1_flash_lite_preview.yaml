@@ -1,0 +1,124 @@
+meta:
+  scenario_id: 41_ikze_cascade
+  scenario_name: IKZE w kaskadzie odliczeń — odliczenie od dochodu NIE
+  provider: google
+  model: gemini-3.1-flash-lite-preview
+  fingerprint: v1_44b432297994daf4_e28dbe587108877c_google_993fbcd8
+  recorded_at: '2026-04-19T19:15:11.970917+00:00'
+  recording_duration_seconds: 4.24
+  prompt_tokens_estimate: 11209
+  response_tokens_estimate: 669
+  algorithm_hash: 44b432297994daf4
+  cassette_format_version: 2
+turns:
+- role: user
+  prompt: ''
+  response: "Oto analiza Twojego rozliczenia IP Box w trybie BATCH.\n\n### FAZA 0–2: Kwalifikacja i Obliczenia W\n*   **Współczynnik\
+    \ W:** Obliczony jako `(160 - 48) / 160 = 0,70` (70%).\n*   **Klasyfikacja:** ZUS w KPiR (koszt MIX).\n\n### FAZA 3–4:\
+    \ Koszty i Dochody\n*   **Koszty:** ZUS (1418,48 zł) jest kosztem MIX.\n    *   Koszty IP: `1418,48 * 0,70 = 992,94 zł`\n\
+    \    *   Koszty NIE: `1418,48 * 0,30 = 425,54 zł`\n*   **Przychody:**\n    *   Przychód IP: `15000 * 0,70 = 10500 zł`\n\
+    \    *   Przychód NIE: `15000 * 0,30 = 4500 zł`\n\n*(Obliczenia dla 2 miesięcy: 2025-01 i 2025-02)*\n\n<result>\nrok:\
+    \ 2025\nforma_opodatkowania: liniowy_19%\nmetoda_rachunkowości: memoriał\nzus:\n  sposób_ujęcia: w_KPiR\n  kwota_społeczne:\
+    \ 2836.96\n  kwota_zdrowotne: 0.00\nprzychody_roczne:\n  IP: 21000.00\n  NIE: 9000.00\n  KPiR_total: 30000.00\nkoszty_roczne:\n\
+    \  IP: 1985.88\n  NIE: 851.08\n  WYKLUCZONE: 0.00\nnexus:\n  A: 0.00\n  B: 0.00\n  C: 0.00\n  D: 0.00\n  wartość: 1.00\n\
+    kaskada_odliczeń:\n  straty_poprzednie: 0.00\n  ZUS_odliczenie: 0.00\n  IKZE: 7000.00\n  darowizny: 0.00\n  ulga_internet:\
+    \ 0.00\n  ulga_rehabilitacyjna: 0.00\n  ulga_BR: 0.00\n  termomodernizacja_wykorzystano: 0.00\n  termomodernizacja_carry_over:\
+    \ 0.00\npodatek:\n  podstawa_NIE_zaokr: 1149\n  podatek_NIE_przed_ulgami: 218\n  ulga_prorodzinna: 0.00\n  podatek_NIE_finalny:\
+    \ 218\n  podstawa_IP_zaokr: 19014\n  podatek_IP: 951\n  podatek_łączny: 1169\nzaliczki:\n  typ: miesięczne\n  suma: 0\n\
+    \  rozbicie: [0,0,0,0,0,0,0,0,0,0,0,0]\nwynik:\n  nadpłata_lub_dopłata: -1169\ntesty:\n  test_1_bilans: PASS\n  test_2_koszty_prywatne:\
+    \ PASS\n  test_3_anty_dubel_ZUS: PASS\n  test_4_kaskada: PASS\n  test_5_podatek_IP: PASS\n  test_6_nadpłata: PASS\nreview_do_weryfikacji:\
+    \ [REVIEW_09]\n</result>\n\n<classifications>\n- Składki ZUS społeczne: MIX\n</classifications>\n\n<monthly_W>\n2025-01:\
+    \ 70.00\n2025-02: 70.00\n</monthly_W>\n\n<tests>\nTEST_1: PASS\nTEST_2: PASS\nTEST_3: PASS\nTEST_4: PASS\nTEST_5: PASS\n\
+    TEST_6: PASS\n</tests>\n\n<stops_reviews>\nstops: []\nreviews: \n  - REVIEW_09: Jeden kontrahent (TechCorp Sp. z o.o.)\
+    \ odpowiada za 100% przychodów. Ryzyko uznania za ukryty etat.\n</reviews>\n</stops_reviews>\n\n**Uwagi eksperta:**\n\
+    1. **REVIEW_09:** Pracujesz dla jednego kontrahenta. Przy kontroli KAS musisz posiadać dowody na to, że nie jesteś w relacji\
+    \ pracowniczej (np. brak podporządkowania, własne narzędzia, ponoszenie ryzyka gospodarczego).\n2. **IKZE:** Odliczyłem\
+    \ 7000 zł od dochodu NIE. Pamiętaj, że IKZE odlicza się od dochodu, a nie od podatku.\n3. **ZUS:** Skoro ZUS jest w KPiR,\
+    \ nie odliczamy go w PIT (zgodnie z Twoją deklaracją).\n4. **Dopłata:** Wynik -1169 zł oznacza dopłatę podatku, ponieważ\
+    \ nie wpłacałeś zaliczek w trakcie roku.\n\nCzy chcesz, abym wygenerował plik ewidencji IP Box w formacie CSV?"
+  prompt_hash: c145e4cfd19feae3
+parsed:
+  result_yaml:
+    rok: 2025
+    forma_opodatkowania: liniowy_19%
+    metoda_rachunkowości: memoriał
+    zus:
+      sposób_ujęcia: w_KPiR
+      kwota_społeczne: 2836.96
+      kwota_zdrowotne: 0.0
+    przychody_roczne:
+      IP: 21000.0
+      NIE: 9000.0
+      KPiR_total: 30000.0
+    koszty_roczne:
+      IP: 1985.88
+      NIE: 851.08
+      WYKLUCZONE: 0.0
+    nexus:
+      A: 0.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      wartość: 1.0
+    kaskada_odliczeń:
+      straty_poprzednie: 0.0
+      ZUS_odliczenie: 0.0
+      IKZE: 7000.0
+      darowizny: 0.0
+      ulga_internet: 0.0
+      ulga_rehabilitacyjna: 0.0
+      ulga_BR: 0.0
+      termomodernizacja_wykorzystano: 0.0
+      termomodernizacja_carry_over: 0.0
+    podatek:
+      podstawa_NIE_zaokr: 1149
+      podatek_NIE_przed_ulgami: 218
+      ulga_prorodzinna: 0.0
+      podatek_NIE_finalny: 218
+      podstawa_IP_zaokr: 19014
+      podatek_IP: 951
+      podatek_łączny: 1169
+    zaliczki:
+      typ: miesięczne
+      suma: 0
+      rozbicie:
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+    wynik:
+      nadpłata_lub_dopłata: -1169
+    testy:
+      test_1_bilans: PASS
+      test_2_koszty_prywatne: PASS
+      test_3_anty_dubel_ZUS: PASS
+      test_4_kaskada: PASS
+      test_5_podatek_IP: PASS
+      test_6_nadpłata: PASS
+    review_do_weryfikacji:
+    - REVIEW_09
+  classifications: '- Składki ZUS społeczne: MIX'
+  monthly_W: '2025-01: 70.00
+
+    2025-02: 70.00'
+  tests: 'TEST_1: PASS
+
+    TEST_2: PASS
+
+    TEST_3: PASS
+
+    TEST_4: PASS
+
+    TEST_5: PASS
+
+    TEST_6: PASS'
+  stops_reviews: "stops: []\nreviews: \n  - REVIEW_09: Jeden kontrahent (TechCorp Sp. z o.o.) odpowiada za 100% przychodów.\
+    \ Ryzyko uznania za ukryty etat.\n</reviews>"

@@ -1,0 +1,14 @@
+meta:
+  id: "15_vacation_sick_mix"
+  name: "Logika: Urlop + L4"
+  description: "Weryfikacja dzielnika czasu pracy"
+  tags: ["core", "time"]
+  priority: "P1"
+input:
+  rok: 2025
+  miesiace:
+    - miesiac: "2025-01"
+      godziny_pracy: 40 # Tylko 1 tydzień pracy
+      godziny_nie_IP: 4
+assertions:
+  W_miesieczne: {"2025-01": 90.0}

@@ -1,0 +1,64 @@
+meta:
+  id: "28_edge_multiple_carry-overs"
+  name: "Edge: Wielokrotne przeniesienia ulg termomodernizacyjnych"
+  description: >
+    Pula termomodernizacyjna skomponowana z dwóch lat (8000 z 2023 + 7000 z 2024).
+    Test czy carry-over z wielu lat jest poprawnie sumowany i stosowany.
+  tags: ["edge", "relief", "termo", "carry-over"]
+  priority: P1
+  expected_stops: []
+  expected_reviews: []
+
+input:
+  rok: 2025
+  forma_opodatkowania: "liniowy_19%"
+  zus:
+    sposob: "w_KPiR"
+    spoleczne_miesiecznie: 1418.48
+  kontrahenci:
+    - nazwa: "TechCorp Sp. z o.o."
+      waluta: "PLN"
+      klauzula_IP: true
+      model_komercjalizacji: "przeniesienie_praw"
+
+  miesiace:
+    - miesiac: "2025-01"
+      faktury:
+        - kwota_netto: 15000
+          kontrahent: "TechCorp Sp. z o.o."
+      ewidencja:
+        godziny_pracy: 160
+        godziny_nie_IP: 0
+        procent_faktury_IP: 100
+      koszty:
+        - opis: "Składki ZUS społeczne"
+          kwota: 1418.48
+      opis_projektu: "Zaimplementowałem moduł API integracji z systemem płatności Stripe."
+    - miesiac: "2025-02"
+      faktury:
+        - kwota_netto: 15000
+          kontrahent: "TechCorp Sp. z o.o."
+      ewidencja:
+        godziny_pracy: 160
+        godziny_nie_IP: 0
+        procent_faktury_IP: 100
+      koszty:
+        - opis: "Składki ZUS społeczne"
+          kwota: 1418.48
+      opis_projektu: "Zaprojektowałem algorytm buforowania zapytań dla usługi uwierzytelniania."
+
+  ulgi:
+    # Carry-over z 2 poprzednich lat: 8000 (2023) + 7000 (2024) = 15000
+    termomodernizacja_pula: 15000
+    ikze: 9388.80
+
+  zaliczki:
+    typ: "miesięczne"
+    suma: 2000
+    rozbicie: [1000, 1000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+assertions:
+  nexus: 1.0
+  # Dochód_IP = (15000 - 1418.48) * 2 = 27163.04
+  # IP tax = 27163.04 * 5% = 1358.15
+  podatek_IP_range: [1300, 1450]

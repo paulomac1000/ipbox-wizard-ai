@@ -1,0 +1,29 @@
+meta:
+  id: "02_basic_scale_single_client"
+  name: "Bazowy: skala 12/32%, 1 klient PLN"
+  description: "Weryfikacja progów skali i kwoty wolnej"
+  tags: ["smoke", "skala", "PLN"]
+  priority: "P0"
+
+input:
+  rok: 2025
+  forma_opodatkowania: "skala"
+  zus:
+    sposob: "PIT"
+  kontrahenci:
+    - nazwa: "LocalCorp"
+      waluta: "PLN"
+      klauzula_IP: true
+  miesiace:
+    - miesiac: "2025-01"
+      przychody: 15000
+      godziny_pracy: 160
+      godziny_nie_IP: 0
+      koszty: []
+  ulgi:
+    ikze: 0
+
+assertions:
+  nexus: 1.0
+  podatek_IP_range: [700, 800] # 15000 * 5% = 750
+  testy_pass: ["TEST_1", "TEST_2", "TEST_3", "TEST_4", "TEST_5", "TEST_6"]

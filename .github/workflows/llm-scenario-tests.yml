@@ -1,0 +1,158 @@
+name: "LLM Scenario Tests"
+
+on:
+  workflow_call:
+  push:
+    branches: [ main ]
+    paths:
+      - "ipbox_algorytm.md"
+      - "python_helper/**"
+      - "tests/llm/**"
+  pull_request:
+    paths:
+      - "ipbox_algorytm.md"
+      - "python_helper/**"
+      - "tests/llm/**"
+  workflow_dispatch:
+    inputs:
+      max_scenarios:
+        description: "Maks liczba scenariuszy (0 = wszystkie)"
+        default: "10"
+
+concurrency:
+  group: llm-tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # VCR playback tests (zero API cost)
+  vcr-playback:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt -r requirements-test.txt
+
+      - name: Run LLM tests (VCR playback only)
+        env:
+          VCR_MODE: playback
+        run: |
+          mkdir -p reports
+          python -m pytest tests/llm/test_scenarios.py \
+            --run-llm \
+            -v \
+            --vcr-mode=playback \
+            --tb=short \
+            --junitxml=reports/llm-playback.xml
+
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: llm-playback-results
+          path: reports/
+
+  # Full LLM tests with VCR (auto mode) — tylko push/dispatch/workflow_call, nie PR
+  llm-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    if: github.event_name != 'pull_request'
+
+    env:
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      GEMINI_MODEL: ${{ vars.GEMINI_MODEL }}
+      LLM_MAX_CALLS_PER_RUN: ${{ github.event.inputs.max_scenarios || '10' }}
+      # VCR auto mode: use cassettes if valid, record if stale
+      VCR_MODE: ${{ github.event_name == 'workflow_dispatch' && 'auto' || 'auto' }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install -r requirements-test.txt
+
+      - name: Validate API key
+        run: |
+          if [ -z "$GEMINI_API_KEY" ]; then
+            echo "::error::Brak GEMINI_API_KEY — dodaj go jako GitHub Secret."
+            exit 1
+          fi
+          echo "GEMINI_MODEL=${GEMINI_MODEL:-gemini-2.0-flash}"
+
+      - name: Budget check
+        run: |
+          SCENARIO_COUNT=$(ls tests/llm/scenarios/*.yaml 2>/dev/null | wc -l)
+          echo "Dostępne scenariusze: $SCENARIO_COUNT"
+          echo "Limit: $LLM_MAX_CALLS_PER_RUN"
+          if [ "$LLM_MAX_CALLS_PER_RUN" != "0" ] && [ "$SCENARIO_COUNT" -gt "$LLM_MAX_CALLS_PER_RUN" ]; then
+            echo "::notice::Uruchamiam tylko pierwsze $LLM_MAX_CALLS_PER_RUN z $SCENARIO_COUNT scenariuszy."
+          fi
+
+      - name: Run LLM scenario tests
+        run: |
+          mkdir -p reports
+          python -m pytest tests/llm/test_scenarios.py \
+            --run-llm \
+            -v \
+            --tb=long \
+            --junitxml=reports/llm-results.xml \
+            2>&1 | tee reports/llm-output.log
+
+      - name: Save LLM responses
+        if: always()
+        run: |
+          mkdir -p reports/raw_responses
+          cp -r /tmp/ipbox_llm_responses/. reports/raw_responses/ 2>/dev/null || true
+
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: llm-results
+          path: reports/
+          retention-days: 30
+
+      - name: Comment results on PR
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let log = '';
+            try { log = fs.readFileSync('reports/llm-output.log', 'utf8'); } catch {}
+            const passed = (log.match(/\d+ passed/g) || []).join(', ');
+            const failed = (log.match(/\d+ failed/g) || []).join(', ');
+            const status = failed ? '❌' : '✅';
+            const model = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
+            const body = [
+              `## ${status} LLM Scenario Tests`,
+              `**Model**: \`${model}\``,
+              passed ? `**Passed**: ${passed}` : '',
+              failed ? `**Failed**: ${failed}` : '',
+              '',
+              '<details><summary>Log (ostatnie 80 linii)</summary>\n\n```',
+              log.split('\n').slice(-80).join('\n'),
+              '```\n</details>',
+            ].filter(Boolean).join('\n');
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body,
+            });

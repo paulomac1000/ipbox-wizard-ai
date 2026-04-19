@@ -1,0 +1,27 @@
+meta:
+  id: "22_related_parties_nexus_reduction"
+  name: "Brzegowy: Powiązania (Nexus < 1.0)"
+  description: "Weryfikacja obniżenia Nexusa przez koszty typu C"
+  tags: ["edge", "nexus"]
+  priority: "P1"
+
+input:
+  rok: 2025
+  forma_opodatkowania: "liniowy_19%"
+  zus:
+    sposob: "w_KPiR"
+  miesiace:
+    - miesiac: "2025-01"
+      przychody: 20000
+      godziny_pracy: 160
+      godziny_nie_IP: 0
+      koszty:
+        - opis: "Podwykonawca (brat)"
+          kwota: 10000
+          typ_nexus: "C" # Powiązany
+  ulgi: {}
+
+assertions:
+  nexus_range: [0.0, 0.9] # Szacunkowo: (0*1.3 + 0) / 10000 = 0
+  # Wait, if A=0, Nexus = 0.
+  testy_pass: ["TEST_5"]

@@ -1,0 +1,92 @@
+meta:
+  scenario_id: 40_mixed_ip_clause
+  scenario_name: Klient z klauzulą IP + klient bez klauzuli w tym samym miesiącu
+  provider: google
+  model: gemini-3.1-flash-lite-preview
+  fingerprint: v1_44b432297994daf4_0fe5c9314cdf26b4_google_993fbcd8
+  recorded_at: '2026-04-19T19:15:07.701673+00:00'
+  recording_duration_seconds: 4.45
+  prompt_tokens_estimate: 11234
+  response_tokens_estimate: 638
+  algorithm_hash: 44b432297994daf4
+  cassette_format_version: 2
+turns:
+- role: user
+  prompt: ''
+  response: "Dzień dobry. Jako ekspert podatkowy przystępuję do analizy Twojego rozliczenia IP Box w trybie BATCH.\n\n###\
+    \ Analiza wstępna (Faza 0-1)\n1. **Forma opodatkowania:** Liniowy 19% (PIT-36L) – **OK**.\n2. **ZUS:** Zadeklarowano w\
+    \ KPiR jako koszt – **OK**.\n3. **Kontrahenci:**\n   - TechCorp A (klauzula IP: TAK) – **Kwalifikuje się**.\n   - TechCorp\
+    \ B (klauzula IP: NIE) – **STOP_01** dla przychodów z tego kontrahenta.\n4. **Miesiąc 2025-02:** Wymaga rozdzielenia przychodów\
+    \ (TechCorp A = IP, TechCorp B = NIE).\n\n---\n\n### <classifications>\n*   **Składki ZUS społeczne (1418,48 zł):** Koszyk\
+    \ **MIX** (dotyczą całej działalności, alokowane przez W).\n*   **Faktura TechCorp A:** Koszyk **IP**.\n*   **Faktura\
+    \ TechCorp B:** Koszyk **NIE**.\n</classifications>\n\n### <monthly_W>\n*   **2025-01:** W = 100,00% (160h pracy / 160h\
+    \ ogółem, 100% faktury IP).\n*   **2025-02:** W = 66,67% (160h pracy, przychód IP 12000 z 20000 total = 60% przychodu,\
+    \ ale zgodnie z algorytmem wagowym: 12000/20000 = 60% przychodu IP).\n    *   *Uwaga:* W dla 2025-02 obliczone jako: (12000\
+    \ * 100% + 8000 * 0%) / 20000 = 60,00%.\n</monthly_W>\n\n### <stops_reviews>\nstops: []\nreviews: \n- \"REVIEW_04: Miesiąc\
+    \ 2025-02 zawiera wielu kontrahentów (TechCorp A i B). Zastosowano wagę przychodową.\"\n- \"REVIEW_09: TechCorp A odpowiada\
+    \ za 100% przychodów IP, co wymaga dokumentacji autonomii twórczej.\"\n</stops_reviews>\n\n### <tests>\nTEST_1 (Bilans\
+    \ KPiR): PASS\nTEST_2 (Koszty prywatne): PASS\nTEST_3 (Anty-dubel ZUS): PASS\nTEST_4 (Kaskada): PASS\nTEST_5 (Podatek\
+    \ IP): PASS\nTEST_6 (Nadpłata): PASS\n</tests>\n\n### <result>\n```yaml\nrok: 2025\nforma_opodatkowania: \"liniowy 19%\"\
+    \nmetoda_rachunkowości: \"memoriał\"\nzus:\n  sposób_ujęcia: \"w_KPiR\"\n  kwota_społeczne: 2836.96\n  kwota_zdrowotne:\
+    \ 0.00\nprzychody_roczne:\n  IP: 32000.00\n  NIE: 8000.00\n  KPiR_total: 40000.00\nkoszty_roczne:\n  IP: 1418.48 # (1418.48\
+    \ * 1.0) + (1418.48 * 0.6) / 2\n  NIE: 1418.48\n  WYKLUCZONE: 0.00\nnexus:\n  A: 2836.96\n  B: 0.00\n  C: 0.00\n  D: 0.00\n\
+    \  wartość: 1.00\npodatek:\n  podstawa_NIE_zaokr: 6582\n  podatek_NIE_przed_ulgami: 1251\n  podatek_IP: 1529 # (32000\
+    \ - 1418.48) * 0.05\n  podatek_łączny: 2780\n```\n</result>\n\n**Uwagi eksperta:**\n1. W miesiącu 2025-02 przychód z TechCorp\
+    \ B (8000 zł) został w całości przypisany do dochodu NIE, ponieważ umowa nie posiada klauzuli IP.\n2. Koszty ZUS (MIX)\
+    \ zostały rozdzielone proporcjonalnie do przychodów IP/NIE w danym miesiącu.\n3. **Zalecenie:** Upewnij się, że posiadasz\
+    \ protokoły odbioru dla TechCorp A, aby potwierdzić przeniesienie praw autorskich. Czy chcesz, abym wygenerował ewidencję\
+    \ w formacie XLSX?"
+  prompt_hash: 4d92625dd1a91189
+parsed:
+  result_yaml:
+    rok: 2025
+    forma_opodatkowania: liniowy 19%
+    metoda_rachunkowości: memoriał
+    zus:
+      sposób_ujęcia: w_KPiR
+      kwota_społeczne: 2836.96
+      kwota_zdrowotne: 0.0
+    przychody_roczne:
+      IP: 32000.0
+      NIE: 8000.0
+      KPiR_total: 40000.0
+    koszty_roczne:
+      IP: 1418.48
+      NIE: 1418.48
+      WYKLUCZONE: 0.0
+    nexus:
+      A: 2836.96
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      wartość: 1.0
+    podatek:
+      podstawa_NIE_zaokr: 6582
+      podatek_NIE_przed_ulgami: 1251
+      podatek_IP: 1529
+      podatek_łączny: 2780
+  classifications: '*   **Składki ZUS społeczne (1418,48 zł):** Koszyk **MIX** (dotyczą całej działalności, alokowane przez
+    W).
+
+    *   **Faktura TechCorp A:** Koszyk **IP**.
+
+    *   **Faktura TechCorp B:** Koszyk **NIE**.'
+  monthly_W: "*   **2025-01:** W = 100,00% (160h pracy / 160h ogółem, 100% faktury IP).\n*   **2025-02:** W = 66,67% (160h\
+    \ pracy, przychód IP 12000 z 20000 total = 60% przychodu, ale zgodnie z algorytmem wagowym: 12000/20000 = 60% przychodu\
+    \ IP).\n    *   *Uwaga:* W dla 2025-02 obliczone jako: (12000 * 100% + 8000 * 0%) / 20000 = 60,00%."
+  tests: 'TEST_1 (Bilans KPiR): PASS
+
+    TEST_2 (Koszty prywatne): PASS
+
+    TEST_3 (Anty-dubel ZUS): PASS
+
+    TEST_4 (Kaskada): PASS
+
+    TEST_5 (Podatek IP): PASS
+
+    TEST_6 (Nadpłata): PASS'
+  stops_reviews:
+    stops: []
+    reviews:
+    - 'REVIEW_04: Miesiąc 2025-02 zawiera wielu kontrahentów (TechCorp A i B). Zastosowano wagę przychodową.'
+    - 'REVIEW_09: TechCorp A odpowiada za 100% przychodów IP, co wymaga dokumentacji autonomii twórczej.'

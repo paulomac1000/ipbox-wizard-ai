@@ -1,0 +1,13 @@
+meta:
+  id: "33_kpir_balance_fail"
+  name: "Weryfikacja: Bilans KPiR (FAIL)"
+  tags: ["verification", "fail"]
+input:
+  podsumowanie_kpir:
+    przychody: 100000
+    koszty: 50000
+  miesiace:
+    - miesiac: "2025-01"
+      przychody: 90000 # SUMA != 100000
+assertions:
+  testy_fail: ["TEST_1"]

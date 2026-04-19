@@ -1,0 +1,30 @@
+meta:
+  id: "17_low_w_review"
+  name: "Logika: W < 50% — flaga REVIEW_02"
+  description: "Weryfikacja czy algorytm generuje ostrzeżenie REVIEW_02 gdy W < 50%"
+  tags: ["core", "review", "W"]
+  priority: "P1"
+  expected_reviews: ["REVIEW_02"]
+
+input:
+  rok: 2025
+  forma_opodatkowania: "liniowy_19%"
+  zus:
+    sposob: "w_KPiR"
+  miesiace:
+    - miesiac: "2025-01"
+      faktury:
+        - kwota_netto: 20000
+          kontrahent: "TestCorp"
+      ewidencja:
+        godziny_pracy: 160
+        godziny_nie_IP: 90
+        procent_faktury_IP: 100
+      koszty:
+        - opis: "Księgowość"
+          kwota: 300
+
+assertions:
+  W_miesieczne:
+    "2025-01": 43.75
+  warnings: ["REVIEW_02"]

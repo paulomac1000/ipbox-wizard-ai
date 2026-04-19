@@ -1,0 +1,57 @@
+meta:
+  id: "35_verify_monthly_w_jump_inconsistency"
+  name: "Weryfikacja: Skok W >30pp między miesiącami (REVIEW_08)"
+  description: >
+    W_styczeń = 90%, W_luty = 30% — skok o 60pp.
+    Algorytm (REVIEW_08) powinien odnotować tę niespójność jako REVIEW.
+  tags: ["verification", "review", "W-coefficient"]
+  priority: P1
+  expected_stops: []
+  expected_reviews: ["REVIEW_08"]
+
+input:
+  rok: 2025
+  forma_opodatkowania: "liniowy_19%"
+  zus:
+    sposob: "w_KPiR"
+    spoleczne_miesiecznie: 1418.48
+  kontrahenci:
+    - nazwa: "DevHouse Sp. z o.o."
+      waluta: "PLN"
+      klauzula_IP: true
+      model_komercjalizacji: "przeniesienie_praw"
+
+  miesiace:
+    - miesiac: "2025-01"
+      faktury:
+        - kwota_netto: 20000
+          kontrahent: "DevHouse Sp. z o.o."
+      ewidencja:
+        godziny_pracy: 160
+        godziny_nie_IP: 16    # W = (160-16)/160*100 = 90%
+        procent_faktury_IP: 100
+      koszty:
+        - opis: "Składki ZUS społeczne"
+          kwota: 1418.48
+      opis_projektu: >
+        Zaprojektowałem i zaimplementowałem silnik wyszukiwania pełnotekstowego.
+    - miesiac: "2025-02"
+      faktury:
+        - kwota_netto: 20000
+          kontrahent: "DevHouse Sp. z o.o."
+      ewidencja:
+        godziny_pracy: 160
+        godziny_nie_IP: 112   # W = (160-112)/160*100 = 30%
+        procent_faktury_IP: 100
+      koszty:
+        - opis: "Składki ZUS społeczne"
+          kwota: 1418.48
+      opis_projektu: >
+        Wdrożyłem moduł importu danych z systemu legacy.
+
+  ulgi: {}
+
+assertions:
+  W_miesieczne:
+    "2025-01": 90.0
+    "2025-02": 30.0

@@ -1,0 +1,29 @@
+meta:
+  id: 24_donations_relief
+  name: 'Brzegowy: Ulga na darowizny'
+  description: Weryfikacja odliczenia darowizn od dochodu NIE przed kaskadą
+  tags:
+  - edge
+  - relief
+  priority: P1
+input:
+  rok: 2025
+  forma_opodatkowania: liniowy_19%
+  zus:
+    sposob: w_KPiR
+  miesiace:
+  - miesiac: 2025-01
+    faktury:
+    - kwota_netto: 20000
+      kontrahent: TestCorp
+    ewidencja:
+      godziny_pracy: 160
+      godziny_nie_IP: 16
+      procent_faktury_IP: 100
+    koszty:
+    - opis: Abonament internet
+      kwota: 89
+  ulgi:
+    darowizny: 5000
+assertions:
+  nexus: 1.0

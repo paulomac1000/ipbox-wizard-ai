@@ -1,0 +1,32 @@
+meta:
+  id: 27_termomodernizacja_full
+  name: 'Brzegowy: Termomodernizacja — pełna pula'
+  description: Weryfikacja odliczenia termomodernizacji po IKZE, z carry-over do następnych
+    lat
+  tags:
+  - edge
+  - relief
+  - termo
+  priority: P1
+input:
+  rok: 2025
+  forma_opodatkowania: liniowy_19%
+  zus:
+    sposob: w_KPiR
+  miesiace:
+  - miesiac: 2025-01
+    faktury:
+    - kwota_netto: 20000
+      kontrahent: TestCorp
+    ewidencja:
+      godziny_pracy: 160
+      godziny_nie_IP: 16
+      procent_faktury_IP: 100
+    koszty:
+    - opis: Abonament internet
+      kwota: 89
+  ulgi:
+    termomodernizacja_pula: 53000
+    ikze: 9388.8
+assertions:
+  nexus: 1.0

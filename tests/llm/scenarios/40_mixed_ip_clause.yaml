@@ -1,0 +1,65 @@
+meta:
+  id: "40_mixed_ip_clause"
+  name: "Klient z klauzulą IP + klient bez klauzuli w tym samym miesiącu"
+  description: >
+    Miesiąc z dwoma klientami: jeden z klauzulą IP, drugi bez. Tylko przychód od
+    klienta z klauzulą trafia do IP Box.
+  tags: [ "core", "ip-clause", "mixed" ]
+  priority: "P1"
+
+input:
+  rok: 2025
+  forma_opodatkowania: "liniowy_19%"
+  zus:
+    sposob: "w_KPiR"
+    spoleczne_miesiecznie: 1418.48
+  kontrahenci:
+    - nazwa: "TechCorp A"
+      NIP: "1234567890"
+      waluta: "PLN"
+      klauzula_IP: true
+      model_komercjalizacji: "przeniesienie_praw"
+    - nazwa: "TechCorp B"
+      NIP: "0987654321"
+      waluta: "PLN"
+      klauzula_IP: false
+      model_komercjalizacji: "usluga"
+
+  miesiace:
+    - miesiac: "2025-01"
+      faktury:
+        - kwota_netto: 20000
+          kontrahent: "TechCorp A"
+      ewidencja:
+        godziny_pracy: 160
+        godziny_nie_IP: 0
+        procent_faktury_IP: 100
+      koszty:
+        - opis: "Składki ZUS społeczne"
+          kwota: 1418.48
+      opis_projektu: >
+        Rozwój modułu autoryzacji OAuth2 dla TechCorp A.
+
+    - miesiac: "2025-02"
+      faktury:
+        - kwota_netto: 12000
+          kontrahent: "TechCorp A"
+        - kwota_netto: 8000
+          kontrahent: "TechCorp B"
+      ewidencja:
+        godziny_pracy: 160
+        godziny_nie_IP: 0
+        procent_faktury_IP: 100
+      koszty:
+        - opis: "Składki ZUS społeczne"
+          kwota: 1418.48
+      opis_projektu: >
+        Miesiąc 2: Projekt A (z klauzulą) + Projekt B (bez klauzuli).
+
+  ulgi: {}
+
+assertions:
+  # Przychód IP = 20k + 12k = 32k
+  # Przychód NIE = 8k (tylko od B w m2)
+  przychod_IP_roczny_range: [ 30000, 40000 ]
+  przychod_NIE_roczny_range: [ 7000, 9000 ]

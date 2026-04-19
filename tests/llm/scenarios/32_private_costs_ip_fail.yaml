@@ -1,0 +1,13 @@
+meta:
+  id: "32_private_costs_ip_fail"
+  name: "Weryfikacja: Prywatne w IP (FAIL)"
+  tags: ["verification", "fail"]
+input:
+  miesiace:
+    - miesiac: "2025-01"
+      koszty:
+        - opis: "Kawa do domu"
+          kwota: 100
+          koszyk: "IP" # BŁĄD! Powinno być NIE.
+assertions:
+  testy_fail: ["TEST_2"]

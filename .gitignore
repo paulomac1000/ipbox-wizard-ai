@@ -1,0 +1,40 @@
+# ==============================================================================
+# IP Box Wizard AI - Git Ignore Configuration
+# ==============================================================================
+
+# --- Secrets and Environment ---
+.env
+.env.*
+!.env.example
+
+# --- Project Specific Data ---
+input/
+reports/
+tmp/
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+.ipynb_checkpoints
+*.so
+
+# --- Testing & Coverage ---
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+tests/llm/expected/
+.cache/
+
+# --- IDEs & Editors ---
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# --- System ---
+.DS_Store
+Thumbs.db
+desktop.ini

@@ -1,0 +1,72 @@
+meta:
+  id: "43_review_09_single_client_100pct"
+  name: "REVIEW_09: jeden kontrahent = 100% przychodów przez cały rok"
+  description: >
+    REVIEW_09: Ryzyko "ukrytego etatu" — jeden kontrahent przez cały rok.
+    Algorytm powinien emitować ostrzeżenie.
+  tags: [ "review", "single-client", "risk" ]
+  priority: "P1"
+  expected_reviews: [ "REVIEW_09" ]
+
+input:
+  rok: 2025
+  forma_opodatkowania: "liniowy_19%"
+  zus:
+    sposob: "w_KPiR"
+    spoleczne_miesiecznie: 1418.48
+
+  kontrahenci:
+    - nazwa: "TechCorp Sp. z o.o."
+      NIP: "1234567890"
+      waluta: "PLN"
+      klauzula_IP: true
+      model_komercjalizacji: "przeniesienie_praw"
+
+  miesiace:
+    - miesiac: "2025-01"
+      faktury:
+        - kwota_netto: 20000
+          kontrahent: "TechCorp Sp. z o.o."
+      ewidencja:
+        godziny_pracy: 160
+        godziny_nie_IP: 0
+        procent_faktury_IP: 100
+      koszty:
+        - opis: "Składki ZUS społeczne"
+          kwota: 1418.48
+      opis_projektu: >
+        Rozwój modułu autoryzacji OAuth2.
+
+    - miesiac: "2025-02"
+      faktury:
+        - kwota_netto: 20000
+          kontrahent: "TechCorp Sp. z o.o."
+      ewidencja:
+        godziny_pracy: 160
+        godziny_nie_IP: 0
+        procent_faktury_IP: 100
+      koszty:
+        - opis: "Składki ZUS społeczne"
+          kwota: 1418.48
+      opis_projektu: >
+        Kontynuacja rozwoju modułu autoryzacji.
+
+    - miesiac: "2025-03"
+      faktury:
+        - kwota_netto: 20000
+          kontrahent: "TechCorp Sp. z o.o."
+      ewidencja:
+        godziny_pracy: 160
+        godziny_nie_IP: 0
+        procent_faktury_IP: 100
+      koszty:
+        - opis: "Składki ZUS społeczne"
+          kwota: 1418.48
+      opis_projektu: >
+        Zakończenie modułu autoryzacji.
+
+  ulgi: {}
+
+assertions:
+  # 100% przychodów od jednego kontrahenta = REVIEW_09
+  przychod_IP_roczny_range: [ 55000, 70000 ]

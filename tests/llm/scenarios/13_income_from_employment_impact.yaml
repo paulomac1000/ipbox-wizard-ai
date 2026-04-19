@@ -1,0 +1,12 @@
+meta:
+  id: "13_income_from_employment_impact"
+  name: "Logika: Dochody z UoP"
+  description: "Weryfikacja progu 120k przy dochodach mieszanych"
+  tags: ["core", "scale"]
+input:
+  rok: 2025
+  forma_opodatkowania: "skala"
+  dochody_dodatkowe_skala: 100000
+  miesiace:
+    - miesiac: "2025-01"
+      przychody: 50000

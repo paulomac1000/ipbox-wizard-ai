@@ -1,0 +1,16 @@
+meta:
+  id: "14_lump_sum_ineligible_check"
+  name: "Logika: Ryczałt (STOP)"
+  description: "Weryfikacja czy algorytm zatrzyma się przy formie podst. Ryczałt"
+  tags: ["core", "ryczalt", "stop"]
+  priority: "P1"
+
+input:
+  rok: 2025
+  forma_opodatkowania: "ryczalt"
+  zus:
+    sposob: "PIT"
+  miesiace: []
+
+assertions:
+  stops: ["INELIGIBLE_TAX_FORM"]

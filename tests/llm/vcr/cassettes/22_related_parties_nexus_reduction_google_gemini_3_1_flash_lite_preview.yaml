@@ -1,0 +1,42 @@
+meta:
+  scenario_id: 22_related_parties_nexus_reduction
+  scenario_name: 'Brzegowy: Powiązania (Nexus < 1.0)'
+  provider: google
+  model: gemini-3.1-flash-lite-preview
+  fingerprint: v1_44b432297994daf4_1a4c9b20d39f3707_google_993fbcd8
+  recorded_at: '2026-04-19T19:13:45.342628+00:00'
+  recording_duration_seconds: 5.07
+  prompt_tokens_estimate: 11039
+  response_tokens_estimate: 748
+  algorithm_hash: 44b432297994daf4
+  cassette_format_version: 2
+turns:
+- role: user
+  prompt: ''
+  response: "Jako ekspert podatkowy, przystępuję do analizy Twojego przypadku zgodnie z algorytmem IP Box.\n\n### Analiza\
+    \ wstępna (Faza 0-3)\n1. **Kwalifikacja:** Podwykonawca (brat) to podmiot powiązany (koszyk C w NEXUS).\n2. **Koszty:**\
+    \ Wydatek 10 000 zł na podwykonawcę (brat) jest kosztem kwalifikowanym, ale w NEXUS trafia do kategorii **C** (podmioty\
+    \ powiązane), co wpływa na obniżenie wskaźnika NEXUS.\n3. **ZUS:** Zadeklarowano ZUS w KPiR, więc jest on kosztem MIX\
+    \ (alokowanym przez W).\n4. **Współczynnik W:** Przy 160h pracy i 0h nie-IP, W = 100%.\n\n---\n\n### <monthly_W>\n| Miesiąc\
+    \ | Godziny pracy | Godziny nie-IP | W (%) |\n| :--- | :--- | :--- | :--- |\n| 2025-01 | 160 | 0 | 100,00 |\n\n---\n\n\
+    ### <classifications>\n*   **Podwykonawca (brat):** 10 000 zł -> **IP** (ale w NEXUS jako kategoria C)\n\n---\n\n### <tests>\n\
+    *   **TEST 1 (Bilans KPiR):** PASS (Przychód 20k, Koszt 10k)\n*   **TEST 2 (Koszty prywatne):** PASS\n*   **TEST 3 (Anty-dubel\
+    \ ZUS):** PASS (ZUS w KPiR, brak odliczenia w PIT)\n*   **TEST 4 (Kaskada):** PASS\n*   **TEST 5 (Podatek IP):** PASS\n\
+    *   **TEST 6 (Nadpłata):** PASS\n\n---\n\n### <stops_reviews>\n*   **stops:** []\n*   **reviews:** [REVIEW_11: Praca z\
+    \ podmiotem powiązanym (brat) wymaga udokumentowania rynkowości cen (dokumentacja cen transferowych). REVIEW_04: Podwykonawca\
+    \ powiązany wpływa na NEXUS.]\n\n---\n\n### <result>\n```yaml\nrok: 2025\nforma_opodatkowania: \"liniowy 19%\"\nmetoda_rachunkowości:\
+    \ \"memoriał\"\nzus:\n  sposób_ujęcia: \"w_KPiR\"\n  kwota_społeczne: 0.00\n  kwota_zdrowotne: 0.00\nprzychody_roczne:\n\
+    \  IP: 20000.00\n  NIE: 0.00\n  KPiR_total: 20000.00\nkoszty_roczne:\n  IP: 10000.00\n  NIE: 0.00\n  WYKLUCZONE: 0.00\n\
+    nexus:\n  A: 0.00\n  B: 0.00\n  C: 10000.00\n  D: 0.00\n  wartość: 0.00 # NEXUS = (0*1.3 + 0) / (0 + 0 + 10000 + 0) =\
+    \ 0\nkaskada_odliczeń:\n  straty_poprzednie: 0.00\n  ZUS_odliczenie: 0.00\n  IKZE: 0.00\n  darowizny: 0.00\n  ulga_internet:\
+    \ 0.00\n  ulga_rehabilitacyjna: 0.00\n  ulga_BR: 0.00\n  termomodernizacja_wykorzystano: 0.00\n  termomodernizacja_carry_over:\
+    \ 0.00\npodatek:\n  podstawa_NIE_zaokr: 10000\n  podatek_NIE_przed_ulgami: 1900\n  ulga_prorodzinna: 0.00\n  podatek_NIE_finalny:\
+    \ 1900\n  podstawa_IP_zaokr: 0\n  podatek_IP: 0\n  podatek_łączny: 1900\nzaliczki:\n  typ: \"miesięczne\"\n  suma: 0\n\
+    \  rozbicie: [0,0,0,0,0,0,0,0,0,0,0,0]\nwynik:\n  nadpłata_lub_dopłata: -1900 # dopłata\ntesty:\n  test_1_bilans: \"PASS\"\
+    \n  test_2_koszty_prywatne: \"PASS\"\n  test_3_anty_dubel_ZUS: \"PASS\"\n  test_4_kaskada: \"PASS\"\n  test_5_podatek_IP:\
+    \ \"PASS\"\n  test_6_nadpłata: \"PASS\"\nreview_do_weryfikacji: [\"REVIEW_11\", \"REVIEW_04\"]\n```\n\n**Ważna uwaga ekspercka:**\
+    \ Twój wskaźnik NEXUS wynosi **0**, ponieważ wszystkie koszty B+R poniosłeś u podmiotu powiązanego (brat). Zgodnie z art.\
+    \ 30ca ust. 4 ustawy o PIT, koszty podmiotów powiązanych nie zwiększają licznika NEXUS. W efekcie dochód z IP Box wynosi\
+    \ 0 zł, a całość dochodu opodatkowana jest stawką 19%. Aby ulga zadziałała, musisz ponosić koszty bezpośrednie (A) lub\
+    \ u podmiotów niepowiązanych (B). Czy chcesz, abym wygenerował ewidencję XLSX dla tego rozliczenia?"
+  prompt_hash: 8e77ecd4ea2ccf9c

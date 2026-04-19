@@ -1,0 +1,32 @@
+meta:
+  id: "03_fx_usd_single_client"
+  name: "Walutowy: liniowy 19%, USD"
+  description: "Weryfikacja kursów NBP i różnic kursowych"
+  tags: ["smoke", "liniowy", "FX", "USD"]
+  priority: "P0"
+
+input:
+  rok: 2025
+  forma_opodatkowania: "liniowy_19%"
+  zus:
+    sposob: "w_KPiR"
+  kontrahenci:
+    - nazwa: "US_Client"
+      waluta: "USD"
+      klauzula_IP: true
+  miesiace:
+    - miesiac: "2025-01"
+      przychody: 5000 # 5000 USD
+      faktury:
+        - numer: "FV/2025/01"
+          kwota_waluta: 5000
+          waluta: "USD"
+          data_wystawienia: "2025-01-14"
+          data_wplywu: "2025-01-20"
+      godziny_pracy: 160
+      godziny_nie_IP: 0
+  ulgi: {}
+
+assertions:
+  roznice_kursowe_w_IP: false
+  testy_pass: ["TEST_1", "TEST_2", "TEST_3", "TEST_4", "TEST_5", "TEST_6"]

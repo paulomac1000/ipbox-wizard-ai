@@ -1,0 +1,93 @@
+meta:
+  scenario_id: 32_private_costs_ip_fail
+  scenario_name: 'Weryfikacja: Prywatne w IP (FAIL)'
+  provider: google
+  model: gemini-3.1-flash-lite-preview
+  fingerprint: v1_44b432297994daf4_c6f8688155417c7e_google_993fbcd8
+  recorded_at: '2026-04-19T19:14:33.614475+00:00'
+  recording_duration_seconds: 3.93
+  prompt_tokens_estimate: 11003
+  response_tokens_estimate: 543
+  algorithm_hash: 44b432297994daf4
+  cassette_format_version: 2
+turns:
+- role: user
+  prompt: ''
+  response: "Dzień dobry. Przystępuję do analizy Twoich danych zgodnie z algorytmem IP Box.\n\n### FAZA 0–3: Weryfikacja i\
+    \ Klasyfikacja\nZidentyfikowałem błąd w Twoich danych wejściowych:\n*   **Pozycja:** \"Kawa do domu\" (100 zł) zaklasyfikowana\
+    \ jako `IP`.\n*   **Korekta:** Zgodnie z Fazą 3.6, artykuły spożywcze (kawa) są kosztem prywatnym, czyli koszykiem **NIE**\
+    \ (a w przypadku \"kawy do domu\" – wręcz **WYKLUCZONE** jako koszt uzyskania przychodu).\n\n### FAZA 6: STOP / REVIEW\n\
+    *   **STOP_03:** Brak opisu projektu dla stycznia 2025.\n*   **REVIEW_10:** Koszt \"kawy\" (nawet jeśli byłby kosztem)\
+    \ jest kosztem prywatnym.\n\n---\n\n<result>\nrok: 2025\nforma_opodatkowania: \"liniowy 19%\"\nmetoda_rachunkowości: \"\
+    memoriał\"\nzus:\n  sposób_ujęcia: \"w_KPiR\"\n  kwota_społeczne: 0.00\n  kwota_zdrowotne: 0.00\nprzychody_roczne:\n \
+    \ IP: 0.00\n  NIE: 0.00\n  KPiR_total: 0.00\nkoszty_roczne:\n  IP: 0.00\n  NIE: 0.00\n  WYKLUCZONE: 100.00\nnexus:\n \
+    \ A: 0.00\n  B: 0.00\n  C: 0.00\n  D: 0.00\n  wartość: 0.00\npodatek:\n  podstawa_NIE_zaokr: 0\n  podatek_NIE_przed_ulgami:\
+    \ 0\n  podatek_IP: 0\n  podatek_łączny: 0\nwynik:\n  nadpłata_lub_dopłata: 0\ntesty:\n  test_1_bilans: \"PASS\"\n  test_2_koszty_prywatne:\
+    \ \"FAIL\"\n  test_3_anty_dubel_ZUS: \"PASS\"\n  test_4_kaskada: \"PASS\"\n  test_5_podatek_IP: \"PASS\"\n  test_6_nadpłata:\
+    \ \"PASS\"\nreview_do_weryfikacji: [\"REVIEW_10: Koszt prywatny w KPiR\"]\n</result>\n\n<classifications>\n- Kawa do domu:\
+    \ WYKLUCZONE (koszt prywatny, nie stanowi kosztu uzyskania przychodu)\n</classifications>\n\n<monthly_W>\n- 2025-01: 0.00\
+    \ (Brak danych o godzinach pracy i B+R)\n</monthly_W>\n\n<tests>\nTEST_1: PASS\nTEST_2: FAIL (Wykryto koszt prywatny w\
+    \ KPiR)\nTEST_3: PASS\nTEST_4: PASS\nTEST_5: PASS\nTEST_6: PASS\n</tests>\n\n<stops_reviews>\nstops: [\"STOP_03: Brak\
+    \ opisu projektu\", \"STOP_04: Brak godzin B+R\"]\nreviews: [\"REVIEW_10: Koszt prywatny (kawa) zaklasyfikowany jako IP\"\
+    ]\n</stops_reviews>\n\n---\n**Dalsze kroki:**\n1. Usuń wydatek na kawę z KPiR (nie jest to koszt uzyskania przychodu).\n\
+    2. Uzupełnij ewidencję czasu pracy (godziny B+R vs godziny ogółem).\n3. Dodaj opis projektu dla stycznia 2025 (co konkretnie\
+    \ zostało stworzone/zoptymalizowane).\n\nCzy posiadasz interpretację indywidualną KIS, czy kontynuujemy na zasadach ogólnych?"
+  prompt_hash: 077f38134d3ddd56
+parsed:
+  result_yaml:
+    rok: 2025
+    forma_opodatkowania: liniowy 19%
+    metoda_rachunkowości: memoriał
+    zus:
+      sposób_ujęcia: w_KPiR
+      kwota_społeczne: 0.0
+      kwota_zdrowotne: 0.0
+    przychody_roczne:
+      IP: 0.0
+      NIE: 0.0
+      KPiR_total: 0.0
+    koszty_roczne:
+      IP: 0.0
+      NIE: 0.0
+      WYKLUCZONE: 100.0
+    nexus:
+      A: 0.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      wartość: 0.0
+    podatek:
+      podstawa_NIE_zaokr: 0
+      podatek_NIE_przed_ulgami: 0
+      podatek_IP: 0
+      podatek_łączny: 0
+    wynik:
+      nadpłata_lub_dopłata: 0
+    testy:
+      test_1_bilans: PASS
+      test_2_koszty_prywatne: FAIL
+      test_3_anty_dubel_ZUS: PASS
+      test_4_kaskada: PASS
+      test_5_podatek_IP: PASS
+      test_6_nadpłata: PASS
+    review_do_weryfikacji:
+    - 'REVIEW_10: Koszt prywatny w KPiR'
+  classifications: '- Kawa do domu: WYKLUCZONE (koszt prywatny, nie stanowi kosztu uzyskania przychodu)'
+  monthly_W: '- 2025-01: 0.00 (Brak danych o godzinach pracy i B+R)'
+  tests: 'TEST_1: PASS
+
+    TEST_2: FAIL (Wykryto koszt prywatny w KPiR)
+
+    TEST_3: PASS
+
+    TEST_4: PASS
+
+    TEST_5: PASS
+
+    TEST_6: PASS'
+  stops_reviews:
+    stops:
+    - 'STOP_03: Brak opisu projektu'
+    - 'STOP_04: Brak godzin B+R'
+    reviews:
+    - 'REVIEW_10: Koszt prywatny (kawa) zaklasyfikowany jako IP'

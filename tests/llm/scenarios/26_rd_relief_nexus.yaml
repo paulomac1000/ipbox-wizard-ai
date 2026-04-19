@@ -1,0 +1,31 @@
+meta:
+  id: 26_rd_relief_nexus
+  name: 'Brzegowy: Ulga B+R a IP Box'
+  description: 'Weryfikacja blokady double-dipping: ulga B+R nie może łączyć się z
+    IP Box dla tych samych kosztów'
+  tags:
+  - edge
+  - relief
+  - BR
+  priority: P1
+input:
+  rok: 2025
+  forma_opodatkowania: liniowy_19%
+  zus:
+    sposob: w_KPiR
+  miesiace:
+  - miesiac: 2025-01
+    faktury:
+    - kwota_netto: 20000
+      kontrahent: TestCorp
+    ewidencja:
+      godziny_pracy: 160
+      godziny_nie_IP: 16
+      procent_faktury_IP: 100
+    koszty:
+    - opis: Abonament internet
+      kwota: 89
+  ulgi:
+    ulga_BR: 10000
+assertions:
+  nexus: 1.0

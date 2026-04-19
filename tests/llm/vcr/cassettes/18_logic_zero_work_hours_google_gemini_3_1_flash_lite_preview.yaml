@@ -1,0 +1,126 @@
+meta:
+  scenario_id: 18_logic_zero_work_hours
+  scenario_name: 'Logika: Miesiąc z zerową liczbą godzin pracy'
+  provider: google
+  model: gemini-3.1-flash-lite-preview
+  fingerprint: v1_44b432297994daf4_ffd3a5dbff0ca978_google_993fbcd8
+  recorded_at: '2026-04-19T19:13:36.115487+00:00'
+  recording_duration_seconds: 4.35
+  prompt_tokens_estimate: 11053
+  response_tokens_estimate: 690
+  algorithm_hash: 44b432297994daf4
+  cassette_format_version: 2
+turns:
+- role: user
+  prompt: ''
+  response: "Dzień dobry. Jako ekspert podatkowy przystępuję do analizy Twojego rozliczenia IP Box w trybie BATCH.\n\n###\
+    \ FAZA 0–1: KWALIFIKACJA I ZBIERANIE DANYCH\n*   **Forma opodatkowania:** Liniowy 19% (PIT-36L) – **OK**.\n*   **ZUS:**\
+    \ W KPiR jako koszt – **OK**.\n*   **Dane:** Przetworzono styczeń 2025. Brak interpretacji KIS – **Ostrzeżenie: Rozliczenie\
+    \ na ryzyko własne.**\n*   **Klasyfikacja kosztów:**\n    *   Abonament internet (89 zł) -> **MIX** (koszt wspólny).\n\
+    \n### FAZA 2–4: OBLICZENIA (STYCZEŃ 2025)\n*   **Współczynnik W:** `(0h - 0h) / 0h` -> W tym miesiącu brak godzin pracy\
+    \ (0h).\n    *   *Uwaga:* Zgodnie z algorytmem, jeśli `godziny_pracy = 0`, miesiąc nie kwalifikuje się do IP Box (STOP_04).\n\
+    *   **Przychody:** 20 000 zł (całość do przychodu NIE).\n*   **Koszty:** 89 zł (całość do kosztu NIE).\n\n### FAZA 6:\
+    \ STOP / REVIEW\n*   **STOP_04:** Brak godzin pracy w ewidencji (0h). Miesiąc wykluczony z IP Box.\n\n---\n\n<result>\n\
+    rok: 2025\nforma_opodatkowania: \"liniowy 19%\"\nmetoda_rachunkowości: \"memoriał\"\nzus:\n  sposób_ujęcia: \"w_KPiR\"\
+    \n  kwota_społeczne: 0.00\n  kwota_zdrowotne: 0.00\nprzychody_roczne:\n  IP: 0.00\n  NIE: 20000.00\n  KPiR_total: 20000.00\n\
+    koszty_roczne:\n  IP: 0.00\n  NIE: 89.00\n  WYKLUCZONE: 0.00\nnexus:\n  A: 0.00\n  B: 0.00\n  C: 0.00\n  D: 0.00\n  wartość:\
+    \ 1.00\nkaskada_odliczeń:\n  straty_poprzednie: 0.00\n  ZUS_odliczenie: 0.00\n  IKZE: 0.00\n  darowizny: 0.00\n  ulga_internet:\
+    \ 0.00\n  ulga_rehabilitacyjna: 0.00\n  ulga_BR: 0.00\n  termomodernizacja_wykorzystano: 0.00\n  termomodernizacja_carry_over:\
+    \ 0.00\npodatek:\n  podstawa_NIE_zaokr: 19911\n  podatek_NIE_przed_ulgami: 3783\n  ulga_prorodzinna: 0.00\n  podatek_NIE_finalny:\
+    \ 3783\n  podstawa_IP_zaokr: 0\n  podatek_IP: 0\n  podatek_łączny: 3783\nzaliczki:\n  typ: \"miesięczne\"\n  suma: 0\n\
+    \  rozbicie: [0,0,0,0,0,0,0,0,0,0,0,0]\nwynik:\n  nadpłata_lub_dopłata: -3783\ntesty:\n  test_1_bilans: \"PASS\"\n  test_2_koszty_prywatne:\
+    \ \"PASS\"\n  test_3_anty_dubel_ZUS: \"PASS\"\n  test_4_kaskada: \"PASS\"\n  test_5_podatek_IP: \"PASS\"\n  test_6_nadpłata:\
+    \ \"PASS\"\nreview_do_weryfikacji: [\"REVIEW_09: Jeden kontrahent = 100% przychodów\"]\n</result>\n\n<classifications>\n\
+    - Abonament internet: MIX\n</classifications>\n\n<monthly_W>\n- 2025-01: 0.00 (Brak godzin pracy)\n</monthly_W>\n\n<tests>\n\
+    TEST_1: PASS\nTEST_2: PASS\nTEST_3: PASS\nTEST_4: PASS\nTEST_5: PASS\nTEST_6: PASS\n</tests>\n\n<stops_reviews>\nstops:\
+    \ [\"STOP_04: Brak godzin pracy w ewidencji (W=0)\"]\nreviews: [\"REVIEW_09: Jeden kontrahent = 100% przychodów\"]\n</stops_reviews>\n\
+    \n**Podsumowanie:**\nTwój styczeń 2025 nie kwalifikuje się do ulgi IP Box z powodu braku wykazanych godzin pracy (W=0).\
+    \ Cały dochód z tego miesiąca podlega opodatkowaniu stawką 19%. Jeśli pracowałeś w tym miesiącu, uzupełnij ewidencję czasu\
+    \ pracy, aby przeliczyć wynik. Czy chcesz, abym wygenerował szablon ewidencji w Excelu?"
+  prompt_hash: 0104f55d457b1daa
+parsed:
+  result_yaml:
+    rok: 2025
+    forma_opodatkowania: liniowy 19%
+    metoda_rachunkowości: memoriał
+    zus:
+      sposób_ujęcia: w_KPiR
+      kwota_społeczne: 0.0
+      kwota_zdrowotne: 0.0
+    przychody_roczne:
+      IP: 0.0
+      NIE: 20000.0
+      KPiR_total: 20000.0
+    koszty_roczne:
+      IP: 0.0
+      NIE: 89.0
+      WYKLUCZONE: 0.0
+    nexus:
+      A: 0.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      wartość: 1.0
+    kaskada_odliczeń:
+      straty_poprzednie: 0.0
+      ZUS_odliczenie: 0.0
+      IKZE: 0.0
+      darowizny: 0.0
+      ulga_internet: 0.0
+      ulga_rehabilitacyjna: 0.0
+      ulga_BR: 0.0
+      termomodernizacja_wykorzystano: 0.0
+      termomodernizacja_carry_over: 0.0
+    podatek:
+      podstawa_NIE_zaokr: 19911
+      podatek_NIE_przed_ulgami: 3783
+      ulga_prorodzinna: 0.0
+      podatek_NIE_finalny: 3783
+      podstawa_IP_zaokr: 0
+      podatek_IP: 0
+      podatek_łączny: 3783
+    zaliczki:
+      typ: miesięczne
+      suma: 0
+      rozbicie:
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+    wynik:
+      nadpłata_lub_dopłata: -3783
+    testy:
+      test_1_bilans: PASS
+      test_2_koszty_prywatne: PASS
+      test_3_anty_dubel_ZUS: PASS
+      test_4_kaskada: PASS
+      test_5_podatek_IP: PASS
+      test_6_nadpłata: PASS
+    review_do_weryfikacji:
+    - 'REVIEW_09: Jeden kontrahent = 100% przychodów'
+  classifications: '- Abonament internet: MIX'
+  monthly_W: '- 2025-01: 0.00 (Brak godzin pracy)'
+  tests: 'TEST_1: PASS
+
+    TEST_2: PASS
+
+    TEST_3: PASS
+
+    TEST_4: PASS
+
+    TEST_5: PASS
+
+    TEST_6: PASS'
+  stops_reviews:
+    stops:
+    - 'STOP_04: Brak godzin pracy w ewidencji (W=0)'
+    reviews:
+    - 'REVIEW_09: Jeden kontrahent = 100% przychodów'

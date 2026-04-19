@@ -1,0 +1,104 @@
+# Przykładowy output YAML — rok 2025, programista B2B liniowy 19%
+# (dane anonimizowane; wartości do przykładu)
+
+rok: 2025
+forma_opodatkowania: "liniowy_19%"
+metoda_rachunkowości: "memoriał"
+
+zus:
+  sposób_ujęcia: "w_KPiR"           # <— deklaracja użytkownika, krytyczne dla TEST 3
+  kwota_społeczne: 15000.00
+  kwota_zdrowotne: 11600.00          # limit 2024; sprawdź aktualny
+
+kontrahenci:
+  - nazwa: "Klient Software House Sp. z o.o."
+    NIP: "0000000000"
+    umowa_klauzula_IP: true
+    model_komercjalizacji: "przeniesienie_praw"
+
+interpretacja_KIS:
+  posiada: true
+  sygnatura: "0115-KDIT3.4011.XXX.2024.2.MK"
+  potwierdza_IP_Box: true
+
+przychody_roczne:
+  IP: 181687.42
+  NIE: 5832.10
+  KPiR_total: 187519.52
+  roznice_kursowe_netto: 0
+
+koszty_roczne:
+  IP: 13096.34
+  NIE: 3210.85
+  WYKLUCZONE: 0.00                   # kary, ST >10k, etc.
+
+nexus:
+  A: 13096.34                        # własna działalność (bez pytania o B/C/D, bo brak)
+  B: 0
+  C: 0
+  D: 0
+  wartość: 1.0000
+
+dochody_roczne:
+  IP_przed_nexus: 168591.08
+  IP_po_nexus: 168591.08
+  NIE: 2621.25
+
+kaskada_odliczeń:
+  straty_poprzednie: 0.00
+  ZUS_odliczenie: 0.00               # 0 bo ZUS w KPiR
+  IKZE: 9388.80
+  darowizny: 0.00
+  ulga_internet: 760.00
+  ulga_rehabilitacyjna: 0.00
+  ulga_BR: 0.00
+  termomodernizacja_wykorzystano: 2621.25   # <- tylko tyle, ile się zmieściło
+  termomodernizacja_pula_poczatkowa: 23481.53
+  termomodernizacja_carry_over_na_2026: 20860.28   # <- reszta przechodzi
+  
+  # Uwaga: tutaj IKZE + internet + pierwsze kroki zdominowały dochód NIE;
+  # gdyby użytkownik odliczył termo najpierw, straciłby IKZE bezpowrotnie.
+
+podatek:
+  podstawa_NIE_zaokr: 0              # po kaskadzie = 0 (wyzerowane)
+  podatek_NIE_przed_ulgami: 0
+  ulga_prorodzinna_uzyta: 0
+  podatek_NIE_finalny: 0
+  podstawa_IP_zaokr: 168591
+  podatek_IP_5_procent: 8430
+  podatek_łączny: 8430
+
+zaliczki:
+  typ: "miesięczne"
+  suma: 35964
+  rozbicie:
+    - {miesiąc: "2025-01", kwota: 2997}
+    - {miesiąc: "2025-02", kwota: 2997}
+    - {miesiąc: "2025-03", kwota: 2997}
+    - {miesiąc: "2025-04", kwota: 2997}
+    - {miesiąc: "2025-05", kwota: 2997}
+    - {miesiąc: "2025-06", kwota: 2997}
+    - {miesiąc: "2025-07", kwota: 2997}
+    - {miesiąc: "2025-08", kwota: 2997}
+    - {miesiąc: "2025-09", kwota: 2997}
+    - {miesiąc: "2025-10", kwota: 2997}
+    - {miesiąc: "2025-11", kwota: 2997}
+    - {miesiąc: "2025-12", kwota: 2997}
+
+wynik:
+  nadpłata_lub_dopłata: 27534         # + = nadpłata (do zwrotu)
+  typ: "nadpłata"
+
+testy:
+  test_1_bilans_KPiR: "PASS"
+  test_2_koszty_prywatne: "PASS"     # żadnych kosztów prywatnych w IP Box
+  test_3_anty_dubel_ZUS: "PASS"      # ZUS w KPiR i odliczenie = 0
+  test_4_kaskada: "PASS"             # kolejność + max(0, ...) + carry-over >= 0
+  test_5_podatek_IP: "PASS"          # round(168591 * 0.05) = 8430
+  test_6_nadpłata: "PASS"            # 35964 - 8430 = 27534
+
+review_do_weryfikacji:
+  - REVIEW_09: "Jeden kontrahent = 100% przychodów IP. Udokumentuj autonomię."
+
+# Wartości przykładowe. Dla Twojego rozliczenia kwoty będą inne.
+# Jeśli Twój output znacząco różni się od tej struktury — zgłoś jako issue.
