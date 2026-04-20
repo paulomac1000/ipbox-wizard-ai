@@ -68,19 +68,20 @@
 
 **Rekomendowane modele** (testowane, stan 04/2026):
 
-| Model | Code Interpreter | Rekomendacja |
+| Model | Uruchamianie kodu | Rekomendacja |
 |---|---|---|
 | Claude Opus 4.7 (Claude.ai Pro) | ✅ | ⭐⭐⭐ najlepszy do długich sesji wizard, Projects z plikami |
-| GPT-5 / GPT-4o (ChatGPT Plus) | ✅ | ⭐⭐⭐ Custom GPT + Code Interpreter, świetna arytmetyka |
-| Gemini 3.1 Pro (Google AI Studio / Advanced) | ✅ | ⭐⭐ Gems, dobra obsługa plików |
-| Claude Sonnet / GPT-5-mini (darmowe) | ⚠️ ograniczone | ⭐ zadziała, ale pilnuj arytmetyki |
-| Lokalne LLM (Llama 3.x, Qwen) | ❌ zwykle | ⭐ tylko jeśli wymuszasz Python zewnętrznie |
+| GPT-5.4 (ChatGPT Plus) | ✅ | ⭐⭐⭐ Custom GPT + Advanced Data Analysis, świetna arytmetyka |
+| Gemini 3.1 Pro (Google AI Studio / Google AI Pro) | ✅ | ⭐⭐ Gems, dobra obsługa plików |
+| Claude Sonnet 4.6 / GPT-5.3 (darmowe) | ⚠️ ograniczone | ⭐ zadziała, ale pilnuj arytmetyki |
+| Claude Haiku / GPT-5.4 mini (fallback) / Gemini 3.1 Flash | ❌ | ⭐ może zadziałać, ale nie polecam |
+| Lokalne LLM (Llama 4, Qwen 3.6, Mistral Large) | ❌ zwykle | ⭐ tylko jeśli wymuszasz Python zewnętrznie |
 
-### Ścieżka B: Z użyciem Code Interpreter (rekomendowana dla precyzji)
+### Ścieżka B: Z uruchamianiem kodu (rekomendowana dla precyzji)
 
 Zamiast polegać na "matematyce w głowie" LLM, wymuszasz wykonywanie obliczeń w Pythonie:
 
-1. Użyj Claude Opus 4.7 z Code Execution (dostępne w Claude.ai) albo Custom GPT z Code Interpreter.
+1. Użyj Claude Opus 4.7 z Code Execution (dostępne w Claude.ai) albo Custom GPT z Advanced Data Analysis / Code Interpreter.
 2. Załaduj dodatkowo plik [**`python_helper/ipbox_calculator.py`**](python_helper/ipbox_calculator.py) — zawiera gotowe funkcje do obliczeń W, NEXUS, kaskady podatkowej i weryfikacji.
 3. W system prompcie dodaj linijkę: *"Przed każdym obliczeniem uruchom odpowiednią funkcję z `ipbox_calculator.py` — nie licz w głowie."*
 4. Dalej jak w ścieżce A.
@@ -103,19 +104,19 @@ Wtedy Claude automatycznie uruchomi skill kiedy wspomnisz o rozliczaniu IP Box.
 
 **Tak, zadziała — ale z ostrożnością.** Algorytm został zaprojektowany tak, żeby działał w obu trybach:
 
-- **Z Code Interpreter:** pełna dokładność matematyczna, tabele Pandas, testy jako assertions.
-- **Bez Code Interpreter (tylko tekst):** agent wymuszony jest pokazywać formułę + podstawienie + wynik krok po kroku. Sumy 12 miesięcy robimy iteracyjnie z sumą częściową po każdym miesiącu.
+- **Z uruchamianiem kodu (Code Execution / Advanced Data Analysis):** pełna dokładność matematyczna, tabele Pandas, testy jako assertions.
+- **Bez uruchamiania kodu (tylko tekst):** agent wymuszony jest pokazywać formułę + podstawienie + wynik krok po kroku. Sumy 12 miesięcy robimy iteracyjnie z sumą częściową po każdym miesiącu.
 
-Kiedy rekomenduję Code Interpreter, a kiedy tekst wystarczy:
+Kiedy rekomenduję uruchamianie kodu, a kiedy tekst wystarczy:
 
 | Sytuacja | Rekomendacja |
 |---|---|
 | 1 kontrahent, faktury PLN, proste koszty, ZUS w KPiR | tekst wystarczy |
-| Faktury walutowe (kursy NBP) | Code Interpreter (API NBP) |
-| Wieloprojektowość, wiele klientów | Code Interpreter (mniej błędów) |
-| Ulga B+R + IP Box jednocześnie | Code Interpreter (zawiła kaskada) |
-| Mieszane zaliczki (część miesięczne, część uproszczone) | Code Interpreter |
-| Wysoki dochód, wysokie stawki | Code Interpreter (każdy błąd bolesny) |
+| Faktury walutowe (kursy NBP) | uruchamianie kodu (API NBP) |
+| Wieloprojektowość, wiele klientów | uruchamianie kodu (mniej błędów) |
+| Ulga B+R + IP Box jednocześnie | uruchamianie kodu (zawiła kaskada) |
+| Mieszane zaliczki (część miesięczne, część uproszczone) | uruchamianie kodu |
+| Wysoki dochód, wysokie stawki | uruchamianie kodu (każdy błąd bolesny) |
 
 ---
 
@@ -126,7 +127,7 @@ ipbox-wizard-ai/
 ├── README.md                          ← jesteś tu
 ├── ipbox_algorytm.md                  ← GŁÓWNY PLIK — wklej do agenta AI
 ├── python_helper/
-│   └── ipbox_calculator.py            ← Kalkulator dla Code Interpreter
+│   └── ipbox_calculator.py            ← Kalkulator Pythonowy (Code Execution / Advanced Data Analysis)
 ├── scripts/                           ← Skrypty (vcr, pre-commit)
 ├── docs/                              ← Dokumentacja techniczna i testowa
 │   └── testing.md                     ← Szczegółowy opis systemu testów
@@ -168,9 +169,7 @@ Algorytm ewoluował poprzez dziesiątki iteracji testowych, uwzględniając najc
 - **Współczynnik W**: Wykorzystanie faktycznego czasu pracy jako dzielnika (brak kary za urlop).
 - **Weryfikacja matematyczna**: Wprowadzenie 6 testów kontrolnych (szanty/balance check).
 
-### 43 Scenariusze Testowe (VCR)
-
-Każda zmiana w algorytmie jest weryfikowana przez system testów LLM. Wykorzystujemy mechanizm **VCR (Virtual Cassette Recorder)**, który nagrywa odpowiedzi modeli Gemini i porównuje je z oczekiwanymi wynikami (NEXUS, podatek, klasyfikacje). Gwarantuje to stabilność algorytmu nawet przy zmianach w modelach AI.
+Każda zmiana w algorytmie jest weryfikowana przez system testów LLM. Wykorzystujemy mechanizm **VCR (Virtual Cassette Recorder)**, który nagrywa odpowiedzi modeli Gemini i porównuje je z oczekiwanymi wynikami (NEXUS, podatek, klasyfikacje). Obecnie posiadamy bazę **34 scenariuszy testowych**, co gwarantuje stabilność algorytmu nawet przy zmianach w modelach AI.
 
 ### Orzecznictwo
 
@@ -249,7 +248,7 @@ Każdy issue = szansa na ulepszenie algorytmu dla całej społeczności. Dzięki
 2. Nie łączy się z ryczałtem ewidencjonowanym.
 3. Podinstrukcja dla rzadkich ulg wymaga wyszukania w sieci — nie wszystko jest w katalogu domyślnym.
 4. Dla bardzo skomplikowanych przypadków (podwykonawcy powiązani, spółki cywilne, zmiana formy w trakcie roku) wymaga weryfikacji z doradcą podatkowym.
-5. Status UD116 (projekt zmian wymagający zatrudnienia 3 osób dla IP Box) — monitoruj stan legislacyjny, algorytm nie śledzi zmian automatycznie.
+5. Status UD116 (projekt zmian wymagający zatrudnienia 3 osób dla IP Box) — projekt **nie wszedł w życie 1 stycznia 2026 r.**, rozliczenie za 2025 r. jest bezpieczne na starych zasadach. Prace legislacyjne trwają (brak ogłoszonej daty wejścia w życie) — zmiany mogą objąć kolejny rok. Monitoruj stan legislacyjny, algorytm nie śledzi zmian automatycznie.
 6. Numery pól formularzy PIT podawane są opisowo (nie `"poz. 40"` na sztywno), bo numery zmieniają się między latami.
 
 ---

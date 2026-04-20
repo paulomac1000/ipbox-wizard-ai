@@ -1,139 +1,139 @@
 entries:
   01_basic_linear:
     file: 01_basic_linear_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_44b432297994daf4_87a24bb22c10fcb2_google_993fbcd8
-    recorded_at: '2026-04-19T19:12:56.513862+00:00'
+    fingerprint: v1_3893459fc7f178da_87a24bb22c10fcb2_google_993fbcd8
+    recorded_at: '2026-04-20T20:40:10.827840+00:00'
   02_basic_scale_single_client:
     file: 02_basic_scale_single_client_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_44b432297994daf4_e5f529d484295bc9_google_993fbcd8
-    recorded_at: '2026-04-19T19:13:00.599742+00:00'
+    fingerprint: v1_3893459fc7f178da_e5f529d484295bc9_google_993fbcd8
+    recorded_at: '2026-04-20T20:40:15.023008+00:00'
   03_fx_usd_single_client:
     file: 03_fx_usd_single_client_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_44b432297994daf4_f079ae7362765116_google_993fbcd8
-    recorded_at: '2026-04-19T19:13:04.634100+00:00'
+    fingerprint: v1_3893459fc7f178da_f079ae7362765116_google_993fbcd8
+    recorded_at: '2026-04-20T20:40:19.531538+00:00'
   11_multi_client_mixed_currencies:
     file: 11_multi_client_mixed_currencies_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_44b432297994daf4_16066a276e59296c_google_993fbcd8
-    recorded_at: '2026-04-19T19:13:09.194664+00:00'
+    fingerprint: v1_3893459fc7f178da_16066a276e59296c_google_993fbcd8
+    recorded_at: '2026-04-20T20:40:23.587075+00:00'
   12_zus_in_pit_path:
     file: 12_zus_in_pit_path_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_44b432297994daf4_5ebfeea019440ed8_google_993fbcd8
-    recorded_at: '2026-04-19T19:13:13.210473+00:00'
+    fingerprint: v1_3893459fc7f178da_5ebfeea019440ed8_google_993fbcd8
+    recorded_at: '2026-04-20T20:40:28.305613+00:00'
   13_income_from_employment_impact:
     file: 13_income_from_employment_impact_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_44b432297994daf4_60539fdafcf7e025_google_993fbcd8
-    recorded_at: '2026-04-19T19:13:17.101848+00:00'
+    fingerprint: v1_3893459fc7f178da_60539fdafcf7e025_google_993fbcd8
+    recorded_at: '2026-04-20T20:40:32.487429+00:00'
   14_lump_sum_ineligible_check:
     file: 14_lump_sum_ineligible_check_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_44b432297994daf4_d0241fd5bed76bcc_google_993fbcd8
-    recorded_at: '2026-04-19T19:13:19.918742+00:00'
+    fingerprint: v1_3893459fc7f178da_d0241fd5bed76bcc_google_993fbcd8
+    recorded_at: '2026-04-20T20:40:35.075962+00:00'
   15_vacation_sick_mix:
     file: 15_vacation_sick_mix_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_44b432297994daf4_4c00640c55ae20eb_google_993fbcd8
-    recorded_at: '2026-04-19T19:13:23.882393+00:00'
+    fingerprint: v1_3893459fc7f178da_4c00640c55ae20eb_google_993fbcd8
+    recorded_at: '2026-04-20T20:40:38.801157+00:00'
   16_high_w_review:
     file: 16_high_w_review_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_44b432297994daf4_5868ecab9223c3e4_google_993fbcd8
-    recorded_at: '2026-04-19T19:13:27.970390+00:00'
+    fingerprint: v1_3893459fc7f178da_5868ecab9223c3e4_google_993fbcd8
+    recorded_at: '2026-04-20T20:40:42.492654+00:00'
   17_low_w_review:
     file: 17_low_w_review_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_44b432297994daf4_0fa3ab369fb863a3_google_993fbcd8
-    recorded_at: '2026-04-19T19:13:31.747629+00:00'
+    fingerprint: v1_3893459fc7f178da_0fa3ab369fb863a3_google_993fbcd8
+    recorded_at: '2026-04-20T20:40:47.259116+00:00'
   18_logic_zero_work_hours:
     file: 18_logic_zero_work_hours_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_44b432297994daf4_ffd3a5dbff0ca978_google_993fbcd8
-    recorded_at: '2026-04-19T19:13:36.127330+00:00'
+    fingerprint: v1_3893459fc7f178da_ffd3a5dbff0ca978_google_993fbcd8
+    recorded_at: '2026-04-20T20:40:50.985342+00:00'
   21_monthly_loss_impact:
     file: 21_monthly_loss_impact_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_44b432297994daf4_23f866d52e53d80e_google_993fbcd8
-    recorded_at: '2026-04-19T19:13:40.255762+00:00'
+    fingerprint: v1_3893459fc7f178da_23f866d52e53d80e_google_993fbcd8
+    recorded_at: '2026-04-20T20:40:54.800982+00:00'
   22_related_parties_nexus_reduction:
     file: 22_related_parties_nexus_reduction_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_44b432297994daf4_1a4c9b20d39f3707_google_993fbcd8
-    recorded_at: '2026-04-19T19:13:45.347155+00:00'
+    fingerprint: v1_3893459fc7f178da_1a4c9b20d39f3707_google_993fbcd8
+    recorded_at: '2026-04-20T20:40:59.237603+00:00'
   23_loss_carry_forward:
     file: 23_loss_carry_forward_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_44b432297994daf4_f4a71a1c5c2557a6_google_993fbcd8
-    recorded_at: '2026-04-19T19:13:49.969342+00:00'
+    fingerprint: v1_3893459fc7f178da_f4a71a1c5c2557a6_google_993fbcd8
+    recorded_at: '2026-04-20T20:41:03.662393+00:00'
   24_donations_relief:
     file: 24_donations_relief_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_44b432297994daf4_fc54b8657f97d211_google_993fbcd8
-    recorded_at: '2026-04-19T19:13:54.361117+00:00'
+    fingerprint: v1_3893459fc7f178da_fc54b8657f97d211_google_993fbcd8
+    recorded_at: '2026-04-20T20:41:07.947883+00:00'
   25_rehab_relief:
     file: 25_rehab_relief_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_44b432297994daf4_8d2bc72ccf92c9cf_google_993fbcd8
-    recorded_at: '2026-04-19T19:13:58.377890+00:00'
+    fingerprint: v1_3893459fc7f178da_8d2bc72ccf92c9cf_google_993fbcd8
+    recorded_at: '2026-04-20T20:41:12.290807+00:00'
   26_rd_relief_nexus:
     file: 26_rd_relief_nexus_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_44b432297994daf4_08c8d76e72149d89_google_993fbcd8
-    recorded_at: '2026-04-19T19:14:02.771064+00:00'
+    fingerprint: v1_3893459fc7f178da_08c8d76e72149d89_google_993fbcd8
+    recorded_at: '2026-04-20T20:41:16.819599+00:00'
   27_termomodernizacja_full:
     file: 27_termomodernizacja_full_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_44b432297994daf4_8c47b7c5211b8036_google_993fbcd8
-    recorded_at: '2026-04-19T19:14:10.138887+00:00'
+    fingerprint: v1_3893459fc7f178da_8c47b7c5211b8036_google_993fbcd8
+    recorded_at: '2026-04-20T20:41:21.358445+00:00'
   28_edge_multiple_carry-overs:
     file: 28_edge_multiple_carry-overs_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_44b432297994daf4_8ff6ce2d4e566e0b_google_993fbcd8
-    recorded_at: '2026-04-19T19:14:15.117640+00:00'
+    fingerprint: v1_3893459fc7f178da_8ff6ce2d4e566e0b_google_993fbcd8
+    recorded_at: '2026-04-20T20:41:25.997809+00:00'
   29_edge_related_parties_nexus_0:
     file: 29_edge_related_parties_nexus_0_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_44b432297994daf4_fcd9003138de7965_google_993fbcd8
-    recorded_at: '2026-04-19T19:14:20.389342+00:00'
+    fingerprint: v1_3893459fc7f178da_fcd9003138de7965_google_993fbcd8
+    recorded_at: '2026-04-20T20:41:30.471865+00:00'
   30_edge_related_parties_nexus_mixed:
     file: 30_edge_related_parties_nexus_mixed_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_44b432297994daf4_ec227b329456f454_google_993fbcd8
-    recorded_at: '2026-04-19T19:14:25.231592+00:00'
+    fingerprint: v1_3893459fc7f178da_ec227b329456f454_google_993fbcd8
+    recorded_at: '2026-04-20T20:41:35.210950+00:00'
   31_zus_double_dip_fail:
     file: 31_zus_double_dip_fail_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_44b432297994daf4_dbc2c5a84bd73664_google_993fbcd8
-    recorded_at: '2026-04-19T19:14:29.668252+00:00'
+    fingerprint: v1_3893459fc7f178da_dbc2c5a84bd73664_google_993fbcd8
+    recorded_at: '2026-04-20T20:41:39.196246+00:00'
   32_private_costs_ip_fail:
     file: 32_private_costs_ip_fail_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_44b432297994daf4_c6f8688155417c7e_google_993fbcd8
-    recorded_at: '2026-04-19T19:14:33.624562+00:00'
+    fingerprint: v1_3893459fc7f178da_c6f8688155417c7e_google_993fbcd8
+    recorded_at: '2026-04-20T20:41:43.193908+00:00'
   33_kpir_balance_fail:
     file: 33_kpir_balance_fail_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_44b432297994daf4_0a5acbd6e237136a_google_993fbcd8
-    recorded_at: '2026-04-19T19:14:37.888983+00:00'
+    fingerprint: v1_3893459fc7f178da_0a5acbd6e237136a_google_993fbcd8
+    recorded_at: '2026-04-20T20:41:47.078231+00:00'
   34_verify_fixed_asset_threshold_fail:
     file: 34_verify_fixed_asset_threshold_fail_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_44b432297994daf4_a315136ccf3e8a5f_google_993fbcd8
-    recorded_at: '2026-04-19T19:14:43.167071+00:00'
+    fingerprint: v1_3893459fc7f178da_a315136ccf3e8a5f_google_993fbcd8
+    recorded_at: '2026-04-20T20:41:51.692086+00:00'
   35_verify_monthly_w_jump_inconsistency:
     file: 35_verify_monthly_w_jump_inconsistency_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_44b432297994daf4_9862390246558a24_google_993fbcd8
-    recorded_at: '2026-04-19T19:14:47.924784+00:00'
+    fingerprint: v1_3893459fc7f178da_9862390246558a24_google_993fbcd8
+    recorded_at: '2026-04-20T20:41:55.617795+00:00'
   36_verify_negative_income_error:
     file: 36_verify_negative_income_error_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_44b432297994daf4_b64a2d1f780eb1ef_google_993fbcd8
-    recorded_at: '2026-04-19T19:14:52.349419+00:00'
+    fingerprint: v1_3893459fc7f178da_b64a2d1f780eb1ef_google_993fbcd8
+    recorded_at: '2026-04-20T20:41:59.792715+00:00'
   37_verify_invalid_tax_form_stop:
     file: 37_verify_invalid_tax_form_stop_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_44b432297994daf4_6ac4d61af1d0d462_google_993fbcd8
-    recorded_at: '2026-04-19T19:14:55.226883+00:00'
+    fingerprint: v1_3893459fc7f178da_6ac4d61af1d0d462_google_993fbcd8
+    recorded_at: '2026-04-20T20:42:02.570293+00:00'
   38_verify_missing_kpir_data:
     file: 38_verify_missing_kpir_data_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_44b432297994daf4_fe6c26e8dd5aea59_google_993fbcd8
-    recorded_at: '2026-04-19T19:14:59.386793+00:00'
+    fingerprint: v1_3893459fc7f178da_fe6c26e8dd5aea59_google_993fbcd8
+    recorded_at: '2026-04-20T20:42:06.754102+00:00'
   39_multi_project_weighted_W:
     file: 39_multi_project_weighted_W_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_44b432297994daf4_73c21ec4ce094cd8_google_993fbcd8
-    recorded_at: '2026-04-19T19:15:03.223873+00:00'
+    fingerprint: v1_3893459fc7f178da_73c21ec4ce094cd8_google_993fbcd8
+    recorded_at: '2026-04-20T20:42:10.926768+00:00'
   40_mixed_ip_clause:
     file: 40_mixed_ip_clause_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_44b432297994daf4_0fe5c9314cdf26b4_google_993fbcd8
-    recorded_at: '2026-04-19T19:15:07.710432+00:00'
+    fingerprint: v1_3893459fc7f178da_0fe5c9314cdf26b4_google_993fbcd8
+    recorded_at: '2026-04-20T20:42:14.987076+00:00'
   41_ikze_cascade:
     file: 41_ikze_cascade_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_44b432297994daf4_e28dbe587108877c_google_993fbcd8
-    recorded_at: '2026-04-19T19:15:11.982416+00:00'
+    fingerprint: v1_3893459fc7f178da_e28dbe587108877c_google_993fbcd8
+    recorded_at: '2026-04-20T20:42:18.908502+00:00'
   42_stop_08_no_documentation:
     file: 42_stop_08_no_documentation_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_44b432297994daf4_a5c0955680a3b89e_google_993fbcd8
-    recorded_at: '2026-04-19T19:15:16.806602+00:00'
+    fingerprint: v1_3893459fc7f178da_a5c0955680a3b89e_google_993fbcd8
+    recorded_at: '2026-04-20T20:42:23.556909+00:00'
   43_review_09_single_client_100pct:
     file: 43_review_09_single_client_100pct_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_44b432297994daf4_ed00c5790c76eb77_google_993fbcd8
-    recorded_at: '2026-04-19T19:15:21.203021+00:00'
-generated_at: '2026-04-19T19:15:21.203036+00:00'
+    fingerprint: v1_3893459fc7f178da_ed00c5790c76eb77_google_993fbcd8
+    recorded_at: '2026-04-20T20:42:28.419440+00:00'
+generated_at: '2026-04-20T20:42:28.419458+00:00'
 manifest_version: 1

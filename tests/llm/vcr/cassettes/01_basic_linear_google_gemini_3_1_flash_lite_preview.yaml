@@ -3,43 +3,41 @@ meta:
   scenario_name: Podstawowy programista B2B — liniowy 19%, 1 klient PLN
   provider: google
   model: gemini-3.1-flash-lite-preview
-  fingerprint: v1_44b432297994daf4_87a24bb22c10fcb2_google_993fbcd8
-  recorded_at: '2026-04-19T19:12:56.497687+00:00'
-  recording_duration_seconds: 4.66
-  prompt_tokens_estimate: 11247
-  response_tokens_estimate: 737
-  algorithm_hash: 44b432297994daf4
+  fingerprint: v1_3893459fc7f178da_87a24bb22c10fcb2_google_993fbcd8
+  recorded_at: '2026-04-20T20:40:10.813944+00:00'
+  recording_duration_seconds: 4.34
+  prompt_tokens_estimate: 11278
+  response_tokens_estimate: 679
+  algorithm_hash: 3893459fc7f178da
   cassette_format_version: 2
 turns:
 - role: user
   prompt: ''
-  response: "Oto analiza Twojego rozliczenia IP Box w trybie BATCH.\n\n### Faza 0-3: Klasyfikacja i obliczenia wstępne\n\n\
-    **Klasyfikacja kosztów (KPiR):**\n*   Składki ZUS społeczne (1418,48 zł): **MIX** (zadeklarowano w KPiR)\n*   Składka\
-    \ zdrowotna (900,00 zł): **MIX** (zadeklarowano w KPiR)\n*   Internet firmowy (89,00 zł): **MIX**\n*   Licencja JetBrains\
-    \ (119,00 zł): **IP** (bezpośrednie)\n*   Księgowość (400,00 zł): **MIX**\n\n**Obliczenie współczynnika W (styczeń 2025):**\n\
-    *   Czas pracy: 168h\n*   Czas nie-IP: 16h\n*   Czas IP: 168h - 16h = 152h\n*   Formuła: $W = (152 / 168) \\times 100$\n\
-    *   Wynik: **90,48%**\n\n---\n\n<result>\nrok: 2025\nforma_opodatkowania: liniowy_19%\nmetoda_rachunkowości: memoriał\n\
-    zus:\n  sposób_ujęcia: w_KPiR\n  kwota_społeczne: 17021.76\n  kwota_zdrowotne: 10800.0\nprzychody_roczne:\n  IP: 271440.0\n\
-    \  NIE: 28560.0\n  KPiR_total: 300000.0\nkoszty_roczne:\n  IP: 1428.0\n  NIE: 3360.0\n  WYKLUCZONE: 0.0\nnexus:\n  A:\
-    \ 1428.0\n  B: 0.0\n  C: 0.0\n  D: 0.0\n  wartość: 1.0\nkaskada_odliczeń:\n  straty_poprzednie: 0.0\n  ZUS_odliczenie:\
-    \ 0.0\n  IKZE: 9388.8\n  darowizny: 0.0\n  ulga_internet: 0.0\n  ulga_rehabilitacyjna: 0.0\n  ulga_BR: 0.0\n  termomodernizacja_wykorzystano:\
-    \ 0.0\n  termomodernizacja_carry_over: 0.0\npodatek:\n  podstawa_NIE_zaokr: 15811\n  podatek_NIE_przed_ulgami: 3004\n\
-    \  ulga_prorodzinna: 0.0\n  podatek_NIE_finalny: 3004\n  podstawa_IP_zaokr: 270012\n  podatek_IP: 13501\n  podatek_łączny:\
-    \ 16505\nzaliczki:\n  typ: miesięczne\n  suma: 36000\n  rozbicie: [3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000,\
-    \ 3000, 3000, 3000]\nwynik:\n  nadpłata_lub_dopłata: 19495\ntesty:\n  test_1_bilans: PASS\n  test_2_koszty_prywatne: PASS\n\
-    \  test_3_anty_dubel_ZUS: PASS\n  test_4_kaskada: PASS\n  test_5_podatek_IP: PASS\n  test_6_nadpłata: PASS\nreview_do_weryfikacji:\
-    \ [REVIEW_09]\n</result>\n\n<classifications>\n- Składki ZUS społeczne: MIX\n- Składka zdrowotna: MIX\n- Internet firmowy:\
-    \ MIX\n- Licencja JetBrains: IP\n- Księgowość: MIX\n</classifications>\n\n<monthly_W>\n- 2025-01: 90.48\n- (Pozostałe\
-    \ miesiące przyjęto analogicznie do stycznia dla celów symulacji rocznej)\n</monthly_W>\n\n<tests>\nTEST_1: PASS\nTEST_2:\
-    \ PASS\nTEST_3: PASS\nTEST_4: PASS\nTEST_5: PASS\nTEST_6: PASS\n</tests>\n\n<stops_reviews>\nstops: []\nreviews: \n  -\
-    \ REVIEW_09: Jeden kontrahent (TechCorp Sp. z o.o.) odpowiada za 100% przychodów. Ryzyko uznania za \"ukryty etat\". Wymagana\
-    \ dokumentacja autonomii twórczej.\n</reviews>\n</stops_reviews>\n\n**Uwagi eksperta:**\n1. **REVIEW_09:** Ponieważ pracujesz\
-    \ dla jednego kontrahenta, upewnij się, że posiadasz protokoły odbioru prac i dowody na to, że nie jesteś w relacji podporządkowania\
-    \ (brak wyznaczonych godzin pracy, brak poleceń służbowych).\n2. **ZUS:** Składki ZUS społeczne i zdrowotne zostały ujęte\
-    \ w kosztach (MIX), co jest poprawne przy liniowym 19%. Nie odliczaj ich ponownie w PIT-36L.\n3. **Nadpłata:** Symulacja\
-    \ wykazuje znaczną nadpłatę (19 495 zł) wynikającą z faktu, że zaliczki były płacone od pełnego dochodu, a po zastosowaniu\
-    \ IP Box podatek drastycznie spada."
-  prompt_hash: a0edbf6b278469b5
+  response: "Dzień dobry. Jako ekspert podatkowy przystępuję do przetwarzania Twoich danych zgodnie z algorytmem IP Box.\n\
+    \n### Faza 0: Kwalifikacja\n*   **Interpretacja:** Posiadasz interpretację (sygnatura 0111-KDIB1-1.4010.XXX.2024.X.XX).\
+    \ Przyjmuję ją jako podstawę.\n*   **Forma:** Liniowy 19% (zgodne z IP Box).\n*   **ZUS:** Zadeklarowano \"w KPiR jako\
+    \ koszt\". Zgodnie z instrukcją, składki te trafiają do koszyka **MIX** (dotyczą całej działalności).\n\n### Faza 1-4:\
+    \ Obliczenia (dla stycznia 2025)\n*   **Współczynnik W:**\n    *   Czas pracy: 168h\n    *   Czas nie-IP: 16h\n    * \
+    \  Czas IP: 168 - 16 = 152h\n    *   Formuła: $W = (152 / 168) \\times 100 = 90,476... \\approx 90,48\\%$\n*   **Klasyfikacja\
+    \ kosztów (styczeń):**\n    *   ZUS społeczne (1418,48) + Zdrowotna (900,00) + Internet (89,00) + Księgowość (400,00)\
+    \ = **2807,48 (MIX)**\n    *   Licencja JetBrains = **119,00 (IP)**\n*   **Alokacja kosztów:**\n    *   Koszty IP = 119,00\
+    \ + (2807,48 * 0,9048) = 119,00 + 2540,24 = **2659,24**\n    *   Koszty NIE = 2807,48 * (1 - 0,9048) = **267,24**\n\n\
+    ---\n\n<result>\nrok: 2025\nforma_opodatkowania: liniowy_19%\nmetoda_rachunkowości: memoriał\nzus:\n  sposób_ujęcia: w_KPiR\n\
+    \  kwota_społeczne: 1418.48\n  kwota_zdrowotne: 900.0\nprzychody_roczne:\n  IP: 22620.0\n  NIE: 2380.0\n  KPiR_total:\
+    \ 25000.0\nkoszty_roczne:\n  IP: 2659.24\n  NIE: 267.24\n  WYKLUCZONE: 0.0\nnexus:\n  A: 2659.24\n  B: 0.0\n  C: 0.0\n\
+    \  D: 0.0\n  wartość: 1.0\nkaskada_odliczeń:\n  straty_poprzednie: 0.0\n  ZUS_odliczenie: 0.0\n  IKZE: 9388.8\n  darowizny:\
+    \ 0.0\n  ulga_internet: 0.0\n  ulga_rehabilitacyjna: 0.0\n  ulga_BR: 0.0\n  termomodernizacja_wykorzystano: 0.0\n  termomodernizacja_carry_over:\
+    \ 0.0\npodatek:\n  podstawa_NIE_zaokr: 0\n  podatek_NIE_przed_ulgami: 0\n  ulga_prorodzinna: 0.0\n  podatek_NIE_finalny:\
+    \ 0\n  podstawa_IP_zaokr: 19961\n  podatek_IP: 998\n  podatek_łączny: 998\nzaliczki:\n  typ: miesięczne\n  suma: 3000\n\
+    \  rozbicie: [3000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]\nwynik:\n  nadpłata_lub_dopłata: 2002\ntesty:\n  test_1_bilans: PASS\n\
+    \  test_2_koszty_prywatne: PASS\n  test_3_anty_dubel_ZUS: PASS\n  test_4_kaskada: PASS\n  test_5_podatek_IP: PASS\n  test_6_nadpłata:\
+    \ PASS\n</result>\n\n<classifications>\n- Składki ZUS społeczne: MIX\n- Składka zdrowotna: MIX\n- Internet firmowy: MIX\n\
+    - Licencja JetBrains: IP\n- Księgowość: MIX\n</classifications>\n\n<monthly_W>\n- 2025-01: 90.48\n</monthly_W>\n\n<tests>\n\
+    TEST_1: PASS\nTEST_2: PASS\nTEST_3: PASS\nTEST_4: PASS\nTEST_5: PASS\nTEST_6: PASS\n</tests>\n\n<stops_reviews>\nstops:\
+    \ []\nreviews:\n- REVIEW_09: Jeden kontrahent odpowiada za 100% przychodów (ryzyko ukrytego etatu).\n</stops_reviews>\n\
+    \n**Uwaga:** W styczniu wystąpiła nadpłata zaliczki (wpłacono 3000 zł, a wyliczony podatek łączny to 998 zł). Czy chcesz,\
+    \ abym przygotował szablon ewidencji IP Box w formacie CSV?"
+  prompt_hash: d346d5f53b0c1383
 parsed:
   result_yaml:
     rok: 2025
@@ -47,18 +45,18 @@ parsed:
     metoda_rachunkowości: memoriał
     zus:
       sposób_ujęcia: w_KPiR
-      kwota_społeczne: 17021.76
-      kwota_zdrowotne: 10800.0
+      kwota_społeczne: 1418.48
+      kwota_zdrowotne: 900.0
     przychody_roczne:
-      IP: 271440.0
-      NIE: 28560.0
-      KPiR_total: 300000.0
+      IP: 22620.0
+      NIE: 2380.0
+      KPiR_total: 25000.0
     koszty_roczne:
-      IP: 1428.0
-      NIE: 3360.0
+      IP: 2659.24
+      NIE: 267.24
       WYKLUCZONE: 0.0
     nexus:
-      A: 1428.0
+      A: 2659.24
       B: 0.0
       C: 0.0
       D: 0.0
@@ -74,31 +72,31 @@ parsed:
       termomodernizacja_wykorzystano: 0.0
       termomodernizacja_carry_over: 0.0
     podatek:
-      podstawa_NIE_zaokr: 15811
-      podatek_NIE_przed_ulgami: 3004
+      podstawa_NIE_zaokr: 0
+      podatek_NIE_przed_ulgami: 0
       ulga_prorodzinna: 0.0
-      podatek_NIE_finalny: 3004
-      podstawa_IP_zaokr: 270012
-      podatek_IP: 13501
-      podatek_łączny: 16505
+      podatek_NIE_finalny: 0
+      podstawa_IP_zaokr: 19961
+      podatek_IP: 998
+      podatek_łączny: 998
     zaliczki:
       typ: miesięczne
-      suma: 36000
+      suma: 3000
       rozbicie:
       - 3000
-      - 3000
-      - 3000
-      - 3000
-      - 3000
-      - 3000
-      - 3000
-      - 3000
-      - 3000
-      - 3000
-      - 3000
-      - 3000
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
     wynik:
-      nadpłata_lub_dopłata: 19495
+      nadpłata_lub_dopłata: 2002
     testy:
       test_1_bilans: PASS
       test_2_koszty_prywatne: PASS
@@ -106,8 +104,6 @@ parsed:
       test_4_kaskada: PASS
       test_5_podatek_IP: PASS
       test_6_nadpłata: PASS
-    review_do_weryfikacji:
-    - REVIEW_09
   classifications: '- Składki ZUS społeczne: MIX
 
     - Składka zdrowotna: MIX
@@ -117,9 +113,7 @@ parsed:
     - Licencja JetBrains: IP
 
     - Księgowość: MIX'
-  monthly_W: '- 2025-01: 90.48
-
-    - (Pozostałe miesiące przyjęto analogicznie do stycznia dla celów symulacji rocznej)'
+  monthly_W: '- 2025-01: 90.48'
   tests: 'TEST_1: PASS
 
     TEST_2: PASS
@@ -131,5 +125,7 @@ parsed:
     TEST_5: PASS
 
     TEST_6: PASS'
-  stops_reviews: "stops: []\nreviews: \n  - REVIEW_09: Jeden kontrahent (TechCorp Sp. z o.o.) odpowiada za 100% przychodów.\
-    \ Ryzyko uznania za \"ukryty etat\". Wymagana dokumentacja autonomii twórczej.\n</reviews>"
+  stops_reviews:
+    stops: []
+    reviews:
+    - REVIEW_09: Jeden kontrahent odpowiada za 100% przychodów (ryzyko ukrytego etatu).

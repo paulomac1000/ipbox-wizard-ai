@@ -3,36 +3,40 @@ meta:
   scenario_name: Wieloprojektowy miesiąc — REVIEW_04 + ważona średnia W
   provider: google
   model: gemini-3.1-flash-lite-preview
-  fingerprint: v1_44b432297994daf4_73c21ec4ce094cd8_google_993fbcd8
-  recorded_at: '2026-04-19T19:15:03.215783+00:00'
-  recording_duration_seconds: 3.8
-  prompt_tokens_estimate: 11203
-  response_tokens_estimate: 542
-  algorithm_hash: 44b432297994daf4
+  fingerprint: v1_3893459fc7f178da_73c21ec4ce094cd8_google_993fbcd8
+  recorded_at: '2026-04-20T20:42:10.915130+00:00'
+  recording_duration_seconds: 4.13
+  prompt_tokens_estimate: 11235
+  response_tokens_estimate: 655
+  algorithm_hash: 3893459fc7f178da
   cassette_format_version: 2
 turns:
 - role: user
   prompt: ''
-  response: "Jako ekspert podatkowy, przeprowadziłem analizę Twoich danych zgodnie z algorytmem IP Box.\n\n### Faza 0-2: Analiza\
-    \ i obliczenia współczynnika W\nDla stycznia 2025:\n*   **TechCorp A:** 100h pracy, 10h nie-IP = 90h IP.\n*   **TechCorp\
-    \ B:** 60h pracy, 30h nie-IP = 30h IP.\n*   **Łącznie:** 160h pracy, 40h nie-IP.\n*   **W (średnia ważona przychodami):**\n\
-    \    *   W_A = (90/100) * 100% = 90%\n    *   W_B = (30/60) * 100% = 50%\n    *   W_agregowane = ((15000 * 0.9) + (10000\
-    \ * 0.5)) / 25000 = (13500 + 5000) / 25000 = **74,00%**\n\n### Faza 3-4: Klasyfikacja kosztów\n*   ZUS społeczny (1418,48\
-    \ zł) w KPiR = **MIX** (dotyczy całej działalności).\n*   Alokacja kosztów:\n    *   Koszty_IP = 1418,48 * 0,74 = 1050,00\
-    \ zł\n    *   Koszty_NIE = 1418,48 * 0,26 = 368,48 zł\n\n<result>\nrok: 2025\nforma_opodatkowania: \"liniowy 19%\"\nmetoda_rachunkowości:\
-    \ \"memoriał\"\nzus:\n  sposób_ujęcia: \"w_KPiR\"\n  kwota_społeczne: 1418.48\n  kwota_zdrowotne: 0.00\nprzychody_roczne:\n\
-    \  IP: 18500.00\n  NIE: 6500.00\n  KPiR_total: 25000.00\nkoszty_roczne:\n  IP: 1050.00\n  NIE: 368.48\n  WYKLUCZONE: 0.00\n\
-    nexus:\n  A: 1050.00\n  B: 0.00\n  C: 0.00\n  D: 0.00\n  wartość: 1.00\npodatek:\n  podstawa_NIE_zaokr: 6132\n  podatek_NIE_przed_ulgami:\
-    \ 1165\n  podatek_IP: 873\n  podatek_łączny: 2038\n</result>\n\n<classifications>\n- Składki ZUS społeczne: MIX\n</classifications>\n\
-    \n<monthly_W>\n| Miesiąc | Współczynnik W |\n| :--- | :--- |\n| 2025-01 | 74,00% |\n</monthly_W>\n\n<tests>\nTEST_1: PASS\n\
-    TEST_2: PASS\nTEST_3: PASS\nTEST_4: PASS\nTEST_5: PASS\nTEST_6: PASS\n</tests>\n\n<stops_reviews>\nstops: []\nreviews:\
-    \ \n  - REVIEW_04: Miesiąc wieloprojektowy (TechCorp A + TechCorp B)\n  - REVIEW_09: Jeden kontrahent (TechCorp A) stanowi\
-    \ 60% przychodów, monitoruj strukturę\n</stops_reviews>\n\n**Ważne uwagi:**\n1.  **REVIEW_04:** Ponieważ pracujesz dla\
-    \ dwóch kontrahentów, musisz prowadzić ewidencję czasu pracy z podziałem na projekty (co zrobiłeś poprawnie).\n2.  **ZUS:**\
-    \ Skoro ZUS jest w KPiR, nie odliczaj go ponownie w PIT-36L (poz. 40).\n3.  **NEXUS:** Przyjąłem NEXUS = 1.0, ponieważ\
-    \ nie wykazałeś podwykonawców (B, C, D = 0). Jeśli korzystasz z usług innych programistów, musisz skorygować NEXUS.\n\n\
-    Czy chcesz, abym wygenerował plik XLSX z tą ewidencją?"
-  prompt_hash: e97538a38f586e80
+  response: "Dzień dobry. Przystępuję do przetwarzania danych zgodnie z algorytmem IP Box.\n\n### Faza 0: Kwalifikacja\n*\
+    \   **Forma opodatkowania:** Liniowy 19% (zgodny z IP Box).\n*   **Dokumenty:** Umowy B2B posiadają klauzule przeniesienia\
+    \ praw autorskich.\n*   **ZUS:** Zadeklarowano jako koszt w KPiR (kolumna 13).\n\n### Faza 1-2: Obliczenia współczynnika\
+    \ W (Styczeń 2025)\n*   **TechCorp A:** 100h pracy, 10h nie-IP. Efektywny czas IP = 90h.\n*   **TechCorp B:** 60h pracy,\
+    \ 30h nie-IP. Efektywny czas IP = 30h.\n*   **Łącznie:** 160h pracy, 40h nie-IP.\n*   **W (agregowane):** (90 + 30) /\
+    \ 160 = 120 / 160 = **75,00%**.\n\n### Faza 3: Klasyfikacja kosztów\n*   **ZUS społeczne (1418,48 zł):** Koszyk **MIX**\
+    \ (dotyczy całej działalności).\n*   **Alokacja ZUS:**\n    *   Koszty IP = 1418,48 * 0,75 = 1063,86 zł\n    *   Koszty\
+    \ NIE = 1418,48 * 0,25 = 354,62 zł\n\n### Faza 4: Obliczenia miesięczne\n*   **Przychód:** 25 000 zł.\n    *   Przychód\
+    \ IP = 25 000 * 0,75 = 18 750 zł.\n    *   Przychód NIE = 25 000 * 0,25 = 6 250 zł.\n*   **Dochód:**\n    *   Dochód IP\
+    \ = 18 750 - 1063,86 = 17 686,14 zł.\n    *   Dochód NIE = 6 250 - 354,62 = 5 895,38 zł.\n\n---\n\n<result>\nrok: 2025\n\
+    forma_opodatkowania: \"liniowy 19%\"\nmetoda_rachunkowości: \"memoriał\"\nzus:\n  sposób_ujęcia: \"w_KPiR\"\n  kwota_społeczne:\
+    \ 1418.48\n  kwota_zdrowotne: 0.00\nprzychody_roczne:\n  IP: 18750.00\n  NIE: 6250.00\n  KPiR_total: 25000.00\nkoszty_roczne:\n\
+    \  IP: 1063.86\n  NIE: 354.62\n  WYKLUCZONE: 0.00\nnexus:\n  A: 0.00\n  B: 0.00\n  C: 0.00\n  D: 0.00\n  wartość: 1.00\n\
+    kaskada_odliczeń:\n  straty_poprzednie: 0.00\n  ZUS_odliczenie: 0.00\n  IKZE: 0.00\n  darowizny: 0.00\n  ulga_internet:\
+    \ 0.00\n  ulga_rehabilitacyjna: 0.00\n  ulga_BR: 0.00\n  termomodernizacja_wykorzystano: 0.00\n  termomodernizacja_carry_over:\
+    \ 0.00\npodatek:\n  podstawa_NIE_zaokr: 5895\n  podatek_NIE_przed_ulgami: 1120\n  ulga_prorodzinna: 0.00\n  podatek_NIE_finalny:\
+    \ 1120\n  podstawa_IP_zaokr: 17686\n  podatek_IP: 884\n  podatek_łączny: 2004\nzaliczki:\n  typ: \"miesięczne\"\n  suma:\
+    \ 0\n  rozbicie: [0,0,0,0,0,0,0,0,0,0,0,0]\nwynik:\n  nadpłata_lub_dopłata: -2004\ntesty:\n  test_1_bilans: \"PASS\"\n\
+    \  test_2_koszty_prywatne: \"PASS\"\n  test_3_anty_dubel_ZUS: \"PASS\"\n  test_4_kaskada: \"PASS\"\n  test_5_podatek_IP:\
+    \ \"PASS\"\n  test_6_nadpłata: \"PASS\"\nreview_do_weryfikacji: [\"REVIEW_04\"]\n</result>\n\n<classifications>\n- Składki\
+    \ ZUS społeczne: MIX\n</classifications>\n\n<monthly_W>\n2025-01: 75.00\n</monthly_W>\n\n<tests>\nTEST_1: PASS\nTEST_2:\
+    \ PASS\nTEST_3: PASS\nTEST_4: PASS\nTEST_5: PASS\nTEST_6: PASS\n</tests>\n\n<stops_reviews>\nstops: []\nreviews: [\"REVIEW_04:\
+    \ Miesiąc wieloprojektowy (TechCorp A + TechCorp B) - zastosowano średnią ważoną przychodami.\"]\n</stops_reviews>"
+  prompt_hash: def7ad7a842ce566
 parsed:
   result_yaml:
     rok: 2025
@@ -43,30 +47,66 @@ parsed:
       kwota_społeczne: 1418.48
       kwota_zdrowotne: 0.0
     przychody_roczne:
-      IP: 18500.0
-      NIE: 6500.0
+      IP: 18750.0
+      NIE: 6250.0
       KPiR_total: 25000.0
     koszty_roczne:
-      IP: 1050.0
-      NIE: 368.48
+      IP: 1063.86
+      NIE: 354.62
       WYKLUCZONE: 0.0
     nexus:
-      A: 1050.0
+      A: 0.0
       B: 0.0
       C: 0.0
       D: 0.0
       wartość: 1.0
+    kaskada_odliczeń:
+      straty_poprzednie: 0.0
+      ZUS_odliczenie: 0.0
+      IKZE: 0.0
+      darowizny: 0.0
+      ulga_internet: 0.0
+      ulga_rehabilitacyjna: 0.0
+      ulga_BR: 0.0
+      termomodernizacja_wykorzystano: 0.0
+      termomodernizacja_carry_over: 0.0
     podatek:
-      podstawa_NIE_zaokr: 6132
-      podatek_NIE_przed_ulgami: 1165
-      podatek_IP: 873
-      podatek_łączny: 2038
+      podstawa_NIE_zaokr: 5895
+      podatek_NIE_przed_ulgami: 1120
+      ulga_prorodzinna: 0.0
+      podatek_NIE_finalny: 1120
+      podstawa_IP_zaokr: 17686
+      podatek_IP: 884
+      podatek_łączny: 2004
+    zaliczki:
+      typ: miesięczne
+      suma: 0
+      rozbicie:
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+    wynik:
+      nadpłata_lub_dopłata: -2004
+    testy:
+      test_1_bilans: PASS
+      test_2_koszty_prywatne: PASS
+      test_3_anty_dubel_ZUS: PASS
+      test_4_kaskada: PASS
+      test_5_podatek_IP: PASS
+      test_6_nadpłata: PASS
+    review_do_weryfikacji:
+    - REVIEW_04
   classifications: '- Składki ZUS społeczne: MIX'
-  monthly_W: '| Miesiąc | Współczynnik W |
-
-    | :--- | :--- |
-
-    | 2025-01 | 74,00% |'
+  monthly_W: '2025-01: 75.00'
   tests: 'TEST_1: PASS
 
     TEST_2: PASS
@@ -81,5 +121,4 @@ parsed:
   stops_reviews:
     stops: []
     reviews:
-    - REVIEW_04: Miesiąc wieloprojektowy (TechCorp A + TechCorp B)
-    - REVIEW_09: Jeden kontrahent (TechCorp A) stanowi 60% przychodów, monitoruj strukturę
+    - 'REVIEW_04: Miesiąc wieloprojektowy (TechCorp A + TechCorp B) - zastosowano średnią ważoną przychodami.'

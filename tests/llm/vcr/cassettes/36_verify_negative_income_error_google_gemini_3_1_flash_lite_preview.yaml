@@ -3,45 +3,43 @@ meta:
   scenario_name: 'Weryfikacja: Ujemny dochód IP roczny → podatek = 0'
   provider: google
   model: gemini-3.1-flash-lite-preview
-  fingerprint: v1_44b432297994daf4_b64a2d1f780eb1ef_google_993fbcd8
-  recorded_at: '2026-04-19T19:14:52.337310+00:00'
-  recording_duration_seconds: 4.39
-  prompt_tokens_estimate: 11261
-  response_tokens_estimate: 681
-  algorithm_hash: 44b432297994daf4
+  fingerprint: v1_3893459fc7f178da_b64a2d1f780eb1ef_google_993fbcd8
+  recorded_at: '2026-04-20T20:41:59.780369+00:00'
+  recording_duration_seconds: 4.14
+  prompt_tokens_estimate: 11293
+  response_tokens_estimate: 619
+  algorithm_hash: 3893459fc7f178da
   cassette_format_version: 2
 turns:
 - role: user
   prompt: ''
-  response: "Oto analiza Twojego rozliczenia IP Box w trybie BATCH.\n\n### FAZA 0-3: Klasyfikacja i Weryfikacja\n*   **Kwalifikacja:**\
-    \ Umowa z przeniesieniem praw autorskich (StartupXYZ) spełnia wymogi.\n*   **ZUS:** Zadeklarowano \"nie odlicza\" (brak\
-    \ w KPiR, brak w PIT).\n*   **Klasyfikacja kosztów:**\n    *   Dzierżawa serwera GPU: **IP** (dedykowane B+R)\n    * \
-    \  Licencja PyTorch: **IP** (dedykowane B+R)\n    *   Usługi AWS: **IP** (dedykowane B+R)\n\n### FAZA 4-7: Obliczenia\n\
-    *   **Współczynnik W:** Dla obu miesięcy: (160h - 0h) / 160h * 100% = **100%**.\n*   **NEXUS:** Przyjęto 1.0 (brak podwykonawców/zakupów\
-    \ IP).\n\n<classifications>\n- Dzierżawa serwera GPU (infrastruktura B+R): IP\n- Licencja oprogramowania ML (PyTorch Enterprise):\
-    \ IP\n- Usługi cloud AWS (przetwarzanie danych): IP\n</classifications>\n\n<monthly_W>\n| Miesiąc | Współczynnik W |\n\
-    | :--- | :--- |\n| 2025-01 | 100.00% |\n| 2025-02 | 100.00% |\n</monthly_W>\n\n<tests>\nTEST_1 (Bilans KPiR): PASS\nTEST_2\
-    \ (Koszty prywatne): PASS\nTEST_3 (Anty-dubel ZUS): PASS\nTEST_4 (Kaskada): PASS\nTEST_5 (Podatek IP): PASS\nTEST_6 (Nadpłata):\
-    \ PASS\n</tests>\n\n<stops_reviews>\nstops: []\nreviews: \n- REVIEW_09: Jeden kontrahent odpowiada za 100% przychodów\
-    \ (ryzyko ukrytego etatu).\n</stops_reviews>\n\n<result>\nrok: 2025\nforma_opodatkowania: \"liniowy 19%\"\nmetoda_rachunkowości:\
-    \ \"memoriał\"\nzus:\n  sposób_ujęcia: \"brak\"\n  kwota_społeczne: 0.00\n  kwota_zdrowotne: 0.00\nprzychody_roczne:\n\
-    \  IP: 6000.00\n  NIE: 0.00\n  KPiR_total: 6000.00\nkoszty_roczne:\n  IP: 8800.00\n  NIE: 0.00\n  WYKLUCZONE: 0.00\nnexus:\n\
-    \  A: 8800.00\n  B: 0.00\n  C: 0.00\n  D: 0.00\n  wartość: 1.00\nkaskada_odliczeń:\n  straty_poprzednie: 0.00\n  ZUS_odliczenie:\
-    \ 0.00\n  IKZE: 0.00\n  darowizny: 0.00\n  ulga_internet: 0.00\n  ulga_rehabilitacyjna: 0.00\n  ulga_BR: 0.00\n  termomodernizacja_wykorzystano:\
-    \ 0.00\n  termomodernizacja_carry_over: 0.00\npodatek:\n  podstawa_NIE_zaokr: 0\n  podatek_NIE_przed_ulgami: 0\n  ulga_prorodzinna:\
-    \ 0.00\n  podatek_NIE_finalny: 0\n  podstawa_IP_zaokr: 0\n  podatek_IP: 0\n  podatek_łączny: 0\nzaliczki:\n  typ: \"miesięczne\"\
-    \n  suma: 0\n  rozbicie: [0,0,0,0,0,0,0,0,0,0,0,0]\nwynik:\n  nadpłata_lub_dopłata: 0\ntesty:\n  test_1_bilans: \"PASS\"\
-    \n  test_2_koszty_prywatne: \"PASS\"\n  test_3_anty_dubel_ZUS: \"PASS\"\n  test_4_kaskada: \"PASS\"\n  test_5_podatek_IP:\
-    \ \"PASS\"\n  test_6_nadpłata: \"PASS\"\nreview_do_weryfikacji: [\"REVIEW_09\"]\n</result>\n\n**Uwaga ekspercka:** W Twoim\
-    \ przypadku koszty (8800 zł) przewyższają przychody (6000 zł). W roku 2025 wygenerowałeś stratę podatkową w wysokości\
-    \ 2800 zł. W związku z tym podatek IP Box wynosi 0 zł, a strata z działalności (NIE) może być rozliczana w kolejnych latach.\
-    \ Pamiętaj o **REVIEW_09** – przy 100% przychodów od jednego kontrahenta, KAS może kwestionować charakter Twojej działalności\
-    \ jako B2B."
-  prompt_hash: 68b0fdc3a3e6068e
+  response: "Oto analiza Twojego rozliczenia IP Box w trybie BATCH.\n\n### Faza 0–1: Kwalifikacja i Dane\n*   **Forma:** Liniowy\
+    \ 19%.\n*   **ZUS:** Nie odliczasz (brak w KPiR, brak w PIT).\n*   **Umowa:** Posiadasz klauzulę przeniesienia praw (spełnione\
+    \ 0.5).\n*   **Koszty:** Wszystkie koszty (serwer GPU, licencje, AWS) są bezpośrednio związane z tworzeniem IP (koszyk\
+    \ IP).\n\n### Faza 2–4: Obliczenia miesięczne\nWspółczynnik **W** dla obu miesięcy wynosi **100%** (160h pracy, 0h nie-IP,\
+    \ 100% faktury).\n\n| Miesiąc | Przychód IP | Koszty IP | Dochód IP |\n| :--- | :--- | :--- | :--- |\n| 2025-01 | 3000\
+    \ zł | 4300 zł | -1300 zł |\n| 2025-02 | 3000 zł | 4500 zł | -1500 zł |\n| **SUMA** | **6000 zł** | **8800 zł** | **-2800\
+    \ zł** |\n\n*Uwaga: Występuje strata podatkowa w ramach IP Box. Zgodnie z art. 30ca ust. 6 ustawy o PIT, stratę z kwalifikowanych\
+    \ praw IP możesz odliczyć od dochodu z kwalifikowanych praw IP w kolejnych 5 latach podatkowych.*\n\n---\n\n<result>\n\
+    rok: 2025\nforma_opodatkowania: liniowy_19%\nmetoda_rachunkowości: memoriał\nzus:\n  sposób_ujęcia: brak\n  kwota_społeczne:\
+    \ 0.00\n  kwota_zdrowotne: 0.00\nprzychody_roczne:\n  IP: 6000.00\n  NIE: 0.00\n  KPiR_total: 6000.00\nkoszty_roczne:\n\
+    \  IP: 8800.00\n  NIE: 0.00\n  WYKLUCZONE: 0.00\nnexus:\n  A: 8800.00\n  B: 0.00\n  C: 0.00\n  D: 0.00\n  wartość: 1.00\n\
+    kaskada_odliczeń:\n  straty_poprzednie: 0.00\n  ZUS_odliczenie: 0.00\n  IKZE: 0.00\n  darowizny: 0.00\n  ulga_internet:\
+    \ 0.00\n  ulga_rehabilitacyjna: 0.00\n  ulga_BR: 0.00\n  termomodernizacja_wykorzystano: 0.00\n  termomodernizacja_carry_over:\
+    \ 0.00\npodatek:\n  podstawa_NIE_zaokr: 0\n  podatek_NIE_przed_ulgami: 0\n  ulga_prorodzinna: 0.00\n  podatek_NIE_finalny:\
+    \ 0\n  podstawa_IP_zaokr: 0\n  podatek_IP: 0\n  podatek_łączny: 0\nzaliczki:\n  typ: miesięczne\n  suma: 0\n  rozbicie:\
+    \ [0,0,0,0,0,0,0,0,0,0,0,0]\nwynik:\n  nadpłata_lub_dopłata: 0\ntesty:\n  test_1_bilans: PASS\n  test_2_koszty_prywatne:\
+    \ PASS\n  test_3_anty_dubel_ZUS: PASS\n  test_4_kaskada: PASS\n  test_5_podatek_IP: PASS\n  test_6_nadpłata: PASS\nreview_do_weryfikacji:\
+    \ [REVIEW_09]\n</result>\n\n<classifications>\n- Dzierżawa serwera GPU: IP\n- Licencja oprogramowania ML: IP\n- Usługi\
+    \ cloud AWS: IP\n</classifications>\n\n<monthly_W>\n2025-01: 100.00\n2025-02: 100.00\n</monthly_W>\n\n<tests>\nTEST_1:\
+    \ PASS\nTEST_2: PASS\nTEST_3: PASS\nTEST_4: PASS\nTEST_5: PASS\nTEST_6: PASS\n</tests>\n\n<stops_reviews>\nstops: []\n\
+    reviews: \n- \"REVIEW_09: Jeden kontrahent (StartupXYZ Sp. z o.o.) odpowiada za 100% przychodów. Ryzyko zakwestionowania\
+    \ przez KAS jako 'ukryty etat'.\"\n</stops_reviews>"
+  prompt_hash: f27e99fcb6b81f32
 parsed:
   result_yaml:
     rok: 2025
-    forma_opodatkowania: liniowy 19%
+    forma_opodatkowania: liniowy_19%
     metoda_rachunkowości: memoriał
     zus:
       sposób_ujęcia: brak
@@ -106,30 +104,27 @@ parsed:
       test_6_nadpłata: PASS
     review_do_weryfikacji:
     - REVIEW_09
-  classifications: '- Dzierżawa serwera GPU (infrastruktura B+R): IP
+  classifications: '- Dzierżawa serwera GPU: IP
 
-    - Licencja oprogramowania ML (PyTorch Enterprise): IP
+    - Licencja oprogramowania ML: IP
 
-    - Usługi cloud AWS (przetwarzanie danych): IP'
-  monthly_W: '| Miesiąc | Współczynnik W |
+    - Usługi cloud AWS: IP'
+  monthly_W: '2025-01: 100.00
 
-    | :--- | :--- |
+    2025-02: 100.00'
+  tests: 'TEST_1: PASS
 
-    | 2025-01 | 100.00% |
+    TEST_2: PASS
 
-    | 2025-02 | 100.00% |'
-  tests: 'TEST_1 (Bilans KPiR): PASS
+    TEST_3: PASS
 
-    TEST_2 (Koszty prywatne): PASS
+    TEST_4: PASS
 
-    TEST_3 (Anty-dubel ZUS): PASS
+    TEST_5: PASS
 
-    TEST_4 (Kaskada): PASS
-
-    TEST_5 (Podatek IP): PASS
-
-    TEST_6 (Nadpłata): PASS'
+    TEST_6: PASS'
   stops_reviews:
     stops: []
     reviews:
-    - REVIEW_09: Jeden kontrahent odpowiada za 100% przychodów (ryzyko ukrytego etatu).
+    - 'REVIEW_09: Jeden kontrahent (StartupXYZ Sp. z o.o.) odpowiada za 100% przychodów. Ryzyko zakwestionowania przez KAS
+      jako ''ukryty etat''.'

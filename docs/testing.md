@@ -153,7 +153,7 @@ Po otwarciu projektu w VSCode panel **Testing** (ikona probówki) pokaże zarów
 - `llm-scenario-tests.yml` — uruchamiany przy zmianach w `ipbox_algorytm.md` lub `tests/llm/`
 - `full-suite.yml` — orchestrator (unit → llm → summary), uruchamiany na `main` i co poniedziałek
 
-Domyślny limit LLM: `LLM_MAX_CALLS_PER_RUN=10` (pierwsze 10 scenariuszy alfabetycznie).
+Domyślny limit LLM: `LLM_MAX_CALLS_PER_RUN=0` (wszystkie scenariusze).
 
 ## Dodawanie scenariuszy LLM
 

@@ -29,7 +29,7 @@ Podstawienie:  X = (160 − 40) / 160 × 100
 Wynik:  X = 75,00%
 ```
 
-Jeśli środowisko daje Ci dostęp do Code Interpreter (Python) — **używaj go dla wszystkich obliczeń**. Jeśli nie — wykonuj arytmetykę krok po kroku w tekście, zawsze z pośrednim wynikiem pokazanym użytkownikowi. Nigdy nie "zgaduj" sumy 12 liczb — licz iteracyjnie i pokaż sumę częściową.
+Jeśli środowisko daje Ci dostęp do uruchamiania kodu Python (Code Execution w Claude, Advanced Data Analysis w ChatGPT, Code Execution w Gemini) — **używaj go dla wszystkich obliczeń**. Jeśli nie — wykonuj arytmetykę krok po kroku w tekście, zawsze z pośrednim wynikiem pokazanym użytkownikowi. Nigdy nie "zgaduj" sumy 12 liczb — licz iteracyjnie i pokaż sumę częściową.
 
 ### R4. Zapamiętywanie stanu przez podsumowania
 
@@ -877,7 +877,7 @@ Po wygenerowaniu YAML zapytaj:
 
 > *"Wszystkie testy PASS. Chcesz, żebym wygenerował ewidencję IP Box w formacie XLSX (2 wiersze na miesiąc: IP + NIE, kolumny data/kontrahent/opis/koszyk/przychód/koszt/NEXUS, z podsumowaniem rocznym)?"*
 
-Jeśli Twoje środowisko to wspiera (Python + openpyxl, Code Interpreter, Artifacts) — generuj. Jeśli nie — wygeneruj dane w formacie CSV który użytkownik wklei do Excela.
+Jeśli Twoje środowisko to wspiera (Python + openpyxl, uruchamianie kodu, Artifacts) — generuj. Jeśli nie — wygeneruj dane w formacie CSV który użytkownik wklei do Excela.
 
 Zaproponuj też wygenerowanie **checklisty do PIT** i **draft opisu projektów** (gotowy do wklejenia do ewidencji).
 
@@ -1010,9 +1010,9 @@ JEŚLI korekta obejmuje ulgi carry-over (np. termomodernizacja):
 
 # ZAŁĄCZNIK — PRZYPOMNIENIE DLA AGENTA AI
 
-Jeśli Twoje środowisko ma **Code Interpreter / Python** — używaj go do wszystkich obliczeń. Zamiast "W = 75%" wyświetlaj tabelę z kodem i krokami. Użytkownik zaufa bardziej kodowi niż tekstowemu twierdzeniu.
+Jeśli Twoje środowisko ma **uruchamianie kodu Python** (Code Execution / Advanced Data Analysis) — używaj go do wszystkich obliczeń. Zamiast "W = 75%" wyświetlaj tabelę z kodem i krokami. Użytkownik zaufa bardziej kodowi niż tekstowemu twierdzeniu.
 
-Jeśli środowisko **nie ma** Code Interpreter — wykonuj arytmetykę krok po kroku w tekście, zawsze pokazując formułę, podstawienie i wynik. Nie sumuj 12 miesięcy "w głowie" — sumuj iteracyjnie, pokazując sumę częściową po każdym dodanym miesiącu.
+Jeśli środowisko **nie ma** uruchamiania kodu — wykonuj arytmetykę krok po kroku w tekście, zawsze pokazując formułę, podstawienie i wynik. Nie sumuj 12 miesięcy "w głowie" — sumuj iteracyjnie, pokazując sumę częściową po każdym dodanym miesiącu.
 
 Na końcu zawsze pytaj użytkownika:
 1. Czy potwierdzi dane w YAML?

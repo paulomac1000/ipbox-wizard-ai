@@ -3,46 +3,44 @@ meta:
   scenario_name: 'Weryfikacja: Środek trwały >10k jako jednorazowy koszt (FAIL)'
   provider: google
   model: gemini-3.1-flash-lite-preview
-  fingerprint: v1_44b432297994daf4_a315136ccf3e8a5f_google_993fbcd8
-  recorded_at: '2026-04-19T19:14:43.154361+00:00'
-  recording_duration_seconds: 5.24
-  prompt_tokens_estimate: 11136
-  response_tokens_estimate: 823
-  algorithm_hash: 44b432297994daf4
+  fingerprint: v1_3893459fc7f178da_a315136ccf3e8a5f_google_993fbcd8
+  recorded_at: '2026-04-20T20:41:51.679441+00:00'
+  recording_duration_seconds: 4.58
+  prompt_tokens_estimate: 11168
+  response_tokens_estimate: 779
+  algorithm_hash: 3893459fc7f178da
   cassette_format_version: 2
 turns:
 - role: user
   prompt: ''
   response: "Dzień dobry. Przystępuję do analizy Twojego rozliczenia IP Box w trybie BATCH.\n\n### Analiza wstępna (Faza 0-3)\n\
-    1. **Kwalifikacja:** Forma liniowa 19% jest dopuszczalna. Umowa z SoftClient Sp. z o.o. zawiera klauzulę przeniesienia\
-    \ praw.\n2. **ZUS:** Zadeklarowano \"ZUS w KPiR jako koszt\". Zgodnie z instrukcją, składki te trafiają do koszyka **MIX**\
-    \ (dotyczą całej działalności).\n3. **Środek trwały:** Laptop (12 500 zł) przekracza limit 10 000 zł. Zgodnie z **Fazą\
-    \ 3.5**, kwota ta jest **WYKLUCZONA** z kosztów bezpośrednich. Należy wprowadzić odpis amortyzacyjny (zakładając amortyzację\
-    \ jednorazową dla małego podatnika, w ewidencji należy ująć 12 500 zł jako koszt jednorazowy w miesiącu zakupu, jeśli\
-    \ spełnione są warunki ustawowe). Przyjmuję to założenie dla obliczeń.\n\n---\n\n<classifications>\n- Składki ZUS społeczne:\
-    \ MIX\n- Laptop ThinkPad X1 Carbon: WYKLUCZONE (wymaga ujęcia jako odpis amortyzacyjny - w obliczeniach przyjmuję 12 500\
-    \ zł jako koszt jednorazowy w ramach MIX, zgodnie z zasadą amortyzacji)\n</classifications>\n\n<monthly_W>\n- 2025-01:\
-    \ 100.00\n</monthly_W>\n\n<tests>\n- TEST_1 (bilans KPiR): PASS\n- TEST_2 (koszty prywatne): PASS\n- TEST_3 (anty-dubel\
-    \ ZUS): PASS\n- TEST_4 (kaskada): PASS\n- TEST_5 (podatek IP): PASS\n- TEST_6 (nadpłata): PASS\n</tests>\n\n<stops_reviews>\n\
-    stops: []\nreviews: \n- REVIEW_09: Jeden kontrahent = 100% przychodów (ryzyko \"ukrytego etatu\")\n- REVIEW_10: Koszty\
-    \ laptopa (amortyzacja) stanowią znaczną część kosztów\n</stops_reviews>\n\n<result>\nrok: 2025\nforma_opodatkowania:\
-    \ \"liniowy 19%\"\nmetoda_rachunkowości: \"memoriał\"\nzus:\n  sposób_ujęcia: \"w_KPiR\"\n  kwota_społeczne: 1418.48\n\
-    \  kwota_zdrowotne: 0.00\nprzychody_roczne:\n  IP: 25000.00\n  NIE: 0.00\n  KPiR_total: 25000.00\nkoszty_roczne:\n  IP:\
-    \ 0.00\n  NIE: 0.00\n  MIX: 13918.48 # 1418.48 (ZUS) + 12500 (Amortyzacja)\n  WYKLUCZONE: 0.00\nnexus:\n  A: 13918.48\n\
-    \  B: 0.00\n  C: 0.00\n  D: 0.00\n  wartość: 1.00\nkaskada_odliczeń:\n  straty_poprzednie: 0.00\n  ZUS_odliczenie: 0.00\n\
-    \  IKZE: 0.00\n  darowizny: 0.00\n  ulga_internet: 0.00\n  ulga_rehabilitacyjna: 0.00\n  ulga_BR: 0.00\n  termomodernizacja_wykorzystano:\
+    1. **Kwalifikacja:** Posiadasz umowę z przeniesieniem praw autorskich, co spełnia wymogi [PRAWO].\n2. **ZUS:** Zadeklarowałeś\
+    \ ZUS w KPiR jako koszt. Zgodnie z instrukcją, trafia on do koszyka **MIX** (dotyczy całej działalności).\n3. **Środek\
+    \ trwały:** Laptop (12 500 zł) przekracza limit 10 000 zł. Zgodnie z [FAZA 3.5], kwota ta jest **WYKLUCZONA** z kosztów\
+    \ bezpośrednich. Należy wprowadzić go do ewidencji środków trwałych i rozliczać poprzez odpisy amortyzacyjne. W obliczeniach\
+    \ przyjmuję wartość 0 zł dla zakupu w KPiR (wymagana korekta ewidencji przez księgową).\n\n---\n\n<classifications>\n\
+    # Klasyfikacja pozycji KPiR:\n- Składki ZUS społeczne: MIX (1418.48 zł)\n- Laptop ThinkPad X1 Carbon: WYKLUCZONE (wymagana\
+    \ amortyzacja)\n</classifications>\n\n<monthly_W>\n# Tabela współczynników W:\n- 2025-01: 100.00% (160h pracy / 160h całkowitych)\n\
+    </monthly_W>\n\n<tests>\n# Wyniki testów weryfikacyjnych:\n- TEST_1 (Bilans KPiR): PASS\n- TEST_2 (Koszty prywatne): PASS\n\
+    - TEST_3 (Anty-dubel ZUS): PASS\n- TEST_4 (Kaskada): PASS\n- TEST_5 (Podatek IP): PASS\n- TEST_6 (Nadpłata): PASS\n</tests>\n\
+    \n<stops_reviews>\nstops: []\nreviews: \n  - REVIEW_09: \"Jeden kontrahent (SoftClient Sp. z o.o.) odpowiada za 100% przychodów.\
+    \ Ryzyko ukrytego etatu.\"\n  - REVIEW_10: \"Brak kosztów operacyjnych poza ZUS. Wymagana weryfikacja amortyzacji laptopa.\"\
+    \n</stops_reviews>\n\n<result>\nrok: 2025\nforma_opodatkowania: \"liniowy 19%\"\nmetoda_rachunkowości: \"memoriał\"\n\
+    zus:\n  sposób_ujęcia: \"w_KPiR\"\n  kwota_społeczne: 1418.48\n  kwota_zdrowotne: 0.00\nprzychody_roczne:\n  IP: 25000.00\n\
+    \  NIE: 0.00\n  KPiR_total: 25000.00\nkoszty_roczne:\n  IP: 1418.48\n  NIE: 0.00\n  WYKLUCZONE: 12500.00\nnexus:\n  A:\
+    \ 1418.48\n  B: 0.00\n  C: 0.00\n  D: 0.00\n  wartość: 1.00\nkaskada_odliczeń:\n  straty_poprzednie: 0.00\n  ZUS_odliczenie:\
+    \ 0.00\n  IKZE: 0.00\n  darowizny: 0.00\n  ulga_internet: 0.00\n  ulga_rehabilitacyjna: 0.00\n  ulga_BR: 0.00\n  termomodernizacja_wykorzystano:\
     \ 0.00\n  termomodernizacja_carry_over: 0.00\npodatek:\n  podstawa_NIE_zaokr: 0\n  podatek_NIE_przed_ulgami: 0\n  ulga_prorodzinna:\
-    \ 0.00\n  podatek_NIE_finalny: 0\n  podstawa_IP_zaokr: 11082 # (25000 - 13918)\n  podatek_IP: 554\n  podatek_łączny: 554\n\
-    zaliczki:\n  typ: \"miesięczne\"\n  suma: 0\n  rozbicie: [0,0,0,0,0,0,0,0,0,0,0,0]\nwynik:\n  nadpłata_lub_dopłata: -554\
-    \ # dopłata\ntesty:\n  test_1_bilans: \"PASS\"\n  test_2_koszty_prywatne: \"PASS\"\n  test_3_anty_dubel_ZUS: \"PASS\"\n\
-    \  test_4_kaskada: \"PASS\"\n  test_5_podatek_IP: \"PASS\"\n  test_6_nadpłata: \"PASS\"\n</result>\n\n**Komentarz eksperta:**\n\
-    1. **Amortyzacja:** W obliczeniach przyjąłem jednorazowy odpis amortyzacyjny 12 500 zł. Upewnij się, że w KPiR w kolumnie\
-    \ 13 widnieje zapis \"Odpis amortyzacyjny\", a nie \"Zakup laptopa\".\n2. **Ryzyko:** Otrzymałeś `REVIEW_09` ze względu\
-    \ na jednego kontrahenta. Zalecam przygotowanie dokumentacji ADR (Architecture Decision Records) dla projektu, aby wykazać\
-    \ samodzielność twórczą.\n3. **Dopłata:** W obliczeniach wyszła dopłata 554 zł, ponieważ nie uwzględniłeś w danych wejściowych\
-    \ wpłaconych zaliczek na podatek. Jeśli wpłacałeś zaliczki, podatek do zapłaty będzie odpowiednio niższy.\n\nCzy chcesz,\
-    \ abym wygenerował plik XLSX z tą ewidencją?"
-  prompt_hash: c87edd1b131bb541
+    \ 0.00\n  podatek_NIE_finalny: 0\n  podstawa_IP_zaokr: 23582\n  podatek_IP: 1179\n  podatek_łączny: 1179\nzaliczki:\n\
+    \  typ: \"miesięczne\"\n  suma: 0\n  rozbicie: [0,0,0,0,0,0,0,0,0,0,0,0]\nwynik:\n  nadpłata_lub_dopłata: -1179\ntesty:\n\
+    \  test_1_bilans: \"PASS\"\n  test_2_koszty_prywatne: \"PASS\"\n  test_3_anty_dubel_ZUS: \"PASS\"\n  test_4_kaskada: \"\
+    PASS\"\n  test_5_podatek_IP: \"PASS\"\n  test_6_nadpłata: \"PASS\"\nreview_do_weryfikacji: [\"REVIEW_09\", \"REVIEW_10\"\
+    ]\n</result>\n\n**Komentarz eksperta:**\n1. **Amortyzacja:** Laptopa nie możesz wrzucić w koszty jednorazowo. Musisz wprowadzić\
+    \ go do ewidencji środków trwałych i dokonywać odpisów (np. 30% rocznie). Powyższe obliczenia zakładają, że w 2025 roku\
+    \ koszt laptopa wynosi 0 zł (do czasu ustalenia planu amortyzacji).\n2. **Dopłata:** Wynik -1179 zł oznacza konieczność\
+    \ dopłaty podatku, ponieważ nie odprowadziłeś zaliczek na podatek w trakcie roku.\n3. **Kolejne kroki:** Czy chcesz, abym\
+    \ wygenerował plik XLSX z ewidencją IP Box na podstawie tych danych?"
+  prompt_hash: 687d14c31f16b45e
 parsed:
   result_yaml:
     rok: 2025
@@ -57,12 +55,11 @@ parsed:
       NIE: 0.0
       KPiR_total: 25000.0
     koszty_roczne:
-      IP: 0.0
+      IP: 1418.48
       NIE: 0.0
-      MIX: 13918.48
-      WYKLUCZONE: 0.0
+      WYKLUCZONE: 12500.0
     nexus:
-      A: 13918.48
+      A: 1418.48
       B: 0.0
       C: 0.0
       D: 0.0
@@ -82,9 +79,9 @@ parsed:
       podatek_NIE_przed_ulgami: 0
       ulga_prorodzinna: 0.0
       podatek_NIE_finalny: 0
-      podstawa_IP_zaokr: 11082
-      podatek_IP: 554
-      podatek_łączny: 554
+      podstawa_IP_zaokr: 23582
+      podatek_IP: 1179
+      podatek_łączny: 1179
     zaliczki:
       typ: miesięczne
       suma: 0
@@ -102,7 +99,7 @@ parsed:
       - 0
       - 0
     wynik:
-      nadpłata_lub_dopłata: -554
+      nadpłata_lub_dopłata: -1179
     testy:
       test_1_bilans: PASS
       test_2_koszty_prywatne: PASS
@@ -110,24 +107,32 @@ parsed:
       test_4_kaskada: PASS
       test_5_podatek_IP: PASS
       test_6_nadpłata: PASS
-  classifications: '- Składki ZUS społeczne: MIX
+    review_do_weryfikacji:
+    - REVIEW_09
+    - REVIEW_10
+  classifications: '# Klasyfikacja pozycji KPiR:
 
-    - Laptop ThinkPad X1 Carbon: WYKLUCZONE (wymaga ujęcia jako odpis amortyzacyjny - w obliczeniach przyjmuję 12 500 zł jako
-    koszt jednorazowy w ramach MIX, zgodnie z zasadą amortyzacji)'
-  monthly_W: '- 2025-01: 100.00'
-  tests: '- TEST_1 (bilans KPiR): PASS
+    - Składki ZUS społeczne: MIX (1418.48 zł)
 
-    - TEST_2 (koszty prywatne): PASS
+    - Laptop ThinkPad X1 Carbon: WYKLUCZONE (wymagana amortyzacja)'
+  monthly_W: '# Tabela współczynników W:
 
-    - TEST_3 (anty-dubel ZUS): PASS
+    - 2025-01: 100.00% (160h pracy / 160h całkowitych)'
+  tests: '# Wyniki testów weryfikacyjnych:
 
-    - TEST_4 (kaskada): PASS
+    - TEST_1 (Bilans KPiR): PASS
 
-    - TEST_5 (podatek IP): PASS
+    - TEST_2 (Koszty prywatne): PASS
 
-    - TEST_6 (nadpłata): PASS'
+    - TEST_3 (Anty-dubel ZUS): PASS
+
+    - TEST_4 (Kaskada): PASS
+
+    - TEST_5 (Podatek IP): PASS
+
+    - TEST_6 (Nadpłata): PASS'
   stops_reviews:
     stops: []
     reviews:
-    - REVIEW_09: Jeden kontrahent = 100% przychodów (ryzyko "ukrytego etatu")
-    - REVIEW_10: Koszty laptopa (amortyzacja) stanowią znaczną część kosztów
+    - REVIEW_09: Jeden kontrahent (SoftClient Sp. z o.o.) odpowiada za 100% przychodów. Ryzyko ukrytego etatu.
+    - REVIEW_10: Brak kosztów operacyjnych poza ZUS. Wymagana weryfikacja amortyzacji laptopa.

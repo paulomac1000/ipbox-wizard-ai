@@ -47,7 +47,7 @@ make vcr-check   # Sprawdź świeżość kaset
 System VCR pozwala na redukcję kosztów API o >95% poprzez nagrywanie i odtwarzanie odpowiedzi LLM.
 
 | Tryb | Env `VCR_MODE` | Zachowanie |
-|------|--------------|----------|
+| ------ | -------------- | ---------- |
 | `playback` | `playback` | Użyj wyłącznie kaset. Fail jeśli brak. Zero API calls. |
 | `auto` | `auto` (domyślny) | Użyj kasety jeśli aktualna, inaczej nagraj |
 | `record` | `record` | Zawsze nagraj (nadpisz istniejące) |
@@ -89,7 +89,7 @@ Pełna dokumentacja: [docs/testing.md](docs/testing.md)
 
 - `GEMINI_MODEL`: zmienna GitHub Actions (`vars.GEMINI_MODEL`), **nie secret**
 - `GEMINI_API_KEY`: secret GitHub Actions (`secrets.GEMINI_API_KEY`)
-- Limit scenariuszy LLM w CI: `LLM_MAX_CALLS_PER_RUN` (domyślnie 10)
+- Limit scenariuszy LLM w CI: `LLM_MAX_CALLS_PER_RUN` (domyślnie 0 — wszystkie)
 
 ## Czego NIE robić
 

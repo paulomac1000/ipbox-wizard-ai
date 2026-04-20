@@ -16,7 +16,7 @@ jobs:
     needs: unit
     uses: ./.github/workflows/llm-scenario-tests.yml
     secrets: inherit
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' || github.event_name == 'pull_request'
 
   summary:
     needs: [unit, llm]

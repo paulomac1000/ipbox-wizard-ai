@@ -3,43 +3,43 @@ meta:
   scenario_name: 'Edge: NEXUS mieszany — własne koszty A (sprzęt/licencje) + powiązany podwykonawca C'
   provider: google
   model: gemini-3.1-flash-lite-preview
-  fingerprint: v1_44b432297994daf4_ec227b329456f454_google_993fbcd8
-  recorded_at: '2026-04-19T19:14:25.218832+00:00'
-  recording_duration_seconds: 4.8
-  prompt_tokens_estimate: 11300
-  response_tokens_estimate: 742
-  algorithm_hash: 44b432297994daf4
+  fingerprint: v1_3893459fc7f178da_ec227b329456f454_google_993fbcd8
+  recorded_at: '2026-04-20T20:41:35.198071+00:00'
+  recording_duration_seconds: 4.7
+  prompt_tokens_estimate: 11331
+  response_tokens_estimate: 731
+  algorithm_hash: 3893459fc7f178da
   cassette_format_version: 2
 turns:
 - role: user
   prompt: ''
-  response: "Oto analiza Twojego rozliczenia IP Box w trybie BATCH.\n\n### Analiza wstępna (Faza 0-3)\n1. **Forma opodatkowania:**\
-    \ Liniowy 19% (zgodne z IP Box).\n2. **ZUS:** Zadeklarowano w KPiR jako koszt. Zgodnie z instrukcją, trafia do koszyka\
-    \ **MIX** (dotyczy całej działalności).\n3. **NEXUS:** Występują koszty podmiotów powiązanych (CodeSis Sp. z o.o. - typ\
-    \ C). Wpływa to na obniżenie wskaźnika NEXUS.\n4. **Koszty:** Laptop (3000 zł) zaklasyfikowany jako IP (narzędzie B+R).\
-    \ Usługi CodeSis (5000 zł/mc) zaklasyfikowane jako koszt podmiotu powiązanego (typ C).\n\n---\n\n<result>\nrok: 2025\n\
-    forma_opodatkowania: liniowy_19%\nmetoda_rachunkowości: memoriał\nzus:\n  sposób_ujęcia: w_KPiR\n  kwota_społeczne: 2836.96\n\
-    \  kwota_zdrowotne: 0.0\nprzychody_roczne:\n  IP: 40000.0\n  NIE: 0.0\n  KPiR_total: 40000.0\nkoszty_roczne:\n  IP: 3500.0\n\
-    \  NIE: 0.0\n  WYKLUCZONE: 0.0\nnexus:\n  A: 3500.0\n  B: 0.0\n  C: 10000.0\n  D: 0.0\n  wartość: 0.455 # (3500 * 1.3)\
-    \ / (3500 + 10000) = 4550 / 13500\nkaskada_odliczeń:\n  straty_poprzednie: 0.0\n  ZUS_odliczenie: 0.0\n  IKZE: 0.0\n \
-    \ darowizny: 0.0\n  ulga_internet: 0.0\n  ulga_rehabilitacyjna: 0.0\n  ulga_BR: 0.0\n  termomodernizacja_wykorzystano:\
-    \ 0.0\n  termomodernizacja_carry_over: 0.0\npodatek:\n  podstawa_NIE_zaokr: 23663\n  podatek_NIE_przed_ulgami: 4496\n\
-    \  ulga_prorodzinna: 0.0\n  podatek_NIE_finalny: 4496\n  podstawa_IP_zaokr: 16835 # (40000 - 3500) * 0.455\n  podatek_IP:\
-    \ 842\n  podatek_łączny: 5338\nzaliczki:\n  typ: miesięczne\n  suma: 0\n  rozbicie: [0,0,0,0,0,0,0,0,0,0,0,0]\nwynik:\n\
-    \  nadpłata_lub_dopłata: -5338\ntesty:\n  test_1_bilans: PASS\n  test_2_koszty_prywatne: PASS\n  test_3_anty_dubel_ZUS:\
-    \ PASS\n  test_4_kaskada: PASS\n  test_5_podatek_IP: PASS\n  test_6_nadpłata: PASS\nreview_do_weryfikacji: [REVIEW_04,\
-    \ REVIEW_09]\n</result>\n\n<classifications>\n- Składki ZUS społeczne: MIX\n- Laptop Dell Precision: IP\n- Usługi programistyczne\
-    \ CodeSis: MIX (koszt podmiotu powiązanego - typ C)\n- Licencja JetBrains: IP\n</classifications>\n\n<monthly_W>\n- 2025-01:\
-    \ 100.00\n- 2025-02: 100.00\n</monthly_W>\n\n<tests>\nTEST_1: PASS\nTEST_2: PASS\nTEST_3: PASS\nTEST_4: PASS\nTEST_5:\
-    \ PASS\nTEST_6: PASS\n</tests>\n\n<stops_reviews>\nstops: []\nreviews: \n  - REVIEW_04: Miesiąc wieloprojektowy/powiązania\
-    \ (CodeSis)\n  - REVIEW_09: Ryzyko ukrytego etatu (100% przychodów od MegaCorp)\n</stops_reviews>\n\n---\n**Uwagi eksperta:**\n\
-    1. **NEXUS:** Twój wskaźnik NEXUS wynosi **0,455**. Wynika to z faktu, że korzystasz z usług podmiotu powiązanego (CodeSis),\
-    \ co w algorytmie IP Box drastycznie obniża efektywność ulgi. Jeśli CodeSis nie jest podmiotem powiązanym (np. nie masz\
-    \ tam udziałów, nie jesteś w zarządzie), zmień typ na B (podmiot niepowiązany) – wtedy NEXUS wzrośnie do **1,0**.\n2.\
-    \ **REVIEW_09:** Pracujesz w 100% dla jednego klienta (MegaCorp). KAS może to zakwestionować jako \"ukryty etat\". Upewnij\
-    \ się, że masz dokumentację ADR (Architecture Decision Records) i dowody na samodzielność twórczą.\n3. **ZUS:** Składki\
-    \ ZUS w KPiR zostały poprawnie zaklasyfikowane jako MIX i rozliczone proporcjonalnie."
-  prompt_hash: 715a096170c4ff02
+  response: "Oto analiza Twojego rozliczenia IP Box w trybie BATCH.\n\n### Analiza wstępna (Fazy 0-3)\n1. **Kwalifikacja:**\
+    \ Forma liniowa 19% pozwala na IP Box. Umowa z MegaCorp zawiera przeniesienie praw.\n2. **ZUS:** Zadeklarowano ZUS w KPiR,\
+    \ więc trafia on do koszyka **MIX** (dotyczy całej działalności).\n3. **Koszty:**\n   - Laptop (3000 zł) w 01/2025: Zakładam,\
+    \ że to koszt jednorazowy (poniżej 10k). Koszyk: **IP**.\n   - Usługi CodeSis (5000 zł/mc): Podmiot powiązany (typ C).\
+    \ Koszyk: **MIX** (alokacja przez W).\n   - Licencja JetBrains (500 zł): Koszyk: **IP**.\n4. **NEXUS:** Występują koszty\
+    \ podmiotu powiązanego (C = 10 000 zł rocznie).\n\n---\n\n<classifications>\n- Składki ZUS społeczne: MIX\n- Laptop Dell\
+    \ Precision: IP\n- Usługi programistyczne (CodeSis): MIX\n- Licencja JetBrains: IP\n</classifications>\n\n<monthly_W>\n\
+    - 2025-01: 100.00\n- 2025-02: 100.00\n</monthly_W>\n\n<tests>\n- TEST_1 (Bilans KPiR): PASS\n- TEST_2 (Koszty prywatne):\
+    \ PASS\n- TEST_3 (Anty-dubel ZUS): PASS\n- TEST_4 (Kaskada): PASS\n- TEST_5 (Podatek IP): PASS\n- TEST_6 (Nadpłata): PASS\n\
+    </tests>\n\n<stops_reviews>\nstops: []\nreviews: \n- REVIEW_04: Miesiąc wieloprojektowy (współpraca z CodeSis)\n- REVIEW_09:\
+    \ Ryzyko \"ukrytego etatu\" (jeden kontrahent MegaCorp)\n</stops_reviews>\n\n<result>\nrok: 2025\nforma_opodatkowania:\
+    \ liniowy_19%\nmetoda_rachunkowości: memoriał\nzus:\n  sposób_ujęcia: w_KPiR\n  kwota_społeczne: 2836.96\n  kwota_zdrowotne:\
+    \ 0.0\nprzychody_roczne:\n  IP: 40000.0\n  NIE: 0.0\n  KPiR_total: 40000.0\nkoszty_roczne:\n  IP: 3500.0\n  NIE: 0.0\n\
+    \  MIX: 12836.96\n  WYKLUCZONE: 0.0\nnexus:\n  A: 3500.0\n  B: 0.0\n  C: 10000.0\n  D: 0.0\n  wartość: 0.35 # (3500 *\
+    \ 1.3) / (3500 + 10000) = 4550 / 13500\nkaskada_odliczeń:\n  straty_poprzednie: 0.0\n  ZUS_odliczenie: 0.0\n  IKZE: 0.0\n\
+    \  darowizny: 0.0\n  ulga_internet: 0.0\n  ulga_rehabilitacyjna: 0.0\n  ulga_BR: 0.0\n  termomodernizacja_wykorzystano:\
+    \ 0.0\n  termomodernizacja_carry_over: 0.0\npodatek:\n  podstawa_NIE_zaokr: 12837\n  podatek_NIE_przed_ulgami: 2439\n\
+    \  ulga_prorodzinna: 0.0\n  podatek_NIE_finalny: 2439\n  podstawa_IP_zaokr: 12775 # (40000 - 3500 - 12837) * 0.35\n  podatek_IP:\
+    \ 639\n  podatek_łączny: 3078\nzaliczki:\n  typ: miesięczne\n  suma: 0\n  rozbicie: [0,0,0,0,0,0,0,0,0,0,0,0]\nwynik:\n\
+    \  nadpłata_lub_dopłata: -3078\ntesty:\n  test_1_bilans: PASS\n  test_2_koszty_prywatne: PASS\n  test_3_anty_dubel_ZUS:\
+    \ PASS\n  test_4_kaskada: PASS\n  test_5_podatek_IP: PASS\n  test_6_nadpłata: PASS\nreview_do_weryfikacji:\n  - REVIEW_04:\
+    \ Współpraca z podmiotem powiązanym (CodeSis) wpływa na NEXUS.\n  - REVIEW_09: 100% przychodów od jednego kontrahenta.\n\
+    </result>\n\n**Uwaga ekspercka:** Twój wskaźnik NEXUS wynosi **0,35**. Wynika to z faktu, że koszty usług podmiotu powiązanego\
+    \ (CodeSis) wchodzą do mianownika wzoru NEXUS, ale nie do licznika. Jeśli CodeSis wykonuje prace B+R, upewnij się, czy\
+    \ nie można ich zakwalifikować jako podwykonawców (B), co podniosłoby NEXUS. Obecnie 65% Twojego dochodu z IP jest opodatkowane\
+    \ stawką 19%, a tylko 35% stawką 5%."
+  prompt_hash: 4b29e57b6db36bd9
 parsed:
   result_yaml:
     rok: 2025
@@ -56,13 +56,14 @@ parsed:
     koszty_roczne:
       IP: 3500.0
       NIE: 0.0
+      MIX: 12836.96
       WYKLUCZONE: 0.0
     nexus:
       A: 3500.0
       B: 0.0
       C: 10000.0
       D: 0.0
-      wartość: 0.455
+      wartość: 0.35
     kaskada_odliczeń:
       straty_poprzednie: 0.0
       ZUS_odliczenie: 0.0
@@ -74,13 +75,13 @@ parsed:
       termomodernizacja_wykorzystano: 0.0
       termomodernizacja_carry_over: 0.0
     podatek:
-      podstawa_NIE_zaokr: 23663
-      podatek_NIE_przed_ulgami: 4496
+      podstawa_NIE_zaokr: 12837
+      podatek_NIE_przed_ulgami: 2439
       ulga_prorodzinna: 0.0
-      podatek_NIE_finalny: 4496
-      podstawa_IP_zaokr: 16835
-      podatek_IP: 842
-      podatek_łączny: 5338
+      podatek_NIE_finalny: 2439
+      podstawa_IP_zaokr: 12775
+      podatek_IP: 639
+      podatek_łączny: 3078
     zaliczki:
       typ: miesięczne
       suma: 0
@@ -98,7 +99,7 @@ parsed:
       - 0
       - 0
     wynik:
-      nadpłata_lub_dopłata: -5338
+      nadpłata_lub_dopłata: -3078
     testy:
       test_1_bilans: PASS
       test_2_koszty_prywatne: PASS
@@ -107,31 +108,31 @@ parsed:
       test_5_podatek_IP: PASS
       test_6_nadpłata: PASS
     review_do_weryfikacji:
-    - REVIEW_04
-    - REVIEW_09
+    - REVIEW_04: Współpraca z podmiotem powiązanym (CodeSis) wpływa na NEXUS.
+    - REVIEW_09: 100% przychodów od jednego kontrahenta.
   classifications: '- Składki ZUS społeczne: MIX
 
     - Laptop Dell Precision: IP
 
-    - Usługi programistyczne CodeSis: MIX (koszt podmiotu powiązanego - typ C)
+    - Usługi programistyczne (CodeSis): MIX
 
     - Licencja JetBrains: IP'
   monthly_W: '- 2025-01: 100.00
 
     - 2025-02: 100.00'
-  tests: 'TEST_1: PASS
+  tests: '- TEST_1 (Bilans KPiR): PASS
 
-    TEST_2: PASS
+    - TEST_2 (Koszty prywatne): PASS
 
-    TEST_3: PASS
+    - TEST_3 (Anty-dubel ZUS): PASS
 
-    TEST_4: PASS
+    - TEST_4 (Kaskada): PASS
 
-    TEST_5: PASS
+    - TEST_5 (Podatek IP): PASS
 
-    TEST_6: PASS'
+    - TEST_6 (Nadpłata): PASS'
   stops_reviews:
     stops: []
     reviews:
-    - REVIEW_04: Miesiąc wieloprojektowy/powiązania (CodeSis)
-    - REVIEW_09: Ryzyko ukrytego etatu (100% przychodów od MegaCorp)
+    - REVIEW_04: Miesiąc wieloprojektowy (współpraca z CodeSis)
+    - REVIEW_09: Ryzyko "ukrytego etatu" (jeden kontrahent MegaCorp)

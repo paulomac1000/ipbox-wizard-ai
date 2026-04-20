@@ -3,43 +3,40 @@ meta:
   scenario_name: 'Edge: NEXUS = 0 — tylko powiązany podwykonawca (typ C)'
   provider: google
   model: gemini-3.1-flash-lite-preview
-  fingerprint: v1_44b432297994daf4_fcd9003138de7965_google_993fbcd8
-  recorded_at: '2026-04-19T19:14:20.378406+00:00'
-  recording_duration_seconds: 5.24
-  prompt_tokens_estimate: 11136
-  response_tokens_estimate: 732
-  algorithm_hash: 44b432297994daf4
+  fingerprint: v1_3893459fc7f178da_fcd9003138de7965_google_993fbcd8
+  recorded_at: '2026-04-20T20:41:30.462641+00:00'
+  recording_duration_seconds: 4.44
+  prompt_tokens_estimate: 11168
+  response_tokens_estimate: 648
+  algorithm_hash: 3893459fc7f178da
   cassette_format_version: 2
 turns:
 - role: user
   prompt: ''
-  response: "Dzień dobry. Jako ekspert podatkowy przystępuję do analizy Twojego przypadku w trybie BATCH zgodnie z algorytmem\
-    \ IP Box.\n\n### Analiza wstępna (Faza 0-1)\n1. **Kwalifikacja:** Posiadasz umowę z przeniesieniem praw autorskich (GlobalSoft\
-    \ S.A.), co spełnia wymogi [PRAWO].\n2. **Ryzyko:** Wskazałeś podwykonawcę powiązanego (DevBro Sp. z o.o. – spółka brata).\
-    \ Zgodnie z art. 30ca ust. 7 pkt 2 ustawy o PIT, koszty od podmiotów powiązanych (koszyk C) wchodzą do mianownika NEXUS,\
-    \ ale nie do licznika.\n3. **ZUS:** Brak deklaracji ZUS (przyjęto 0 zł).\n4. **Koszty:** Faktura od spółki powiązanej\
-    \ (15 000 zł) jest kosztem kwalifikowanym B+R, ale ze względu na powiązania, w całości trafia do koszyka **C** (mianownik\
-    \ NEXUS).\n\n---\n\n### Obliczenia (Faza 2-4)\n\n**Współczynnik W:**\nFormuła: `W = ((160 - 0) * 100%) / 160 * 100 = 100,00%`\n\
-    \n**NEXUS (Faza 7.3):**\n`A` (własne) = 0 zł\n`B` (niepowiązane) = 0 zł\n`C` (powiązane) = 15 000 zł\n`D` (nabycie IP)\
-    \ = 0 zł\n`NEXUS = min(1,0, (0 * 1,3 + 0) / (0 + 0 + 15000 + 0)) = 0,00`\n\n**Wniosek:** Przy obecnej strukturze kosztów\
-    \ (tylko podwykonawca powiązany), Twój wskaźnik NEXUS wynosi **0**. Oznacza to, że dochód z IP Box nie kwalifikuje się\
-    \ do stawki 5% w tym roku, chyba że poniesiesz koszty własne (A) lub od podmiotów niepowiązanych (B).\n\n---\n\n<result>\n\
-    rok: 2025\nforma_opodatkowania: liniowy_19%\nmetoda_rachunkowości: memoriał\nzus:\n  sposób_ujęcia: brak\n  kwota_społeczne:\
-    \ 0.00\n  kwota_zdrowotne: 0.00\nprzychody_roczne:\n  IP: 20000.00\n  NIE: 0.00\n  KPiR_total: 20000.00\nkoszty_roczne:\n\
-    \  IP: 0.00\n  NIE: 0.00\n  WYKLUCZONE: 0.00\nnexus:\n  A: 0.00\n  B: 0.00\n  C: 15000.00\n  D: 0.00\n  wartość: 0.00\n\
-    kaskada_odliczeń:\n  straty_poprzednie: 0.00\n  ZUS_odliczenie: 0.00\n  IKZE: 0.00\n  darowizny: 0.00\n  ulga_internet:\
-    \ 0.00\n  ulga_rehabilitacyjna: 0.00\n  ulga_BR: 0.00\n  termomodernizacja_wykorzystano: 0.00\n  termomodernizacja_carry_over:\
-    \ 0.00\npodatek:\n  podstawa_NIE_zaokr: 5000\n  podatek_NIE_przed_ulgami: 950\n  ulga_prorodzinna: 0.00\n  podatek_NIE_finalny:\
-    \ 950\n  podstawa_IP_zaokr: 0\n  podatek_IP: 0\n  podatek_łączny: 950\nzaliczki:\n  typ: miesięczne\n  suma: 0\n  rozbicie:\
-    \ [0,0,0,0,0,0,0,0,0,0,0,0]\nwynik:\n  nadpłata_lub_dopłata: -950\ntesty:\n  test_1_bilans: PASS\n  test_2_koszty_prywatne:\
-    \ PASS\n  test_3_anty_dubel_ZUS: PASS\n  test_4_kaskada: PASS\n  test_5_podatek_IP: PASS\n  test_6_nadpłata: PASS\nreview_do_weryfikacji:\
-    \ [REVIEW_09, REVIEW_11]\n</result>\n\n<classifications>\n- Usługi programistyczne (DevBro Sp. z o.o.): WYKLUCZONE (z\
-    \ punktu widzenia IP Box jako kosztu bezpośredniego, wchodzi do NEXUS jako C)\n</classifications>\n\n<monthly_W>\n2025-01:\
-    \ 100.00\n</monthly_W>\n\n<tests>\nTEST_1: PASS\nTEST_2: PASS\nTEST_3: PASS\nTEST_4: PASS\nTEST_5: PASS\nTEST_6: PASS\n\
-    </tests>\n\n<stops_reviews>\nstops: []\nreviews: \n  - REVIEW_09: Jeden kontrahent (GlobalSoft S.A.) odpowiada za 100%\
-    \ przychodów.\n  - REVIEW_11: Praca zespołowa/podwykonawstwo (DevBro Sp. z o.o.) wymaga udokumentowania samodzielnego\
-    \ modułu.\n</reviews>"
-  prompt_hash: b626dc5a4faa6d38
+  response: "Oto analiza Twojego przypadku zgodnie z algorytmem IP Box.\n\n### Faza 0-1: Kwalifikacja i Dane\n*   **Forma:**\
+    \ Liniowy 19%.\n*   **Model:** Przeniesienie praw (GlobalSoft S.A.).\n*   **Koszty:** 15 000 zł (podwykonawca powiązany\
+    \ - DevBro Sp. z o.o.).\n*   **NEXUS:** Występuje koszt podmiotu powiązanego (C = 15 000).\n*   **Współczynnik W:** 160h\
+    \ pracy / 160h ogółem = 100%.\n\n### Faza 2-4: Obliczenia (Miesiąc 2025-01)\n*   **Przychód IP:** 20 000 zł.\n*   **Koszty\
+    \ IP:** 0 zł (bezpośrednie) + 0 zł (MIX) = 0 zł.\n*   **Koszty NIE:** 15 000 zł (koszt podwykonawcy powiązanego nie wchodzi\
+    \ do NEXUS A, jest kosztem NIE).\n*   **Dochód IP:** 20 000 zł.\n*   **Dochód NIE:** -15 000 zł.\n\n### Faza 7: NEXUS\
+    \ i Podatek\n*   **NEXUS:** `min(1,0, (0 * 1,3 + 0) / (0 + 0 + 15000 + 0)) = 0`.\n*   **Wniosek:** Przy braku kosztów\
+    \ własnych (A=0) i obecności kosztów podmiotów powiązanych (C=15000), wskaźnik NEXUS wynosi 0. **Ulga IP Box w tym miesiącu\
+    \ nie przynosi korzyści podatkowej.**\n\n---\n\n<result>\nrok: 2025\nforma_opodatkowania: liniowy_19%\nmetoda_rachunkowości:\
+    \ memoriał\nzus:\n  sposób_ujęcia: brak\nprzychody_roczne:\n  IP: 20000.00\n  NIE: 0.00\n  KPiR_total: 20000.00\nkoszty_roczne:\n\
+    \  IP: 0.00\n  NIE: 15000.00\n  WYKLUCZONE: 0.00\nnexus:\n  A: 0.00\n  B: 0.00\n  C: 15000.00\n  D: 0.00\n  wartość: 0.00\n\
+    podatek:\n  podstawa_NIE_zaokr: 0\n  podatek_NIE_przed_ulgami: 0\n  podatek_IP: 0\n  podatek_łączny: 0\nwynik:\n  nadpłata_lub_dopłata:\
+    \ 0\ntesty:\n  test_1_bilans: \"PASS\"\n  test_2_koszty_prywatne: \"PASS\"\n  test_3_anty_dubel_ZUS: \"PASS\"\n  test_4_kaskada:\
+    \ \"PASS\"\n  test_5_podatek_IP: \"PASS\"\n  test_6_nadpłata: \"PASS\"\n</result>\n\n<classifications>\n- Usługi programistyczne\
+    \ (DevBro Sp. z o.o.): NIE (koszt podmiotu powiązanego, nie buduje NEXUS A)\n</classifications>\n\n<monthly_W>\n| Miesiąc\
+    \ | Współczynnik W |\n| :--- | :--- |\n| 2025-01 | 100.00 |\n</monthly_W>\n\n<tests>\nTEST_1: PASS\nTEST_2: PASS\nTEST_3:\
+    \ PASS\nTEST_4: PASS\nTEST_5: PASS\nTEST_6: PASS\n</tests>\n\n<stops_reviews>\nstops: []\nreviews: \n- \"REVIEW_03: A\
+    \ = 0 przy dodatnim dochodzie IP. Brak kosztów własnych (A) przy obecności kosztów podmiotów powiązanych (C) zeruje wskaźnik\
+    \ NEXUS.\"\n- \"REVIEW_11: Praca zespołowa/podwykonawstwo. Koszty zlecone podmiotowi powiązanemu nie zwiększają NEXUS,\
+    \ a mogą go zerować.\"\n</stops_reviews>\n\n**Ważna uwaga:** Twój wskaźnik NEXUS wynosi 0, ponieważ nie poniosłeś żadnych\
+    \ kosztów własnych (A=0), a jedyny koszt (15 000 zł) pochodzi od podmiotu powiązanego (C). W tej konfiguracji ulga IP\
+    \ Box jest nieefektywna. Zalecam poniesienie kosztów własnych (np. zakup sprzętu, licencji) w ramach działalności B+R,\
+    \ aby zwiększyć wartość licznika NEXUS."
+  prompt_hash: 4eddb3e7ac0778b5
 parsed:
   result_yaml:
     rok: 2025
@@ -47,15 +44,13 @@ parsed:
     metoda_rachunkowości: memoriał
     zus:
       sposób_ujęcia: brak
-      kwota_społeczne: 0.0
-      kwota_zdrowotne: 0.0
     przychody_roczne:
       IP: 20000.0
       NIE: 0.0
       KPiR_total: 20000.0
     koszty_roczne:
       IP: 0.0
-      NIE: 0.0
+      NIE: 15000.0
       WYKLUCZONE: 0.0
     nexus:
       A: 0.0
@@ -63,42 +58,13 @@ parsed:
       C: 15000.0
       D: 0.0
       wartość: 0.0
-    kaskada_odliczeń:
-      straty_poprzednie: 0.0
-      ZUS_odliczenie: 0.0
-      IKZE: 0.0
-      darowizny: 0.0
-      ulga_internet: 0.0
-      ulga_rehabilitacyjna: 0.0
-      ulga_BR: 0.0
-      termomodernizacja_wykorzystano: 0.0
-      termomodernizacja_carry_over: 0.0
     podatek:
-      podstawa_NIE_zaokr: 5000
-      podatek_NIE_przed_ulgami: 950
-      ulga_prorodzinna: 0.0
-      podatek_NIE_finalny: 950
-      podstawa_IP_zaokr: 0
+      podstawa_NIE_zaokr: 0
+      podatek_NIE_przed_ulgami: 0
       podatek_IP: 0
-      podatek_łączny: 950
-    zaliczki:
-      typ: miesięczne
-      suma: 0
-      rozbicie:
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
+      podatek_łączny: 0
     wynik:
-      nadpłata_lub_dopłata: -950
+      nadpłata_lub_dopłata: 0
     testy:
       test_1_bilans: PASS
       test_2_koszty_prywatne: PASS
@@ -106,12 +72,12 @@ parsed:
       test_4_kaskada: PASS
       test_5_podatek_IP: PASS
       test_6_nadpłata: PASS
-    review_do_weryfikacji:
-    - REVIEW_09
-    - REVIEW_11
-  classifications: '- Usługi programistyczne (DevBro Sp. z o.o.): WYKLUCZONE (z punktu widzenia IP Box jako kosztu bezpośredniego,
-    wchodzi do NEXUS jako C)'
-  monthly_W: '2025-01: 100.00'
+  classifications: '- Usługi programistyczne (DevBro Sp. z o.o.): NIE (koszt podmiotu powiązanego, nie buduje NEXUS A)'
+  monthly_W: '| Miesiąc | Współczynnik W |
+
+    | :--- | :--- |
+
+    | 2025-01 | 100.00 |'
   tests: 'TEST_1: PASS
 
     TEST_2: PASS
@@ -123,4 +89,9 @@ parsed:
     TEST_5: PASS
 
     TEST_6: PASS'
-  stops_reviews: null
+  stops_reviews:
+    stops: []
+    reviews:
+    - 'REVIEW_03: A = 0 przy dodatnim dochodzie IP. Brak kosztów własnych (A) przy obecności kosztów podmiotów powiązanych
+      (C) zeruje wskaźnik NEXUS.'
+    - 'REVIEW_11: Praca zespołowa/podwykonawstwo. Koszty zlecone podmiotowi powiązanemu nie zwiększają NEXUS, a mogą go zerować.'

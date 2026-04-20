@@ -3,45 +3,45 @@ meta:
   scenario_name: 'Weryfikacja: Brak danych KPiR — REVIEW o niekompletne dane'
   provider: google
   model: gemini-3.1-flash-lite-preview
-  fingerprint: v1_44b432297994daf4_fe6c26e8dd5aea59_google_993fbcd8
-  recorded_at: '2026-04-19T19:14:59.374935+00:00'
-  recording_duration_seconds: 4.13
-  prompt_tokens_estimate: 11122
-  response_tokens_estimate: 669
-  algorithm_hash: 44b432297994daf4
+  fingerprint: v1_3893459fc7f178da_fe6c26e8dd5aea59_google_993fbcd8
+  recorded_at: '2026-04-20T20:42:06.742569+00:00'
+  recording_duration_seconds: 4.15
+  prompt_tokens_estimate: 11154
+  response_tokens_estimate: 682
+  algorithm_hash: 3893459fc7f178da
   cassette_format_version: 2
 turns:
 - role: user
   prompt: ''
-  response: "Dzień dobry. Jako ekspert podatkowy przystępuję do analizy Twojego rozliczenia IP Box w trybie BATCH.\n\n###\
-    \ FAZA 0–6: Analiza i weryfikacja\n*   **Kwalifikacja:** Umowa z AnonymCorp zawiera klauzulę przeniesienia praw (spełnia\
-    \ 0.5). Forma opodatkowania: liniowy 19% (dopuszczalna).\n*   **Brak danych:** W przesłanych danych brakuje ewidencji\
-    \ czasu pracy (godziny B+R vs nie-B+R). Przyjąłem założenie, że w podanych miesiącach 100% czasu pracy było poświęcone\
-    \ na tworzenie IP (W=100%), co wymaga Twojej weryfikacji (REVIEW_01).\n*   **Koszty:** Brak kosztów w KPiR oznacza, że\
-    \ NEXUS A = 0. W przypadku braku kosztów bezpośrednich, ulga IP Box jest ryzykowna (brak \"wkładu\" w IP). Zalecam ujęcie\
-    \ choćby kosztów licencji IDE lub sprzętu w KPiR.\n\n---\n\n<result>\nrok: 2025\nforma_opodatkowania: \"liniowy 19%\"\n\
-    metoda_rachunkowości: \"memoriał\"\nzus:\n  sposób_ujęcia: \"w_KPiR\"\n  kwota_społeczne: 0.00\n  kwota_zdrowotne: 0.00\n\
-    przychody_roczne:\n  IP: 36000.00\n  NIE: 0.00\n  KPiR_total: 36000.00\nkoszty_roczne:\n  IP: 0.00\n  NIE: 0.00\n  WYKLUCZONE:\
-    \ 0.00\nnexus:\n  A: 0.00\n  B: 0.00\n  C: 0.00\n  D: 0.00\n  wartość: 1.00\nkaskada_odliczeń:\n  straty_poprzednie: 0.00\n\
-    \  ZUS_odliczenie: 0.00\n  IKZE: 0.00\n  darowizny: 0.00\n  ulga_internet: 0.00\n  ulga_rehabilitacyjna: 0.00\n  ulga_BR:\
-    \ 0.00\n  termomodernizacja_wykorzystano: 0.00\n  termomodernizacja_carry_over: 0.00\npodatek:\n  podstawa_NIE_zaokr:\
-    \ 0\n  podatek_NIE_przed_ulgami: 0\n  ulga_prorodzinna: 0.00\n  podatek_NIE_finalny: 0\n  podstawa_IP_zaokr: 36000\n \
-    \ podatek_IP: 1800\n  podatek_łączny: 1800\nzaliczki:\n  typ: \"miesięczne\"\n  suma: 0\n  rozbicie: [0,0,0,0,0,0,0,0,0,0,0,0]\n\
-    wynik:\n  nadpłata_lub_dopłata: -1800\ntesty:\n  test_1_bilans: \"PASS\"\n  test_2_koszty_prywatne: \"PASS\"\n  test_3_anty_dubel_ZUS:\
-    \ \"PASS\"\n  test_4_kaskada: \"PASS\"\n  test_5_podatek_IP: \"PASS\"\n  test_6_nadpłata: \"PASS\"\nreview_do_weryfikacji:\
-    \ [\"REVIEW_01: W=100% wymaga pełnej dokumentacji\", \"REVIEW_09: Jeden kontrahent = 100% przychodów\"]\n</result>\n\n\
-    <classifications>\n# Brak pozycji w KPiR w przesłanych danych.\n</classifications>\n\n<monthly_W>\n2025-01: 100.00\n2025-02:\
-    \ 100.00\n</monthly_W>\n\n<tests>\nTEST_1: PASS\nTEST_2: PASS\nTEST_3: PASS\nTEST_4: PASS\nTEST_5: PASS\nTEST_6: PASS\n\
-    </tests>\n\n<stops_reviews>\nstops: []\nreviews: \n  - \"REVIEW_01: W=100% wymaga pełnej dokumentacji (brak ewidencji\
-    \ czasu)\"\n  - \"REVIEW_09: Jeden kontrahent = 100% przychodów (ryzyko ukrytego etatu)\"\n</stops_reviews>\n\n---\n**Dalsze\
-    \ kroki:**\n1. Czy potwierdzasz, że w tych miesiącach 100% czasu pracy było poświęcone na prace B+R?\n2. Czy posiadasz\
-    \ jakiekolwiek koszty (np. laptop, licencje), które można ująć w KPiR, aby zwiększyć NEXUS A?\n3. Czy chcesz, abym wygenerował\
-    \ szablon ewidencji IP Box w formacie CSV?"
-  prompt_hash: 26ec23c0148e96ba
+  response: "Dzień dobry. Przystępuję do procedowania Twojego rozliczenia IP Box w trybie BATCH zgodnie z algorytmem.\n\n\
+    ### Faza 0: Kwalifikacja\n*   **Forma opodatkowania:** Liniowy 19% (dopuszczalna).\n*   **Umowa:** Przeniesienie praw\
+    \ autorskich (spełnia wymogi).\n*   **Brak interpretacji KIS:** Ostrzegam, że rozliczenie opieram na katalogu domyślnym.\
+    \ Ryzyko zakwestionowania przez KAS spoczywa na Tobie.\n*   **ZUS:** W KPiR (koszt).\n\n### Faza 1-4: Obliczenia\nPrzyjąłem\
+    \ 160h jako standardowy czas pracy (brak ewidencji godzinowej w danych wejściowych). Przyjąłem 100% zaangażowania w IP\
+    \ (W=100%), ponieważ opisy projektów wskazują na tworzenie nowych rozwiązań (integracja API, optymalizacja SQL).\n\n**Obliczenia\
+    \ miesięczne (styczeń i luty):**\n*   Przychód IP: 18 000 zł\n*   Koszty IP: 0 zł\n*   Dochód IP: 18 000 zł\n*   W = 100%\n\
+    \n---\n\n<result>\nrok: 2025\nforma_opodatkowania: liniowy_19%\nmetoda_rachunkowości: memoriał\nzus:\n  sposób_ujęcia:\
+    \ w_KPiR\n  kwota_społeczne: 0.00\n  kwota_zdrowotne: 0.00\nprzychody_roczne:\n  IP: 36000.00\n  NIE: 0.00\n  KPiR_total:\
+    \ 36000.00\nkoszty_roczne:\n  IP: 0.00\n  NIE: 0.00\n  WYKLUCZONE: 0.00\nnexus:\n  A: 0.00\n  B: 0.00\n  C: 0.00\n  D:\
+    \ 0.00\n  wartość: 1.00\nkaskada_odliczeń:\n  straty_poprzednie: 0.00\n  ZUS_odliczenie: 0.00\n  IKZE: 0.00\n  darowizny:\
+    \ 0.00\n  ulga_internet: 0.00\n  ulga_rehabilitacyjna: 0.00\n  ulga_BR: 0.00\n  termomodernizacja_wykorzystano: 0.00\n\
+    \  termomodernizacja_carry_over: 0.00\npodatek:\n  podstawa_NIE_zaokr: 0\n  podatek_NIE_przed_ulgami: 0\n  ulga_prorodzinna:\
+    \ 0.00\n  podatek_NIE_finalny: 0\n  podstawa_IP_zaokr: 36000\n  podatek_IP: 1800\n  podatek_łączny: 1800\nzaliczki:\n\
+    \  typ: miesięczne\n  suma: 0\n  rozbicie: [0,0,0,0,0,0,0,0,0,0,0,0]\nwynik:\n  nadpłata_lub_dopłata: -1800\ntesty:\n\
+    \  test_1_bilans: PASS\n  test_2_koszty_prywatne: PASS\n  test_3_anty_dubel_ZUS: PASS\n  test_4_kaskada: PASS\n  test_5_podatek_IP:\
+    \ PASS\n  test_6_nadpłata: PASS\nreview_do_weryfikacji: [REVIEW_09]\n</result>\n\n<classifications>\n# Brak kosztów w\
+    \ KPiR w dostarczonych danych.\n</classifications>\n\n<monthly_W>\n2025-01: 100.00\n2025-02: 100.00\n</monthly_W>\n\n\
+    <tests>\nTEST_1: PASS\nTEST_2: PASS\nTEST_3: PASS\nTEST_4: PASS\nTEST_5: PASS\nTEST_6: PASS\n</tests>\n\n<stops_reviews>\n\
+    stops: []\nreviews: \n  - REVIEW_09: Jeden kontrahent (AnonymCorp Sp. z o.o.) odpowiada za 100% przychodów. Ryzyko uznania\
+    \ za \"ukryty etat\".\n</reviews>\n</stops_reviews>\n\n---\n\n**Dalsze kroki:**\n1. Czy potwierdzasz powyższe dane?\n\
+    2. Czy chcesz, abym wygenerował ewidencję IP Box w formacie CSV/XLSX?\n3. Pamiętaj o **REVIEW_09** — przy 100% przychodów\
+    \ od jednego klienta, KAS może zakwestionować IP Box. Zalecam przygotowanie dokumentacji potwierdzającej brak podporządkowania\
+    \ (np. brak godzin pracy narzuconych przez klienta, brak korzystania z narzędzi klienta)."
+  prompt_hash: 737648261a92792a
 parsed:
   result_yaml:
     rok: 2025
-    forma_opodatkowania: liniowy 19%
+    forma_opodatkowania: liniowy_19%
     metoda_rachunkowości: memoriał
     zus:
       sposób_ujęcia: w_KPiR
@@ -105,9 +105,8 @@ parsed:
       test_5_podatek_IP: PASS
       test_6_nadpłata: PASS
     review_do_weryfikacji:
-    - 'REVIEW_01: W=100% wymaga pełnej dokumentacji'
-    - 'REVIEW_09: Jeden kontrahent = 100% przychodów'
-  classifications: '# Brak pozycji w KPiR w przesłanych danych.'
+    - REVIEW_09
+  classifications: '# Brak kosztów w KPiR w dostarczonych danych.'
   monthly_W: '2025-01: 100.00
 
     2025-02: 100.00'
@@ -122,8 +121,5 @@ parsed:
     TEST_5: PASS
 
     TEST_6: PASS'
-  stops_reviews:
-    stops: []
-    reviews:
-    - 'REVIEW_01: W=100% wymaga pełnej dokumentacji (brak ewidencji czasu)'
-    - 'REVIEW_09: Jeden kontrahent = 100% przychodów (ryzyko ukrytego etatu)'
+  stops_reviews: "stops: []\nreviews: \n  - REVIEW_09: Jeden kontrahent (AnonymCorp Sp. z o.o.) odpowiada za 100% przychodów.\
+    \ Ryzyko uznania za \"ukryty etat\".\n</reviews>"

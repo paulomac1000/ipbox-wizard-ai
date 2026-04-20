@@ -3,25 +3,25 @@ meta:
   scenario_name: 'Brzegowy: Ulga rehabilitacyjna'
   provider: google
   model: gemini-3.1-flash-lite-preview
-  fingerprint: v1_44b432297994daf4_8d2bc72ccf92c9cf_google_993fbcd8
-  recorded_at: '2026-04-19T19:13:58.367691+00:00'
-  recording_duration_seconds: 3.99
-  prompt_tokens_estimate: 11064
-  response_tokens_estimate: 599
-  algorithm_hash: 44b432297994daf4
+  fingerprint: v1_3893459fc7f178da_8d2bc72ccf92c9cf_google_993fbcd8
+  recorded_at: '2026-04-20T20:41:12.279683+00:00'
+  recording_duration_seconds: 4.31
+  prompt_tokens_estimate: 11096
+  response_tokens_estimate: 671
+  algorithm_hash: 3893459fc7f178da
   cassette_format_version: 2
 turns:
 - role: user
   prompt: ''
-  response: "Dzień dobry. Jako ekspert podatkowy przystępuję do analizy Twojego rozliczenia IP Box w trybie BATCH.\n\n###\
-    \ FAZA 0–6: Analiza i obliczenia\n\n**1. Współczynnik W (Faza 2):**\nFormuła: `W = ((Czas_pracy − Czas_nie_IP) × (%_faktury\
-    \ / 100)) / Czas_pracy × 100`\nPodstawienie: `W = ((160 − 16) × 1,0) / 160 × 100`\nWynik: `W = 90,00%`\n\n**2. Klasyfikacja\
-    \ kosztów (Faza 3):**\n- Abonament internet (89 zł): Koszyk **MIX** (dotyczy całej działalności).\n\n**3. Obliczenia miesięczne\
-    \ (Faza 4):**\n- Przychód IP: `20 000 × 90% = 18 000 zł`\n- Przychód NIE: `20 000 × 10% = 2 000 zł`\n- Koszt IP: `89 ×\
-    \ 90% = 80,10 zł`\n- Koszt NIE: `89 × 10% = 8,90 zł`\n- Dochód IP: `18 000 − 80,10 = 17 919,90 zł`\n- Dochód NIE: `2 000\
-    \ − 8,90 = 1 991,10 zł`\n\n**4. Kaskada odliczeń (Faza 7):**\n- Dochód NIE po odliczeniu ulgi rehabilitacyjnej: `1 991,10\
-    \ − 3 000 = 0 zł` (nadwyżka ulgi przepada, gdyż nie ma innych dochodów NIE).\n- Podstawa opodatkowania IP: `17 919,90\
-    \ zł` (przy założeniu NEXUS = 1,0).\n- Podatek IP (5%): `896 zł` (po zaokrągleniu).\n\n---\n\n<result>\nrok: 2025\nforma_opodatkowania:\
+  response: "Dzień dobry. Przystępuję do procedowania Twojego rozliczenia IP Box w trybie BATCH zgodnie z algorytmem.\n\n\
+    ### Faza 0-1: Kwalifikacja i Dane\n*   **Forma:** Liniowy 19% (dopuszczalny).\n*   **ZUS:** W KPiR (koszt).\n*   **Dane:**\
+    \ Przetworzono styczeń 2025.\n*   **Współczynnik W:** (160h - 16h) / 160h = 90,00%.\n\n### Faza 3: Klasyfikacja kosztów\n\
+    *   Abonament internet (89 zł) -> **MIX** (koszt wspólny).\n\n### Faza 4: Obliczenia miesięczne (2025-01)\n*   **Przychód:**\
+    \ 20 000 zł.\n*   **Przychód IP:** 20 000 * 0,90 = 18 000 zł.\n*   **Przychód NIE:** 20 000 * 0,10 = 2 000 zł.\n*   **Koszty\
+    \ MIX:** 89 zł.\n*   **Koszty IP:** 89 * 0,90 = 80,10 zł.\n*   **Koszty NIE:** 89 * 0,10 = 8,90 zł.\n*   **Dochód IP:**\
+    \ 18 000 - 80,10 = 17 919,90 zł.\n*   **Dochód NIE:** 2 000 - 8,90 = 1 991,10 zł.\n\n### Faza 7: Kaskada (Roczna)\n* \
+    \  Dochód NIE po odliczeniach: 1 991,10 - 3 000 (ulga rehab) = 0 zł (podstawa NIE = 0).\n*   Dochód IP (NEXUS 1.0): 17\
+    \ 919,90 zł.\n*   Podatek IP (5%): 17 919,90 * 0,05 = 896 zł (po zaokrągleniu).\n\n---\n\n<result>\nrok: 2025\nforma_opodatkowania:\
     \ liniowy_19%\nmetoda_rachunkowości: memoriał\nzus:\n  sposób_ujęcia: w_KPiR\n  kwota_społeczne: 0.00\n  kwota_zdrowotne:\
     \ 0.00\nprzychody_roczne:\n  IP: 18000.00\n  NIE: 2000.00\n  KPiR_total: 20000.00\nkoszty_roczne:\n  IP: 80.10\n  NIE:\
     \ 8.90\n  WYKLUCZONE: 0.00\nnexus:\n  A: 0.00\n  B: 0.00\n  C: 0.00\n  D: 0.00\n  wartość: 1.00\nkaskada_odliczeń:\n \
@@ -30,11 +30,14 @@ turns:
     \ podstawa_NIE_zaokr: 0\n  podatek_NIE_przed_ulgami: 0\n  ulga_prorodzinna: 0.00\n  podatek_NIE_finalny: 0\n  podstawa_IP_zaokr:\
     \ 17920\n  podatek_IP: 896\n  podatek_łączny: 896\nwynik:\n  nadpłata_lub_dopłata: 0\ntesty:\n  test_1_bilans: PASS\n\
     \  test_2_koszty_prywatne: PASS\n  test_3_anty_dubel_ZUS: PASS\n  test_4_kaskada: PASS\n  test_5_podatek_IP: PASS\n  test_6_nadpłata:\
-    \ PASS\n</result>\n\n<classifications>\n- Abonament internet: MIX\n</classifications>\n\n<monthly_W>\n2025-01: 90.00\n\
+    \ PASS\n</result>\n\n<classifications>\nAbonament internet -> MIX\n</classifications>\n\n<monthly_W>\n2025-01: 90.00\n\
     </monthly_W>\n\n<tests>\nTEST_1: PASS\nTEST_2: PASS\nTEST_3: PASS\nTEST_4: PASS\nTEST_5: PASS\nTEST_6: PASS\n</tests>\n\
-    \n<stops_reviews>\nstops: []\nreviews: \n  - REVIEW_09: Jeden kontrahent odpowiada za 100% przychodów (ryzyko ukrytego\
-    \ etatu).\n  - REVIEW_03: A = 0 (brak kosztów bezpośrednich w NEXUS).\n</stops_reviews>"
-  prompt_hash: 4e54247ebb786f22
+    \n<stops_reviews>\nstops: []\nreviews: \n  - REVIEW_09: Jeden kontrahent = 100% przychodów (ryzyko ukrytego etatu)\n</stops_reviews>\n\
+    \n**Podsumowanie:**\nTwoje rozliczenie jest poprawne matematycznie. Zwróć uwagę na **REVIEW_09** – pracujesz dla jednego\
+    \ kontrahenta, co przy kontroli KAS wymaga posiadania solidnej dokumentacji (np. ADR, protokoły odbioru, historia commitów),\
+    \ aby wykazać, że nie jest to ukryty etat.\n\nCzy chcesz, abym wygenerował plik ewidencji w formacie CSV do wklejenia\
+    \ do Excela?"
+  prompt_hash: 4fb946dbaf425503
 parsed:
   result_yaml:
     rok: 2025
@@ -85,7 +88,7 @@ parsed:
       test_4_kaskada: PASS
       test_5_podatek_IP: PASS
       test_6_nadpłata: PASS
-  classifications: '- Abonament internet: MIX'
+  classifications: Abonament internet -> MIX
   monthly_W: '2025-01: 90.00'
   tests: 'TEST_1: PASS
 
@@ -101,5 +104,4 @@ parsed:
   stops_reviews:
     stops: []
     reviews:
-    - REVIEW_09: Jeden kontrahent odpowiada za 100% przychodów (ryzyko ukrytego etatu).
-    - REVIEW_03: A = 0 (brak kosztów bezpośrednich w NEXUS).
+    - REVIEW_09: Jeden kontrahent = 100% przychodów (ryzyko ukrytego etatu)

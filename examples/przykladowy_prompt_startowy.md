@@ -30,8 +30,8 @@ Składka zdrowotna: w KPiR jako koszt (liniowy, w limicie)
 Zaliczki: miesięczne, łącznie 36 000 zł
 Dochody dodatkowe (UoP/zlecenie): brak
 
-Poprowadź mnie przez algorytm od Fazy 0. Używaj Code Interpreter
-(jeśli masz) do wszystkich obliczeń. Podsumowuj stan co 3 fazy.
+Poprowadź mnie przez algorytm od Fazy 0. Używaj uruchamiania kodu Python
+(Code Execution / Advanced Data Analysis, jeśli masz) do wszystkich obliczeń. Podsumowuj stan co 3 fazy.
 ```
 
 ---

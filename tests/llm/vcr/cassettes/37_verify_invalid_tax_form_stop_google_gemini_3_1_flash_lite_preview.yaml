@@ -3,43 +3,42 @@ meta:
   scenario_name: 'Weryfikacja: Ryczałt niekompatybilny z IP Box (STOP)'
   provider: google
   model: gemini-3.1-flash-lite-preview
-  fingerprint: v1_44b432297994daf4_6ac4d61af1d0d462_google_993fbcd8
-  recorded_at: '2026-04-19T19:14:55.221940+00:00'
-  recording_duration_seconds: 2.85
-  prompt_tokens_estimate: 11088
-  response_tokens_estimate: 458
-  algorithm_hash: 44b432297994daf4
+  fingerprint: v1_3893459fc7f178da_6ac4d61af1d0d462_google_993fbcd8
+  recorded_at: '2026-04-20T20:42:02.565426+00:00'
+  recording_duration_seconds: 2.75
+  prompt_tokens_estimate: 11120
+  response_tokens_estimate: 381
+  algorithm_hash: 3893459fc7f178da
   cassette_format_version: 2
 turns:
 - role: user
   prompt: ''
-  response: "Zgodnie z instrukcją, przystępuję do analizy Twojego przypadku w trybie BATCH.\n\n### FAZA 0 — KWALIFIKACJA [PRAWO]\n\
-    **STOP:** Wykryto formę opodatkowania: **ryczałt od przychodów ewidencjonowanych**.\n**Podstawa prawna:** Art. 30ca ust.\
-    \ 1 ustawy o PIT wyraźnie wskazuje, że ulga IP Box przysługuje wyłącznie podatnikom opodatkowanym na zasadach ogólnych\
-    \ (skala podatkowa) lub podatkiem liniowym (19%). Ryczałt od przychodów ewidencjonowanych jest formą opodatkowania wykluczającą\
-    \ możliwość stosowania ulgi IP Box.\n\n**Status:** **STOP_RYCZAŁT**. Algorytm przerywa obliczenia, ponieważ ulga jest\
-    \ prawnie niedostępna dla Twojej formy opodatkowania.\n\n---\n\n<result>\nrok: 2025\nforma_opodatkowania: \"ryczałt\"\n\
-    status: \"STOP - IP Box nie łączy się z ryczałtem\"\nkomunikat: \"Ulga IP Box (art. 30ca PIT) jest dostępna wyłącznie\
-    \ dla podatników opodatkowanych skalą podatkową lub podatkiem liniowym. Na ryczałcie nie odlicza się kosztów, co uniemożliwia\
-    \ wyliczenie dochodu kwalifikowanego.\"\n</result>\n\n<classifications>\n# Brak klasyfikacji - proces zatrzymany w Fazie\
-    \ 0.\n</classifications>\n\n<monthly_W>\n# Brak obliczeń - proces zatrzymany w Fazie 0.\n</monthly_W>\n\n<tests>\nTEST_1:\
-    \ N/A\nTEST_2: N/A\nTEST_3: N/A\nTEST_4: N/A\nTEST_5: N/A\nTEST_6: N/A\n</tests>\n\n<stops_reviews>\nstops: [\"STOP_RYCZAŁT:\
-    \ IP Box nie łączy się z ryczałtem ewidencjonowanym.\"]\nreviews: []\n</stops_reviews>\n\n---\n\n### Rekomendacja eksperta:\n\
-    Jeśli planujesz wdrożenie IP Box w przyszłości, musisz dokonać zmiany formy opodatkowania na **podatek liniowy (19%)**\
-    \ lub **skalę podatkową**. Zmiany formy opodatkowania na kolejny rok podatkowy dokonuje się do 20 lutego roku, w którym\
-    \ chcesz ją stosować. \n\n**Czy chcesz, abym przygotował symulację porównawczą (Ryczałt vs Podatek Liniowy z IP Box) dla\
-    \ Twoich przychodów, abyś mógł podjąć decyzję o zmianie formy opodatkowania na rok 2026?**"
-  prompt_hash: 31212131a95d5aa8
+  response: "Zgodnie z algorytmem IP Box, przystępuję do analizy przesłanych danych.\n\n### FAZA 0 — KWALIFIKACJA [PRAWO]\n\
+    **STOP:** Użytkownik wskazał formę opodatkowania: **ryczałt**.\nZgodnie z art. 30ca ust. 1 ustawy o PIT, ulga IP Box przysługuje\
+    \ wyłącznie podatnikom opodatkowanym na zasadach ogólnych (skala podatkowa) lub podatkiem liniowym (19%). Ryczałt od przychodów\
+    \ ewidencjonowanych wyklucza możliwość stosowania ulgi IP Box.\n\n**Status:** STOP_RYCZAŁT.\n\n---\n\n<result>\nrok: 2025\n\
+    forma_opodatkowania: \"ryczałt\"\nstatus: \"STOP - brak kwalifikacji do IP Box\"\nkomunikat: \"Ulga IP Box nie łączy się\
+    \ z ryczałtem od przychodów ewidencjonowanych. Aby skorzystać z ulgi, należy zmienić formę opodatkowania na podatek liniowy\
+    \ (19%) lub skalę podatkową (12/32%) przed rozpoczęciem roku podatkowego.\"\n</result>\n\n<classifications>\n# Brak klasyfikacji\
+    \ kosztów - proces przerwany na etapie kwalifikacji (STOP).\n</classifications>\n\n<monthly_W>\n# Brak obliczeń - proces\
+    \ przerwany na etapie kwalifikacji (STOP).\n</monthly_W>\n\n<tests>\n# Wyniki testów weryfikacyjnych:\nTEST_1: N/A\nTEST_2:\
+    \ N/A\nTEST_3: N/A\nTEST_4: N/A\nTEST_5: N/A\nTEST_6: N/A\n</tests>\n\n<stops_reviews>\nstops: \n  - \"STOP_RYCZAŁT: IP\
+    \ Box jest niedostępny dla ryczałtowców.\"\nreviews: []\n</stops_reviews>\n\n---\n**Dalsze kroki:**\nJeśli planujesz przejście\
+    \ na podatek liniowy w kolejnym roku podatkowym, przygotuj się na prowadzenie pełnej ewidencji kosztów (KPiR), co jest\
+    \ niezbędne do wyliczenia dochodu kwalifikowanego (NEXUS). W obecnym stanie prawnym nie ma możliwości zastosowania ulgi."
+  prompt_hash: abfe2606f25b37fa
 parsed:
   result_yaml:
     rok: 2025
     forma_opodatkowania: ryczałt
-    status: STOP - IP Box nie łączy się z ryczałtem
-    komunikat: Ulga IP Box (art. 30ca PIT) jest dostępna wyłącznie dla podatników opodatkowanych skalą podatkową lub podatkiem
-      liniowym. Na ryczałcie nie odlicza się kosztów, co uniemożliwia wyliczenie dochodu kwalifikowanego.
-  classifications: '# Brak klasyfikacji - proces zatrzymany w Fazie 0.'
-  monthly_W: '# Brak obliczeń - proces zatrzymany w Fazie 0.'
-  tests: 'TEST_1: N/A
+    status: STOP - brak kwalifikacji do IP Box
+    komunikat: Ulga IP Box nie łączy się z ryczałtem od przychodów ewidencjonowanych. Aby skorzystać z ulgi, należy zmienić
+      formę opodatkowania na podatek liniowy (19%) lub skalę podatkową (12/32%) przed rozpoczęciem roku podatkowego.
+  classifications: '# Brak klasyfikacji kosztów - proces przerwany na etapie kwalifikacji (STOP).'
+  monthly_W: '# Brak obliczeń - proces przerwany na etapie kwalifikacji (STOP).'
+  tests: '# Wyniki testów weryfikacyjnych:
+
+    TEST_1: N/A
 
     TEST_2: N/A
 
@@ -52,5 +51,5 @@ parsed:
     TEST_6: N/A'
   stops_reviews:
     stops:
-    - 'STOP_RYCZAŁT: IP Box nie łączy się z ryczałtem ewidencjonowanym.'
+    - 'STOP_RYCZAŁT: IP Box jest niedostępny dla ryczałtowców.'
     reviews: []

@@ -3,55 +3,51 @@ meta:
   scenario_name: 'Logika: 2 klientów (PLN + EUR)'
   provider: google
   model: gemini-3.1-flash-lite-preview
-  fingerprint: v1_44b432297994daf4_16066a276e59296c_google_993fbcd8
-  recorded_at: '2026-04-19T19:13:09.182914+00:00'
-  recording_duration_seconds: 4.53
-  prompt_tokens_estimate: 11100
-  response_tokens_estimate: 723
-  algorithm_hash: 44b432297994daf4
+  fingerprint: v1_3893459fc7f178da_16066a276e59296c_google_993fbcd8
+  recorded_at: '2026-04-20T20:40:23.575683+00:00'
+  recording_duration_seconds: 4.02
+  prompt_tokens_estimate: 11132
+  response_tokens_estimate: 580
+  algorithm_hash: 3893459fc7f178da
   cassette_format_version: 2
 turns:
 - role: user
   prompt: ''
   response: "Dzień dobry. Przystępuję do procedowania Twojego rozliczenia IP Box w trybie BATCH zgodnie z algorytmem.\n\n\
-    ### FAZA 0–1: Weryfikacja i zbieranie danych\n*   **Forma opodatkowania:** Liniowy 19% (PIT-36L) – **OK**.\n*   **ZUS:**\
-    \ W KPiR jako koszt – **OK**.\n*   **Umowy:** Obaj kontrahenci (TechPL, EuroSoft) posiadają klauzulę przeniesienia praw\
-    \ autorskich – **OK**.\n*   **Waluty:** Faktura `FV/EUR/01` z 31.12.2024. Kurs średni NBP z dnia roboczego poprzedzającego\
-    \ (30.12.2024) dla EUR wynosił **4,3240 PLN**.\n    *   Przychód: 3000 EUR × 4,3240 = 12 972,00 PLN.\n    *   Łączny przychód\
-    \ styczeń: 10 000 (TechPL) + 12 972 (EuroSoft) = 22 972,00 PLN.\n\n### FAZA 2: Współczynnik W (Styczeń 2025)\n*   Godziny\
-    \ pracy: 160h.\n*   Godziny nie-IP: 0h.\n*   W = (160 - 0) / 160 * 100 = **100,00%**.\n\n### FAZA 3–4: Koszty i dochody\n\
-    *   Brak danych o kosztach w KPiR w przesłanym pliku – przyjmuję 0,00 PLN (do uzupełnienia w przypadku posiadania KPiR).\n\
-    *   Dochód IP = 22 972,00 PLN.\n\n---\n\n<result>\nrok: 2025\nforma_opodatkowania: liniowy_19%\nmetoda_rachunkowości:\
-    \ memoriał\nzus:\n  sposób_ujęcia: w_KPiR\n  kwota_społeczne: 0.00\n  kwota_zdrowotne: 0.00\nprzychody_roczne:\n  IP:\
-    \ 22972.00\n  NIE: 0.00\n  KPiR_total: 22972.00\nkoszty_roczne:\n  IP: 0.00\n  NIE: 0.00\n  WYKLUCZONE: 0.00\nnexus:\n\
-    \  A: 0.00\n  B: 0.00\n  C: 0.00\n  D: 0.00\n  wartość: 1.00\nkaskada_odliczeń:\n  straty_poprzednie: 0.00\n  ZUS_odliczenie:\
-    \ 0.00\n  IKZE: 0.00\n  darowizny: 0.00\n  ulga_internet: 0.00\n  ulga_rehabilitacyjna: 0.00\n  ulga_BR: 0.00\n  termomodernizacja_wykorzystano:\
-    \ 0.00\n  termomodernizacja_carry_over: 0.00\npodatek:\n  podstawa_NIE_zaokr: 0\n  podatek_NIE_przed_ulgami: 0\n  ulga_prorodzinna:\
-    \ 0.00\n  podatek_NIE_finalny: 0\n  podstawa_IP_zaokr: 22972\n  podatek_IP: 1149\n  podatek_łączny: 1149\nzaliczki:\n\
-    \  typ: miesięczne\n  suma: 0\n  rozbicie: [0,0,0,0,0,0,0,0,0,0,0,0]\nwynik:\n  nadpłata_lub_dopłata: -1149\ntesty:\n\
-    \  test_1_bilans: PASS\n  test_2_koszty_prywatne: PASS\n  test_3_anty_dubel_ZUS: PASS\n  test_4_kaskada: PASS\n  test_5_podatek_IP:\
-    \ PASS\n  test_6_nadpłata: PASS\nreview_do_weryfikacji: [REVIEW_09]\n</result>\n\n<classifications>\n# Brak pozycji KPiR\
-    \ w danych wejściowych. Proszę o przesłanie pliku KPiR w celu klasyfikacji.\n</classifications>\n\n<monthly_W>\n2025-01:\
+    ### Faza 0: Kwalifikacja\n*   **Forma opodatkowania:** Liniowy 19% (dopuszczalna).\n*   **Dokumenty:** Umowy posiadają\
+    \ klauzule IP. Brak interpretacji KIS (ostrzeżenie: działamy na ryzyko podatnika).\n*   **ZUS:** W KPiR (koszt).\n\n###\
+    \ Faza 1-4: Obliczenia (Styczeń 2025)\n*   **Kurs EUR:** 31.12.2024 (dzień roboczy przed wystawieniem 31.12.2024 to 30.12.2024).\
+    \ Kurs NBP 30.12.2024: 4,3120 PLN.\n*   **Przychód EUR:** 3000 EUR × 4,3120 = 12 936 PLN.\n*   **Przychód PLN:** 10 000\
+    \ PLN.\n*   **Łączny przychód:** 22 936 PLN.\n*   **Współczynnik W:** (160h - 0h) / 160h = 100%.\n\n---\n\n<result>\n\
+    rok: 2025\nforma_opodatkowania: \"liniowy 19%\"\nmetoda_rachunkowości: \"memoriał\"\nzus:\n  sposób_ujęcia: \"w_KPiR\"\
+    \n  kwota_społeczne: 0.00\n  kwota_zdrowotne: 0.00\nprzychody_roczne:\n  IP: 22936.00\n  NIE: 0.00\n  KPiR_total: 22936.00\n\
+    koszty_roczne:\n  IP: 0.00\n  NIE: 0.00\n  WYKLUCZONE: 0.00\nnexus:\n  A: 0.00\n  B: 0.00\n  C: 0.00\n  D: 0.00\n  wartość:\
+    \ 1.00\npodatek:\n  podstawa_NIE_zaokr: 0\n  podatek_NIE_przed_ulgami: 0\n  podatek_NIE_finalny: 0\n  podstawa_IP_zaokr:\
+    \ 22936\n  podatek_IP: 1147\n  podatek_łączny: 1147\ntesty:\n  test_1_bilans: \"PASS\"\n  test_2_koszty_prywatne: \"PASS\"\
+    \n  test_3_anty_dubel_ZUS: \"PASS\"\n  test_4_kaskada: \"PASS\"\n  test_5_podatek_IP: \"PASS\"\n  test_6_nadpłata: \"\
+    PASS\"\n</result>\n\n<classifications>\n# Brak pozycji KPiR w danych wejściowych.\n# W przypadku wystąpienia kosztów,\
+    \ klasyfikacja będzie następująca:\n# - Laptop/IDE/Hosting -> IP\n# - Internet/Telefon/Księgowość -> MIX\n# - Kawa/Chemia/Odzież\
+    \ -> NIE\n# - Amortyzacja ST > 10k -> WYKLUCZONE (tylko odpis amortyzacyjny)\n</classifications>\n\n<monthly_W>\n2025-01:\
     \ 100.00\n</monthly_W>\n\n<tests>\nTEST_1: PASS\nTEST_2: PASS\nTEST_3: PASS\nTEST_4: PASS\nTEST_5: PASS\nTEST_6: PASS\n\
-    </tests>\n\n<stops_reviews>\nstops: []\nreviews: \n  - REVIEW_09: Jeden kontrahent (TechPL) odpowiada za znaczną część\
-    \ przychodów, a EuroSoft za resztę. W przypadku 100% przychodów od jednego podmiotu w skali roku, występuje ryzyko zakwestionowania\
-    \ IP Box jako \"ukrytego etatu\".\n</reviews>\n</stops_reviews>\n\n**Dalsze kroki:**\n1. Czy posiadasz plik KPiR, abym\
-    \ mógł zaklasyfikować koszty (MIX/IP/NIE)?\n2. Czy chcesz, abym wygenerował ewidencję IP Box w formacie XLSX?\n3. Czy\
-    \ potwierdzasz, że w 2025 roku nie planujesz korzystać z ulgi B+R, która mogłaby kolidować z IP Box?"
-  prompt_hash: fbfe8d72e305cb8d
+    </tests>\n\n<stops_reviews>\nstops: []\nreviews: \n  - \"REVIEW_09: Jeden kontrahent (TechPL) stanowi 43.6%, EuroSoft\
+    \ 56.4%. Brak 100% koncentracji, ale monitoruj strukturę.\"\n  - \"REVIEW_01: W=100% wymaga pełnej dokumentacji (logi\
+    \ commitów, tickety, protokoły).\"\n</stops_reviews>\n\n---\n\n**Dalsze kroki:**\n1. Czy potwierdzasz powyższe dane?\n\
+    2. Czy chcesz, abym wygenerował ewidencję w formacie XLSX (wymaga potwierdzenia)?\n3. Czy posiadasz koszty w KPiR, które\
+    \ powinienem sklasyfikować (jeśli tak, wklej listę)?"
+  prompt_hash: 612fff840867fb01
 parsed:
   result_yaml:
     rok: 2025
-    forma_opodatkowania: liniowy_19%
+    forma_opodatkowania: liniowy 19%
     metoda_rachunkowości: memoriał
     zus:
       sposób_ujęcia: w_KPiR
       kwota_społeczne: 0.0
       kwota_zdrowotne: 0.0
     przychody_roczne:
-      IP: 22972.0
+      IP: 22936.0
       NIE: 0.0
-      KPiR_total: 22972.0
+      KPiR_total: 22936.0
     koszty_roczne:
       IP: 0.0
       NIE: 0.0
@@ -62,42 +58,13 @@ parsed:
       C: 0.0
       D: 0.0
       wartość: 1.0
-    kaskada_odliczeń:
-      straty_poprzednie: 0.0
-      ZUS_odliczenie: 0.0
-      IKZE: 0.0
-      darowizny: 0.0
-      ulga_internet: 0.0
-      ulga_rehabilitacyjna: 0.0
-      ulga_BR: 0.0
-      termomodernizacja_wykorzystano: 0.0
-      termomodernizacja_carry_over: 0.0
     podatek:
       podstawa_NIE_zaokr: 0
       podatek_NIE_przed_ulgami: 0
-      ulga_prorodzinna: 0.0
       podatek_NIE_finalny: 0
-      podstawa_IP_zaokr: 22972
-      podatek_IP: 1149
-      podatek_łączny: 1149
-    zaliczki:
-      typ: miesięczne
-      suma: 0
-      rozbicie:
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-      - 0
-    wynik:
-      nadpłata_lub_dopłata: -1149
+      podstawa_IP_zaokr: 22936
+      podatek_IP: 1147
+      podatek_łączny: 1147
     testy:
       test_1_bilans: PASS
       test_2_koszty_prywatne: PASS
@@ -105,9 +72,17 @@ parsed:
       test_4_kaskada: PASS
       test_5_podatek_IP: PASS
       test_6_nadpłata: PASS
-    review_do_weryfikacji:
-    - REVIEW_09
-  classifications: '# Brak pozycji KPiR w danych wejściowych. Proszę o przesłanie pliku KPiR w celu klasyfikacji.'
+  classifications: '# Brak pozycji KPiR w danych wejściowych.
+
+    # W przypadku wystąpienia kosztów, klasyfikacja będzie następująca:
+
+    # - Laptop/IDE/Hosting -> IP
+
+    # - Internet/Telefon/Księgowość -> MIX
+
+    # - Kawa/Chemia/Odzież -> NIE
+
+    # - Amortyzacja ST > 10k -> WYKLUCZONE (tylko odpis amortyzacyjny)'
   monthly_W: '2025-01: 100.00'
   tests: 'TEST_1: PASS
 
@@ -120,6 +95,8 @@ parsed:
     TEST_5: PASS
 
     TEST_6: PASS'
-  stops_reviews: "stops: []\nreviews: \n  - REVIEW_09: Jeden kontrahent (TechPL) odpowiada za znaczną część przychodów, a\
-    \ EuroSoft za resztę. W przypadku 100% przychodów od jednego podmiotu w skali roku, występuje ryzyko zakwestionowania\
-    \ IP Box jako \"ukrytego etatu\".\n</reviews>"
+  stops_reviews:
+    stops: []
+    reviews:
+    - 'REVIEW_09: Jeden kontrahent (TechPL) stanowi 43.6%, EuroSoft 56.4%. Brak 100% koncentracji, ale monitoruj strukturę.'
+    - 'REVIEW_01: W=100% wymaga pełnej dokumentacji (logi commitów, tickety, protokoły).'

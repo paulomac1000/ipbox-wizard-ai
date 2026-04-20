@@ -17,7 +17,7 @@ on:
     inputs:
       max_scenarios:
         description: "Maks liczba scenariuszy (0 = wszystkie)"
-        default: "10"
+        default: "0"
 
 concurrency:
   group: llm-tests-${{ github.ref }}
@@ -52,7 +52,8 @@ jobs:
             -v \
             --vcr-mode=playback \
             --tb=short \
-            --junitxml=reports/llm-playback.xml
+            --junitxml=reports/llm-playback.xml \
+            2>&1 | tee reports/llm-output.log
 
       - name: Upload results
         if: always()
@@ -60,6 +61,35 @@ jobs:
         with:
           name: llm-playback-results
           path: reports/
+
+      - name: Comment results on PR
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let log = '';
+            try { log = fs.readFileSync('reports/llm-output.log', 'utf8'); } catch {}
+            const passed = (log.match(/\d+ passed/g) || []).join(', ');
+            const failed = (log.match(/\d+ failed/g) || []).join(', ');
+            const status = failed ? '❌' : '✅';
+            const model = "VCR Playback";
+            const body = [
+              `## ${status} LLM Scenario Tests (VCR Playback)`,
+              `**Mode**: \`playback\``,
+              passed ? `**Passed**: ${passed}` : '',
+              failed ? `**Failed**: ${failed}` : '',
+              '',
+              '<details><summary>Log (ostatnie 80 linii)</summary>\n\n```',
+              log.split('\n').slice(-80).join('\n'),
+              '```\n</details>',
+            ].filter(Boolean).join('\n');
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body,
+            });
 
   # Full LLM tests with VCR (auto mode) — tylko push/dispatch/workflow_call, nie PR
   llm-tests:
@@ -70,9 +100,9 @@ jobs:
     env:
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
       GEMINI_MODEL: ${{ vars.GEMINI_MODEL }}
-      LLM_MAX_CALLS_PER_RUN: ${{ github.event.inputs.max_scenarios || '10' }}
+      LLM_MAX_CALLS_PER_RUN: ${{ github.event.inputs.max_scenarios || '0' }}
       # VCR auto mode: use cassettes if valid, record if stale
-      VCR_MODE: ${{ github.event_name == 'workflow_dispatch' && 'auto' || 'auto' }}
+      VCR_MODE: auto
 
     steps:
       - uses: actions/checkout@v4
@@ -128,31 +158,4 @@ jobs:
           path: reports/
           retention-days: 30
 
-      - name: Comment results on PR
-        if: github.event_name == 'pull_request' && always()
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const fs = require('fs');
-            let log = '';
-            try { log = fs.readFileSync('reports/llm-output.log', 'utf8'); } catch {}
-            const passed = (log.match(/\d+ passed/g) || []).join(', ');
-            const failed = (log.match(/\d+ failed/g) || []).join(', ');
-            const status = failed ? '❌' : '✅';
-            const model = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
-            const body = [
-              `## ${status} LLM Scenario Tests`,
-              `**Model**: \`${model}\``,
-              passed ? `**Passed**: ${passed}` : '',
-              failed ? `**Failed**: ${failed}` : '',
-              '',
-              '<details><summary>Log (ostatnie 80 linii)</summary>\n\n```',
-              log.split('\n').slice(-80).join('\n'),
-              '```\n</details>',
-            ].filter(Boolean).join('\n');
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body,
-            });
+

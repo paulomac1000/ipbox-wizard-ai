@@ -51,7 +51,7 @@ jobs:
           path: reports/
 
       - name: Comment coverage on PR
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && matrix.python-version == '3.12'
         uses: orgoro/coverage@v3.2
         with:
           coverageFile: reports/coverage.xml
