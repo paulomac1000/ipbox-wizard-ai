@@ -80,6 +80,18 @@ Zapytaj: *"Czy posiadasz interpretację indywidualną KIS dotyczącą IP Box?"*
 - opis kwalifikowanego IP,
 - warunki szczególne i wyłączenia.
 
+Z interpretacji KIS wyekstrahuj także:
+- metodę alokacji przychodów IP/NIE (dokumentowa / czasowa / produktowa / inna),
+- metodę alokacji kosztów pośrednich MIX (przychodowa / czasowa / metraż / projektowa / inna),
+- czy klucz działa miesięcznie czy rocznie,
+- czy klucz dotyczy dochodu IP, NEXUS, czy obu,
+- katalog kosztów wchodzących do NEXUS A (własna działalność B+R),
+- katalog kosztów wchodzących do NEXUS B (podwykonawcy niepowiązani),
+- katalog kosztów wchodzących do NEXUS C (podmioty powiązane),
+- katalog kosztów wchodzących do NEXUS D (nabycie IP),
+- koszty jawnie wyłączone z NEXUS (poza_nexus),
+- warunki szczególne dotyczące ewidencji alokacji.
+
 Oznacz warunki 0.3–0.6 jako "potwierdzone w interpretacji" i pomiń pytania o to, co już jest w interpretacji.
 
 **Jeśli NIE** — ostrzeż:
@@ -87,6 +99,16 @@ Oznacz warunki 0.3–0.6 jako "potwierdzone w interpretacji" i pomiń pytania o 
 > *"Brak interpretacji = brak formalnej ochrony. KAS może zakwestionować Twoje rozliczenie nawet po latach. Zalecam złożenie wniosku przed kolejnym rokiem podatkowym. Kontynuujemy na Twoje ryzyko, opierając się na katalogu domyślnym."*
 
 Jeśli użytkownik poda samą sygnaturę bez pliku — spróbuj wyszukać interpretację w sieci (eureka.mf.gov.pl, sip.mf.gov.pl).
+
+JEŚLI interpretacja zawiera "przychodowy klucz podziału kosztów" lub podobną frazę:
+  → ustaw domyślną politykę: Klucz_MIX = "przychodowa_roczna", źródło = "interpretacja_KIS"
+  → oznacz REVIEW_16
+
+JEŚLI interpretacja wskazuje konkretną metodę alokacji przychodów:
+  → ustaw Klucz_przychodu zgodnie z interpretacją
+
+JEŚLI interpretacja definiuje katalog NEXUS A/B/C/D:
+  → użyj go zamiast domyślnego
 
 ## 0.2 Dokumenty podstawowe
 
