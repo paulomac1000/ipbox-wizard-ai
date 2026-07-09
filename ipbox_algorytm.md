@@ -275,7 +275,13 @@ Dla każdego miesiąca zbierz:
 
 # FAZA 2 — WSPÓŁCZYNNIK W [PRAWO + HEURYSTYKA]
 
-**Cel:** Obliczyć W dla każdego miesiąca.
+**Cel:** Obliczyć miesięczny współczynnik czasu IP (W), który służy do:
+- alokacji przychodu z faktury mieszanej (gdy brak lepszego klucza),
+- walidacji dokumentacji B+R,
+- wykrywania ryzyk REVIEW,
+- opcjonalnie: alokacji kosztów MIX, tylko jeśli Klucz_MIX = "czasowy_W".
+
+⚠️ **W NIE jest automatycznym kluczem alokacji kosztów MIX.** Klucz_MIX ustala się osobno w Fazie 2A.
 
 ## 2.1 Formuła (poprawiona — dzielnik = faktyczny czas pracy)
 
@@ -322,6 +328,87 @@ Jeśli w miesiącu >1 kontrakt lub >1 odrębne IP:
   W_agregowane = Σ(Przychód_i × W_i) / Σ(Przychód_i)
   ```
 - **ZAWSZE emituj REVIEW_04 gdy miesiąc zawiera więcej niż 1 projekt lub kontrahent** — niezależnie od wynikowego W.
+
+---
+
+# FAZA 2A — POLITYKA ALOKACJI [PRAWO + DOWÓD]
+
+**Cel:** Ustalić osobno trzy niezależne klucze alokacji przed rozpoczęciem klasyfikacji kosztów i obliczeń miesięcznych.
+
+## 2A.1 Ustal źródło polityki alokacji
+
+Hierarchia pierwszeństwa:
+1. **Interpretacja KIS** — najwyższy priorytet. Jeśli interpretacja wskazuje metodę alokacji, użyj jej.
+2. **Księgowa / poprzednie rozliczenie** — wysoki priorytet. Jeśli metoda jest zgodna z interpretacją lub spójną ewidencją, użyj jej. Oznacz REVIEW_19 przy zmianie.
+3. **Domyślna wizard** — gdy brak interpretacji i historii, wizard jawnie tworzy politykę z REVIEW_20.
+4. **Decyzja użytkownika** — użytkownik może jawnie wybrać metodę; wymaga uzasadnienia.
+
+## 2A.2 Trzy niezależne klucze
+
+Rozdziel trzy osobne klucze — nie używaj W jako uniwersalnego klucza:
+
+1. **Klucz_Przychodu_IP** — jak dzielimy przychód między IP i NIE.
+2. **Klucz_MIX** — jak dzielimy koszty pośrednie między IP i NIE.
+3. **Klasyfikacja NEXUS (A/B/C/D/poza_nexus)** — które koszty wchodzą do wskaźnika NEXUS.
+
+Każdy koszt ma osobną klasyfikację dla dochodu IP (basket) i dla NEXUS (nexus_basket).
+
+## 2A.3 Klucz alokacji przychodów
+
+Hierarchia wyboru Klucz_Przychodu_IP:
+1. **Dokumentowy** — jeśli umowa/faktura rozdziela wynagrodzenie za IP, support, maintenance, konsulting.
+2. **Produktowy/SaaS** — jeśli subskrypcja dotyczy dostępu do programu; wydziel support, wdrożenia, utrzymanie, szkolenia jako NIE.
+3. **Czasowy W** — jeśli faktura jest mieszana i brak rozdziału dokumentowego; użyj W/100 tylko po jawnej decyzji w Fazie 2A.
+4. **Z interpretacji KIS** — użyj klucza wskazanego w interpretacji.
+5. Jeśli nie da się przypisać przychodu do IP → STOP_02.
+
+## 2A.4 Klucz alokacji kosztów MIX
+
+Zastąp zasadę "MIX dzielone przez W" zasadą "MIX dzielone przez Klucz_MIX".
+
+Hierarchia wyboru Klucz_MIX:
+1. **Z interpretacji KIS** — najwyższy priorytet.
+2. **Z utrwalonej ewidencji / księgowej** — wysoki priorytet.
+3. **Naturalny miernik kosztu** — metraż dla najmu/mediów, czas użycia dla zasobów godzinowych, liczba licencji dla narzędzi, projekt/repo dla usług chmurowych, log przejazdów dla auta.
+4. **Przychodowy roczny** — domyślny fallback gdy brak lepszego miernika: `Klucz_MIX = Przychód_IP_roczny / Przychód_całkowity_roczny`.
+5. **Czasowy W** — tylko jawnie i z uzasadnieniem. Wymaga `mix_method="czasowa_W"`, source, justification i REVIEW_15.
+
+⚠️ Uwaga: Nie wybieraj klucza pod wynik podatkowy. Wybierz klucz obiektywnie uzasadniony, konsekwentny i możliwy do opisania w ewidencji.
+
+## 2A.5 Koszty bezpośrednie — bez zmian
+
+- IP_bezpośrednie → 100% IP (nie podlega Klucz_MIX)
+- NIE_bezpośrednie → 100% NIE (nie podlega Klucz_MIX)
+- WYKLUCZONE → 0% w kosztach (nie podlega Klucz_MIX)
+- MIX → alokacja przez Klucz_MIX
+
+Nie wolno mnożyć kosztów bezpośrednich IP przez Klucz_MIX ani przez W.
+
+## 2A.6 NEXUS vs dochód IP — rozdzielenie
+
+Koszt może pomniejszać dochód IP, ale nie wchodzić do wskaźnika NEXUS.
+Każdy koszt ma dwie niezależne klasyfikacje:
+- **basket** (IP/MIX/NIE/WYKLUCZONE) → wpływa na dochód IP
+- **nexus_basket** (A/B/C/D/poza_nexus) → wpływa na wskaźnik NEXUS
+
+Przykłady:
+- Księgowość: basket=MIX, nexus_basket=poza_nexus → pomniejsza dochód, poza NEXUS
+- Laptop B+R: basket=IP, nexus_basket=A → pomniejsza dochód, NEXUS A
+- B2B podwykonawca niepowiązany: basket=IP, nexus_basket=B → pomniejsza dochód, NEXUS B
+
+## 2A.7 Wielo-IP i wieloprojektowość
+
+Jeśli użytkownik ma >1 IP/projekt/kontrakt, użyj dwustopniowej alokacji:
+
+```
+Krok 1:
+Koszty_wspólne_software_IP = MIX_całość × Przychody_software_IP / Przychody_całkowite
+
+Krok 2:
+Koszty_danego_IP = Koszty_software_IP × Przychody_danego_IP / Przychody_wszystkich_IP
+```
+
+Koszty bezpośrednio przypisane do konkretnego IP nie przechodzą przez alokację dwustopniową — idą 100% do tego IP. Zawsze emituj REVIEW_04 przy >1 projekcie.
 
 ---
 
