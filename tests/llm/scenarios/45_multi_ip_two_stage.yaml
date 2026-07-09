@@ -1,0 +1,35 @@
+meta:
+  id: "45_multi_ip_two_stage"
+  name: "MIX: dwustopniowa alokacja kosztów dla wielu IP"
+  description: "Weryfikuje dwustopniową alokację kosztów pośrednich dla dwóch IP"
+  tags: ["mix", "multi-IP", "allocation"]
+  priority: "P1"
+  expected_reviews: ["REVIEW_04", "REVIEW_16"]
+
+input:
+  rok: 2025
+  forma_opodatkowania: "liniowy_19%"
+  zus:
+    sposob: "w_KPiR"
+  interpretacja_KIS:
+    klucz_kosztów_pośrednich: "przychodowy_roczny"
+  kontrahenci:
+    - nazwa: "ClientA"
+      waluta: "PLN"
+      klauzula_IP: true
+    - nazwa: "ClientB"
+      waluta: "PLN"
+      klauzula_IP: true
+  miesiace:
+    - miesiac: "2025-01"
+      przychody: 30000
+      godziny_pracy: 160
+      godziny_nie_IP: 20
+      koszty:
+        - opis: "Koszty ogólne"
+          kwota: 1000
+          kategoria: "MIX"
+
+assertions:
+  review_obecne: ["REVIEW_04"]
+  testy_pass: ["TEST_1", "TEST_7"]
