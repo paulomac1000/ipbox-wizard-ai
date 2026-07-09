@@ -915,8 +915,22 @@ def allocate_multi_ip(
         raise ValueError(
             f"total_revenue must be > 0, got {total_revenue}"
         )
+    if software_ip_revenue < 0:
+        raise ValueError(
+            f"software_ip_revenue must be >= 0, got {software_ip_revenue}"
+        )
+    if software_ip_revenue > total_revenue:
+        raise ValueError(
+            f"software_ip_revenue ({software_ip_revenue}) cannot exceed "
+            f"total_revenue ({total_revenue})"
+        )
     if not ip_revenues:
         raise ValueError("ip_revenues dict must be non-empty")
+    for ip_name, ip_rev in ip_revenues.items():
+        if ip_rev < 0:
+            raise ValueError(
+                f"ip_revenues[{ip_name!r}] must be >= 0, got {ip_rev}"
+            )
     total_ip_revenue = sum(ip_revenues.values())
     if total_ip_revenue <= 0:
         raise ValueError(
