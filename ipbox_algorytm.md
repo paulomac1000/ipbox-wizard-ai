@@ -421,7 +421,7 @@ Koszty bezpośrednio przypisane do konkretnego IP nie przechodzą przez alokacj�
 | Koszyk | Definicja | Alokacja |
 |---|---|---|
 | **IP** | 100% związane z B+R (dedykowane) | w całości do kosztów IP Box |
-| **MIX** | wspólne dla całej działalności | dzielone przez W: część do IP, część do NIE |
+| **MIX** | wspólne dla całej działalności | dzielone przez Klucz_MIX (ustalony w Fazie 2A) |
 | **NIE** | 100% niezwiązane z B+R | w całości do kosztów NIE, NIE mnożyć przez W |
 | **WYKLUCZONE** | nie są kosztem uzyskania przychodu | w ogóle nie wchodzą do kosztów (ani IP, ani NIE) |
 
@@ -433,10 +433,18 @@ Koszty bezpośrednio przypisane do konkretnego IP nie przechodzą przez alokacj�
    planowane do odliczenia w PIT, wydatki osobiste).
 3. Odizoluj IP bezpośrednie (100% B+R) — np. dedykowany laptop.
 4. Odizoluj NIE bezpośrednie (0% B+R) — np. kawa, chemia, dekoracje.
-5. Reszta = MIX (czysta pula do alokacji przez W).
-6. Dopiero teraz:
-      Koszty_IP  = Koszty_IP_bezpośrednie + (MIX × W / 100)
-      Koszty_NIE = Koszty_NIE_bezpośrednie + (MIX × (1 − W / 100))
+5. Reszta = MIX.
+6. Dla każdej pozycji MIX wybierz Klucz_MIX zgodnie z hierarchią z Fazy 2A.4:
+   - pierwszeństwo: klucz z interpretacji KIS,
+   - naturalny miernik kosztu (metraż, czas użycia, licencje, projekt),
+   - domyślnie: przychodowy roczny,
+   - czasowy W tylko gdy jest jawnie wybrany i uzasadniony.
+7. Oblicz (uwaga — klucz roczny liczony w Fazie 7.2.A):
+   Jeśli Klucz_MIX = "przychodowa_roczna" lub inny klucz roczny:
+     → odłóż MIX do alokacji w Fazie 7.2.A (po zebraniu sum rocznych)
+   Jeśli Klucz_MIX = "czasowa_W" lub inny klucz miesięczny:
+     → Koszty_IP  = IP_bezpośrednie + MIX × Klucz_MIX
+     → Koszty_NIE = NIE_bezpośrednie + MIX × (1 − Klucz_MIX)
 ```
 
 **Dlaczego kolejność ma znaczenie:** Jeśli najpierw odejmiesz tylko NIE i resztę pomnożysz przez W, to koszty IP bezpośrednie też zostaną pomnożone przez W (zamiast iść w 100%). Błąd zaniża koszty IP.
