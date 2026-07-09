@@ -543,8 +543,14 @@ Jeśli użytkownik ma interpretację KIS — stosuj katalog z interpretacji. Dom
 ```
 Przychód_podstawowy  = Σ(kwoty netto faktur PLN + faktury walutowe przeliczone na PLN)
 
-Przychód_IP   = Przychód_podstawowy × W / 100
-Przychód_NIE  = Przychód_podstawowy × (1 − W / 100)
+Przychód_IP   = Przychód_podstawowy × Klucz_przychodu_IP
+Przychód_NIE  = Przychód_podstawowy × (1 − Klucz_przychodu_IP)
+
+gdzie Klucz_przychodu_IP pochodzi z Fazy 2A.3:
+- dokumentowy (z umowy/faktury): użyj wartości z dokumentu,
+- produktowy/SaaS: wydziel support, maintenance, wdrożenia jako NIE,
+- czasowy W: użyj W/100 tylko jeśli Phase 2A jawnie ustaliła revenue_method="czasowa_W" na podstawie ewidencji czasu i braku dokumentowego rozdziału przychodu,
+- z interpretacji KIS: użyj klucza wskazanego w interpretacji.
 ```
 
 ## 4.2 Faktury walutowe
@@ -570,8 +576,23 @@ Jeśli < 0 → Koszty_NIE += |Różnica_kursowa| (w miesiącu wpływu)
 
 ```
 (Po klasyfikacji z Fazy 3.2)
-Koszty_IP  = Koszty_IP_bezpośrednie + (MIX × W / 100)
-Koszty_NIE = Koszty_NIE_bezpośrednie + (MIX × (1 − W / 100)) + |Różnice_kursowe_ujemne|
+
+Jeśli Klucz_MIX = "czasowa_W" (miesięczny, jawny i uzasadniony):
+  Koszty_IP  = Koszty_IP_bezpośrednie + (MIX × Klucz_MIX)
+  Koszty_NIE = Koszty_NIE_bezpośrednie + (MIX × (1 − Klucz_MIX)) + |RK_ujemne|
+  Dochód_IP i Dochód_NIE są FINAL dla tego miesiąca.
+
+Jeśli Klucz_MIX jest roczny (przychodowy/inny):
+  → MIX NIE jest alokowany miesięcznie.
+  → Koszty_IP  = Koszty_IP_bezpośrednie
+  → Koszty_NIE = Koszty_NIE_bezpośrednie + |RK_ujemne|
+  → Dochód_IP_miesięczny = Przychód_IP − Koszty_IP_bezpośrednie  [PROVISIONAL]
+  → Dochód_NIE_miesięczny = Przychód_NIE − Koszty_NIE  [PROVISIONAL]
+  → MIX zostanie zaalokowany w Fazie 7.2.A.
+  → Po Fazie 7.2.A: Dochód_IP/NIE roczny = Σ(provisional) − MIX_do_IP/NIE  [FINAL]
+
+⚠️ WAŻNE: YAML miesięczny musi oznaczać pola dochodu jako provisional
+gdy używany jest klucz roczny. Dopiero YAML roczny zawiera wartości finalne.
 ```
 
 ## 4.5 Dochody miesięczne
@@ -626,6 +647,19 @@ Dla każdego miesiąca opis jest akceptowalny, gdy:
 
 **Cel:** Wyciąć miesiące które nie kwalifikują się do IP Box, zanim zaczniemy liczyć.
 
+## 6.0 — Błędy walidacji alokacji (ERROR)
+
+| Kod | Warunek |
+|---|---|
+| ERROR_ALLOC_01 | Koszty MIX istnieją, ale polityka alokacji nie została ustalona |
+| ERROR_ALLOC_02 | mix_key brakuje dla miesięcznej metody alokacji |
+| ERROR_ALLOC_03 | mix_key poza zakresem 0.0–1.0 |
+| ERROR_ALLOC_04 | W użyte dla MIX bez jawnej metody = "czasowa_W" |
+| ERROR_ALLOC_05 | Wybrano klucz przychodowy roczny, ale roczny przychód = 0 |
+| ERROR_ALLOC_06 | Źródło polityki = KIS/księgowa, ale brak wyekstrahowanych dowodów |
+
+⚠️ ERROR_ALLOC_* zatrzymują obliczenia techniczne. Nie wolno w nich zgadywać.
+
 ## STOP — pomiń miesiąc w IP Box
 
 | Kod | Warunek |
@@ -639,6 +673,8 @@ Dla każdego miesiąca opis jest akceptowalny, gdy:
 | STOP_07 | Dominujący udział AI bez istotnego ludzkiego wkładu twórczego |
 | STOP_08 | Przychód IP = 100% deklarowany, ale zero udokumentowanych godzin B+R |
 | STOP_09 | Brak jakichkolwiek dowodów (zero commitów/ticketów) przez 3+ miesiące z rzędu |
+| STOP_10 | Brak możliwości ustalenia przychodu IP/NIE żadną obiektywną metodą |
+| STOP_11 | Brak ewidencji pozwalającej ustalić przychody, koszty i dochód/stratę przypadające na kwalifikowane IP |
 
 ## REVIEW — wpisz, ale odnotuj i monitoruj
 
@@ -658,6 +694,15 @@ Dla każdego miesiąca opis jest akceptowalny, gdy:
 | REVIEW_12 | Użycie AI bez dokumentacji procesu twórczego |
 | REVIEW_13 | Współwłasność małżeńska — sprawdź zgodę małżonka w umowie |
 | REVIEW_14 | Niejednoznaczna odpowiedź użytkownika — potwierdź z księgową |
+| REVIEW_15 | Użyto niestandardowego klucza MIX innego niż domyślny przychodowy roczny |
+| REVIEW_16 | Interpretacja KIS wskazuje konkretny klucz alokacji; użyto go |
+| REVIEW_17 | Porównanie metod: różnica podatku > 10 zł LUB różnica klucza > 0,05 pp |
+| REVIEW_18 | Koszt pomniejsza dochód IP, ale jest poza NEXUS (nexus_source = indirect_or_general) |
+| REVIEW_19 | Metoda różni się od poprzedniego rozliczenia / księgowej |
+| REVIEW_20 | Brak interpretacji; użyto domyślnej polityki wizard (przychodowa roczna) |
+
+⚠️ Brak interpretacji KIS NIE jest automatycznym STOP.
+Brak interpretacji = wysokie REVIEW (REVIEW_20), nie STOP.
 
 ---
 
