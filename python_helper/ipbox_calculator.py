@@ -797,5 +797,121 @@ def allocate_revenue_monthly(
     }
 
 
+# ============================================================================
+# Annual MIX Allocation by Revenue (Phase 4 — deferred mix settlement)
+# ============================================================================
+
+
+def annual_mix_allocation_revenue(
+    deferred_mix_total: float,
+    annual_ip_revenue: float,
+    annual_total_revenue: float,
+) -> dict[str, Any]:
+    """
+    Allocate deferred MIX costs using annual IP revenue proportion
+    (roczna metoda przychodowa).
+
+    When monthly MIX costs cannot be resolved under przychodowa_roczna
+    method (no per-item allocation key), they are deferred to year-end.
+    This function allocates them at annual settlement:
+
+        mix_key = annual_ip_revenue / annual_total_revenue
+        costs_ip_mix = deferred_mix_total * mix_key
+        costs_non_mix = deferred_mix_total * (1 - mix_key)
+    """
+    if annual_total_revenue <= 0:
+        raise ValueError(
+            f"annual_total_revenue must be > 0, got {annual_total_revenue}"
+        )
+    if annual_ip_revenue < 0:
+        raise ValueError(
+            f"annual_ip_revenue must be >= 0, got {annual_ip_revenue}"
+        )
+    if annual_ip_revenue > annual_total_revenue:
+        raise ValueError(
+            f"annual_ip_revenue ({annual_ip_revenue}) cannot exceed "
+            f"annual_total_revenue ({annual_total_revenue})"
+        )
+    if deferred_mix_total < 0:
+        raise ValueError(
+            f"deferred_mix_total must be >= 0, got {deferred_mix_total}"
+        )
+
+    if deferred_mix_total == 0:
+        return {
+            "mix_key_used": 0.0,
+            "costs_ip_mix": 0.0,
+            "costs_non_mix": 0.0,
+            "deferred_mix_total": 0.0,
+        }
+
+    mix_key = annual_ip_revenue / annual_total_revenue
+    costs_ip_mix = deferred_mix_total * mix_key
+    costs_non_mix = deferred_mix_total * (1 - mix_key)
+
+    return {
+        "mix_key_used": round(mix_key, 4),
+        "costs_ip_mix": round(costs_ip_mix, 2),
+        "costs_non_mix": round(costs_non_mix, 2),
+        "deferred_mix_total": round(deferred_mix_total, 2),
+    }
+
+
+def allocate_multi_ip(
+    total_indirect_costs: float,
+    software_ip_revenue: float,
+    total_revenue: float,
+    ip_revenues: dict[str, float],
+) -> dict[str, Any]:
+    """
+    Two-stage allocation of shared indirect costs across multiple IPs.
+
+    Stage 1 — Software IP share of total indirect costs:
+        software_share = total_indirect_costs * software_ip_revenue / total_revenue
+
+    Stage 2 — Split software_share among individual IPs by revenue:
+        cost_for_ip = software_share * ip_revenue / sum(ip_revenues)
+
+    Note: Direct costs per IP are NOT processed here — this function
+    handles only shared/indirect costs.
+    """
+    if total_indirect_costs < 0:
+        raise ValueError(
+            f"total_indirect_costs must be >= 0, got {total_indirect_costs}"
+        )
+    if total_revenue <= 0:
+        raise ValueError(
+            f"total_revenue must be > 0, got {total_revenue}"
+        )
+    if not ip_revenues:
+        raise ValueError("ip_revenues dict must be non-empty")
+    total_ip_revenue = sum(ip_revenues.values())
+    if total_ip_revenue <= 0:
+        raise ValueError(
+            f"Sum of ip_revenues values must be > 0, got {total_ip_revenue}"
+        )
+
+    # Stage 1
+    software_share = total_indirect_costs * software_ip_revenue / total_revenue
+
+    # Stage 2
+    stage2: dict[str, dict[str, float]] = {}
+    for ip_name, ip_rev in ip_revenues.items():
+        ip_share = ip_rev / total_ip_revenue
+        stage2[ip_name] = {
+            "costs": round(software_share * ip_share, 2),
+            "share": round(ip_share, 4),
+        }
+
+    return {
+        "stage1": {
+            "software_share": round(software_share, 2),
+            "software_ip_revenue": round(software_ip_revenue, 2),
+            "total_revenue": round(total_revenue, 2),
+        },
+        "stage2": stage2,
+    }
+
+
 if __name__ == "__main__":
     print("DEMO OK")
