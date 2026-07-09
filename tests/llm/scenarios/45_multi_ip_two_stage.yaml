@@ -22,14 +22,19 @@ input:
       klauzula_IP: true
   miesiace:
     - miesiac: "2025-01"
-      przychody: 30000
+      przychody_całkowite: 100000
+      przychody_software_IP: 80000
+      przychody_IP:
+        IP_A: 30000
+        IP_B: 50000
       godziny_pracy: 160
       godziny_nie_IP: 20
-      koszty:
-        - opis: "Koszty ogólne"
-          kwota: 1000
-          kategoria: "MIX"
+      koszty_wspólne_MIX: 10000
 
 assertions:
+  alokacja_multi_ip:
+    stage1_software_share: 8000
+    IP_A: 3000
+    IP_B: 5000
   review_obecne: ["REVIEW_04"]
   testy_pass: ["TEST_1", "TEST_7"]

@@ -355,23 +355,27 @@ Każdy koszt ma osobną klasyfikację dla dochodu IP (basket) i dla NEXUS (nexus
 
 ## 2A.3 Klucz alokacji przychodów
 
-Hierarchia wyboru Klucz_Przychodu_IP:
-1. **Dokumentowy** — jeśli umowa/faktura rozdziela wynagrodzenie za IP, support, maintenance, konsulting.
-2. **Produktowy/SaaS** — jeśli subskrypcja dotyczy dostępu do programu; wydziel support, wdrożenia, utrzymanie, szkolenia jako NIE.
-3. **Czasowy W** — jeśli faktura jest mieszana i brak rozdziału dokumentowego; użyj W/100 tylko po jawnej decyzji w Fazie 2A.
-4. **Z interpretacji KIS** — użyj klucza wskazanego w interpretacji.
-5. Jeśli nie da się przypisać przychodu do IP → STOP_02.
+```
+Jeśli interpretacja KIS wskazuje konkretną metodę alokacji przychodu:
+  → użyj metody z KIS.
+  → nie nadpisuj jej dokumentem, W ani domyślną polityką wizard.
+  → oznacz REVIEW_16.
+
+Jeśli KIS nie wskazuje metody:
+  → zastosuj domyślną hierarchię: dokumentowy > produktowy/SaaS > czasowa_W > STOP_02.
+```
 
 ## 2A.4 Klucz alokacji kosztów MIX
 
-Zastąp zasadę "MIX dzielone przez W" zasadą "MIX dzielone przez Klucz_MIX".
+```
+Jeśli interpretacja KIS wskazuje konkretną metodę alokacji kosztów MIX:
+  → użyj metody z KIS.
+  → nie nadpisuj jej naturalnym miernikiem, przychodową roczną ani W.
+  → oznacz REVIEW_16.
 
-Hierarchia wyboru Klucz_MIX:
-1. **Z interpretacji KIS** — najwyższy priorytet.
-2. **Z utrwalonej ewidencji / księgowej** — wysoki priorytet.
-3. **Naturalny miernik kosztu** — metraż dla najmu/mediów, czas użycia dla zasobów godzinowych, liczba licencji dla narzędzi, projekt/repo dla usług chmurowych, log przejazdów dla auta.
-4. **Przychodowy roczny** — domyślny fallback gdy brak lepszego miernika: `Klucz_MIX = Przychód_IP_roczny / Przychód_całkowity_roczny`.
-5. **Czasowy W** — tylko jawnie i z uzasadnieniem. Wymaga `mix_method="czasowa_W"`, source, justification i REVIEW_15.
+Jeśli KIS nie wskazuje metody:
+  → księgowa/poprzednie rozliczenie > naturalny miernik > przychodowa_roczna > czasowa_W z uzasadnieniem.
+```
 
 ⚠️ Uwaga: Nie wybieraj klucza pod wynik podatkowy. Wybierz klucz obiektywnie uzasadniony, konsekwentny i możliwy do opisania w ewidencji.
 
@@ -657,6 +661,7 @@ Dla każdego miesiąca opis jest akceptowalny, gdy:
 | ERROR_ALLOC_04 | W użyte dla MIX bez jawnej metody = "czasowa_W" |
 | ERROR_ALLOC_05 | Wybrano klucz przychodowy roczny, ale roczny przychód = 0 |
 | ERROR_ALLOC_06 | Źródło polityki = KIS/księgowa, ale brak wyekstrahowanych dowodów |
+| ERROR_ALLOC_07 | Wybrano roczną metodę MIX inną niż przychodowa_roczna, ale brak formuły i dowodu |
 
 ⚠️ ERROR_ALLOC_* zatrzymują obliczenia techniczne. Nie wolno w nich zgadywać.
 
@@ -725,7 +730,13 @@ Dochód_NIE_roczny = Σ(Dochód_NIE z 12 miesięcy)
 
 ## 7.2.A — Alokacja kosztów MIX (jeśli klucz roczny)
 
-Jeśli w Fazie 2A.4 wybrano klucz roczny (przychodowy lub inny):
+Phase 7.2.A dotyczy tylko Klucz_MIX = "przychodowa_roczna".
+
+Jeśli wybrano inną roczną metodę:
+  → musi mieć osobną formułę i dowód.
+  → jeśli brak formuły: ERROR_ALLOC_07.
+
+Dla Klucz_MIX = "przychodowa_roczna":
 
 1. Oblicz sumy roczne deferred:
    MIX_roczne_deferred = Σ(mix_deferred z miesięcy)
