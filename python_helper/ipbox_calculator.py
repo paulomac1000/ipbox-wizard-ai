@@ -177,6 +177,77 @@ class CostItem:
     amount: float
     basket: str = ""  # IP | MIX | NON | EXCLUDED
     note: str = ""
+    allocation_method: str = ""  # dokumentowa | czasowa_W | produktowa | z_interpretacji | custom
+    allocation_key: float = 0.0  # percentage key for mix allocation (0-1)
+    allocation_source: str = ""  # where the allocation policy came from
+    nexus_source: str = ""  # own_br | unrelated_br_contractor | related_br_contractor | ip_acquisition | indirect_or_general | unknown
+    nexus_basket: str = ""  # A | B | C | D | poza_nexus
+
+
+# ============================================================================
+# Allocation Policy (Phase 4 — MIX allocation policy)
+# ============================================================================
+
+VALID_MIX_METHODS = {"przychodowa_roczna", "czasowa_W", "metraż", "licencje", "projekt", "custom"}
+VALID_REVENUE_METHODS = {"dokumentowa", "czasowa_W", "produktowa", "z_interpretacji", "custom"}
+VALID_SOURCE = {"interpretacja_KIS", "księgowa", "poprzednie_rozliczenie", "domyślna_wizard", "użytkownik"}
+
+
+@dataclass(frozen=True, kw_only=True)
+class AllocationPolicy:
+    """
+    Allocation policy for MIX costs — how to split costs between IP and non-IP.
+
+    Fields:
+        policy_id: Unique identifier for this policy
+        revenue_method: How revenue is attributed
+        mix_method: How MIX costs are allocated to IP
+        mix_key: The percentage key (0.0-1.0) used for mix_method=czasowa_W or custom
+        source: Origin of the policy
+        justification: Documentation or reasoning for this policy
+    """
+    policy_id: str
+    revenue_method: str = "dokumentowa"
+    mix_method: str = "przychodowa_roczna"
+    mix_key: float = 0.0
+    source: str = ""
+    justification: str = ""
+
+    def __post_init__(self) -> None:
+        """Validate policy fields."""
+        errors: list[str] = []
+
+        # source is required
+        if not self.source:
+            errors.append("source is required — must be one of " + str(sorted(VALID_SOURCE)))
+        if self.source and self.source not in VALID_SOURCE:
+            errors.append(f"source={self.source!r} — must be one of {sorted(VALID_SOURCE)}")
+
+        # valid enums
+        if self.mix_method not in VALID_MIX_METHODS:
+            errors.append(f"mix_method={self.mix_method!r} — must be one of {sorted(VALID_MIX_METHODS)}")
+        if self.revenue_method not in VALID_REVENUE_METHODS:
+            errors.append(f"revenue_method={self.revenue_method!r} — must be one of {sorted(VALID_REVENUE_METHODS)}")
+
+        # mix_key range 0-1
+        if not (0 <= self.mix_key <= 1):
+            errors.append(f"mix_key must be between 0 and 1, got {self.mix_key}")
+
+        # czasowa_W requires justification + mix_key
+        if self.mix_method == "czasowa_W":
+            if not self.justification:
+                errors.append("czasowa_W requires justification (e.g., time tracking summary)")
+            if not (0 < self.mix_key <= 1):
+                errors.append(f"czasowa_W requires mix_key in (0, 1], got {self.mix_key}")
+
+        # custom, metraż, licencje, projekt require justification
+        if self.mix_method in {"custom", "metraż", "licencje", "projekt"} and not self.justification:
+            errors.append(f"{self.mix_method} requires justification")
+
+        if errors:
+            raise ValueError(
+                "AllocationPolicy validation failed:\n" + "\n".join(f"  - {e}" for e in errors)
+            )
 
 
 # Keywords for automatic classification (Polish terms as per logic)
@@ -541,6 +612,85 @@ def verify_overpayment(
     if diff > tolerance:
         return {"test": "VERIFY 6", "status": "FAIL", "error": f"Expected {expected}, declared {declared_result}"}
     return {"test": "VERIFY 6 — Overpayment", "status": "PASS"}
+
+
+# ============================================================================
+# NEXUS Classification & MIX Key Resolution (Phase 4 — Allocation)
+# ============================================================================
+
+NEXUS_SOURCE_MAP: dict[str, str] = {
+    "own_br": "A",
+    "unrelated_br_contractor": "B",
+    "related_br_contractor": "C",
+    "ip_acquisition": "D",
+    "indirect_or_general": "poza_nexus",
+    "unknown": "poza_nexus",
+}
+
+
+def nexus_classify(item: CostItem, nexus_source: str = "unknown") -> CostItem:
+    """
+    Classify a cost item into a NEXUS basket based on its nexus_source.
+
+    Mapping:
+        own_br                  → A
+        unrelated_br_contractor → B
+        related_br_contractor   → C
+        ip_acquisition           → D
+        indirect_or_general      → poza_nexus
+        unknown                 → poza_nexus (with REVIEW_NEXUS_UNKNOWN note)
+    """
+    source = nexus_source or "unknown"
+    basket = NEXUS_SOURCE_MAP.get(source, "poza_nexus")
+    item.nexus_basket = basket
+
+    if source == "unknown":
+        item.note += "REVIEW_NEXUS_UNKNOWN: nexus_source unknown; treated as poza_nexus conservatively"
+
+    return item
+
+
+def resolve_mix_key(
+    item: CostItem,
+    default_policy: AllocationPolicy,
+) -> float:
+    """
+    Resolve the effective mix key for a cost item.
+
+    Skip non-MIX items — return 0.0.
+    Check per-item allocation_key first (validated 0-1).
+    Fall back to policy mix_key.
+    Raise ValueError if neither provides a valid key.
+    """
+    if item.basket != "MIX":
+        return 0.0
+
+    if 0 < item.allocation_key <= 1:
+        return item.allocation_key
+
+    if 0 < default_policy.mix_key <= 1:
+        return default_policy.mix_key
+
+    raise ValueError(
+        f"Cannot resolve mix_key for {item.description!r}: "
+        f"item.allocation_key={item.allocation_key}, "
+        f"policy.mix_key={default_policy.mix_key}. "
+        "One must be in (0, 1] for MIX items."
+    )
+
+
+def aggregate_nexus_costs(items: list[CostItem]) -> dict[str, float]:
+    """
+    Aggregate cost item amounts by nexus_basket.
+
+    Returns {A: sum, B: sum, C: sum, D: sum, poza_nexus: sum}.
+    """
+    result: dict[str, float] = {"A": 0.0, "B": 0.0, "C": 0.0, "D": 0.0, "poza_nexus": 0.0}
+    for item in items:
+        basket = item.nexus_basket or "poza_nexus"
+        if basket in result:
+            result[basket] += item.amount
+    return result
 
 
 if __name__ == "__main__":
