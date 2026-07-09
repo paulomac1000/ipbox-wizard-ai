@@ -75,6 +75,88 @@ class Evaluator:
                     "message": f"Oczekiwany REVIEW '{expected_review}' nie wystąpił",
                 })
 
+        # --- klucz_MIX_metoda ---
+        klucz_mix_metoda = assertions.get("klucz_MIX_metoda")
+        if klucz_mix_metoda:
+            actual = _find_klucz_mix_field(result, "metoda")
+            if actual is None:
+                failures.append({
+                    "type": "klucz_mix_metoda_missing",
+                    "message": "Nie znaleziono metody klucza MIX w wyniku",
+                })
+            elif str(actual).strip().lower() != str(klucz_mix_metoda).strip().lower():
+                failures.append({
+                    "type": "klucz_mix_metoda_mismatch",
+                    "message": f"klucz_MIX_metoda: oczekiwano '{klucz_mix_metoda}', otrzymano '{actual}'",
+                })
+
+        # --- klucz_MIX_źródło ---
+        klucz_mix_zrodlo = assertions.get("klucz_MIX_źródło")
+        if klucz_mix_zrodlo:
+            actual = _find_klucz_mix_field(result, "źródło") or _find_klucz_mix_field(result, "zrodlo")
+            if actual is None:
+                actual = _nested_get(result, "źródło") or _nested_get(result, "zrodlo")
+            if actual is None:
+                failures.append({
+                    "type": "klucz_mix_zrodlo_missing",
+                    "message": "Nie znaleziono źródła klucza MIX w wyniku",
+                })
+            elif str(actual).strip().lower() != str(klucz_mix_zrodlo).strip().lower():
+                failures.append({
+                    "type": "klucz_mix_zrodlo_mismatch",
+                    "message": f"klucz_MIX_źródło: oczekiwano '{klucz_mix_zrodlo}', otrzymano '{actual}'",
+                })
+
+        # --- nie_używaj_W_do_MIX ---
+        if assertions.get("nie_używaj_W_do_MIX") is True:
+            actual_method = _find_klucz_mix_field(result, "metoda")
+            w_used = False
+            if actual_method:
+                m = str(actual_method).strip().lower()
+                if "czasow" in m and ("w" in m.replace("_", "").replace("-", "") or "w_" in m):
+                    w_used = True
+            classifications = parsed.get("classifications") or ""
+            if _w_used_for_mix(classifications):
+                w_used = True
+            if w_used:
+                failures.append({
+                    "type": "w_used_for_mix",
+                    "message": "Użyto W do alokacji MIX — powinien być inny klucz (np. przychodowy)",
+                })
+
+        # review_obecne: każdy oczekiwany REVIEW musi się pojawić
+        for expected_review in assertions.get("review_obecne", []):
+            if isinstance(stops_reviews, dict):
+                reviews_list = stops_reviews.get("reviews", [])
+            else:
+                reviews_list = [str(stops_reviews)] if stops_reviews else []
+            if not any(expected_review.lower() in str(r).lower() for r in reviews_list):
+                failures.append({
+                    "type": "missing_review",
+                    "message": f"Oczekiwany REVIEW '{expected_review}' nie wystąpił",
+                })
+
+        # alokacja_multi_ip: sprawdzenie wartości alokacji dwustopniowej
+        alokacja_multi = assertions.get("alokacja_multi_ip", {})
+        if alokacja_multi:
+            classifications_text = parsed.get("classifications") or ""
+            for field_key, expected_value in alokacja_multi.items():
+                actual = _find_value(result, [field_key, f"alokacja_{field_key}", f"multi_ip_{field_key}"])
+                if actual is None:
+                    actual = _nested_get(result, field_key)
+                if actual is None:
+                    raw = parsed.get("raw_response") or ""
+                    actual = _find_number_for_key(raw + "\n" + classifications_text, field_key)
+                if actual is not None:
+                    try:
+                        if abs(float(actual) - float(expected_value)) > 0.5:
+                            failures.append({
+                                "type": "alokacja_multi_ip_mismatch",
+                                "message": f"alokacja_multi_ip.{field_key}: oczekiwano {expected_value}, otrzymano {actual}",
+                            })
+                    except (ValueError, TypeError):
+                        pass
+
         # koszty_koszyk: sprawdzenie przypisania wybranych pozycji do koszyków
         for cost_desc, expected_basket in assertions.get("koszty_koszyk", {}).items():
             classifications = parsed.get("classifications") or ""
@@ -244,6 +326,85 @@ def _find_monthly_w(text: str, month: str) -> float | None:
         except ValueError:
             pass
     return None
+
+
+def _find_klucz_mix_field(result: dict, field: str) -> str | None:
+    """Search for a field in klucz_MIX-related structures in the result dict.
+
+    Looks in: alokacja.koszty_MIX.<field>, klucze_alokacji_roczne.koszty_MIX.<field>,
+    and any direct key containing 'klucz' + field.
+    """
+    import re
+
+    # Check alokacja.koszty_MIX.<field>
+    alokacja = result.get("alokacja") or {}
+    koszty_mix = alokacja.get("koszty_MIX") or alokacja.get("koszty_mix") or {}
+    if field in koszty_mix:
+        return koszty_mix[field]
+
+    # Check klucze_alokacji_roczne.koszty_MIX.<field>
+    klucze = result.get("klucze_alokacji_roczne") or result.get("klucze_alokacji") or {}
+    koszty_mix2 = klucze.get("koszty_MIX") or klucze.get("koszty_mix") or {}
+    if field in koszty_mix2:
+        return koszty_mix2[field]
+
+    # Check any key for 'klucz' + field (case-insensitive)
+    field_lower = field.lower()
+    for key, val in _flatten_dict(result).items():
+        k = key.lower().replace(" ", "_").replace("-", "_")
+        if "klucz" in k and field_lower in k:
+            return str(val)
+
+    return None
+
+
+def _w_used_for_mix(classifications: str) -> bool:
+    """Return True if classifications show W being used for MIX costs."""
+    if not classifications:
+        return False
+    import re
+    for line in classifications.splitlines():
+        lower = line.lower()
+        # Check if line mentions both MIX and W (time-based allocation)
+        if "mix" in lower and ("w" in lower or "współczynnik" in lower or "wspolczynnik" in lower):
+            if re.search(r'\bw\s*[=:>]', lower) or "czasow" in lower:
+                return True
+        # Check for "W_czasowy" or "czasowa_W" patterns
+        if "w_czasowy" in lower or "czasowa_w" in lower or "w miesięczn" in lower:
+            if "mix" in lower:
+                return True
+    return False
+
+
+def _find_number_for_key(text: str, key: str) -> float | None:
+    """Search text for a pattern like '<key>: <number>' or '<key>=<number>'."""
+    import re
+    escaped = re.escape(key)
+    patterns = [
+        rf"{escaped}\s*[:=]\s*([\d.,]+)",
+        rf"{escaped}\s*\|>\s*([\d.,]+)",
+        rf"{escaped}[^a-zA-Z]*?(\d[\d.,]*)",
+    ]
+    for pattern in patterns:
+        m = re.search(pattern, text, re.IGNORECASE)
+        if m:
+            try:
+                return float(m.group(1).replace(",", "."))
+            except (ValueError, TypeError):
+                pass
+    return None
+
+
+def _flatten_dict(d: dict, parent_key: str = "") -> dict:
+    """Flatten a nested dict to a single level with dot-separated keys."""
+    items: dict[str, Any] = {}
+    for k, v in d.items():
+        new_key = f"{parent_key}.{k}" if parent_key else k
+        if isinstance(v, dict):
+            items.update(_flatten_dict(v, new_key))
+        else:
+            items[new_key] = v
+    return items
 
 
 def _nested_get(d: dict, key: str) -> Any:

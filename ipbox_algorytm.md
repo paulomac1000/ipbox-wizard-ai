@@ -104,8 +104,10 @@ JEŚLI interpretacja zawiera "przychodowy klucz podziału kosztów" lub podobną
   → ustaw domyślną politykę: Klucz_MIX = "przychodowa_roczna", źródło = "interpretacja_KIS"
   → oznacz REVIEW_16
 
+Sama fraza "przychodowy klucz podziału kosztów" nie oznacza automatycznie, że klucz jest roczny. Jeśli interpretacja nie wskazuje okresowości → REVIEW_16, wymagaj jawnego ustalenia okresu (miesięczny / roczny / według okresu ewidencji).
+
 JEŚLI interpretacja wskazuje konkretną metodę alokacji przychodów:
-  → ustaw Klucz_przychodu zgodnie z interpretacją
+  → ustaw Klucz_Przychodu_IP zgodnie z interpretacją
 
 JEŚLI interpretacja definiuje katalog NEXUS A/B/C/D:
   → użyj go zamiast domyślnego
@@ -402,6 +404,11 @@ Przykłady:
 
 ## 2A.7 Wielo-IP i wieloprojektowość
 
+Preconditions:
+- Przychody_całkowite > 0
+- Przychody_wszystkich_IP > 0
+Brak spełnienia → ERROR lub STOP.
+
 Jeśli użytkownik ma >1 IP/projekt/kontrakt, użyj dwustopniowej alokacji:
 
 ```
@@ -615,6 +622,8 @@ Dochód_NIE  = Przychód_NIE − Koszty_NIE
   `Dochód_IP_roczny = Σ(Dochód_IP miesięczne)` — ujemne miesiące zmniejszają roczną sumę.
 - NIE zeruj straty miesięcznej przed zsumowaniem — strata musi pomniejszyć dochód roczny.
 
+Jeśli Klucz_MIX = "przychodowa_roczna", MIX pozostaje deferred także w miesiącach z przychodem = 0. Nie używaj W jako awaryjnego klucza dla takich miesięcy.
+
 ---
 
 # FAZA 5 — WALIDACJA OPISÓW PROJEKTÓW [DOWÓD]
@@ -739,7 +748,7 @@ Jeśli wybrano inną roczną metodę:
 Dla Klucz_MIX = "przychodowa_roczna":
 
 1. Oblicz sumy roczne deferred:
-   MIX_roczne_deferred = Σ(mix_deferred z miesięcy)
+   MIX_roczne_deferred = Σ(miesiąc.koszty.MIX_deferred)
    Przychód_IP_roczny = Σ(Przychód_IP z 12 miesięcy)
    Przychód_całkowity_roczny = Σ(Przychód_podstawowy z 12 miesięcy)
 
@@ -765,6 +774,8 @@ Jeśli Klucz_MIX = "czasowa_W":
 
 ⚠️ Roczny true-up NIE może drugi raz policzyć kosztów MIX, które miały per-item allocation_key i zostały rozliczone miesięcznie.
 
+MIX już zaalokowany miesięcznie przez per-item allocation_key NIE wchodzi ponownie do true-up.
+
 ## 7.3 NEXUS (roczny, nie miesięczny!)
 
 ```
@@ -775,6 +786,8 @@ B = roczne koszty B+R od podmiotów niepowiązanych (podwykonawcy)
 C = roczne koszty B+R od podmiotów powiązanych
 D = roczne koszty nabycia kwalifikowanego IP
 ```
+
+Jeśli A+B+C+D = 0 → NEXUS = 0, emituj REVIEW/ERROR. Nie licz wzoru dla mianownika 0.
 
 ⚠️ **NIE utożsamiaj kosztów IP dla dochodu z kosztami NEXUS.**
 
@@ -1073,6 +1086,8 @@ koszty:
   MIX: 0.00
   MIX_do_IP: 0.00
   MIX_do_NIE: 0.00
+  MIX_deferred: 0.00
+  MIX_status: "ALLOCATED / DEFERRED / PARTIAL"
   IP_obliczone: 0.00  # IP_bezpośrednie + MIX_do_IP
   NIE_obliczone: 0.00  # NIE_bezpośrednie + MIX_do_NIE + ujemne różnice kursowe
   WYKLUCZONE: 0.00  # kary, amortyzacja ST, itp.
@@ -1085,6 +1100,7 @@ nexus_koszty:
 dochody:
   IP_Box: 0.00
   NIE_IP: 0.00
+  status: "FINAL / PROVISIONAL"
 opis_projektu: ""
 stop: []
 review: []
@@ -1114,7 +1130,7 @@ koszty_roczne:
 polityka_alokacji:
   źródło: "interpretacja_KIS / księgowa / poprzednie_rozliczenie / domyślna_wizard / użytkownik"
   opis: ""
-  spójna_z_interpretacją_KIS: true
+  spójna_z_interpretacją_KIS: null  # true tylko po realnej weryfikacji zgodności z KIS
 klucze_alokacji_roczne:
   przychód_IP:
     metoda: ""
@@ -1170,6 +1186,9 @@ testy:
   test_4_kaskada: "PASS"
   test_5_podatek_IP: "PASS"
   test_6_nadpłata: "PASS"
+  test_7_spójność_polityki_alokacji: "PASS/FAIL"
+  test_8_dochód_IP_vs_NEXUS: "PASS/FAIL"
+  test_9_porównanie_metod: "PASS/FAIL"
 review_do_weryfikacji: []
 ```
 
