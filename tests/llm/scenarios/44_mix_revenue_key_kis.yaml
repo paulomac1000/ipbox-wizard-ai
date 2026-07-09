@@ -35,5 +35,5 @@ assertions:
   klucz_MIX_metoda: "przychodowa_roczna"
   klucz_MIX_źródło: "interpretacja_KIS"
   nie_używaj_W_do_MIX: true
-  review_obecne: ["REVIEW_16"]
+  review_obecne: ["REVIEW_16", "REVIEW_17"]
   testy_pass: ["TEST_1", "TEST_2", "TEST_7", "TEST_8"]

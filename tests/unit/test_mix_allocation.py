@@ -4,10 +4,12 @@ import pytest
 from python_helper.ipbox_calculator import (
     AllocationPolicy,
     CostItem,
+    aggregate_nexus_costs,
     allocate_costs_monthly,
     allocate_revenue_monthly,
     annual_mix_allocation_revenue,
     allocate_multi_ip,
+    nexus_classify,
 )
 
 
@@ -203,3 +205,85 @@ class TestMixAllocationNegative:
                 revenue_method="czasowa_W",
                 revenue_key=1.5,
             )
+
+    # --- P0 guard tests ---
+
+    @pytest.mark.unit
+    @pytest.mark.P0
+    def test_przychodowa_roczna_accepts_mix_key_none_and_defers(self):
+        """Annual policy with mix_key=None defers MIX costs."""
+        policy = AllocationPolicy(
+            policy_id="guard1",
+            revenue_method="czasowa_W",
+            mix_method="przychodowa_roczna",
+            mix_key=None,
+            source="domyślna_wizard",
+            justification="guard test",
+        )
+        items = [CostItem("MIX", 1000.0, basket="MIX")]
+        r = allocate_costs_monthly(items, allocation_policy=policy)
+        assert r["mix_deferred"] == 1000.0
+        assert r["result_status"] == "PROVISIONAL"
+
+    @pytest.mark.unit
+    @pytest.mark.P0
+    def test_policy_mix_key_zero_is_valid(self):
+        """0.0 is a valid explicit key under non-annual methods."""
+        policy = AllocationPolicy(
+            policy_id="guard2",
+            revenue_method="czasowa_W",
+            mix_method="metraż",
+            mix_key=0.0,
+            source="użytkownik",
+            justification="metraż zero key",
+        )
+        items = [CostItem("MIX", 1000.0, basket="MIX")]
+        r = allocate_costs_monthly(items, allocation_policy=policy)
+        assert r["costs_ip"] == 0.0  # 0% to IP
+
+    @pytest.mark.unit
+    @pytest.mark.P0
+    def test_per_item_allocation_key_zero_overrides(self):
+        """Per-item allocation_key=0.0 overrides policy mix_key."""
+        policy = AllocationPolicy(
+            policy_id="guard3",
+            revenue_method="czasowa_W",
+            mix_method="przychodowa_roczna",
+            mix_key=None,
+            source="domyślna_wizard",
+            justification="guard",
+        )
+        items = [CostItem("MIX", 1000.0, basket="MIX", allocation_key=0.0)]
+        r = allocate_costs_monthly(items, allocation_policy=policy)
+        assert r["costs_ip"] == 0.0
+        assert r["mix_deferred"] == 0.0  # allocated, not deferred
+
+    @pytest.mark.unit
+    @pytest.mark.P0
+    def test_annual_policy_rejects_policy_mix_key(self):
+        """Annual policy with mix_key != None raises ValueError."""
+        with pytest.raises(ValueError):
+            AllocationPolicy(
+                policy_id="guard4",
+                revenue_method="czasowa_W",
+                mix_method="przychodowa_roczna",
+                mix_key=0.80,
+                source="domyślna_wizard",
+                justification="should fail",
+            )
+
+    @pytest.mark.unit
+    @pytest.mark.P0
+    def test_invalid_nexus_source_raises_valueerror(self):
+        """Typo in nexus_source raises ValueError."""
+        item = CostItem("test", 100.0, basket="IP")
+        with pytest.raises(ValueError):
+            nexus_classify(item, nexus_source="unrelated_contractor")
+
+    @pytest.mark.unit
+    @pytest.mark.P0
+    def test_mix_into_a_without_nexus_amount_rejected(self):
+        """MIX cost with nexus_basket=A but no nexus_amount raises ValueError."""
+        item = CostItem("MIX cost", 1000.0, basket="MIX", nexus_basket="A")
+        with pytest.raises(ValueError):
+            aggregate_nexus_costs([item])
