@@ -178,10 +178,11 @@ class CostItem:
     basket: str = ""  # IP | MIX | NON | EXCLUDED
     note: str = ""
     allocation_method: str = ""  # dokumentowa | czasowa_W | produktowa | z_interpretacji | custom
-    allocation_key: float = 0.0  # percentage key for mix allocation (0-1)
+    allocation_key: float | None = None  # explicit key 0-1 (None = deferred for annual policy)
     allocation_source: str = ""  # where the allocation policy came from
     nexus_source: str = ""  # own_br | unrelated_br_contractor | related_br_contractor | ip_acquisition | indirect_or_general | unknown
     nexus_basket: str = ""  # A | B | C | D | poza_nexus
+    nexus_amount: float | None = None  # explicit amount for NEXUS (None = use item.amount)
 
 
 # ============================================================================
@@ -209,7 +210,7 @@ class AllocationPolicy:
     policy_id: str
     revenue_method: str = "dokumentowa"
     mix_method: str = "przychodowa_roczna"
-    mix_key: float = 0.0
+    mix_key: float | None = None
     source: str = ""
     justification: str = ""
 
@@ -229,16 +230,20 @@ class AllocationPolicy:
         if self.revenue_method not in VALID_REVENUE_METHODS:
             errors.append(f"revenue_method={self.revenue_method!r} — must be one of {sorted(VALID_REVENUE_METHODS)}")
 
-        # mix_key range 0-1
-        if not (0 <= self.mix_key <= 1):
+        # mix_key range 0-1 (only if not None)
+        if self.mix_key is not None and not (0 <= self.mix_key <= 1):
             errors.append(f"mix_key must be between 0 and 1, got {self.mix_key}")
 
         # czasowa_W requires justification + mix_key
         if self.mix_method == "czasowa_W":
             if not self.justification:
                 errors.append("czasowa_W requires justification (e.g., time tracking summary)")
-            if not (0 < self.mix_key <= 1):
-                errors.append(f"czasowa_W requires mix_key in (0, 1], got {self.mix_key}")
+            if self.mix_key is None:
+                errors.append("czasowa_W requires mix_key")
+
+        # przychodowa_roczna deferred — must NOT have mix_key in monthly policy
+        if self.mix_method == "przychodowa_roczna" and self.mix_key is not None:
+            errors.append("przychodowa_roczna is deferred; do not set mix_key in monthly policy")
 
         # custom, metraż, licencje, projekt require justification
         if self.mix_method in {"custom", "metraż", "licencje", "projekt"} and not self.justification:
@@ -355,23 +360,29 @@ def allocate_costs_monthly(
     costs_ip = total_ip_direct
     costs_non = sum_non_direct
     mix_deferred: float = 0.0
-    mix_key_used: float | None = None
+    mix_ip: float = 0.0
+    mix_total_allocated: float = 0.0
 
     for item in mix_items:
         if allocation_policy.mix_method == "przychodowa_roczna":
-            # Try to resolve key; if none available, defer to annual settlement
-            try:
-                key = resolve_mix_key(item, allocation_policy)
-            except ValueError:
+            # Per-item allocation_key can allocate immediately; None → deferred
+            if item.allocation_key is None:
                 mix_deferred += item.amount
                 continue
+            if not (0 <= item.allocation_key <= 1):
+                raise ValueError(
+                    f"allocation_key={item.allocation_key} for {item.description!r} "
+                    "must be between 0 and 1"
+                )
+            key = item.allocation_key
         else:
             # Monthly methods require a key — will raise if none found
             key = resolve_mix_key(item, allocation_policy)
 
         costs_ip += item.amount * key
         costs_non += item.amount * (1 - key)
-        mix_key_used = key
+        mix_ip += item.amount * key
+        mix_total_allocated += item.amount
 
     result_status = "PROVISIONAL" if mix_deferred > 0 else "FINAL"
 
@@ -385,7 +396,8 @@ def allocate_costs_monthly(
         "costs_ip": round(costs_ip, 2),
         "costs_non": round(costs_non, 2),
         "mix_method": allocation_policy.mix_method,
-        "mix_key_used": mix_key_used,
+        "mix_key_used": allocation_policy.mix_key,
+        "mix_effective_key": round(mix_ip / mix_total_allocated, 6) if mix_total_allocated > 0 else None,
         "mix_key_source": allocation_policy.source,
         "result_status": result_status,
         "mix_deferred": round(mix_deferred, 2),
@@ -666,18 +678,18 @@ NEXUS_SOURCE_MAP: dict[str, str] = {
 def nexus_classify(item: CostItem, nexus_source: str = "unknown") -> CostItem:
     """
     Classify a cost item into a NEXUS basket based on its nexus_source.
-
-    Mapping:
-        own_br                  → A
-        unrelated_br_contractor → B
-        related_br_contractor   → C
-        ip_acquisition           → D
-        indirect_or_general      → poza_nexus
-        unknown                 → poza_nexus (with REVIEW_NEXUS_UNKNOWN note)
+    Validates source against NEXUS_SOURCE_MAP; invalid sources raise ValueError.
     """
     source = nexus_source or "unknown"
-    basket = NEXUS_SOURCE_MAP.get(source, "poza_nexus")
-    item.nexus_basket = basket
+
+    if source not in NEXUS_SOURCE_MAP:
+        raise ValueError(
+            f"Invalid nexus_source={source!r}. "
+            f"Valid values: {sorted(NEXUS_SOURCE_MAP)}"
+        )
+
+    item.nexus_source = source
+    item.nexus_basket = NEXUS_SOURCE_MAP[source]
 
     if source == "unknown":
         item.note += "REVIEW_NEXUS_UNKNOWN: nexus_source unknown; treated as poza_nexus conservatively"
@@ -691,40 +703,60 @@ def resolve_mix_key(
 ) -> float:
     """
     Resolve the effective mix key for a cost item.
-
-    Skip non-MIX items — return 0.0.
-    Check per-item allocation_key first (validated 0-1).
-    Fall back to policy mix_key.
-    Raise ValueError if neither provides a valid key.
+    Uses `is not None` so that 0.0 is accepted as a valid key (0% to IP).
     """
     if item.basket != "MIX":
         return 0.0
 
-    if 0 < item.allocation_key <= 1:
+    if item.allocation_key is not None:
+        if not (0 <= item.allocation_key <= 1):
+            raise ValueError(
+                f"allocation_key={item.allocation_key} for {item.description!r} "
+                "must be between 0 and 1"
+            )
         return item.allocation_key
 
-    if 0 < default_policy.mix_key <= 1:
+    if default_policy.mix_key is not None:
+        if not (0 <= default_policy.mix_key <= 1):
+            raise ValueError(
+                f"policy.mix_key={default_policy.mix_key} "
+                "must be between 0 and 1"
+            )
         return default_policy.mix_key
 
     raise ValueError(
         f"Cannot resolve mix_key for {item.description!r}: "
-        f"item.allocation_key={item.allocation_key}, "
-        f"policy.mix_key={default_policy.mix_key}. "
-        "One must be in (0, 1] for MIX items."
+        f"item.allocation_key=None, policy.mix_key=None. "
+        "Set per-item allocation_key or provide mix_key in AllocationPolicy."
     )
 
 
 def aggregate_nexus_costs(items: list[CostItem]) -> dict[str, float]:
     """
     Aggregate cost item amounts by nexus_basket.
-
-    Returns {A: sum, B: sum, C: sum, D: sum, poza_nexus: sum}.
+    MIX costs can only enter A/B/C/D if they have explicit nexus_amount.
     """
     result: dict[str, float] = {"A": 0.0, "B": 0.0, "C": 0.0, "D": 0.0, "poza_nexus": 0.0}
     for item in items:
         basket = item.nexus_basket or "poza_nexus"
-        if basket in result:
-            result[basket] += item.amount
+        if basket not in result:
+            raise ValueError(f"Invalid nexus_basket={basket!r}")
+
+        if item.basket == "MIX" and basket in {"A", "B", "C", "D"}:
+            if item.nexus_amount is None:
+                raise ValueError(
+                    f"MIX cost {item.description!r} cannot enter NEXUS {basket} "
+                    "with full amount. Set explicit nexus_amount."
+                )
+            amount = item.nexus_amount
+        else:
+            amount = item.nexus_amount if item.nexus_amount is not None else item.amount
+
+        if amount < 0:
+            raise ValueError(f"nexus amount cannot be negative for {item.description!r}")
+
+        result[basket] += amount
+
     return result
 
 

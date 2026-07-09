@@ -32,7 +32,7 @@ class TestMixAllocationPositive:
             policy_id="test_a",
             revenue_method="czasowa_W",
             mix_method="przychodowa_roczna",
-            mix_key=0.0,
+            mix_key=None,
             source="domyślna_wizard",
             justification="default test for deferred annual",
         )
@@ -140,7 +140,7 @@ class TestMixAllocationNegative:
             policy_id="n1",
             revenue_method="czasowa_W",
             mix_method="custom",
-            mix_key=0.0,
+            mix_key=None,
             source="użytkownik",
             justification="custom but no key",
         )
