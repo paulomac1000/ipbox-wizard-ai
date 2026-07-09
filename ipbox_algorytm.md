@@ -723,6 +723,37 @@ Dochód_IP_roczny  = Σ(Dochód_IP × NEXUS)   — patrz 7.3
 Dochód_NIE_roczny = Σ(Dochód_NIE z 12 miesięcy)
 ```
 
+## 7.2.A — Alokacja kosztów MIX (jeśli klucz roczny)
+
+Jeśli w Fazie 2A.4 wybrano klucz roczny (przychodowy lub inny):
+
+1. Oblicz sumy roczne deferred:
+   MIX_roczne_deferred = Σ(mix_deferred z miesięcy)
+   Przychód_IP_roczny = Σ(Przychód_IP z 12 miesięcy)
+   Przychód_całkowity_roczny = Σ(Przychód_podstawowy z 12 miesięcy)
+
+2. Oblicz Klucz_MIX:
+   Klucz_MIX = Przychód_IP_roczny / Przychód_całkowity_roczny
+
+3. Alokuj:
+   Koszty_IP_MIX = MIX_roczne_deferred × Klucz_MIX
+   Koszty_NIE_MIX = MIX_roczne_deferred × (1 − Klucz_MIX)
+
+4. Dodaj do rocznych sum kosztów:
+   Koszty_IP_roczne += Koszty_IP_MIX
+   Koszty_NIE_roczne += Koszty_NIE_MIX
+
+   Teraz dochody roczne są FINAL (nie PROVISIONAL).
+
+5. Wygeneruj REVIEW_17 jeśli:
+   |Klucz_MIX − klucz_czasowy_efektywny| > 0.0005 (0.05 pp)
+   LUB |różnica podatku| > 10 zł
+
+Jeśli Klucz_MIX = "czasowa_W":
+   → MIX był już alokowany miesięcznie w Fazie 4.4. Pomiń ten krok.
+
+⚠️ Roczny true-up NIE może drugi raz policzyć kosztów MIX, które miały per-item allocation_key i zostały rozliczone miesięcznie.
+
 ## 7.3 NEXUS (roczny, nie miesięczny!)
 
 ```
@@ -733,6 +764,25 @@ B = roczne koszty B+R od podmiotów niepowiązanych (podwykonawcy)
 C = roczne koszty B+R od podmiotów powiązanych
 D = roczne koszty nabycia kwalifikowanego IP
 ```
+
+⚠️ **NIE utożsamiaj kosztów IP dla dochodu z kosztami NEXUS.**
+
+Każdy koszt ma dwie niezależne klasyfikacje:
+- basket (IP/MIX/NIE/WYKLUCZONE) → wpływa na dochód IP,
+- nexus_basket (A/B/C/D/poza_nexus) → wpływa na wskaźnik NEXUS.
+
+Zasada: koszt może pomniejszać dochód IP (przez basket=MIX + Klucz_MIX), ale NIE wchodzić do NEXUS A (nexus_basket=poza_nexus).
+
+Przykłady:
+- Księgowość: basket=MIX, nexus_basket=poza_nexus → pomniejsza dochód, poza NEXUS
+- Laptop B+R: basket=IP, nexus_basket=A → pomniejsza dochód, wchodzi do NEXUS A
+- B2B podwykonawca niepowiązany: basket=IP, nexus_basket=B → pomniejsza dochód, NEXUS B
+
+Przy obliczaniu NEXUS (wzór poniżej) używaj TYLKO kwot z nexus_basket:
+- A = Σ(kwot gdzie nexus_basket = "A")
+- B = Σ(kwot gdzie nexus_basket = "B")
+- C = Σ(kwot gdzie nexus_basket = "C")
+- D = Σ(kwot gdzie nexus_basket = "D")
 
 **Nie zakładaj z góry NEXUS = 1,0.** Zapytaj użytkownika o B, C, D:
 - *"Czy miałeś podwykonawców B+R (freelancer grafik, UI designer, inny programista na zlecenie)?"* → B
@@ -841,6 +891,15 @@ Sprawdź:
 tolerancja: ±0,10 zł
 ```
 
+**TEST 1 (rozszerzenie dla klucza rocznego):**
+Jeśli Klucz_MIX jest roczny (przychodowy lub inny):
+- Σ(Koszty_IP_bezpośrednie + Koszty_NIE_bezpośrednie + MIX_roczne + WYKLUCZONE)
+  musi zgadzać się z KPiR.
+- Po alokacji rocznej w Fazie 7.2.A:
+  Koszty_IP_finalne + Koszty_NIE_finalne = Koszty_KPiR_bez_WYKLUCZONYCH
+- Miesięczne dochody przed alokacją MIX są oznaczone jako PROVISIONAL.
+  Dopiero po Fazie 7.2.A dochody stają się FINAL.
+
 ## TEST 2 — koszty prywatne
 
 Żadna pozycja z koszyka NIE (spożywcze, chemia, odzież, dekoracje) nie może znajdować się w Koszty_IP. Sprawdź listę.
@@ -874,6 +933,35 @@ Zaokrąglenia do pełnych zł zgodne z zasadami PIT
 
 ```
 Σ(12 zaliczek wpłaconych) − Podatek_łączny = Nadpłata/dopłata
+```
+
+## TEST 7 — spójność polityki alokacji
+
+```
+- Każdy przychód ma zdefiniowaną metodę alokacji (Klucz_przychodu_IP).
+- Każdy koszt MIX ma zdefiniowany Klucz_MIX.
+- Klucz_MIX ≠ W, chyba że metoda = "czasowa_W" i ma uzasadnienie.
+- Jeśli interpretacja KIS wskazuje metodę → wynik używa tej metody (FAIL jeśli nie).
+```
+
+## TEST 8 — dochód IP vs NEXUS
+
+```
+- Każdy koszt ma osobną klasyfikację basket (dla dochodu) i nexus_basket (dla NEXUS).
+- Koszty pośrednie (MIX) mogą pomniejszać dochód IP.
+- Koszty pośrednie NIE trafiają automatycznie do NEXUS A.
+- B2B podwykonawca niepowiązany → nexus_basket = B, nie A.
+```
+
+## TEST 9 — porównanie metod
+
+```
+- Jeśli istnieje alternatywna metoda alokacji MIX:
+  → policz podatek obiema metodami informacyjnie.
+- Jeśli różnica podatku > 10 zł LUB różnica klucza > 0,05 pp:
+  → wygeneruj REVIEW_17.
+  → pokaż raport: metoda_użyta vs metoda_alternatywna.
+- NIE zmieniaj metody tylko dlatego, że alternatywna daje niższy podatek.
 ```
 
 Jeśli jakikolwiek test FAIL — **nie przechodź do Fazy 9**, wróć i popraw.
@@ -957,13 +1045,32 @@ przychody:
   rozne_kursowe_do_NIE: 0.00
   alokacja_IP: 0.00
   alokacja_NIE: 0.00
+alokacja:
+  przychód:
+    metoda: "dokumentowa / czasowa_W / produktowa / z_interpretacji"
+    źródło: "interpretacja_KIS / domyślna_wizard / użytkownik"
+    klucz: 0.0000
+    uzasadnienie: ""
+  koszty_MIX:
+    metoda: "przychodowa_roczna / czasowa_W / metraż / licencje / projekt / custom"
+    źródło: "interpretacja_KIS / domyślna_wizard / użytkownik"
+    klucz: 0.0000
+    uzasadnienie: ""
 koszty:
   IP_bezpośrednie: 0.00
   NIE_bezpośrednie: 0.00
   MIX: 0.00
-  IP_obliczone: 0.00  # IP_bezpośrednie + MIX × W
-  NIE_obliczone: 0.00  # NIE_bezpośrednie + MIX × (1−W) + ujemne różnice kursowe
+  MIX_do_IP: 0.00
+  MIX_do_NIE: 0.00
+  IP_obliczone: 0.00  # IP_bezpośrednie + MIX_do_IP
+  NIE_obliczone: 0.00  # NIE_bezpośrednie + MIX_do_NIE + ujemne różnice kursowe
   WYKLUCZONE: 0.00  # kary, amortyzacja ST, itp.
+nexus_koszty:
+  A: 0.00
+  B: 0.00
+  C: 0.00
+  D: 0.00
+  poza_nexus: 0.00
 dochody:
   IP_Box: 0.00
   NIE_IP: 0.00
@@ -993,6 +1100,28 @@ koszty_roczne:
   IP: 0.00
   NIE: 0.00
   WYKLUCZONE: 0.00
+polityka_alokacji:
+  źródło: "interpretacja_KIS / księgowa / poprzednie_rozliczenie / domyślna_wizard / użytkownik"
+  opis: ""
+  spójna_z_interpretacją_KIS: true
+klucze_alokacji_roczne:
+  przychód_IP:
+    metoda: ""
+    klucz_efektywny: 0.000000
+  koszty_MIX:
+    metoda: ""
+    klucz_efektywny: 0.000000
+    przychód_IP_roczny: 0.00
+    przychód_całkowity_roczny: 0.00
+porównanie_metod:
+  metoda_użyta:
+    nazwa: ""
+    podatek_łączny: 0
+  metoda_alternatywna:
+    nazwa: ""
+    podatek_łączny: 0
+  różnica_podatku: 0
+  komunikat: ""
 nexus:
   A: 0.00
   B: 0.00
