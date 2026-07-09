@@ -325,27 +325,58 @@ def classify_cost(
 
 def allocate_costs_monthly(
     items: list[CostItem],
-    w_coefficient: float,
-    ip_direct_costs: list[CostItem] = None,
-) -> dict[str, float]:
+    *,
+    allocation_policy: AllocationPolicy,
+    w_coefficient: float | None = None,
+    ip_direct_costs: list[CostItem] | None = None,
+) -> dict[str, Any]:
     """
-    Allocate monthly costs to IP / NON in the correct order.
+    Allocate monthly costs to IP / NON in the correct order using an AllocationPolicy.
+
+    Per-item MIX loop: each MIX cost uses resolve_mix_key().
+    For przychodowa_roczna: costs with no allocatable key are deferred to mix_deferred.
+    For other methods: resolve_mix_key() must succeed or ValueError is raised.
+
+    Returns:
+        costs_ip, costs_non, ip_direct, non_direct, mix, excluded,
+        mix_method, mix_key_used, mix_key_source, result_status, mix_deferred
     """
     ip_direct_costs = ip_direct_costs or []
-    
+
     sum_ip_direct = sum(i.amount for i in ip_direct_costs)
     sum_ip_from_classification = sum(i.amount for i in items if i.basket == "IP")
     total_ip_direct = sum_ip_direct + sum_ip_from_classification
-    
+
     sum_non_direct = sum(i.amount for i in items if i.basket == "NON")
-    sum_mix = sum(i.amount for i in items if i.basket == "MIX")
+    mix_items = [i for i in items if i.basket == "MIX"]
     sum_excluded = sum(i.amount for i in items if i.basket == "EXCLUDED")
-    
-    w_frac = w_coefficient / 100
-    
-    costs_ip = total_ip_direct + (sum_mix * w_frac)
-    costs_non = sum_non_direct + (sum_mix * (1 - w_frac))
-    
+
+    # Per-item MIX allocation loop
+    costs_ip = total_ip_direct
+    costs_non = sum_non_direct
+    mix_deferred: float = 0.0
+    mix_key_used: float | None = None
+
+    for item in mix_items:
+        if allocation_policy.mix_method == "przychodowa_roczna":
+            # Try to resolve key; if none available, defer to annual settlement
+            try:
+                key = resolve_mix_key(item, allocation_policy)
+            except ValueError:
+                mix_deferred += item.amount
+                continue
+        else:
+            # Monthly methods require a key — will raise if none found
+            key = resolve_mix_key(item, allocation_policy)
+
+        costs_ip += item.amount * key
+        costs_non += item.amount * (1 - key)
+        mix_key_used = key
+
+    result_status = "PROVISIONAL" if mix_deferred > 0 else "FINAL"
+
+    sum_mix = sum(i.amount for i in mix_items)
+
     return {
         "ip_direct": round(total_ip_direct, 2),
         "non_direct": round(sum_non_direct, 2),
@@ -353,7 +384,11 @@ def allocate_costs_monthly(
         "excluded": round(sum_excluded, 2),
         "costs_ip": round(costs_ip, 2),
         "costs_non": round(costs_non, 2),
-        "w_used": w_coefficient,
+        "mix_method": allocation_policy.mix_method,
+        "mix_key_used": mix_key_used,
+        "mix_key_source": allocation_policy.source,
+        "result_status": result_status,
+        "mix_deferred": round(mix_deferred, 2),
     }
 
 
@@ -691,6 +726,75 @@ def aggregate_nexus_costs(items: list[CostItem]) -> dict[str, float]:
         if basket in result:
             result[basket] += item.amount
     return result
+
+
+# ============================================================================
+# Revenue Allocation (Phase 4.1)
+# ============================================================================
+
+
+def allocate_revenue_monthly(
+    base_revenue: float,
+    revenue_method: str,
+    revenue_key: float | None = None,
+    document_split_ip: float | None = None,
+) -> dict[str, Any]:
+    """
+    Split monthly base revenue into IP and non-IP portions.
+
+    Priority by method:
+        dokumentowa   — uses document_split_ip (absolute PLN amount)
+        czasowa_W     — uses revenue_key as W-derived fraction (0-1)
+        produktowa    — uses revenue_key as product fraction (0-1)
+        z_interpretacji — uses revenue_key as KIS-stipulated fraction (0-1)
+        custom        — uses revenue_key as custom fraction (0-1)
+    """
+    # --- Validations ---
+    errors: list[str] = []
+
+    if base_revenue < 0:
+        errors.append(f"base_revenue ({base_revenue}) must be >= 0")
+
+    if revenue_method not in VALID_REVENUE_METHODS:
+        errors.append(
+            f"revenue_method={revenue_method!r} — must be one of {sorted(VALID_REVENUE_METHODS)}"
+        )
+
+    if revenue_method == "dokumentowa":
+        if document_split_ip is None:
+            errors.append("document_split_ip is required for dokumentowa method")
+        elif not (0 <= document_split_ip <= base_revenue):
+            errors.append(
+                f"document_split_ip ({document_split_ip}) must be between 0 and base_revenue ({base_revenue})"
+            )
+    else:
+        if revenue_key is None:
+            errors.append(f"revenue_key is required for {revenue_method} method")
+        elif not (0 <= revenue_key <= 1):
+            errors.append(f"revenue_key ({revenue_key}) must be between 0 and 1")
+
+    if errors:
+        raise ValueError(
+            "allocate_revenue_monthly validation failed:\n"
+            + "\n".join(f"  - {e}" for e in errors)
+        )
+
+    # --- Allocation ---
+    if revenue_method == "dokumentowa":
+        ip_revenue = document_split_ip  # type: ignore[assignment]
+        non_ip_revenue = base_revenue - ip_revenue
+    else:
+        ip_revenue = base_revenue * revenue_key  # type: ignore[operator]
+        non_ip_revenue = base_revenue * (1 - revenue_key)  # type: ignore[operator]
+
+    return {
+        "base_revenue": round(base_revenue, 2),
+        "ip_revenue": round(ip_revenue, 2),
+        "non_ip_revenue": round(non_ip_revenue, 2),
+        "revenue_method": revenue_method,
+        "revenue_key_used": revenue_key,
+        "document_split_ip_used": document_split_ip,
+    }
 
 
 if __name__ == "__main__":

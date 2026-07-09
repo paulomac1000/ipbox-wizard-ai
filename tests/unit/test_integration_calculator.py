@@ -5,7 +5,8 @@ from python_helper.ipbox_calculator import (
     calculate_nexus, 
     tax_cascade, 
     calculate_overpayment_or_underpayment,
-    CostItem
+    AllocationPolicy,
+    CostItem,
 )
 
 class TestIntegrationCalculator:
@@ -25,7 +26,14 @@ class TestIntegrationCalculator:
         income_non_monthly = revenue * (1 - w_coeff/100) # 2000
         
         items = [CostItem("Server", 1000.0, basket="MIX")]
-        alloc = allocate_costs_monthly(items, w_coeff)
+        policy = AllocationPolicy(
+            policy_id="test",
+            mix_method="czasowa_W",
+            mix_key=w_coeff / 100,
+            source="księgowa",
+            justification=f"W = {w_coeff}%",
+        )
+        alloc = allocate_costs_monthly(items, allocation_policy=policy)
         # Cost IP = 1000 * 0.9 = 900
         # Cost NON = 1000 * 0.1 = 100
         
