@@ -34,6 +34,9 @@ tests/llm/expected/
 *.swo
 *~
 
+# --- Agent runtime state ---
+.omo/
+
 # --- System ---
 .DS_Store
 Thumbs.db
