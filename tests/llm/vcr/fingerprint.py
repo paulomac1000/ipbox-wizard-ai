@@ -6,6 +6,7 @@ Fingerprint = deterministic hash of:
   - scenario YAML content
   - LLM provider name
   - LLM model name
+  - system prompt (optional)
 
 Change to any component → cassette invalidated → re-record triggered.
 """
@@ -15,9 +16,8 @@ from __future__ import annotations
 import hashlib
 from pathlib import Path
 
-
 # Prompt template version — bump when prompt format changes
-PROMPT_TEMPLATE_VERSION = "1"
+PROMPT_TEMPLATE_VERSION = "2"
 
 # Path to algorithm source
 ALGORITHM_PATH = Path(__file__).parent.parent.parent.parent / "ipbox_algorytm.md"
@@ -40,17 +40,19 @@ def compute_fingerprint(
     scenario_path: Path,
     provider: str,
     model: str,
+    system_prompt: str = "",
 ) -> str:
     """
-    Compute fingerprint for (algorithm + scenario + provider + model).
-    
-    Format: "v{version}_{algo_hash}_{scenario_hash}_{provider}_{model_hash}"
-    
-    Example: "v1_a3f8b2c1d4e5f6a7_b1c2d3e4f5a6b7c8_google_gemini-2.0-flash"
+    Compute fingerprint for (algorithm + scenario + provider + model + system_prompt).
+
+    Format: "v{version}_{algo_hash}_{scenario_hash}_{provider}_{model_hash}_sp{sp_hash}"
+
+    Example: "v1_a3f8b2c1d4e5f6a7_b1c2d3e4f5a6b7c8_google_gemini-2.0-flash_spa1b2c3d4"
     """
     algo_hash = _file_hash(ALGORITHM_PATH)
     scenario_hash = _file_hash(scenario_path)
     model_hash = _content_hash(model)[:8]
+    sp_hash = _content_hash(system_prompt)[:8]
 
     return (
         f"v{PROMPT_TEMPLATE_VERSION}"
@@ -58,6 +60,7 @@ def compute_fingerprint(
         f"_{scenario_hash}"
         f"_{provider}"
         f"_{model_hash}"
+        f"_sp{sp_hash}"
     )
 
 
@@ -75,32 +78,33 @@ def explain_fingerprint_change(
 ) -> list[str]:
     """
     Explain what changed between fingerprints.
-    
+
     Returns list of human-readable change descriptions.
     """
     changes = []
-    
+
     stored_parts = stored.split("_")
     current_parts = current.split("_")
-    
-    if len(stored_parts) < 5 or len(current_parts) < 5:
+
+    if len(stored_parts) < 6 or len(current_parts) < 6:
         return ["Unrecognized fingerprint format"]
-    
+
     labels = [
         "prompt_template_version",
         "algorithm_hash",
         "scenario_hash",
         "provider",
         "model_hash",
+        "system_prompt_hash",
     ]
-    
+
     for i, label in enumerate(labels):
         if i < len(stored_parts) and i < len(current_parts):
             if stored_parts[i] != current_parts[i]:
                 changes.append(
                     f"{label}: {stored_parts[i]} → {current_parts[i]}"
                 )
-    
+
     return changes if changes else ["No changes (fingerprints identical)"]
 
 

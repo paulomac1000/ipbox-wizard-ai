@@ -6,27 +6,27 @@ Defines how VCR behaves: playback, auto, record, or none.
 
 from __future__ import annotations
 
-import os
 from enum import Enum
+from os import environ
 from pathlib import Path
 
 
 class VCRMode(Enum):
     """VCR operating modes."""
-    
+
     PLAYBACK = "playback"
     # Always use cassettes. Fail if cassette missing or stale.
     # Default for CI/CD (zero API cost).
-    
+
     AUTO = "auto"
     # Use cassette if exists and valid (fingerprint match + not stale).
     # Otherwise record new cassette.
     # Default for local development.
-    
+
     RECORD = "record"
     # Always record (overwrite existing cassettes).
     # Use after algorithm/model changes.
-    
+
     NONE = "none"
     # Bypass VCR — always call real API.
     # Use for debugging only.
@@ -34,28 +34,28 @@ class VCRMode(Enum):
 
 class VCRConfig:
     """VCR configuration loaded from environment variables."""
-    
+
     def __init__(self):
-        self.mode = VCRMode(os.environ.get("VCR_MODE", "auto"))
+        self.mode = VCRMode(environ.get("VCR_MODE", "auto"))
         self.cassettes_dir = Path(
-            os.environ.get(
+            environ.get(
                 "VCR_CASSETTES_DIR",
                 str(Path(__file__).parent / "cassettes"),
             )
         )
         self.manifest_path = self.cassettes_dir / "_manifest.yaml"
-        
+
         # Staleness threshold in days (0 = never stale)
-        self.max_age_days = int(os.environ.get("VCR_MAX_AGE_DAYS", "30"))
-        
+        self.max_age_days = int(environ.get("VCR_MAX_AGE_DAYS", "30"))
+
         # Whether to save full prompt in cassette (for debugging)
-        self.save_full_prompt = os.environ.get(
+        self.save_full_prompt = environ.get(
             "VCR_SAVE_FULL_PROMPT", "false"
         ).lower() == "true"
-        
+
         # LLM provider configuration
-        self.provider = os.environ.get("LLM_PROVIDER", "google")
-        self.model = os.environ.get("GEMINI_MODEL", "gemini-2.0-flash")
+        self.provider = environ.get("LLM_PROVIDER", "google")
+        self.model = environ.get("GEMINI_MODEL", "google/gemma-4-31b-it")
 
     @property
     def is_playback(self) -> bool:
@@ -92,7 +92,7 @@ class VCRConfig:
             .replace("/", "_")
             .replace(".", "_")
             .replace("-", "_")
-            [:30]
+            [:60]
         )
 
     def __repr__(self) -> str:
