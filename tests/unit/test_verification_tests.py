@@ -81,8 +81,16 @@ class TestVerificationTests:
     @pytest.mark.P2
     def test_verify_private_costs_forbidden(self):
         """TC-VT-002: Prywatne koszty nie mogą być w IP."""
-        # Simple test for the presence of the function
+        # Non-direct costs present alongside IP costs -> leak detected
         res = verify_private_costs({"costs_ip": 100}, 50)
+        assert res["status"] == "FAIL"
+
+        # Clean case: no non-direct costs
+        res = verify_private_costs({"costs_ip": 0}, 0)
+        assert res["status"] == "PASS"
+
+        # Clean case: non-direct sum below tolerance
+        res = verify_private_costs({"costs_ip": 0}, 0.01)
         assert res["status"] == "PASS"
 
     @pytest.mark.unit

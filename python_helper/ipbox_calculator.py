@@ -654,12 +654,31 @@ def verify_private_costs(
     In our allocation logic, this is true by construction, but we verify
     if non_direct costs (NON basket) are properly isolated.
     """
-    # This is a logical check: if we have NON costs, they must not be in IP.
-    # Since allocate_costs_monthly returns 'ip_direct' and 'costs_ip',
-    # we check if any item from NON basket was passed as IP direct.
+    tolerance = 0.02
+    leak_detected = False
+    details = []
+
+    # Check 1: If non_direct_sum > tolerance, we have private costs present
+    if non_direct_sum > tolerance:
+        # Check if any value in allocated_costs with IP-related keys might indicate leakage
+        ip_related = {k: v for k, v in allocated_costs.items() if "ip" in k.lower()}
+        if ip_related and any(v > tolerance for v in ip_related.values()):
+            leak_detected = True
+            details.append(
+                f"Non-direct costs ({non_direct_sum}) found alongside IP costs {ip_related}"
+            )
+
+    if leak_detected:
+        return {
+            "test": "VERIFY 2 — Private Costs",
+            "status": "FAIL",
+            "details": "; ".join(details),
+        }
+
     return {
         "test": "VERIFY 2 — Private Costs",
-        "status": "PASS" # In basic logic it's always PASS if used correctly
+        "status": "PASS",
+        "non_direct_sum": round(non_direct_sum, 2),
     }
 
 
