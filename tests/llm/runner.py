@@ -1,12 +1,14 @@
-import os
 import re
-import yaml
 from pathlib import Path
 from typing import Any
+
+import yaml
 
 from .client import LLMClient
 
 _RESPONSE_DIR = Path("/tmp/ipbox_llm_responses")
+
+SYSTEM_PROMPT = "Jesteś ekspertem podatkowym specjalizującym się w IP Box (art. 30ca PIT). Wykonujesz obliczenia dokładnie i strukturalnie."
 
 TAGS = ["result", "classifications", "monthly_W", "tests", "stops_reviews"]
 
@@ -15,11 +17,18 @@ _vcr_recorder = None
 _vcr_config = None
 
 
+def _reset_vcr():
+    """Reset VCR singleton — use between mode switches (record ↔ playback)."""
+    global _vcr_recorder, _vcr_config
+    _vcr_recorder = None
+    _vcr_config = None
+
+
 def _get_vcr_recorder():
     """Get or create VCR recorder singleton."""
     global _vcr_recorder, _vcr_config
     if _vcr_recorder is None:
-        from .vcr import VCRRecorder, VCRConfig
+        from .vcr import VCRConfig, VCRRecorder
         _vcr_config = VCRConfig()
         _vcr_recorder = VCRRecorder(_vcr_config)
     return _vcr_recorder
@@ -84,11 +93,11 @@ reviews: []
             algorithm = f.read()
 
         prompt = self.build_prompt(algorithm, scenario)
-        
+
         # Get VCR recorder and check if we should use it
         scenario_id = scenario["meta"]["id"]
         scenario_name = scenario["meta"].get("name", scenario_id)
-        
+
         # Try VCR first (if not in none mode)
         config = _get_vcr_config()
         if not config.is_none:
@@ -98,23 +107,20 @@ reviews: []
                     scenario_id=scenario_id,
                     scenario_path=Path(scenario_path),
                     prompt=prompt,
+                    system_prompt=SYSTEM_PROMPT,
                     api_call_fn=lambda p: self.client.call_with_retry(
-                        system_prompt="Jesteś ekspertem podatkowym specjalizującym się w IP Box (art. 30ca PIT). Wykonujesz obliczenia dokładnie i strukturalnie.",
+                        system_prompt=SYSTEM_PROMPT,
                         user_prompt=p,
                     ),
                     scenario_name=scenario_name,
                 )
             except Exception as e:
-                # VCR failed (e.g., cassette issues) — fall back to direct API
-                print(f"  ⚠️  VCR failed for {scenario_id}: {e}. Using live API.")
-                response = self.client.call_with_retry(
-                    system_prompt="Jesteś ekspertem podatkowym specjalizującym się w IP Box (art. 30ca PIT). Wykonujesz obliczenia dokładnie i strukturalnie.",
-                    user_prompt=prompt,
-                )
+                print(f"  ❌ VCR failed for {scenario_id}: {e}")
+                raise
         else:
             # VCR disabled — always use live API
             response = self.client.call_with_retry(
-                system_prompt="Jesteś ekspertem podatkowym specjalizującym się w IP Box (art. 30ca PIT). Wykonujesz obliczenia dokładnie i strukturalnie.",
+                system_prompt=SYSTEM_PROMPT,
                 user_prompt=prompt,
             )
 

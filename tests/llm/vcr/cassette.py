@@ -8,11 +8,11 @@ Supports multi-turn for future wizard-mode compatibility.
 
 from __future__ import annotations
 
-import yaml
-from dataclasses import dataclass, field, asdict
-from datetime import datetime, timezone
+from dataclasses import asdict, dataclass, field
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
+
+import yaml
 
 
 @dataclass
@@ -32,7 +32,7 @@ class CassetteMeta:
 
     def __post_init__(self):
         if not self.recorded_at:
-            self.recorded_at = datetime.now(timezone.utc).isoformat()
+            self.recorded_at = datetime.now(UTC).isoformat()
 
 
 @dataclass
@@ -42,6 +42,8 @@ class CassetteTurn:
     prompt: str = ""
     response: str = ""
     prompt_hash: str = ""
+    request_hash: str = ""
+    system_prompt_hash: str = ""
 
 
 @dataclass
@@ -49,7 +51,7 @@ class Cassette:
     """Complete cassette with metadata and turns."""
     meta: CassetteMeta
     turns: list[CassetteTurn] = field(default_factory=list)
-    
+
     # Pre-parsed results (cached for fast test access)
     parsed_result_yaml: dict | None = None
     parsed_classifications: dict | None = None
@@ -63,7 +65,7 @@ class Cassette:
             "meta": asdict(self.meta),
             "turns": [asdict(t) for t in self.turns],
         }
-        
+
         # Add parsed data if available
         if self.parsed_result_yaml:
             data["parsed"] = {
@@ -73,7 +75,7 @@ class Cassette:
                 "tests": self.parsed_tests,
                 "stops_reviews": self.parsed_stops_reviews,
             }
-        
+
         return yaml.dump(
             data,
             default_flow_style=False,
@@ -92,12 +94,12 @@ class Cassette:
         """Load cassette from file."""
         with open(path, encoding="utf-8") as f:
             data = yaml.safe_load(f)
-        
+
         meta = CassetteMeta(**data["meta"])
         turns = [CassetteTurn(**t) for t in data.get("turns", [])]
-        
+
         parsed = data.get("parsed", {})
-        
+
         return cls(
             meta=meta,
             turns=turns,
@@ -135,7 +137,7 @@ class CassetteManifest:
         """Save manifest to YAML file."""
         data = {
             "manifest_version": 1,
-            "generated_at": datetime.now(timezone.utc).isoformat(),
+            "generated_at": datetime.now(UTC).isoformat(),
             "entries": self.entries,
         }
         path.write_text(
@@ -167,5 +169,5 @@ class CassetteManifest:
         self.entries[scenario_id] = {
             "fingerprint": fingerprint,
             "file": filename,
-            "recorded_at": datetime.now(timezone.utc).isoformat(),
+            "recorded_at": datetime.now(UTC).isoformat(),
         }

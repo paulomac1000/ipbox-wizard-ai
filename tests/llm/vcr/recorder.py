@@ -44,6 +44,8 @@ class VCRRecorder:
         scenario_id: str,
         scenario_path: Path,
         prompt: str,
+        system_prompt: str = "",
+        *,
         api_call_fn: Callable[[str], str],
         scenario_name: str = "",
     ) -> str:
@@ -83,7 +85,7 @@ class VCRRecorder:
 
         if not should_record:
             # PLAYBACK mode
-            return self._playback(cassette_path, scenario_id, prompt)
+            return self._playback(cassette_path, scenario_id, prompt, system_prompt=system_prompt)
 
         if self.config.is_playback:
             # PLAYBACK but cassette missing/stale: FAIL
@@ -100,6 +102,7 @@ class VCRRecorder:
             scenario_name=scenario_name,
             cassette_path=cassette_path,
             prompt=prompt,
+            system_prompt=system_prompt,
             fingerprint=current_fp,
             api_call_fn=api_call_fn,
         )
@@ -155,7 +158,7 @@ class VCRRecorder:
         except Exception:
             return True  # Corrupted cassette → re-record
 
-    def _playback(self, cassette_path: Path, scenario_id: str, prompt: str) -> str:
+    def _playback(self, cassette_path: Path, scenario_id: str, prompt: str, system_prompt: str = "") -> str:
         """Play back response from cassette."""
         cassette = Cassette.load(cassette_path)
 
@@ -175,6 +178,18 @@ class VCRRecorder:
                 f"Run in record mode to update the cassette."
             )
 
+        # Check system_prompt_hash (allow old cassettes where it's empty)
+        if system_prompt:
+            current_system_prompt_hash = hashlib.sha256(system_prompt.encode("utf-8")).hexdigest()[:16]
+            stored_system_prompt_hash = cassette.turns[0].system_prompt_hash if cassette.turns else ""
+            if stored_system_prompt_hash and stored_system_prompt_hash != current_system_prompt_hash:
+                raise ValueError(
+                    f"System prompt hash mismatch for '{scenario_id}': "
+                    f"stored={stored_system_prompt_hash}, current={current_system_prompt_hash}. "
+                    f"This indicates the system prompt has changed. "
+                    f"Run in record mode to update the cassette."
+                )
+
         self._stats["playback_hits"] += 1
         recorded_date = cassette.meta.recorded_at[:10]
         print(f"  ▶️  Playback: {scenario_id} (recorded: {recorded_date})")
@@ -187,7 +202,9 @@ class VCRRecorder:
         scenario_name: str,
         cassette_path: Path,
         prompt: str,
-        fingerprint: str,
+        system_prompt: str = "",
+        *,
+        fingerprint: str = "",
         api_call_fn: Callable[[str], str],
     ) -> str:
         """Record new cassette from API call."""
@@ -210,7 +227,9 @@ class VCRRecorder:
         prompt_hash = hashlib.sha256(
             prompt.encode("utf-8")
         ).hexdigest()[:16]
-        request_hash = hashlib.sha256(prompt.encode("utf-8")).hexdigest()[:16]
+        request_payload = f"{system_prompt}\0{prompt}" if system_prompt else prompt
+        request_hash = hashlib.sha256(request_payload.encode("utf-8")).hexdigest()[:16]
+        system_prompt_hash = hashlib.sha256(system_prompt.encode("utf-8")).hexdigest()[:16] if system_prompt else ""
 
         turn = CassetteTurn(
             role="user",
@@ -218,6 +237,7 @@ class VCRRecorder:
             response=response,
             prompt_hash=prompt_hash,
             request_hash=request_hash,
+            system_prompt_hash=system_prompt_hash,
         )
 
         # Create metadata
