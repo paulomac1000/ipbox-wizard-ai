@@ -1,5 +1,7 @@
 import pytest
+
 from python_helper.ipbox_calculator import tax_cascade
+
 
 class TestTaxCascade:
     """Testy kaskady odliczeń (P0: kolejność, P1: progi)."""
@@ -43,7 +45,7 @@ class TestTaxCascade:
     @pytest.mark.P1
     def test_scale_higher_bracket(self):
         """Tax on scale in second bracket (>120k)."""
-        # Income 150k. 
+        # Income 150k.
         # 120k * 12% - 3600 = 10800
         # 30k * 32% = 9600
         # Total = 20400
@@ -87,7 +89,7 @@ class TestTaxCascade:
         )
         assert res["non_ip_base_rounded"] == 0
         assert res["thermo_used"] == 10000.0 - 6000.0 - 2000.0 - 760.0
-        assert res["ip_tax"] == 5000 
+        assert res["ip_tax"] == 5000
 
     @pytest.mark.unit
     @pytest.mark.P1
@@ -100,6 +102,14 @@ class TestTaxCascade:
     def test_scale_brackets_summary(self, income, expected_tax):
         res = tax_cascade(non_ip_income=income, ip_income=0, nexus=1.0, tax_form="scale")
         assert res["non_ip_tax_before_relief"] == expected_tax
+
+    @pytest.mark.unit
+    @pytest.mark.P1
+    def test_negative_ip_income_zero_tax(self):
+        """Negative IP income must produce zero IP tax."""
+        res = tax_cascade(non_ip_income=0, ip_income=-10000, nexus=0.5, tax_form="linear_19%")
+        assert res["ip_base_rounded"] == 0
+        assert res["ip_tax"] == 0
 
     @pytest.mark.unit
     @pytest.mark.P1
@@ -139,3 +149,20 @@ class TestTaxCascade:
         """Skala z zerowym dochodem nie dzieli przez zero."""
         res = tax_cascade(non_ip_income=0, ip_income=0, nexus=1.0, tax_form="scale")
         assert res["non_ip_tax_before_relief"] == 0
+
+    @pytest.mark.unit
+    @pytest.mark.P1
+    def test_invalid_tax_form_raises_error(self):
+        """TC-TC-VALID: Invalid tax_form raises ValueError."""
+        with pytest.raises(ValueError, match="Invalid tax_form"):
+            tax_cascade(non_ip_income=10000, ip_income=0, nexus=1.0, tax_form="liniowy_19%")
+        with pytest.raises(ValueError, match="Invalid tax_form"):
+            tax_cascade(non_ip_income=10000, ip_income=0, nexus=1.0, tax_form="linar_19%")
+        with pytest.raises(ValueError, match="Invalid tax_form"):
+            tax_cascade(non_ip_income=10000, ip_income=0, nexus=1.0, tax_form="skala")
+        with pytest.raises(ValueError, match="Invalid tax_form"):
+            tax_cascade(non_ip_income=10000, ip_income=0, nexus=1.0, tax_form="")
+        res = tax_cascade(non_ip_income=10000, ip_income=0, nexus=1.0, tax_form="linear_19%")
+        assert res is not None
+        res = tax_cascade(non_ip_income=10000, ip_income=0, nexus=1.0, tax_form="scale")
+        assert res is not None

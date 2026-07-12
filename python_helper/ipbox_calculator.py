@@ -11,12 +11,10 @@ License: MIT
 
 from __future__ import annotations
 
-import math
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Any
-
 
 # ============================================================================
 # W Coefficient (Phase 2)
@@ -29,10 +27,10 @@ def calculate_w_coefficient(
 ) -> dict[str, float | str]:
     """
     Calculate the W coefficient for one month.
-    
+
     KEY: divisor = actual work hours (excluding vacation and sick leave),
     NOT 160h calendar hours.
-    
+
     W = ((work_hours - non_ip_hours) * invoice_percentage/100) / work_hours * 100
     """
     if work_hours <= 0:
@@ -41,17 +39,17 @@ def calculate_w_coefficient(
             "message": "Work hours = 0 (vacation/sick leave all month) — skip month in IP Box",
             "W": 0.0,
         }
-    
+
     if non_ip_hours > work_hours:
         return {
             "status": "ERROR",
             "message": f"Non-IP hours ({non_ip_hours}h) > Work hours ({work_hours}h) — check data",
             "W": -1,
         }
-    
+
     effective_ip_hours = (work_hours - non_ip_hours) * (invoice_percentage / 100)
     w_coef = (effective_ip_hours / work_hours) * 100
-    
+
     # Validation
     if w_coef < 0 or w_coef > 100:
         status = "ERROR"
@@ -63,10 +61,18 @@ def calculate_w_coefficient(
         status = "REVIEW_01 (W > 95% — requires strong documentation)"
     else:
         status = "OK"
-    
+
+    formula_str = (
+        "W = ((work_hours - non_ip_hours) * invoice_percentage/100) / "
+        "work_hours * 100"
+    )
+    sub_str = (
+        f"W = (({work_hours} - {non_ip_hours}) * {invoice_percentage}/100) / "
+        f"{work_hours} * 100"
+    )
     return {
-        "formula": "W = ((work_hours - non_ip_hours) * invoice_percentage/100) / work_hours * 100",
-        "substitution": f"W = (({work_hours} - {non_ip_hours}) * {invoice_percentage}/100) / {work_hours} * 100",
+        "formula": formula_str,
+        "substitution": sub_str,
         "effective_ip_hours": round(effective_ip_hours, 2),
         "W": round(w_coef, 2),
         "status": status,
@@ -76,7 +82,7 @@ def calculate_w_coefficient(
 def aggregate_w_multiproject(projects: list[dict]) -> float:
     """
     Aggregate W for multiple projects in one month — revenue-weighted average.
-    
+
     projects = [{"revenue": 10000, "W": 75}, {"revenue": 5000, "W": 90}, ...]
     """
     total_revenue = sum(p["revenue"] for p in projects)
@@ -100,7 +106,7 @@ def get_nbp_rate(currency: str, date_str: str) -> float | None:
     except ImportError:
         print("⚠️  'requests' library unavailable. Download rate manually from nbp.pl")
         return None
-    
+
     url = f"http://api.nbp.pl/api/exchangerates/rates/a/{currency.lower()}/{date_str}/?format=json"
     try:
         response = requests.get(url, timeout=5)
@@ -108,7 +114,8 @@ def get_nbp_rate(currency: str, date_str: str) -> float | None:
             return response.json()["rates"][0]["mid"]
         elif response.status_code == 404:
             # Weekend/holiday — go back one day
-            prev = (datetime.strptime(date_str, "%Y-%m-%d") - timedelta(days=1)).strftime("%Y-%m-%d")
+            prev_date = datetime.strptime(date_str, "%Y-%m-%d") - timedelta(days=1)
+            prev = prev_date.strftime("%Y-%m-%d")
             return get_nbp_rate(currency, prev)
         else:
             return None
@@ -126,7 +133,7 @@ def convert_fx_invoice(
 ) -> dict[str, Any]:
     """
     Convert FX invoice to PLN + calculate exchange rate difference.
-    
+
     IMPORTANT: exchange rate difference ALWAYS goes to NON-IP revenue/costs.
     """
     # Base date for exchange rate
@@ -136,31 +143,33 @@ def convert_fx_invoice(
         if not payment_date:
             return {"error": "Cash method requires payment date"}
         base_date = payment_date
-    
+
     # Previous business day
-    rate_date = (datetime.strptime(base_date, "%Y-%m-%d") - timedelta(days=1)).strftime("%Y-%m-%d")
-    
+    prev_business_date = datetime.strptime(base_date, "%Y-%m-%d") - timedelta(days=1)
+    rate_date = prev_business_date.strftime("%Y-%m-%d")
+
     base_rate = get_nbp_rate(currency, rate_date)
     if base_rate is None:
         return {"error": f"Cannot get NBP rate for {currency} {rate_date} — provide manually"}
-    
+
     revenue_pln = round(amount_currency * base_rate, 2)
-    
+
     # Exchange rate difference (if accrual method and we know payment date)
     difference = 0.0
     payment_rate = None
     if method == "accrual" and payment_date and payment_date != base_date:
-        payment_rate_date = (datetime.strptime(payment_date, "%Y-%m-%d") - timedelta(days=1)).strftime("%Y-%m-%d")
+        payment_prev_date = datetime.strptime(payment_date, "%Y-%m-%d") - timedelta(days=1)
+        payment_rate_date = payment_prev_date.strftime("%Y-%m-%d")
         payment_rate = get_nbp_rate(currency, payment_rate_date)
         if payment_rate is not None:
             difference = round((payment_rate - base_rate) * amount_currency, 2)
-    
+
     return {
         "base_revenue_pln": revenue_pln,
         "base_rate": base_rate,
         "base_rate_date": rate_date,
         "payment_rate": payment_rate,
-        "exchange_rate_difference": difference,  # + = non-IP revenue, − = non-IP cost
+        "exchange_rate_difference": difference,  # + = non-IP revenue, - = non-IP cost
         "revenue_month": base_date[:7],
         "difference_month": payment_date[:7] if payment_date else None,
         "info": "Exchange rate difference → ALWAYS to NON-IP (never to IP Box!)",
@@ -180,9 +189,16 @@ class CostItem:
     allocation_method: str = ""  # dokumentowa | czasowa_W | produktowa | z_interpretacji | custom
     allocation_key: float | None = None  # explicit key 0-1 (None = deferred for annual policy)
     allocation_source: str = ""  # where the allocation policy came from
-    nexus_source: str = ""  # own_br | unrelated_br_contractor | related_br_contractor | ip_acquisition | indirect_or_general | unknown
+    nexus_source: str = ""  # own_br | unrelated_br_contractor ... (see nexus_classify)
     nexus_basket: str = ""  # A | B | C | D | poza_nexus
     nexus_amount: float | None = None  # explicit amount for NEXUS (None = use item.amount)
+
+    def __post_init__(self) -> None:
+        if self.nexus_amount is not None:
+            if not (0 <= self.nexus_amount <= self.amount):
+                raise ValueError(
+                    f"nexus_amount ({self.nexus_amount}) must be between 0 and cost amount ({self.amount}) for {self.description!r}"
+                )
 
 
 # ============================================================================
@@ -191,7 +207,10 @@ class CostItem:
 
 VALID_MIX_METHODS = {"przychodowa_roczna", "czasowa_W", "metraż", "licencje", "projekt", "custom"}
 VALID_REVENUE_METHODS = {"dokumentowa", "czasowa_W", "produktowa", "z_interpretacji", "custom"}
-VALID_SOURCE = {"interpretacja_KIS", "księgowa", "poprzednie_rozliczenie", "domyślna_wizard", "użytkownik"}
+VALID_SOURCE = {
+    "interpretacja_KIS", "księgowa", "poprzednie_rozliczenie",
+    "domyślna_wizard", "użytkownik",
+}
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -216,6 +235,15 @@ class AllocationPolicy:
 
     def __post_init__(self) -> None:
         """Validate policy fields."""
+        aliases = {
+            "przychodowy_roczny": "przychodowa_roczna",
+            "przychodowy": "przychodowa_roczna",
+            "czasowy_W": "czasowa_W",
+            "czasowa": "czasowa_W",
+        }
+        if self.mix_method in aliases:
+            object.__setattr__(self, "mix_method", aliases[self.mix_method])
+
         errors: list[str] = []
 
         # source is required
@@ -226,9 +254,15 @@ class AllocationPolicy:
 
         # valid enums
         if self.mix_method not in VALID_MIX_METHODS:
-            errors.append(f"mix_method={self.mix_method!r} — must be one of {sorted(VALID_MIX_METHODS)}")
+            errors.append(
+                f"mix_method={self.mix_method!r} — must be one of "
+                f"{sorted(VALID_MIX_METHODS)}"
+            )
         if self.revenue_method not in VALID_REVENUE_METHODS:
-            errors.append(f"revenue_method={self.revenue_method!r} — must be one of {sorted(VALID_REVENUE_METHODS)}")
+            errors.append(
+                f"revenue_method={self.revenue_method!r} — must be one of "
+                f"{sorted(VALID_REVENUE_METHODS)}"
+            )
 
         # mix_key range 0-1 (only if not None)
         if self.mix_key is not None and not (0 <= self.mix_key <= 1):
@@ -246,7 +280,10 @@ class AllocationPolicy:
             errors.append("przychodowa_roczna is deferred; do not set mix_key in monthly policy")
 
         # custom, metraż, licencje, projekt require justification
-        if self.mix_method in {"custom", "metraż", "licencje", "projekt"} and not self.justification:
+        is_justified_method = self.mix_method in {
+            "custom", "metraż", "licencje", "projekt",
+        }
+        if is_justified_method and not self.justification:
             errors.append(f"{self.mix_method} requires justification")
 
         if errors:
@@ -282,7 +319,7 @@ def classify_cost(
     Classify a KPiR item into one of the baskets: IP | MIX | NON | EXCLUDED.
     """
     desc = item.description.lower()
-    
+
     # Guard 1: Social Security
     if re.search(KEYWORDS_SOCIAL_SECURITY, desc):
         if social_security_in_kpir:
@@ -292,7 +329,7 @@ def classify_cost(
             item.basket = "EXCLUDED"
             item.note = "ZUS społeczne — deduction in PIT (not business cost)"
         return item
-    
+
     # Guard 2: Health Insurance
     if re.search(KEYWORDS_HEALTH_INSURANCE, desc):
         if health_insurance_in_kpir:
@@ -302,27 +339,30 @@ def classify_cost(
             item.basket = "EXCLUDED"
             item.note = "Składka zdrowotna — not in costs (non-deductible in PIT since 2022)"
         return item
-    
+
     # Guard 3: Fines, penalties
     for pattern in KEYWORDS_EXCLUDED:
         if re.search(pattern, desc):
             item.basket = "EXCLUDED"
             item.note = "Art. 23 ust. 1 pkt 3 PIT — fines/penalties are not costs"
             return item
-    
+
     # Guard 4: Fixed assets > 10k
     if item.amount > asset_threshold:
         item.basket = "?"
-        item.note = f"Item > {asset_threshold:,.0f} PLN — fixed asset? depreciation or one-time? (ask user)"
+        item.note = (
+            f"Item > {asset_threshold:,.0f} PLN — "
+            "fixed asset? depreciation or one-time? (ask user)"
+        )
         return item
-    
+
     # Guard 5: NON basket (private)
     for keyword in KEYWORDS_NON:
         if keyword in desc:
             item.basket = "NON"
             item.note = f"Private cost (category: {keyword})"
             return item
-    
+
     # Default: MIX (common for entire business)
     item.basket = "MIX"
     return item
@@ -346,6 +386,10 @@ def allocate_costs_monthly(
         costs_ip, costs_non, ip_direct, non_direct, mix, excluded,
         mix_method, mix_key_used, mix_key_source, result_status, mix_deferred
     """
+    if w_coefficient is not None:
+        if not (0 <= w_coefficient <= 100):
+            raise ValueError(f"w_coefficient ({w_coefficient}) must be between 0 and 100")
+
     ip_direct_costs = ip_direct_costs or []
 
     sum_ip_direct = sum(i.amount for i in ip_direct_costs)
@@ -397,10 +441,15 @@ def allocate_costs_monthly(
         "costs_non": round(costs_non, 2),
         "mix_method": allocation_policy.mix_method,
         "mix_key_used": allocation_policy.mix_key,
-        "mix_effective_key": round(mix_ip / mix_total_allocated, 6) if mix_total_allocated > 0 else None,
+        "mix_effective_key": (
+            round(mix_ip / mix_total_allocated, 6)
+            if mix_total_allocated > 0
+            else None
+        ),
         "mix_key_source": allocation_policy.source,
         "result_status": result_status,
         "mix_deferred": round(mix_deferred, 2),
+        "w_coefficient": w_coefficient,
     }
 
 
@@ -408,7 +457,7 @@ def allocate_costs_monthly(
 # NEXUS (Phase 7.3)
 # ============================================================================
 
-def calculate_nexus(A: float, B: float = 0, C: float = 0, D: float = 0) -> dict[str, float]:
+def calculate_nexus(A: float, B: float = 0, C: float = 0, D: float = 0) -> dict[str, float]:  # noqa: N803
     """
     Calculate the annual NEXUS (art. 30ca ust. 7 PIT).
     """
@@ -416,9 +465,12 @@ def calculate_nexus(A: float, B: float = 0, C: float = 0, D: float = 0) -> dict[
     if denominator == 0:
         return {
             "nexus": 0,
-            "message": "A=B=C=D=0 — no qualified costs. REVIEW_03 (A=0 with IP income? consider minimal costs).",
+            "message": (
+                "A=B=C=D=0 — no qualified costs. "
+                "REVIEW_03 (A=0 with IP income? consider minimal costs)."
+            ),
         }
-    
+
     nexus_val = min(1.0, (A * 1.3 + B) / denominator)
     return {
         "A": A,
@@ -455,21 +507,33 @@ def tax_cascade(
     """
     Full tax cascade in the binding order.
     """
+    valid_tax_forms = frozenset({"linear_19%", "scale"})
+    if tax_form not in valid_tax_forms:
+        raise ValueError(f"Invalid tax_form: {tax_form!r}. Must be one of {sorted(valid_tax_forms)}")
+
     steps = []
     remaining = non_ip_income
-    
+
     # Step 2: Losses
     if previous_losses > 0:
         deduction = min(previous_losses, remaining)
-        steps.append({"step": "Losses from previous years", "deduction": deduction, "after": remaining - deduction})
+        steps.append({
+            "step": "Losses from previous years",
+            "deduction": deduction,
+            "after": remaining - deduction,
+        })
         remaining -= deduction
-    
+
     # Step 3: Social Security
     if social_security_deduction > 0:
         deduction = min(social_security_deduction, remaining)
-        steps.append({"step": "Social Security", "deduction": deduction, "after": remaining - deduction})
+        steps.append({
+            "step": "Social Security",
+            "deduction": deduction,
+            "after": remaining - deduction,
+        })
         remaining -= deduction
-    
+
     # Step 4: Use-it-or-lose-it
     for name, amount in [
         ("IKZE", ikze),
@@ -482,19 +546,23 @@ def tax_cascade(
             deduction = min(amount, remaining)
             steps.append({"step": name, "deduction": deduction, "after": remaining - deduction})
             remaining -= deduction
-    
+
     # Step 5: Thermomodernization (LAST)
     thermo_used = 0
     if thermomodernization_pool > 0:
         thermo_used = min(thermomodernization_pool, remaining)
-        steps.append({"step": "Thermomodernization", "deduction": thermo_used, "after": remaining - thermo_used})
+        steps.append({
+            "step": "Thermomodernization",
+            "deduction": thermo_used,
+            "after": remaining - thermo_used,
+        })
         remaining -= thermo_used
-    
+
     thermo_carry_over = thermomodernization_pool - thermo_used
-    
+
     # Step 6: Non-IP Tax
     non_ip_base_rounded = round(max(0, remaining))
-    
+
     if tax_form == "linear_19%":
         non_ip_tax_before_relief = round(non_ip_base_rounded * 0.19)
     else:  # scale
@@ -503,22 +571,22 @@ def tax_cascade(
             scale_tax = max(0, round(total_scale_base * 0.12 - 3_600))
         else:
             scale_tax = round(10_800 + (total_scale_base - 120_000) * 0.32)
-        
+
         if total_scale_base > 0:
             non_ip_tax_before_relief = round(scale_tax * (non_ip_base_rounded / total_scale_base))
         else:
             non_ip_tax_before_relief = 0
-    
+
     # Step 7: IP Tax
-    ip_base_rounded = round(ip_income * nexus)
+    ip_base_rounded = round(max(0, ip_income * nexus))
     ip_tax = round(ip_base_rounded * 0.05)
-    
+
     # Step 8: Child Credit
     non_ip_tax_after_relief = max(0, non_ip_tax_before_relief - child_tax_credit)
     used_child_credit = min(child_tax_credit, non_ip_tax_before_relief)
-    
+
     total_tax = non_ip_tax_after_relief + ip_tax
-    
+
     return {
         "steps": steps,
         "remaining_non_ip_income": round(remaining, 2),
@@ -534,8 +602,11 @@ def tax_cascade(
     }
 
 
-def calculate_overpayment_or_underpayment(total_advances: float, total_tax: float) -> dict[str, float]:
-    """Calculate overpayment (+) or underpayment (−)."""
+def calculate_overpayment_or_underpayment(
+    total_advances: float,
+    total_tax: float,
+) -> dict[str, float]:
+    """Calculate overpayment (+) or underpayment (-)."""
     result = round(total_advances - total_tax, 2)
     return {
         "total_advances": round(total_advances, 2),
@@ -564,7 +635,7 @@ def verify_kpir_balance(
     """
     revenue_diff = abs((ip_revenue_sum + non_ip_revenue_sum - net_fx_diff) - kpir_revenue)
     costs_diff = abs((ip_costs_sum + non_ip_costs_sum) - kpir_costs_net)
-    
+
     return {
         "test": "VERIFY 1 — KPiR Balance",
         "revenue_diff": round(revenue_diff, 2),
@@ -580,7 +651,7 @@ def verify_private_costs(
     """
     VERIFY 2: No Private Costs in IP.
     Ensures that costs in the NON basket did not leak into IP costs.
-    In our allocation logic, this is true by construction, but we verify 
+    In our allocation logic, this is true by construction, but we verify
     if non_direct costs (NON basket) are properly isolated.
     """
     # This is a logical check: if we have NON costs, they must not be in IP.
@@ -602,11 +673,19 @@ def verify_no_double_social_security(
     """
     if in_kpir:
         if pit_deduction != 0:
-            return {"test": "VERIFY 3", "status": "FAIL", "error": f"In KPiR, but PIT deduction = {pit_deduction}"}
+            return {
+                "test": "VERIFY 3",
+                "status": "FAIL",
+                "error": f"In KPiR, but PIT deduction = {pit_deduction}",
+            }
     else:
         if monthly_costs_sum != 0:
-            return {"test": "VERIFY 3", "status": "FAIL", "error": f"Deducted in PIT, but in costs = {monthly_costs_sum}"}
-    
+            return {
+                "test": "VERIFY 3",
+                "status": "FAIL",
+                "error": f"Deducted in PIT, but in costs = {monthly_costs_sum}",
+            }
+
     return {"test": "VERIFY 3 — No Double Social Security", "status": "PASS"}
 
 
@@ -618,9 +697,17 @@ def verify_tax_cascade(
     VERIFY 4: Base >= 0, carry-over >= 0.
     """
     if non_ip_base_rounded < 0:
-        return {"test": "VERIFY 4", "status": "FAIL", "error": f"Non-IP base = {non_ip_base_rounded} < 0"}
+        return {
+            "test": "VERIFY 4",
+            "status": "FAIL",
+            "error": f"Non-IP base = {non_ip_base_rounded} < 0",
+        }
     if thermo_carry_over < 0:
-        return {"test": "VERIFY 4", "status": "FAIL", "error": f"Thermo carry-over = {thermo_carry_over} < 0"}
+        return {
+            "test": "VERIFY 4",
+            "status": "FAIL",
+            "error": f"Thermo carry-over = {thermo_carry_over} < 0",
+        }
     return {"test": "VERIFY 4 — Tax Cascade", "status": "PASS"}
 
 
@@ -635,12 +722,20 @@ def verify_ip_tax(
     """
     expected_base = round(ip_income * nexus)
     expected_tax = round(expected_base * 0.05)
-    
+
     if expected_base != declared_base:
-        return {"test": "VERIFY 5", "status": "FAIL", "error": f"Expected base {expected_base}, declared {declared_base}"}
+        return {
+            "test": "VERIFY 5",
+            "status": "FAIL",
+            "error": f"Expected base {expected_base}, declared {declared_base}",
+        }
     if expected_tax != declared_tax:
-        return {"test": "VERIFY 5", "status": "FAIL", "error": f"Expected tax {expected_tax}, declared {declared_tax}"}
-    
+        return {
+            "test": "VERIFY 5",
+            "status": "FAIL",
+            "error": f"Expected tax {expected_tax}, declared {declared_tax}",
+        }
+
     return {"test": "VERIFY 5 — IP Tax", "status": "PASS"}
 
 
@@ -655,9 +750,13 @@ def verify_overpayment(
     """
     expected = round(total_advances - total_tax, 2)
     diff = abs(expected - declared_result)
-    
+
     if diff > tolerance:
-        return {"test": "VERIFY 6", "status": "FAIL", "error": f"Expected {expected}, declared {declared_result}"}
+        return {
+            "test": "VERIFY 6",
+            "status": "FAIL",
+            "error": f"Expected {expected}, declared {declared_result}",
+        }
     return {"test": "VERIFY 6 — Overpayment", "status": "PASS"}
 
 
@@ -692,7 +791,10 @@ def nexus_classify(item: CostItem, nexus_source: str = "unknown") -> CostItem:
     item.nexus_basket = NEXUS_SOURCE_MAP[source]
 
     if source == "unknown":
-        item.note += "REVIEW_NEXUS_UNKNOWN: nexus_source unknown; treated as poza_nexus conservatively"
+        item.note += (
+            "REVIEW_NEXUS_UNKNOWN: nexus_source unknown; "
+            "treated as poza_nexus conservatively"
+        )
 
     return item
 
@@ -797,7 +899,8 @@ def allocate_revenue_monthly(
             errors.append("document_split_ip is required for dokumentowa method")
         elif not (0 <= document_split_ip <= base_revenue):
             errors.append(
-                f"document_split_ip ({document_split_ip}) must be between 0 and base_revenue ({base_revenue})"
+                f"document_split_ip ({document_split_ip}) must be between 0 "
+                f"and base_revenue ({base_revenue})"
             )
     else:
         if revenue_key is None:
@@ -935,6 +1038,12 @@ def allocate_multi_ip(
     if total_ip_revenue <= 0:
         raise ValueError(
             f"Sum of ip_revenues values must be > 0, got {total_ip_revenue}"
+        )
+    if abs(total_ip_revenue - software_ip_revenue) > 0.02:
+        raise ValueError(
+            f"Sum of ip_revenues ({total_ip_revenue}) does not match "
+            f"software_ip_revenue ({software_ip_revenue}) — "
+            f"difference exceeds 0.02"
         )
 
     # Stage 1

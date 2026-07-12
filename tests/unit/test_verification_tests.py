@@ -1,12 +1,14 @@
 import pytest
+
 from python_helper.ipbox_calculator import (
-    verify_kpir_balance, 
-    verify_no_double_social_security, 
-    verify_tax_cascade, 
-    verify_ip_tax, 
+    verify_ip_tax,
+    verify_kpir_balance,
+    verify_no_double_social_security,
     verify_overpayment,
-    verify_private_costs
+    verify_private_costs,
+    verify_tax_cascade,
 )
+
 
 class TestVerificationTests:
     """Testy weryfikacyjne dla gotowych deklaracji (Faza 8)."""
