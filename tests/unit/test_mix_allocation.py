@@ -444,11 +444,13 @@ class TestMixAllocationNegative:
         item_success = CostItem("desc", 100, basket="IP", nexus_basket="A", nexus_amount=30.0)
         res = aggregate_nexus_costs([item_success])
         assert res["A"] == 30.0
+        assert res["poza_nexus"] == 70.0
 
         # Success with nexus_amount for MIX
         item_mix_success = CostItem("MIX desc", 100, basket="MIX", nexus_basket="A", nexus_amount=40.0)
         res_mix = aggregate_nexus_costs([item_mix_success])
         assert res_mix["A"] == 40.0
+        assert res_mix["poza_nexus"] == 60.0
 
     @pytest.mark.unit
     @pytest.mark.P1

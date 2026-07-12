@@ -67,10 +67,10 @@ Pełna dokumentacja: [docs/testing.md](docs/testing.md)
 
 ### Modele AI
 
-- Jedyny obsługiwany provider: **Google Gemini**
-- Klucz: `GEMINI_API_KEY` (secret)
-- Model: `GEMINI_MODEL` (zmienna środowiskowa, domyślnie `gemini-2.0-flash`)
-- Nie dodawać zależności do Anthropic, OpenAI, ani innych providerów
+- Obsługiwani providerzy: **Google Gemini** (direct) oraz **OpenRouter** (proxy)
+- Klucz: `GEMINI_API_KEY` (secret). Alternatywnie: `OPENROUTER_API_KEY` (secret) dla dostępu przez OpenRouter
+- Model: `GEMINI_MODEL` (zmienna środowiskowa, domyślnie `google/gemini-3.5-flash`)
+- Nie dodawać zależności do innych SDK/providerów — OpenRouter jest jedynym proxy, żadnych bezpośrednich SDK poza google-generativeai
 
 ### Testy jednostkowe
 

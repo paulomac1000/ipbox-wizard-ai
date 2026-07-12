@@ -1,5 +1,8 @@
 name: "LLM Scenario Tests"
 
+env:
+  GEMINI_MODEL: google/gemini-3.5-flash
+
 on:
   workflow_call:
   push:
@@ -46,6 +49,7 @@ jobs:
         env:
           VCR_MODE: playback
         run: |
+          set -o pipefail
           mkdir -p reports
           python -m pytest tests/llm/test_scenarios.py \
             --run-llm \
@@ -99,7 +103,7 @@ jobs:
 
     env:
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-      GEMINI_MODEL: ${{ vars.GEMINI_MODEL }}
+      GEMINI_MODEL: ${{ vars.GEMINI_MODEL || 'google/gemini-3.5-flash' }}
       LLM_MAX_CALLS_PER_RUN: ${{ github.event.inputs.max_scenarios || '0' }}
       # VCR auto mode: use cassettes if valid, record if stale
       VCR_MODE: auto
@@ -123,7 +127,7 @@ jobs:
             echo "::error::Brak GEMINI_API_KEY — dodaj go jako GitHub Secret."
             exit 1
           fi
-          echo "GEMINI_MODEL=${GEMINI_MODEL:-gemini-2.0-flash}"
+          echo "GEMINI_MODEL=${GEMINI_MODEL:-google/gemini-3.5-flash}"
 
       - name: Budget check
         run: |
@@ -136,6 +140,7 @@ jobs:
 
       - name: Run LLM scenario tests
         run: |
+          set -o pipefail
           mkdir -p reports
           python -m pytest tests/llm/test_scenarios.py \
             --run-llm \

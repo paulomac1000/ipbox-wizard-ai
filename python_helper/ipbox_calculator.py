@@ -851,13 +851,23 @@ def aggregate_nexus_costs(items: list[CostItem]) -> dict[str, float]:
                     "with full amount. Set explicit nexus_amount."
                 )
             amount = item.nexus_amount
+            result["poza_nexus"] += item.amount - item.nexus_amount
         else:
             amount = item.nexus_amount if item.nexus_amount is not None else item.amount
+            if item.nexus_amount is not None:
+                result["poza_nexus"] += item.amount - item.nexus_amount
 
         if amount < 0:
             raise ValueError(f"nexus amount cannot be negative for {item.description!r}")
 
         result[basket] += amount
+
+    total_allocated = sum(result.values())
+    total_input = sum(item.amount for item in items)
+    if abs(total_allocated - total_input) > 0.02:
+        raise ValueError(
+            f"Cost sum mismatch: allocated {total_allocated:.2f} != input {total_input:.2f}"
+        )
 
     return result
 
