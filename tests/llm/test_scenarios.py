@@ -37,7 +37,7 @@ def discover_scenarios() -> list:
 
 @pytest.fixture(scope="session")
 def llm_client(request):
-    is_vs_code = request.config.pluginmanager.has_plugin("vscode_pytest") or os.getenv("TERM_PROGRAM") == "vscode"
+    is_vs_code = request.config.pluginmanager.has_plugin("vscode_pytest") or os.getenv("TERM_PROGRAM") == "vscode"  # noqa: E501
 
     if not request.config.getoption("--run-llm") and not is_vs_code:
         pytest.skip("Skipped LLM tests — run with flag --run-llm")

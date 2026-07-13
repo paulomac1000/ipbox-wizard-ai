@@ -9,7 +9,7 @@ from .output_schema import OUTPUT_JSON_SCHEMA
 
 _RESPONSE_DIR = Path("/tmp/ipbox_llm_responses")
 
-SYSTEM_PROMPT = "Jesteś ekspertem podatkowym specjalizującym się w IP Box (art. 30ca PIT). Wykonujesz obliczenia dokładnie i strukturalnie."
+SYSTEM_PROMPT = "Jesteś ekspertem podatkowym specjalizującym się w IP Box (art. 30ca PIT). Wykonujesz obliczenia dokładnie i strukturalnie."  # noqa: E501
 
 TAGS = ["result", "classifications", "monthly_W", "tests", "stops_reviews"]
 
@@ -60,7 +60,7 @@ class LLMTestRunner:
                 "result": {
                     "rok": 2025,
                     "przychody_roczne": {"IP": 0.0, "NIE": 0.0},
-                    "nexus": {"A": 0.0, "B": 0.0, "C": 0.0, "D": 0.0, "poza_nexus": 0.0, "wartość": 0.0},
+                    "nexus": {"A": 0.0, "B": 0.0, "C": 0.0, "D": 0.0, "poza_nexus": 0.0, "wartość": 0.0},  # noqa: E501
                     "podatek": {"podatek_IP": 0, "podatek_NIE_finalny": 0},
                 },
                 "classifications": [

@@ -99,8 +99,7 @@ def explain_fingerprint_change(
     ]
 
     for i, label in enumerate(labels):
-        if i < len(stored_parts) and i < len(current_parts):
-            if stored_parts[i] != current_parts[i]:
+        if i < len(stored_parts) and i < len(current_parts) and stored_parts[i] != current_parts[i]:
                 changes.append(
                     f"{label}: {stored_parts[i]} → {current_parts[i]}"
                 )

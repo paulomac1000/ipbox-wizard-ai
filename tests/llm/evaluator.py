@@ -48,7 +48,7 @@ class Evaluator:
         assertions = self.scenario.get("assertions", {})
         if not assertions:
             scenario_id = self.scenario.get("meta", {}).get("id", "unknown")
-            print(f"[EVALUATOR] WARNING: Scenario '{scenario_id}' has no assertions — passing by default")
+            print(f"[EVALUATOR] WARNING: Scenario '{scenario_id}' has no assertions — passing by default")  # noqa: E501
             return failures, warnings
 
         # Check description consistency
@@ -61,7 +61,7 @@ class Evaluator:
 
         result = parsed.get("result") or {}
         if isinstance(result, str):
-            failures.append({"type": "parse_error", "message": "Nie udało się sparsować <result> jako YAML"})
+            failures.append({"type": "parse_error", "message": "Nie udało się sparsować <result> jako YAML"})  # noqa: E501
             return failures, warnings
 
         stops_reviews = parsed.get("stops_reviews") or {}
@@ -109,12 +109,12 @@ class Evaluator:
                 "type": "section_missing_stops_reviews",
                 "message": "Brak sekcji <stops_reviews>, a scenariusz wymaga STOP/REVIEW",
             })
-        if needs_classifications and not raw_classifications:
-            # Only fail if the assertion actually needs to check something
-            if assertions.get("koszty_koszyk") or (assertions.get("roznice_kursowe_w_IP") is False and not result):
+        if needs_classifications and not raw_classifications and (
+            assertions.get("koszty_koszyk") or (assertions.get("roznice_kursowe_w_IP") is False and not result)  # noqa: E501
+        ):
                 failures.append({
                     "type": "section_missing_classifications",
-                    "message": "Brak sekcji <classifications>, a scenariusz wymaga klasyfikacji kosztów",
+                    "message": "Brak sekcji <classifications>, a scenariusz wymaga klasyfikacji kosztów",  # noqa: E501
                 })
 
         # --- Validate assertion keys ---
@@ -129,8 +129,7 @@ class Evaluator:
         # --- HARD checks ---
 
         # zus_dubel: TEST_3 musi być PASS gdy zus_dubel=False
-        if assertions.get("zus_dubel") is False:
-            if _test_failed(tests_text, "TEST_3") or _test_failed(tests_text, "TEST 3"):
+        if assertions.get("zus_dubel") is False and (_test_failed(tests_text, "TEST_3") or _test_failed(tests_text, "TEST 3")):  # noqa: E501
                 failures.append({
                     "type": "zus_double_dip",
                     "message": "Wykryto podwójne odliczenie ZUS (TEST_3 FAIL)",
@@ -141,7 +140,7 @@ class Evaluator:
             if not tests_text:
                 failures.append({
                     "type": f"test_missing_{test_id}",
-                    "message": f"Blok <tests> jest pusty lub brak wyników testów, a oczekiwano {test_id}",
+                    "message": f"Blok <tests> jest pusty lub brak wyników testów, a oczekiwano {test_id}",  # noqa: E501
                 })
             elif not _test_passed(tests_text, test_id):
                 failures.append({
@@ -177,12 +176,11 @@ class Evaluator:
             if status == "FAIL" and test_id_norm not in fail_ids_normalized:
                 failures.append({
                     "type": f"unexpected_fail_{test_id_norm}",
-                    "message": f"{test_id_norm} jest FAIL, ale nie ma go w testy_fail — możliwy błąd algorytmu",
+                    "message": f"{test_id_norm} jest FAIL, ale nie ma go w testy_fail — możliwy błąd algorytmu",  # noqa: E501
                 })
 
         # roznice_kursowe_w_IP: różnice kursowe nie mogą trafić do koszyka IP
-        if assertions.get("roznice_kursowe_w_IP") is False:
-            if _fx_diff_in_ip(classifications_text):
+        if assertions.get("roznice_kursowe_w_IP") is False and _fx_diff_in_ip(classifications_text):
                 failures.append({
                     "type": "fx_diff_in_ip",
                     "message": "Różnice kursowe trafiły do koszyka IP — powinny być w NIE",
@@ -203,7 +201,7 @@ class Evaluator:
             if not _code_matches(expected_stop, stops_list):
                 failures.append({
                     "type": "missing_stop_assertions",
-                    "message": f"Oczekiwany STOP '{expected_stop}' (z assertions.stops) nie wystąpił",
+                    "message": f"Oczekiwany STOP '{expected_stop}' (z assertions.stops) nie wystąpił",  # noqa: E501
                 })
 
         # expected_reviews: wszystkie oczekiwane REVIEW muszą się pojawić
@@ -230,13 +228,13 @@ class Evaluator:
             elif str(actual).strip().lower() != str(klucz_mix_metoda).strip().lower():
                 failures.append({
                     "type": "klucz_mix_metoda_mismatch",
-                    "message": f"klucz_MIX_metoda: oczekiwano '{klucz_mix_metoda}', otrzymano '{actual}'",
+                    "message": f"klucz_MIX_metoda: oczekiwano '{klucz_mix_metoda}', otrzymano '{actual}'",  # noqa: E501
                 })
 
         # --- klucz_MIX_źródło ---
         klucz_mix_zrodlo = assertions.get("klucz_MIX_źródło")
         if klucz_mix_zrodlo:
-            actual = _find_klucz_mix_field(result, "źródło") or _find_klucz_mix_field(result, "zrodlo")
+            actual = _find_klucz_mix_field(result, "źródło") or _find_klucz_mix_field(result, "zrodlo")  # noqa: E501
             if actual is None:
                 actual = _nested_get(result, "źródło") or _nested_get(result, "zrodlo")
             if actual is None:
@@ -247,7 +245,7 @@ class Evaluator:
             elif str(actual).strip().lower() != str(klucz_mix_zrodlo).strip().lower():
                 failures.append({
                     "type": "klucz_mix_zrodlo_mismatch",
-                    "message": f"klucz_MIX_źródło: oczekiwano '{klucz_mix_zrodlo}', otrzymano '{actual}'",
+                    "message": f"klucz_MIX_źródło: oczekiwano '{klucz_mix_zrodlo}', otrzymano '{actual}'",  # noqa: E501
                 })
 
         # --- nie_używaj_W_do_MIX ---
@@ -263,7 +261,7 @@ class Evaluator:
             if w_used:
                 failures.append({
                     "type": "w_used_for_mix",
-                    "message": "Użyto W do alokacji MIX — powinien być inny klucz (np. przychodowy)",
+                    "message": "Użyto W do alokacji MIX — powinien być inny klucz (np. przychodowy)",  # noqa: E501
                 })
 
         # review_obecne: każdy oczekiwany REVIEW musi się pojawić
@@ -282,7 +280,7 @@ class Evaluator:
         alokacja_multi = assertions.get("alokacja_multi_ip", {})
         if alokacja_multi:
             for field_key, expected_value in alokacja_multi.items():
-                actual = _find_value(result, [field_key, f"alokacja_{field_key}", f"multi_ip_{field_key}"])
+                actual = _find_value(result, [field_key, f"alokacja_{field_key}", f"multi_ip_{field_key}"])  # noqa: E501
                 if actual is None:
                     actual = _nested_get(result, field_key)
                 if actual is None:
@@ -290,19 +288,19 @@ class Evaluator:
                 if actual is None:
                     failures.append({
                         "type": "alokacja_multi_ip_missing",
-                        "message": f"alokacja_multi_ip.{field_key}: nie znaleziono wartości w wyniku",
+                        "message": f"alokacja_multi_ip.{field_key}: nie znaleziono wartości w wyniku",  # noqa: E501
                     })
                 else:
                     try:
                         if abs(float(actual) - float(expected_value)) > 0.5:
                             failures.append({
                                 "type": "alokacja_multi_ip_mismatch",
-                                "message": f"alokacja_multi_ip.{field_key}: oczekiwano {expected_value}, otrzymano {actual}",
+                                "message": f"alokacja_multi_ip.{field_key}: oczekiwano {expected_value}, otrzymano {actual}",  # noqa: E501
                             })
                     except (ValueError, TypeError):
                         failures.append({
                             "type": "alokacja_multi_ip_invalid",
-                            "message": f"alokacja_multi_ip.{field_key}: niepoprawny format wartości '{actual}'",
+                            "message": f"alokacja_multi_ip.{field_key}: niepoprawny format wartości '{actual}'",  # noqa: E501
                         })
 
         # koszty_koszyk: sprawdzenie przypisania wybranych pozycji do koszyków
@@ -388,7 +386,7 @@ class Evaluator:
 
         if "przychod_NIE_roczny_range" in assertions:
             low, high = assertions["przychod_NIE_roczny_range"]
-            actual = _find_value(result, ["przychod_NIE", "przychod_nie", "revenue_non_ip", "przychody_NIE"])
+            actual = _find_value(result, ["przychod_NIE", "przychod_nie", "revenue_non_ip", "przychody_NIE"])  # noqa: E501
             if actual is None:
                 failures.append({
                     "type": "przychod_NIE_missing",
@@ -413,7 +411,7 @@ class Evaluator:
                 if diff > 2.0:
                     failures.append({
                         "type": "monthly_w_mismatch",
-                        "message": f"W dla {month}: oczekiwano {expected_w}%, otrzymano {actual_w:.2f}% (różnica {diff:.2f}pp > 2pp)",
+                        "message": f"W dla {month}: oczekiwano {expected_w}%, otrzymano {actual_w:.2f}% (różnica {diff:.2f}pp > 2pp)",  # noqa: E501
                     })
 
         # --- HARD warnings ---
@@ -432,7 +430,7 @@ class Evaluator:
                 ):
                     failures.append({
                         "type": "missing_warning",
-                        "message": f"Oczekiwane ostrzeżenie '{warning_code}' nie zostało wygenerowane",
+                        "message": f"Oczekiwane ostrzeżenie '{warning_code}' nie zostało wygenerowane",  # noqa: E501
                     })
 
         # --- SOFT warnings (non-blocking) ---
@@ -449,7 +447,7 @@ class Evaluator:
                     or warning_code.lower() in classifications_text.lower()
                     or any(warning_code.lower() in str(w).lower() for w in soft_warnings_list)
                 ):
-                    warnings.append(f"Oczekiwane ostrzeżenie '{warning_code}' nie zostało wygenerowane")
+                    warnings.append(f"Oczekiwane ostrzeżenie '{warning_code}' nie zostało wygenerowane")  # noqa: E501
 
         # --- Oracle verification: independently compute TEST 1-9 ---
         oracle_map = {
@@ -463,7 +461,7 @@ class Evaluator:
             "TEST_8": _oracle_test_8,
             "TEST_9": _oracle_test_9,
         }
-        all_expected_tests = set(assertions.get("testy_pass", []) + assertions.get("testy_fail", []))
+        all_expected_tests = set(assertions.get("testy_pass", []) + assertions.get("testy_fail", []))  # noqa: E501
         for test_id in all_expected_tests:
             normalized = _normalize_test_id(test_id)
             oracle_fn = oracle_map.get(normalized)
@@ -473,7 +471,7 @@ class Evaluator:
                 if oracle_result != model_passed:
                     failures.append({
                         "type": "oracle_mismatch",
-                        "message": f"Oracle {normalized}: oracle={'PASS' if oracle_result else 'FAIL'} "
+                        "message": f"Oracle {normalized}: oracle={'PASS' if oracle_result else 'FAIL'} "  # noqa: E501
                                   f"model={'PASS' if model_passed else 'FAIL'}",
                     })
 
@@ -564,8 +562,7 @@ def _fx_diff_in_ip(classifications: str) -> bool:
         return False
     for line in classifications.splitlines():
         lower = line.lower()
-        if ("różnica kursowa" in lower or "roznica kursowa" in lower or "kursow" in lower):
-            if "-> ip" in lower or "koszyk: ip" in lower or "ip box" in lower:
+        if ("różnica kursowa" in lower or "roznica kursowa" in lower or "kursow" in lower) and ("-> ip" in lower or "koszyk: ip" in lower or "ip box" in lower):  # noqa: E501
                 return True
     return False
 
@@ -616,13 +613,12 @@ def _check_description_consistency(scenario: dict) -> list[str]:
 
     # If only stops are expected, description should not suggest REVIEW as an
     # alternative outcome (e.g. "stop or emit REVIEW")
-    if has_stops and not has_reviews:
-        if re.search(r'\breview\b', description, re.IGNORECASE):
-            errors.append(
-                f"Scenario '{meta.get('id', '?')}' only expects stops "
-                f"({expected_stops or assertion_stops}) but description "
-                f"mentions REVIEW: '{description}'"
-            )
+    if has_stops and not has_reviews and re.search(r'\breview\b', description, re.IGNORECASE):
+        errors.append(
+            f"Scenario '{meta.get('id', '?')}' only expects stops "
+            f"({expected_stops or assertion_stops}) but description "
+            f"mentions REVIEW: '{description}'"
+        )
 
     return errors
 
@@ -675,16 +671,16 @@ def _find_value(result: dict, keys: list[str]) -> float | None:
     # Match only whole-word _IP / _NIE to avoid "REVENUE_NON_IP" triggering IP lookup
     przychody = result.get("przychody_roczne", {})
     if isinstance(przychody, dict):
-        wants_ip = any(k.upper().replace("_","").endswith("IP") and "NON" not in k.upper() for k in keys)
+        wants_ip = any(k.upper().replace("_","").endswith("IP") and "NON" not in k.upper() for k in keys)  # noqa: E501
         wants_nie = any("_NIE" in k.upper() or k.upper().endswith("NIE") for k in keys)
         if wants_ip and "IP" in przychody:
             try:
-                return float(str(przychody["IP"]).replace("zł", "").replace(" ", "").replace(",", "."))
+                return float(str(przychody["IP"]).replace("zł", "").replace(" ", "").replace(",", "."))  # noqa: E501
             except (ValueError, TypeError):
                 pass
         if wants_nie and "NIE" in przychody:
             try:
-                return float(str(przychody["NIE"]).replace("zł", "").replace(" ", "").replace(",", "."))
+                return float(str(przychody["NIE"]).replace("zł", "").replace(" ", "").replace(",", "."))  # noqa: E501
             except (ValueError, TypeError):
                 pass
     return None
@@ -739,12 +735,10 @@ def _w_used_for_mix(classifications: str) -> bool:
     for line in classifications.splitlines():
         lower = line.lower()
         # Check if line mentions both MIX and W (time-based allocation)
-        if "mix" in lower and ("w" in lower or "współczynnik" in lower or "wspolczynnik" in lower):
-            if re.search(r'\bw\s*[=:>]', lower) or "czasow" in lower:
+        if "mix" in lower and ("w" in lower or "współczynnik" in lower or "wspolczynnik" in lower) and (re.search(r'\bw\s*[=:>]', lower) or "czasow" in lower):  # noqa: E501
                 return True
         # Check for "W_czasowy" or "czasowa_W" patterns
-        if "w_czasowy" in lower or "czasowa_w" in lower or "w miesięczn" in lower:
-            if "mix" in lower:
+        if ("w_czasowy" in lower or "czasowa_w" in lower or "w miesięczn" in lower) and "mix" in lower:  # noqa: E501
                 return True
     return False
 
@@ -852,8 +846,7 @@ def _oracle_test_7(parsed: dict, scenario: dict) -> bool:
     if isinstance(classifications, str):
         classifications = [classifications]
     for line in classifications:
-        if isinstance(line, str) and "prywatny" in line.lower():
-            if "IP" in line or "MIX" in line or "NIE" in line:
+        if isinstance(line, str) and "prywatny" in line.lower() and ("IP" in line or "MIX" in line or "NIE" in line):  # noqa: E501
                 return False
     return True
 

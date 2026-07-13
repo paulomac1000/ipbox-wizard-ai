@@ -55,7 +55,7 @@ class TestNexus:
 
     @pytest.mark.unit
     @pytest.mark.P2
-    def test_nexus_only_B_subcontractors(self):
+    def test_nexus_only_B_subcontractors(self):  # noqa: N802
         # A=0, B=1000, C=0, D=0
         # NEXUS = (0 + 1000) / 1000 = 1.0
         res = calculate_nexus(A=0, B=1000)
@@ -63,7 +63,7 @@ class TestNexus:
 
     @pytest.mark.unit
     @pytest.mark.P2
-    def test_nexus_only_C_subcontractors(self):
+    def test_nexus_only_C_subcontractors(self):  # noqa: N802
         # A=0, B=0, C=1000, D=0
         # NEXUS = 0 / 1000 = 0
         res = calculate_nexus(A=0, C=1000)

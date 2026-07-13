@@ -55,7 +55,7 @@ class Cassette:
     # Pre-parsed results (cached for fast test access)
     parsed_result_yaml: dict | None = None
     parsed_classifications: dict | None = None
-    parsed_monthly_W: dict | None = None
+    parsed_monthly_W: dict | None = None  # noqa: N815
     parsed_tests: dict | None = None
     parsed_stops_reviews: dict | None = None
 

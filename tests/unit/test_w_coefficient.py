@@ -25,7 +25,7 @@ class TestWCoefficient:
     ])
     def test_w_formula(self, work_hours, non_ip_hours, invoice_percentage, expected_w):
         """Basic W formula."""
-        result = calculate_w_coefficient(work_hours=work_hours, non_ip_hours=non_ip_hours, invoice_percentage=invoice_percentage)
+        result = calculate_w_coefficient(work_hours=work_hours, non_ip_hours=non_ip_hours, invoice_percentage=invoice_percentage)  # noqa: E501
         assert result["W"] == pytest.approx(expected_w, abs=0.01)
 
     @pytest.mark.unit

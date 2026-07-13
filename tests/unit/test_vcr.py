@@ -22,7 +22,7 @@ def make_temp_cassette(tmp_path: Path, scenario_id: str = "test", prompt: str = 
     cassette = Cassette(
         meta=CassetteMeta(scenario_id=scenario_id, scenario_name=scenario_id,
                           provider="test", model="test", fingerprint=fingerprint),
-        turns=[CassetteTurn(role="user", prompt=prompt, response=response, prompt_hash=prompt_hash)])
+        turns=[CassetteTurn(role="user", prompt=prompt, response=response, prompt_hash=prompt_hash)])  # noqa: E501
     cassette.save(cassette_path)
     return cassette_path
 

@@ -142,7 +142,7 @@ class VCRRecorder:
 
         # Check staleness (only in AUTO mode)
         if self.config.is_auto and self._is_stale(cassette_path):
-            print(f"  📼 Cassette {scenario_id} older than {self.config.max_age_days}d → will refresh")
+            print(f"  📼 Cassette {scenario_id} older than {self.config.max_age_days}d → will refresh")  # noqa: E501
             return True
 
         return False
@@ -160,7 +160,7 @@ class VCRRecorder:
         except Exception:
             return True  # Corrupted cassette → re-record
 
-    def _playback(self, cassette_path: Path, scenario_id: str, prompt: str, system_prompt: str = "") -> str:
+    def _playback(self, cassette_path: Path, scenario_id: str, prompt: str, system_prompt: str = "") -> str:  # noqa: E501
         """Play back response from cassette."""
         cassette = Cassette.load(cassette_path)
 
@@ -182,9 +182,9 @@ class VCRRecorder:
 
         # Check system_prompt_hash (allow old cassettes where it's empty)
         if system_prompt:
-            current_system_prompt_hash = hashlib.sha256(system_prompt.encode("utf-8")).hexdigest()[:16]
-            stored_system_prompt_hash = cassette.turns[0].system_prompt_hash if cassette.turns else ""
-            if stored_system_prompt_hash and stored_system_prompt_hash != current_system_prompt_hash:
+            current_system_prompt_hash = hashlib.sha256(system_prompt.encode("utf-8")).hexdigest()[:16]  # noqa: E501
+            stored_system_prompt_hash = cassette.turns[0].system_prompt_hash if cassette.turns else ""  # noqa: E501
+            if stored_system_prompt_hash and stored_system_prompt_hash != current_system_prompt_hash:  # noqa: E501
                 raise ValueError(
                     f"System prompt hash mismatch for '{scenario_id}': "
                     f"stored={stored_system_prompt_hash}, current={current_system_prompt_hash}. "
@@ -263,7 +263,7 @@ class VCRRecorder:
             json_schema=OUTPUT_JSON_SCHEMA,
         )
         request_hash = spec.compute_hash()
-        system_prompt_hash = hashlib.sha256(system_prompt.encode("utf-8")).hexdigest()[:16] if system_prompt else ""
+        system_prompt_hash = hashlib.sha256(system_prompt.encode("utf-8")).hexdigest()[:16] if system_prompt else ""  # noqa: E501
 
         turn = CassetteTurn(
             role="user",

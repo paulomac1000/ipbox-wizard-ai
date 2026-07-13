@@ -16,7 +16,7 @@ def pytest_addoption(parser):
         action="store",
         default=None,
         choices=["playback", "auto", "record", "none"],
-        help="VCR mode: playback (use cassettes), auto (use or record), record (always record), none (bypass VCR)",
+        help="VCR mode: playback (use cassettes), auto (use or record), record (always record), none (bypass VCR)",  # noqa: E501
     )
 
 

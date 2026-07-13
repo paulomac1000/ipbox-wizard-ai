@@ -18,8 +18,10 @@ class TestFXConversion:
         # Exchange diff: (4.40-4.30) * 1000 = +100 PLN (NON-IP revenue)
 
         def side_effect(curr, date):
-            if date in ["2025-01-13"]: return 4.30
-            if date in ["2025-01-19", "2025-01-18", "2025-01-17"]: return 4.40
+            if date in ["2025-01-13"]:
+                return 4.30
+            if date in ["2025-01-19", "2025-01-18", "2025-01-17"]:
+                return 4.40
             return None
 
         mock_rate.side_effect = side_effect
@@ -41,8 +43,10 @@ class TestFXConversion:
     def test_fx_conversion_negative_diff(self, mock_rate):
         # Rate drop -> NON-IP cost
         def side_effect(curr, date):
-            if date in ["2025-01-13"]: return 4.30
-            if date in ["2025-01-19", "2025-01-18", "2025-01-17"]: return 4.20
+            if date in ["2025-01-13"]:
+                return 4.30
+            if date in ["2025-01-19", "2025-01-18", "2025-01-17"]:
+                return 4.20
             return None
         mock_rate.side_effect = side_effect
 
@@ -116,7 +120,8 @@ class TestFXConversion:
     def test_payment_rate_none_branch(self, mock_rate):
         """When payment rate is None, difference should be 0.0."""
         def side_effect(curr, date):
-            if date == "2025-01-13": return 4.30
+            if date == "2025-01-13":
+                return 4.30
             return None
         mock_rate.side_effect = side_effect
         res = convert_fx_invoice(

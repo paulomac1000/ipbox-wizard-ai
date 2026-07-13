@@ -8,12 +8,6 @@ from tests.llm.evaluator import (
     _find_nexus,
     _find_non_ip_tax,
     _find_value,
-    _oracle_test_1,
-    _oracle_test_2,
-    _oracle_test_3,
-    _oracle_test_4,
-    _oracle_test_7,
-    _oracle_test_9,
     _test_failed,
     _test_passed,
     normalize_test_key,
@@ -407,7 +401,7 @@ class TestEvaluatorSuccessCase:
         failures, _ = e.evaluate({
             "result": {
                 "nexus": 0.75,
-                "alokacja": {"koszty_MIX": {"metoda": "przychodowa_roczna", "źródło": "interpretacja_KIS"}},
+                "alokacja": {"koszty_MIX": {"metoda": "przychodowa_roczna", "źródło": "interpretacja_KIS"}},  # noqa: E501
             },
             "tests": "TEST_1: PASS\nTEST_7: PASS",
             "classifications": "Koszty MIX: przychodowa_roczna\nKoszty IP: IP",
@@ -474,7 +468,7 @@ class TestFailClosed:
 class TestFindNonIpTax:
     """Tests for _find_non_ip_tax — must handle podatek_NIE_finalny."""
 
-    def test_find_non_ip_tax_podatek_NIE_finalny(self):
+    def test_find_non_ip_tax_podatek_NIE_finalny(self):  # noqa: N802
         """podatek_NIE_finalny in nested podatek dict should be found."""
         result = {"podatek": {"podatek_NIE_finalny": 2121}}
         assert _find_non_ip_tax(result) == 2121.0

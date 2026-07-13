@@ -32,9 +32,9 @@ class TestCostClassification:
         ("Abonament LuxMed", 100.0, True, "NON"),
         ("Fryzjer męski", 60.0, True, "NON")
     ])
-    def test_basic_classification(self, description, amount, social_security_in_kpir, expected_basket):
+    def test_basic_classification(self, description, amount, social_security_in_kpir, expected_basket):  # noqa: E501
         item = CostItem(description=description, amount=amount)
-        result = classify_cost(item, social_security_in_kpir=social_security_in_kpir, health_insurance_in_kpir=True)
+        result = classify_cost(item, social_security_in_kpir=social_security_in_kpir, health_insurance_in_kpir=True)  # noqa: E501
         assert result.basket == expected_basket
 
     @pytest.mark.unit

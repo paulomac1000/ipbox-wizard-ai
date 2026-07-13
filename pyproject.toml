@@ -20,7 +20,7 @@ addopts = [
     "-ra",
 ]
 filterwarnings = [
-    "ignore::DeprecationWarning",
+    'ignore::DeprecationWarning:pytest.*',
 ]
 
 [tool.coverage.run]
@@ -42,4 +42,4 @@ line-length = 100
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "N", "UP", "B", "SIM", "RUF"]
-ignore = ["N999", "E501", "E701", "N802", "SIM102", "N815"]
+# No global ignores. Use per-line noqa for justified exceptions.

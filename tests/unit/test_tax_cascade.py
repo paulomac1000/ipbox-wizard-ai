@@ -122,7 +122,7 @@ class TestTaxCascade:
     @pytest.mark.P1
     def test_child_tax_credit_limit_on_tax(self):
         # Tax 1000, relief 2000 -> tax 0.
-        res = tax_cascade(non_ip_income=38333.33, ip_income=0, nexus=1.0, tax_form="scale", child_tax_credit=2000)
+        res = tax_cascade(non_ip_income=38333.33, ip_income=0, nexus=1.0, tax_form="scale", child_tax_credit=2000)  # noqa: E501
         # Scale: 38333 * 0.12 - 3600 = 4600 - 3600 = 1000
         assert res["non_ip_tax_after_relief"] == 0
         assert res["used_child_credit"] == pytest.approx(1000, abs=1)

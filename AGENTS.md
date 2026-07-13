@@ -4,7 +4,7 @@
 
 `ipbox-wizard-ai` to system wspomagający rozliczenie ulgi **IP Box** (art. 30ca PIT) dla programistów B2B w Polsce. Składa się z:
 
-1. **`ipbox_algorytm.md`** — główna instrukcja dla agentów AI (system prompt), prowadzi przez 10 faz rozliczenia
+1. **`ipbox_algorytm.md`** — główna instrukcja dla agentów AI (system prompt), prowadzi przez 11 faz rozliczenia (0-10)
 2. **`python_helper/ipbox_calculator.py`** — moduł Pythona z funkcjami matematycznymi (W, NEXUS, kaskada podatkowa, FX)
 3. **`tests/`** — testy jednostkowe Pythona i testy LLM weryfikujące działanie algorytmu
 
@@ -70,7 +70,7 @@ Pełna dokumentacja: [docs/testing.md](docs/testing.md)
 - Obsługiwani providerzy: **Google Gemini** (direct) oraz **OpenRouter** (proxy)
 - Klucz: `OPENROUTER_API_KEY` (secret)
 - Model: `LLM_MODEL` (zmienna środowiskowa, domyślnie `google/gemini-3.5-flash`)
-- Nie dodawać zależności do innych SDK/providerów — OpenRouter jest jedynym proxy, żadnych bezpośrednich SDK poza google-generativeai
+- Nie dodawać zależności do innych SDK/providerów — OpenRouter jest jedynym proxy, żadnych bezpośrednich SDK
 
 ### Testy jednostkowe
 
@@ -82,8 +82,10 @@ Pełna dokumentacja: [docs/testing.md](docs/testing.md)
 
 - Format pliku: `NN_krotka_angielska_nazwa.yaml`
 - Zawartość (input, nazwa po polsku): **po polsku**
-- Plik bez `input.rok` i `input.forma_opodatkowania` → dodaj `skip: true` do `meta`
-- Nie usuwać scenariuszy — zamiast tego dodaj `skip: true` jeśli są niegotowe
+- Scenariusz musi mieć `input.rok` i `input.forma_opodatkowania` — w przeciwnym razie jest niekompletny i należy go poprawić, nie pomijać
+- **Nie dodawać `skip: true` jako sposobu naprawy testu.** Jeśli test nie przechodzi, należy naprawić kod lub zaktualizować asercje do poprawnych matematycznie wartości
+- **Nie edytować ręcznie kaset, hashy ani manifestu** — zmiana któregokolwiek komponentu (algorytm, scenariusz, prompt) wymaga ponownego nagrania kaset przez `VCR_MODE=record`
+- **Nie osłabiać asercji** aby dopasować je do outputu modelu. Asercje muszą odzwierciedlać poprawność matematyczną, nie to co model zwraca
 
 ### CI/CD
 

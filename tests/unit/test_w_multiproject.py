@@ -11,7 +11,7 @@ class TestWMultiproject:
     def test_weighted_average_basic(self):
         # Project 1: 10000 PLN, W=75%
         # Project 2: 5000 PLN, W=90%
-        # Weighted average: (10000*75 + 5000*90) / 15000 = (750000 + 450000) / 15000 = 1200000 / 15000 = 80%
+        # Weighted average: (10000*75 + 5000*90) / 15000 = (750000 + 450000) / 15000 = 1200000 / 15000 = 80%  # noqa: E501
         projects = [
             {"revenue": 10000, "W": 75},
             {"revenue": 5000, "W": 90}

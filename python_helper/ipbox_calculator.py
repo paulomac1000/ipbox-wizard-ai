@@ -102,7 +102,7 @@ def aggregate_w_multiproject(projects: list[dict]) -> float:
         if not math.isfinite(revenue) or revenue < 0:
             raise ValueError(f"project[{i}] revenue must be a finite number >= 0, got {revenue}")
         if not math.isfinite(w_val) or not (0 <= w_val <= 100):
-            raise ValueError(f"project[{i}] W must be a finite number between 0 and 100, got {w_val}")
+            raise ValueError(f"project[{i}] W must be a finite number between 0 and 100, got {w_val}")  # noqa: E501
 
     total_revenue = sum(p["revenue"] for p in projects)
     if total_revenue == 0:
@@ -163,7 +163,7 @@ def convert_fx_invoice(
     # Validate method
     valid_methods = {"accrual", "cash"}
     if method not in valid_methods:
-        raise ValueError(f"Invalid FX method '{method}'. Must be one of: {', '.join(sorted(valid_methods))}")
+        raise ValueError(f"Invalid FX method '{method}'. Must be one of: {', '.join(sorted(valid_methods))}")  # noqa: E501
 
     # Base date for exchange rate
     if method == "accrual":
@@ -225,10 +225,9 @@ class CostItem:
     def __post_init__(self) -> None:
         if not math.isfinite(self.amount) or self.amount < 0:
             raise ValueError(f"amount must be a finite number >= 0, got {self.amount}")
-        if self.nexus_amount is not None:
-            if not (0 <= self.nexus_amount <= self.amount):
+        if self.nexus_amount is not None and not (0 <= self.nexus_amount <= self.amount):
                 raise ValueError(
-                    f"nexus_amount ({self.nexus_amount}) must be between 0 and cost amount ({self.amount}) for {self.description!r}"
+                    f"nexus_amount ({self.nexus_amount}) must be between 0 and cost amount ({self.amount}) for {self.description!r}"  # noqa: E501
                 )
 
 
@@ -419,9 +418,8 @@ def allocate_costs_monthly(
         costs_ip, costs_non, ip_direct, non_direct, mix, excluded,
         mix_method, mix_key_used, mix_key_source, result_status, mix_deferred
     """
-    if w_coefficient is not None:
-        if not (0 <= w_coefficient <= 100):
-            raise ValueError(f"w_coefficient ({w_coefficient}) must be between 0 and 100")
+    if w_coefficient is not None and not (0 <= w_coefficient <= 100):
+        raise ValueError(f"w_coefficient ({w_coefficient}) must be between 0 and 100")
 
     ip_direct_costs = ip_direct_costs or []
 
@@ -552,7 +550,7 @@ def tax_cascade(
 
     valid_tax_forms = frozenset({"linear_19%", "scale"})
     if tax_form not in valid_tax_forms:
-        raise ValueError(f"Invalid tax_form: {tax_form!r}. Must be one of {sorted(valid_tax_forms)}")
+        raise ValueError(f"Invalid tax_form: {tax_form!r}. Must be one of {sorted(valid_tax_forms)}")  # noqa: E501
 
     steps = []
     remaining = max(0, non_ip_income)  # Guard: cannot deduct from negative base
