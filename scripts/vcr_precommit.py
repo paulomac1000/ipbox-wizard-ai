@@ -12,6 +12,7 @@ from pathlib import Path
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+from tests.llm.runner import SYSTEM_PROMPT
 from tests.llm.vcr import CassetteManifest, VCRConfig, compute_fingerprint
 
 
@@ -36,7 +37,7 @@ def check_vcr_freshness() -> int:
             scenario_path=scenario_file,
             provider=config.provider,
             model=config.model,
-            system_prompt="",
+            system_prompt=SYSTEM_PROMPT,
         )
 
         stored_fp = manifest.get_fingerprint(scenario_id)
