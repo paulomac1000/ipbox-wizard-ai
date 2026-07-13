@@ -17,8 +17,8 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Install ruff
-        run: pip install ruff
+      - name: Install dependencies
+        run: pip install -r requirements-test.txt
       - name: Run ruff check
         run: ruff check .
 
@@ -42,10 +42,6 @@ jobs:
           echo "Lint check:    ${{ needs.lint.result }}"
           echo "Unit tests:    ${{ needs.unit.result }}"
           echo "LLM tests:     ${{ needs.llm.result }}"
-          if [[ "${{ needs.llm.result }}" == "cancelled" ]]; then
-            echo "LLM tests were cancelled"
-            exit 1
-          fi
           if [ "${{ needs.lint.result }}" != "success" ]; then
             echo "::error::Linting nie przeszło!"
             exit 1
@@ -54,12 +50,16 @@ jobs:
             echo "::error::Testy jednostkowe nie przeszły!"
             exit 1
           fi
-          if [ "${{ needs.llm.result }}" == "failure" ]; then
-            echo "::error::Testy LLM nie przeszły — sprawdź artefakty."
+          LLM_RESULT="${{ needs.llm.result }}"
+          if [ "$LLM_RESULT" == "success" ]; then
+            echo "LLM tests passed."
+          elif [ "$LLM_RESULT" == "skipped" ] && [ "${{ github.event_name }}" == "schedule" ]; then
+            echo "LLM tests skipped (schedule — OK)."
+          elif [ "$LLM_RESULT" == "cancelled" ]; then
+            echo "::error::LLM tests were cancelled — possible setup failure."
             exit 1
-          fi
-          if [ "${{ needs.llm.result }}" == "skipped" ] && [ "${{ github.event_name }}" != "schedule" ]; then
-            echo "::error::Testy LLM zostały pominięte (oczekiwane tylko dla schedule)."
+          else
+            echo "::error::LLM tests: $LLM_RESULT"
             exit 1
           fi
           echo "Pipeline zakończony."
