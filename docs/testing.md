@@ -7,7 +7,7 @@ Dwie niezależne warstwy testów:
 | Warstwa | Katalog | Cel | Uruchamia się |
 |---|---|---|---|
 | **Unit (Python)** | `tests/unit/` | Deterministyczna weryfikacja matematyki (`ipbox_calculator.py`) | Zawsze — bez klucza API |
-| **LLM (scenariuszowe)** | `tests/llm/` | Weryfikacja end-to-end `ipbox_algorytm.md` przez OpenRouter / Gemini | Tylko z `--run-llm` + `LLM_API_KEY` |
+| **LLM (scenariuszowe)** | `tests/llm/` | Weryfikacja end-to-end `ipbox_algorytm.md` przez OpenRouter | Tylko z `--run-llm` + `LLM_API_KEY` |
 
 ## Szybki start
 
@@ -26,9 +26,7 @@ LLM_PROVIDER=openrouter
 LLM_MODEL=google/gemini-3.5-flash
 OPENROUTER_API_KEY=twoj_klucz_api
 
-# Legacy alias (optional)
-# GEMINI_MODEL=google/gemini-3.5-flash
-# GEMINI_API_KEY=
+# Deprecated — removed in favor of LLM_MODEL/OPENROUTER_API_KEY
 ```
 
 ### 3. Uruchamianie
@@ -157,7 +155,7 @@ Dzięki temu zmiana dowolnego parametru (np. temperatury, schematu, providera) u
 ### Użycie lokalne
 
 ```bash
-# Nagraj pierwsze kasety (wymaga LLM_API_KEY / OPENROUTER_API_KEY)
+# Nagraj pierwsze kasety (wymaga OPENROUTER_API_KEY)
 VCR_MODE=record pytest tests/llm/ --run-llm -v
 
 # Kolejne uruchomienia (użyj kaset, brak kosztów)
@@ -181,7 +179,7 @@ W GitHub Actions domyślnie używany jest tryb `playback` (zero kosztów API). G
 
 ### Playback bez klucza API
 
-W trybie `playback` klucz API nie jest wymagany. `LLMClient` akceptuje `require_api_key=False`, a fixture `llm_client` w `test_scenarios.py` automatycznie przekazuje tę flagę gdy `VCR_MODE=playback`. Nie potrzebujesz ani `OPENROUTER_API_KEY` ani `GEMINI_API_KEY` — kasety są odtwarzane lokalnie.
+W trybie `playback` klucz API nie jest wymagany. `LLMClient` akceptuje `require_api_key=False`, a fixture `llm_client` w `test_scenarios.py` automatycznie przekazuje tę flagę gdy `VCR_MODE=playback`. Nie potrzebujesz `OPENROUTER_API_KEY` — kasety są odtwarzane lokalnie.
 
 ### Rozwiązywanie problemów
 
@@ -196,7 +194,7 @@ W trybie `playback` klucz API nie jest wymagany. `LLMClient` akceptuje `require_
 
 ## VSCode
 
-Po otwarciu projektu w VSCode panel **Testing** (ikona probówki) pokaże zarówno testy `unit/` jak i `llm/`. Testy LLM mają status "skip" dopóki nie ustawisz `OPENROUTER_API_KEY` (lub `GEMINI_API_KEY`) w `.env` i nie uruchomisz ich ręcznie przez terminal z flagą `--run-llm`.
+Po otwarciu projektu w VSCode panel **Testing** (ikona probówki) pokaże zarówno testy `unit/` jak i `llm/`. Testy LLM mają status "skip" dopóki nie ustawisz `OPENROUTER_API_KEY` w `.env` i nie uruchomisz ich ręcznie przez terminal z flagą `--run-llm`.
 
 ## Markery pytest
 
@@ -215,9 +213,8 @@ Po otwarciu projektu w VSCode panel **Testing** (ikona probówki) pokaże zarów
 
 | Typ | Nazwa | Wartość |
 |---|---|---|
-| **Secret** | `OPENROUTER_API_KEY` | Klucz API OpenRouter (lub `GEMINI_API_KEY` jako alias) |
+| **Secret** | `OPENROUTER_API_KEY` | Klucz API OpenRouter |
 | **Variable** | `LLM_MODEL` | np. `google/gemini-3.5-flash` |
-| **Variable** | `GEMINI_MODEL` | (alias) np. `google/gemini-3.5-flash` |
 
 ### Przepływ
 

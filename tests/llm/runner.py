@@ -5,6 +5,7 @@ from typing import Any
 import yaml
 
 from .client import LLMClient
+from .output_schema import OUTPUT_JSON_SCHEMA
 
 _RESPONSE_DIR = Path("/tmp/ipbox_llm_responses")
 
@@ -114,6 +115,7 @@ Klucze po polsku, liczby jako liczby.
                     api_call_fn=lambda p: self.client.call_with_retry(
                         system_prompt=SYSTEM_PROMPT,
                         user_prompt=p,
+                        json_schema=OUTPUT_JSON_SCHEMA,
                     ),
                     scenario_name=scenario_name,
                 )
@@ -125,6 +127,7 @@ Klucze po polsku, liczby jako liczby.
             response = self.client.call_with_retry(
                 system_prompt=SYSTEM_PROMPT,
                 user_prompt=prompt,
+                json_schema=OUTPUT_JSON_SCHEMA,
             )
 
         self._save_response(scenario["meta"]["id"], response)

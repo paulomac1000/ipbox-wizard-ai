@@ -16,6 +16,7 @@ from collections.abc import Callable
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
+from ..output_schema import OUTPUT_JSON_SCHEMA
 from ..request_spec import LLMRequestSpec
 from .cassette import Cassette, CassetteManifest, CassetteMeta, CassetteTurn
 from .config import VCRConfig
@@ -205,6 +206,7 @@ class VCRRecorder:
             user_prompt=prompt,
             temperature=0.0,
             max_tokens=16000,
+            json_schema=OUTPUT_JSON_SCHEMA,
         )
         current_request_hash = current_spec.compute_hash()
         if stored_request_hash != current_request_hash:
@@ -258,6 +260,7 @@ class VCRRecorder:
             user_prompt=prompt,
             temperature=0.0,
             max_tokens=16000,
+            json_schema=OUTPUT_JSON_SCHEMA,
         )
         request_hash = spec.compute_hash()
         system_prompt_hash = hashlib.sha256(system_prompt.encode("utf-8")).hexdigest()[:16] if system_prompt else ""

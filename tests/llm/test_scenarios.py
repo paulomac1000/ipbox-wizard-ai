@@ -52,9 +52,9 @@ def llm_client(request):
     if vcr_mode == "playback":
         return LLMClient(require_api_key=False)
 
-    api_key = os.getenv("OPENROUTER_API_KEY") or os.getenv("GEMINI_API_KEY")
+    api_key = os.getenv("OPENROUTER_API_KEY")
     if not api_key:
-        pytest.fail("OPENROUTER_API_KEY or GEMINI_API_KEY not set — required for LLM tests in non-playback mode")
+        pytest.fail("OPENROUTER_API_KEY not set — required for LLM tests in non-playback mode")
     return LLMClient()
 
 

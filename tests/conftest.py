@@ -9,7 +9,7 @@ def pytest_addoption(parser):
         "--run-llm",
         action="store_true",
         default=False,
-        help="Run LLM scenario tests (requires GEMINI_API_KEY)",
+        help="Run LLM scenario tests (requires OPENROUTER_API_KEY)",
     )
     parser.addoption(
         "--vcr-mode",
@@ -33,10 +33,10 @@ def load_env():
 
 
 @pytest.fixture(scope="session")
-def gemini_api_key():
-    return getenv("GEMINI_API_KEY")
+def openrouter_api_key():
+    return getenv("OPENROUTER_API_KEY")
 
 
 @pytest.fixture(scope="session")
-def gemini_model():
-    return getenv("GEMINI_MODEL", "google/gemma-4-31b-it")
+def llm_model():
+    return getenv("LLM_MODEL", "google/gemini-3.5-flash")

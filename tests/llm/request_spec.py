@@ -17,6 +17,7 @@ class LLMRequestSpec:
     max_tokens: int = 16000
     response_format: dict | None = None
     schema: dict | None = None
+    json_schema: dict | None = None
     schema_version: str | None = None
     provider_preferences: dict | None = None
     seed: int | None = None

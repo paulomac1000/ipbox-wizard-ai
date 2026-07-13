@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import time
 from os import environ
 
@@ -9,14 +11,13 @@ OPENROUTER_BASE = "https://openrouter.ai/api/v1/chat/completions"
 
 class LLMClient:
     def __init__(self, require_api_key: bool = True):
-        # Use OPENROUTER_API_KEY first, fall back to GEMINI_API_KEY for backward compat
-        api_key = environ.get("OPENROUTER_API_KEY") or environ.get("GEMINI_API_KEY")
+        api_key = environ.get("OPENROUTER_API_KEY")
         if require_api_key and not api_key:
-            raise ValueError("OPENROUTER_API_KEY or GEMINI_API_KEY not set")
+            raise ValueError("OPENROUTER_API_KEY not set")
         self.api_key = api_key
-        self.model_name = environ.get("LLM_MODEL") or environ.get("GEMINI_MODEL") or "google/gemini-3.5-flash"
+        self.model_name = environ.get("LLM_MODEL") or "google/gemini-3.5-flash"
 
-    def call(self, system_prompt: str, user_prompt: str, timeout: int = 120) -> str:
+    def call(self, system_prompt: str, user_prompt: str, timeout: int = 120, json_schema: dict | None = None) -> str:
         headers = {
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json",
@@ -31,8 +32,11 @@ class LLMClient:
             "messages": messages,
             "temperature": 0.0,
             "max_tokens": 16000,
-            "response_format": {"type": "json_object"},
         }
+        if json_schema:
+            payload["response_format"] = {"type": "json_schema", "json_schema": json_schema}
+        else:
+            payload["response_format"] = {"type": "json_object"}
 
         response = requests.post(
             OPENROUTER_BASE,
@@ -51,11 +55,12 @@ class LLMClient:
         retries: int = 2,
         delay: int = 15,
         timeout: int = 120,
+        json_schema: dict | None = None,
     ) -> str:
         last_exc: Exception | None = None
         for attempt in range(retries + 1):
             try:
-                return self.call(system_prompt, user_prompt, timeout=timeout)
+                return self.call(system_prompt, user_prompt, timeout=timeout, json_schema=json_schema)
             except Exception as exc:
                 last_exc = exc
                 if attempt < retries:

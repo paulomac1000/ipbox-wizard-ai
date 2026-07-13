@@ -43,13 +43,11 @@ System korzysta z **OpenRouter** jako głównego proxy API, co pozwala na wybór
 
 | Provider | Zmienna środowiskowa | Przykładowy model |
 |---|---|---|
-| **OpenRouter** (rekomendowany) | `OPENROUTER_API_KEY` + `LLM_MODEL` (lub `GEMINI_MODEL`) | `google/gemini-3.5-flash` |
-| **Google Gemini** (direct) | `GEMINI_API_KEY` + `GEMINI_MODEL` | `gemini-3.1-flash-lite-preview` |
+| **OpenRouter** (rekomendowany) | `OPENROUTER_API_KEY` + `LLM_MODEL` | `google/gemini-3.5-flash` |
 
 Domyślny model: `google/gemini-3.5-flash` przez OpenRouter.
 
-> [!NOTE]
-> `LLM_PROVIDER` i `LLM_MODEL` są preferowanymi zmiennymi. `GEMINI_MODEL` i `GEMINI_API_KEY` pozostają jako aliasy dla kompatybilności wstecznej.
+
 
 ---
 

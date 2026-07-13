@@ -18,7 +18,7 @@ pip install -r requirements-test.txt
 
 # 2. Skonfiguruj klucz Gemini
 cp .env.example .env
-# Edytuj .env i wpisz GEMINI_API_KEY
+# Edytuj .env i wpisz OPENROUTER_API_KEY
 
 # 3. Uruchom testy jednostkowe
 pytest tests/unit/ -v
@@ -122,7 +122,7 @@ make vcr-check          # Walidacja fingerprintów
 
 | Problem | Przyczyna | Rozwiązanie |
 |---|---|---|
-| `GEMINI_API_KEY not set` | Brak pliku `.env` | Skopiuj `.env.example` → `.env` i wpisz klucz |
+| `OPENROUTER_API_KEY not set` | Brak pliku `.env` | Skopiuj `.env.example` → `.env` i wpisz klucz |
 | Testy LLM pominięte | Brak flagi | Dodaj `--run-llm` do wywołania pytest |
 | Coverage < 90% | Nowe funkcje bez testów | Dodaj testy do `tests/unit/` |
 | `PytestUnknownMarkWarning` | Nowy marker bez rejestracji | Dodaj do `[tool.pytest.ini_options].markers` w `pyproject.toml` |

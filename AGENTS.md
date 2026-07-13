@@ -68,8 +68,8 @@ Pełna dokumentacja: [docs/testing.md](docs/testing.md)
 ### Modele AI
 
 - Obsługiwani providerzy: **Google Gemini** (direct) oraz **OpenRouter** (proxy)
-- Klucz: `GEMINI_API_KEY` (secret). Alternatywnie: `OPENROUTER_API_KEY` (secret) dla dostępu przez OpenRouter
-- Model: `GEMINI_MODEL` (zmienna środowiskowa, domyślnie `google/gemini-3.5-flash`)
+- Klucz: `OPENROUTER_API_KEY` (secret)
+- Model: `LLM_MODEL` (zmienna środowiskowa, domyślnie `google/gemini-3.5-flash`)
 - Nie dodawać zależności do innych SDK/providerów — OpenRouter jest jedynym proxy, żadnych bezpośrednich SDK poza google-generativeai
 
 ### Testy jednostkowe
@@ -87,8 +87,8 @@ Pełna dokumentacja: [docs/testing.md](docs/testing.md)
 
 ### CI/CD
 
-- `GEMINI_MODEL`: zmienna GitHub Actions (`vars.GEMINI_MODEL`), **nie secret**
-- `GEMINI_API_KEY`: secret GitHub Actions (`secrets.GEMINI_API_KEY`)
+- `LLM_MODEL`: zmienna GitHub Actions (`vars.LLM_MODEL`), **nie secret**
+- `OPENROUTER_API_KEY`: secret GitHub Actions (`secrets.OPENROUTER_API_KEY`)
 - Limit scenariuszy LLM w CI: `LLM_MAX_CALLS_PER_RUN` (domyślnie 0 — wszystkie)
 
 ## Czego NIE robić

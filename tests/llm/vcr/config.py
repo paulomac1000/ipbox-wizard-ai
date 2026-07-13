@@ -54,7 +54,7 @@ class VCRConfig:
 
         # LLM provider configuration
         self.provider = environ.get("LLM_PROVIDER", "openrouter")
-        self.model = environ.get("LLM_MODEL") or environ.get("GEMINI_MODEL") or "google/gemini-3.5-flash"
+        self.model = environ.get("LLM_MODEL") or "google/gemini-3.5-flash"
 
     @property
     def is_playback(self) -> bool:
