@@ -4,26 +4,29 @@ meta:
   provider: openrouter
   model: google/gemini-3.5-flash
   fingerprint: v2_be9aedbd727271f4_c6f8688155417c7e_openrouter_8d99798a_spc2c5afcf
-  recorded_at: '2026-07-13T01:28:32.500069+00:00'
-  recording_duration_seconds: 2.67
+  recorded_at: '2026-07-13T22:25:08.054973+00:00'
+  recording_duration_seconds: 4.19
   prompt_tokens_estimate: 14459
-  response_tokens_estimate: 203
+  response_tokens_estimate: 294
   algorithm_hash: be9aedbd727271f4
   cassette_format_version: 3
 turns:
 - role: user
   prompt: ''
   response: "{\n  \"result\": {\n    \"rok\": 2025,\n    \"przychody_roczne\": {\n      \"IP\": 0.0,\n      \"NIE\": 0.0\n\
-    \    },\n    \"nexus\": {\n      \"A\": 0.0,\n      \"B\": 0.0,\n      \"C\": 0.0,\n      \"D\": 0.0,\n      \"poza_nexus\"\
-    : 0.0,\n      \"wartość\": 0.0\n    },\n    \"podatek\": {\n      \"podatek_IP\": 0,\n      \"podatek_NIE_finalny\": 0\n\
-    \    }\n  },\n  \"classifications\": [\n    {\n      \"opis\": \"Kawa do domu\",\n      \"basket\": \"NIE\",\n      \"\
-    nexus_basket\": \"poza_nexus\",\n      \"nexus_amount\": 0.0\n    }\n  ],\n  \"monthly_W\": {\n    \"2025-01\": 0.0\n\
-    \  },\n  \"tests\": {\n    \"TEST_1\": \"PASS\",\n    \"TEST_2\": \"FAIL\"\n  },\n  \"stops_reviews\": {\n    \"stops\"\
-    : [\n      \"STOP_04\",\n      \"STOP_08\"\n    ],\n    \"reviews\": [\n      \"REVIEW_14\",\n      \"REVIEW_20\"\n  \
-    \  ],\n    \"warnings\": [\n      \"Wydatki osobiste (kawa) zostały przeklasyfikowane do koszyka NIE.\"\n    ]\n  }\n\
-    }\n}"
+    \    },\n    \"nexus\": 0.0,\n    \"podatek\": {\n      \"podatek_IP\": 0.0,\n      \"podatek_NIE_finalny\": 0.0,\n  \
+    \    \"podatek_całościowy\": 0.0\n    },\n    \"dochód_IP\": 0.0,\n    \"dochód_NIE\": -100.0,\n    \"klucz_MIX\": {\n\
+    \      \"metoda\": \"przychodowa_roczna\",\n      \"źródło\": \"domyślna_wizard\"\n    }\n  },\n  \"classifications\"\
+    : [\n    \"Kawa do domu: zaklasyfikowano jako NIE (koszt prywatny, wykluczony z IP)\"\n  ],\n  \"monthly_W\": {\n    \"\
+    2025-01\": 0.0\n  },\n  \"tests\": {\n    \"TEST_1_bilans\": \"PASS\",\n    \"TEST_2_koszty_prywatne\": \"PASS\",\n  \
+    \  \"TEST_3_anty_dubel_ZUS\": \"PASS\",\n    \"TEST_4_kaskada\": \"PASS\",\n    \"TEST_5_podatek_IP\": \"PASS\",\n   \
+    \ \"TEST_6_nadpłata\": \"PASS\",\n    \"TEST_7_spójność_polityki_alokacji\": \"PASS\",\n    \"TEST_8_dochód_IP_vs_NEXUS\"\
+    : \"PASS\",\n    \"TEST_9_porównanie_metod\": \"PASS\"\n  },\n  \"stops_reviews\": {\n    \"stops\": [\n      \"STOP_04:\
+    \ W tym miesiącu zero godzin B+R (W = 0)\",\n      \"STOP_08: Przychód IP = 100% deklarowany, ale zero udokumentowanych\
+    \ godzin B+R\"\n    ],\n    \"warnings\": [\n      \"Koszty prywatne (kawa) zostały automatycznie przeklasyfikowane do\
+    \ koszyka NIE.\"\n    ]\n  }\n}"
   prompt_hash: 8478f92708ec15af
-  request_hash: 4ab69e5c07cec0eb
+  request_hash: 850ba9e936da7053
   system_prompt_hash: c2c5afcf900231f7
 parsed:
   result_yaml:
@@ -31,32 +34,33 @@ parsed:
     przychody_roczne:
       IP: 0.0
       NIE: 0.0
-    nexus:
-      A: 0.0
-      B: 0.0
-      C: 0.0
-      D: 0.0
-      poza_nexus: 0.0
-      wartość: 0.0
+    nexus: 0.0
     podatek:
-      podatek_IP: 0
-      podatek_NIE_finalny: 0
+      podatek_IP: 0.0
+      podatek_NIE_finalny: 0.0
+      podatek_całościowy: 0.0
+    dochód_IP: 0.0
+    dochód_NIE: -100.0
+    klucz_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
   classifications:
-  - opis: Kawa do domu
-    basket: NIE
-    nexus_basket: poza_nexus
-    nexus_amount: 0.0
+  - 'Kawa do domu: zaklasyfikowano jako NIE (koszt prywatny, wykluczony z IP)'
   monthly_W:
     2025-01: 0.0
   tests:
-    TEST_1: PASS
-    TEST_2: FAIL
+    TEST_1_bilans: PASS
+    TEST_2_koszty_prywatne: PASS
+    TEST_3_anty_dubel_ZUS: PASS
+    TEST_4_kaskada: PASS
+    TEST_5_podatek_IP: PASS
+    TEST_6_nadpłata: PASS
+    TEST_7_spójność_polityki_alokacji: PASS
+    TEST_8_dochód_IP_vs_NEXUS: PASS
+    TEST_9_porównanie_metod: PASS
   stops_reviews:
     stops:
-    - STOP_04
-    - STOP_08
-    reviews:
-    - REVIEW_14
-    - REVIEW_20
+    - 'STOP_04: W tym miesiącu zero godzin B+R (W = 0)'
+    - 'STOP_08: Przychód IP = 100% deklarowany, ale zero udokumentowanych godzin B+R'
     warnings:
-    - Wydatki osobiste (kawa) zostały przeklasyfikowane do koszyka NIE.
+    - Koszty prywatne (kawa) zostały automatycznie przeklasyfikowane do koszyka NIE.

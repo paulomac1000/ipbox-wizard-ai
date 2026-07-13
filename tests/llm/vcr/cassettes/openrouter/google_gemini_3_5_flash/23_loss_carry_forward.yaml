@@ -4,63 +4,59 @@ meta:
   provider: openrouter
   model: google/gemini-3.5-flash
   fingerprint: v2_be9aedbd727271f4_b78674b2686aa11a_openrouter_8d99798a_spc2c5afcf
-  recorded_at: '2026-07-13T01:38:08.997515+00:00'
-  recording_duration_seconds: 2.48
+  recorded_at: '2026-07-13T22:24:31.119511+00:00'
+  recording_duration_seconds: 3.6
   prompt_tokens_estimate: 14517
-  response_tokens_estimate: 215
+  response_tokens_estimate: 257
   algorithm_hash: be9aedbd727271f4
   cassette_format_version: 3
 turns:
 - role: user
   prompt: ''
-  response: "{\n  \"result\": {\n    \"rok\": 2025,\n    \"przychody_roczne\": {\n      \"IP\": 20000.0,\n      \"NIE\": 0.0\n\
-    \    },\n    \"nexus\": {\n      \"A\": 0.0,\n      \"B\": 0.0,\n      \"C\": 0.0,\n      \"D\": 0.0,\n      \"poza_nexus\"\
-    : 80.1,\n      \"wartość\": 1.0\n    },\n    \"podatek\": {\n      \"podatek_IP\": 996,\n      \"podatek_NIE_finalny\"\
-    : 0\n    }\n  },\n  \"classifications\": [\n    {\n      \"opis\": \"Abonament internet\",\n      \"basket\": \"MIX\"\
-    ,\n      \"nexus_basket\": \"poza_nexus\",\n      \"nexus_amount\": 0.0\n    }\n  ],\n  \"monthly_W\": {\n    \"2025-01\"\
-    : 90.0\n  },\n  \"tests\": {\n    \"TEST_1\": \"PASS\",\n    \"TEST_2\": \"PASS\",\n    \"TEST_3\": \"PASS\",\n    \"\
-    TEST_4\": \"PASS\",\n    \"TEST_5\": \"PASS\",\n    \"TEST_6\": \"PASS\",\n    \"TEST_7\": \"PASS\",\n    \"TEST_8\":\
-    \ \"PASS\",\n    \"TEST_9\": \"PASS\"\n  },\n  \"stops_reviews\": {\n    \"stops\": [],\n    \"reviews\": [\n      \"\
-    REVIEW_09\",\n      \"REVIEW_20\"\n    ],\n    \"warnings\": []\n  }\n}"
+  response: "{\n  \"result\": {\n    \"rok\": 2025,\n    \"przychody_roczne\": {\n      \"IP\": 18000.0,\n      \"NIE\": 2000.0\n\
+    \    },\n    \"nexus\": 1.0,\n    \"podatek\": {\n      \"podatek_IP\": 900,\n      \"podatek_NIE_finalny\": 0,\n    \
+    \  \"podatek_całościowy\": 900\n    },\n    \"dochód_IP\": 17919.9,\n    \"dochód_NIE\": 1991.1,\n    \"klucz_MIX\": {\n\
+    \      \"metoda\": \"przychodowa_roczna\",\n      \"źródło\": \"domyślna_wizard\"\n    }\n  },\n  \"classifications\"\
+    : [\n    \"Abonament internet: basket=MIX, nexus_basket=poza_nexus\"\n  ],\n  \"monthly_W\": {\n    \"2025-01\": 90.0\n\
+    \  },\n  \"tests\": {\n    \"TEST_1_bilans\": \"PASS\",\n    \"TEST_2_koszty_prywatne\": \"PASS\",\n    \"TEST_3_anty_dubel_ZUS\"\
+    : \"PASS\",\n    \"TEST_4_kaskada\": \"PASS\",\n    \"TEST_5_podatek_IP\": \"PASS\",\n    \"TEST_6_nadpłata\": \"PASS\"\
+    ,\n    \"TEST_7_spójność_polityki_alokacji\": \"PASS\",\n    \"TEST_8_dochód_IP_vs_NEXUS\": \"PASS\",\n    \"TEST_9_porównanie_metod\"\
+    : \"PASS\"\n  },\n  \"stops_reviews\": {\n    \"stops\": [],\n    \"warnings\": [\n      \"Brak interpretacji indywidualnej\
+    \ KIS - wysokie ryzyko zakwestionowania ulgi przez KAS.\"\n    ]\n  }\n}"
   prompt_hash: ee81dfb629510802
-  request_hash: f513eb5b61eb0468
+  request_hash: 23d5971879fb5321
   system_prompt_hash: c2c5afcf900231f7
 parsed:
   result_yaml:
     rok: 2025
     przychody_roczne:
-      IP: 20000.0
-      NIE: 0.0
-    nexus:
-      A: 0.0
-      B: 0.0
-      C: 0.0
-      D: 0.0
-      poza_nexus: 80.1
-      wartość: 1.0
+      IP: 18000.0
+      NIE: 2000.0
+    nexus: 1.0
     podatek:
-      podatek_IP: 996
+      podatek_IP: 900
       podatek_NIE_finalny: 0
+      podatek_całościowy: 900
+    dochód_IP: 17919.9
+    dochód_NIE: 1991.1
+    klucz_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
   classifications:
-  - opis: Abonament internet
-    basket: MIX
-    nexus_basket: poza_nexus
-    nexus_amount: 0.0
+  - 'Abonament internet: basket=MIX, nexus_basket=poza_nexus'
   monthly_W:
     2025-01: 90.0
   tests:
-    TEST_1: PASS
-    TEST_2: PASS
-    TEST_3: PASS
-    TEST_4: PASS
-    TEST_5: PASS
-    TEST_6: PASS
-    TEST_7: PASS
-    TEST_8: PASS
-    TEST_9: PASS
+    TEST_1_bilans: PASS
+    TEST_2_koszty_prywatne: PASS
+    TEST_3_anty_dubel_ZUS: PASS
+    TEST_4_kaskada: PASS
+    TEST_5_podatek_IP: PASS
+    TEST_6_nadpłata: PASS
+    TEST_7_spójność_polityki_alokacji: PASS
+    TEST_8_dochód_IP_vs_NEXUS: PASS
+    TEST_9_porównanie_metod: PASS
   stops_reviews:
     stops: []
-    reviews:
-    - REVIEW_09
-    - REVIEW_20
-    warnings: []
+    warnings:
+    - Brak interpretacji indywidualnej KIS - wysokie ryzyko zakwestionowania ulgi przez KAS.

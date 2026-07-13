@@ -3,71 +3,68 @@ meta:
   scenario_name: 'MIX: dwustopniowa alokacja kosztów dla wielu IP'
   provider: openrouter
   model: google/gemini-3.5-flash
-  fingerprint: v2_be9aedbd727271f4_b3d10a397b534957_openrouter_8d99798a_spc2c5afcf
-  recorded_at: '2026-07-13T01:29:13.449990+00:00'
-  recording_duration_seconds: 3.31
+  fingerprint: v2_be9aedbd727271f4_95cbe85977c555a3_openrouter_8d99798a_spc2c5afcf
+  recorded_at: '2026-07-13T22:26:02.197064+00:00'
+  recording_duration_seconds: 4.01
   prompt_tokens_estimate: 14579
-  response_tokens_estimate: 235
+  response_tokens_estimate: 290
   algorithm_hash: be9aedbd727271f4
   cassette_format_version: 3
 turns:
 - role: user
   prompt: ''
-  response: "{\n  \"result\": {\n    \"rok\": 2025,\n    \"przychody_roczne\": {\n\
-    \      \"IP\": 80000.0,\n      \"NIE\": 0.0\n    },\n    \"nexus\": {\n      \"\
-    A\": 0.0,\n      \"B\": 0.0,\n      \"C\": 0.0,\n      \"D\": 0.0,\n      \"poza_nexus\"\
-    : 8000.0,\n      \"wartość\": 1.0\n    },\n    \"podatek\": {\n      \"podatek_IP\"\
-    : 3600,\n      \"podatek_NIE_finalny\": 0\n    }\n  },\n  \"classifications\"\
-    : [\n    {\n      \"opis\": \"Koszty wspólne MIX (alokowane przychodowo rocznie)\"\
-    ,\n      \"basket\": \"MIX\",\n      \"nexus_basket\": \"poza_nexus\",\n     \
-    \ \"nexus_amount\": 8000.0\n    }\n  ],\n  \"monthly_W\": {\n    \"2025-01\":\
-    \ 87.5\n  },\n  \"tests\": {\n    \"TEST_1\": \"PASS\",\n    \"TEST_2\": \"PASS\"\
-    ,\n    \"TEST_3\": \"PASS\",\n    \"TEST_4\": \"PASS\",\n    \"TEST_5\": \"PASS\"\
-    ,\n    \"TEST_6\": \"PASS\",\n    \"TEST_7\": \"PASS\",\n    \"TEST_8\": \"PASS\"\
-    ,\n    \"TEST_9\": \"PASS\"\n  },\n  \"stops_reviews\": {\n    \"stops\": [],\n\
-    \    \"reviews\": [\n      \"REVIEW_04\",\n      \"REVIEW_15\",\n      \"REVIEW_16\"\
-    ,\n      \"REVIEW_18\"\n    ],\n    \"warnings\": []\n  }\n}\n}"
+  response: "{\n  \"result\": {\n    \"rok\": 2025,\n    \"przychody_roczne\": {\n      \"IP\": 80000.0,\n      \"NIE\": 20000.0\n\
+    \    },\n    \"nexus\": 1.0,\n    \"podatek\": {\n      \"podatek_IP\": 3600.0,\n      \"podatek_NIE_finalny\": 2280.0,\n\
+    \      \"podatek_całościowy\": 5880.0\n    },\n    \"alokacja_multi_ip\": {\n      \"IP_A\": 30000.0,\n      \"IP_B\"\
+    : 50000.0,\n      \"stage1_software_share\": 0.8\n    },\n    \"dochód_IP\": 72000.0,\n    \"dochód_NIE\": 12000.0,\n\
+    \    \"klucz_MIX\": {\n      \"metoda\": \"przychodowa_roczna\",\n      \"źródło\": \"interpretacja_KIS\"\n    }\n  },\n\
+    \  \"classifications\": [\n    \"Koszty wspólne MIX zaklasyfikowane jako koszyk MIX i nexus_basket poza_nexus\"\n  ],\n\
+    \  \"monthly_W\": {\n    \"2025-01\": 87.5\n  },\n  \"tests\": {\n    \"test_1_bilans\": \"PASS\",\n    \"test_2_koszty_prywatne\"\
+    : \"PASS\",\n    \"test_3_anty_dubel_ZUS\": \"PASS\",\n    \"test_4_kaskada\": \"PASS\",\n    \"test_5_podatek_IP\": \"\
+    PASS\",\n    \"test_6_nadpłata\": \"PASS\",\n    \"test_7_spójność_polityki_alokacji\": \"PASS\",\n    \"test_8_dochód_IP_vs_NEXUS\"\
+    : \"PASS\",\n    \"test_9_porównanie_metod\": \"PASS\"\n  },\n  \"stops_reviews\": {\n    \"reviews\": [\n      \"REVIEW_04\"\
+    ,\n      \"REVIEW_16\",\n      \"REVIEW_18\"\n    ],\n    \"stops\": [],\n    \"warnings\": []\n  }\n}"
   prompt_hash: f56c2d97ff58c3ac
-  request_hash: 45c5f2e97e25ea22
+  request_hash: 1478675de96857b9
   system_prompt_hash: c2c5afcf900231f7
 parsed:
   result_yaml:
     rok: 2025
     przychody_roczne:
       IP: 80000.0
-      NIE: 0.0
-    nexus:
-      A: 0.0
-      B: 0.0
-      C: 0.0
-      D: 0.0
-      poza_nexus: 8000.0
-      wartość: 1.0
+      NIE: 20000.0
+    nexus: 1.0
     podatek:
-      podatek_IP: 3600
-      podatek_NIE_finalny: 0
+      podatek_IP: 3600.0
+      podatek_NIE_finalny: 2280.0
+      podatek_całościowy: 5880.0
+    alokacja_multi_ip:
+      IP_A: 30000.0
+      IP_B: 50000.0
+      stage1_software_share: 0.8
+    dochód_IP: 72000.0
+    dochód_NIE: 12000.0
+    klucz_MIX:
+      metoda: przychodowa_roczna
+      źródło: interpretacja_KIS
   classifications:
-  - opis: Koszty wspólne MIX (alokowane przychodowo rocznie)
-    basket: MIX
-    nexus_basket: poza_nexus
-    nexus_amount: 8000.0
+  - Koszty wspólne MIX zaklasyfikowane jako koszyk MIX i nexus_basket poza_nexus
   monthly_W:
     2025-01: 87.5
   tests:
-    TEST_1: PASS
-    TEST_2: PASS
-    TEST_3: PASS
-    TEST_4: PASS
-    TEST_5: PASS
-    TEST_6: PASS
-    TEST_7: PASS
-    TEST_8: PASS
-    TEST_9: PASS
+    test_1_bilans: PASS
+    test_2_koszty_prywatne: PASS
+    test_3_anty_dubel_ZUS: PASS
+    test_4_kaskada: PASS
+    test_5_podatek_IP: PASS
+    test_6_nadpłata: PASS
+    test_7_spójność_polityki_alokacji: PASS
+    test_8_dochód_IP_vs_NEXUS: PASS
+    test_9_porównanie_metod: PASS
   stops_reviews:
-    stops: []
     reviews:
     - REVIEW_04
-    - REVIEW_15
     - REVIEW_16
     - REVIEW_18
+    stops: []
     warnings: []

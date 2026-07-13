@@ -4,30 +4,24 @@ meta:
   provider: openrouter
   model: google/gemini-3.5-flash
   fingerprint: v2_be9aedbd727271f4_00539dcd852041de_openrouter_8d99798a_spc2c5afcf
-  recorded_at: '2026-07-13T01:27:49.754283+00:00'
-  recording_duration_seconds: 2.31
+  recorded_at: '2026-07-13T22:24:01.334830+00:00'
+  recording_duration_seconds: 3.48
   prompt_tokens_estimate: 14453
-  response_tokens_estimate: 206
+  response_tokens_estimate: 166
   algorithm_hash: be9aedbd727271f4
   cassette_format_version: 3
 turns:
 - role: user
   prompt: ''
-  response: "{\n  \"result\": {\n    \"rok\": 2025,\n    \"przychody_roczne\": {\n\
-    \      \"IP\": 0.0,\n      \"NIE\": 0.0\n    },\n    \"nexus\": {\n      \"A\"\
-    : 0.0,\n      \"B\": 0.0,\n      \"C\": 0.0,\n      \"D\": 0.0,\n      \"poza_nexus\"\
-    : 0.0,\n      \"wartość\": 0.0\n    },\n    \"podatek\": {\n      \"podatek_IP\"\
-    : 0,\n      \"podatek_NIE_finalny\": 0\n    }\n  },\n  \"classifications\": [],\n\
-    \  \"monthly_W\": {},\n  \"tests\": {\n    \"TEST_1\": \"FAIL\",\n    \"TEST_2\"\
-    : \"PASS\",\n    \"TEST_3\": \"PASS\",\n    \"TEST_4\": \"PASS\",\n    \"TEST_5\"\
-    : \"PASS\",\n    \"TEST_6\": \"PASS\",\n    \"TEST_7\": \"FAIL\",\n    \"TEST_8\"\
-    : \"FAIL\",\n    \"TEST_9\": \"PASS\"\n  },\n  \"stops_reviews\": {\n    \"stops\"\
-    : [\n      \"STOP_12\"\n    ],\n    \"reviews\": [\n      \"REVIEW_20\"\n    ],\n\
-    \    \"warnings\": [\n      \"IP Box nie łączy się z ryczałtem ewidencjonowanym.\
-    \ Wybrana forma opodatkowania uniemożliwia skorzystanie z ulgi.\"\n    ]\n  }\n\
-    }"
+  response: "{\n  \"result\": {\n    \"rok\": 2025,\n    \"przychody_roczne\": {\n      \"IP\": 0.0,\n      \"NIE\": 0.0\n\
+    \    },\n    \"nexus\": 0.0,\n    \"podatek\": {\n      \"podatek_IP\": 0.0,\n      \"podatek_NIE_finalny\": 0.0,\n  \
+    \    \"podatek_całościowy\": 0.0\n    },\n    \"dochód_IP\": 0.0,\n    \"dochód_NIE\": 0.0\n  },\n  \"classifications\"\
+    : [],\n  \"monthly_W\": {},\n  \"tests\": {\n    \"TEST_1_BILANS\": \"FAIL\",\n    \"TEST_3_ANTY_DUBEL_ZUS\": \"PASS\"\
+    ,\n    \"TEST_7_SPOJNOSC_POLITYKI_ALOKACJI\": \"FAIL\"\n  },\n  \"stops_reviews\": {\n    \"stops\": [\n      \"STOP_12\"\
+    \n    ],\n    \"warnings\": [\n      \"IP Box nie łączy się z ryczałtem ewidencjonowanym. Wybrana forma opodatkowania\
+    \ uniemożliwia skorzystanie z ulgi.\"\n    ]\n  }\n}"
   prompt_hash: 6d38631970104e79
-  request_hash: b2a447be0349ef58
+  request_hash: 5cab96c5df34cbcb
   system_prompt_hash: c2c5afcf900231f7
 parsed:
   result_yaml:
@@ -35,33 +29,21 @@ parsed:
     przychody_roczne:
       IP: 0.0
       NIE: 0.0
-    nexus:
-      A: 0.0
-      B: 0.0
-      C: 0.0
-      D: 0.0
-      poza_nexus: 0.0
-      wartość: 0.0
+    nexus: 0.0
     podatek:
-      podatek_IP: 0
-      podatek_NIE_finalny: 0
+      podatek_IP: 0.0
+      podatek_NIE_finalny: 0.0
+      podatek_całościowy: 0.0
+    dochód_IP: 0.0
+    dochód_NIE: 0.0
   classifications: []
   monthly_W: {}
   tests:
-    TEST_1: FAIL
-    TEST_2: PASS
-    TEST_3: PASS
-    TEST_4: PASS
-    TEST_5: PASS
-    TEST_6: PASS
-    TEST_7: FAIL
-    TEST_8: FAIL
-    TEST_9: PASS
+    TEST_1_BILANS: FAIL
+    TEST_3_ANTY_DUBEL_ZUS: PASS
+    TEST_7_SPOJNOSC_POLITYKI_ALOKACJI: FAIL
   stops_reviews:
     stops:
     - STOP_12
-    reviews:
-    - REVIEW_20
     warnings:
-    - IP Box nie łączy się z ryczałtem ewidencjonowanym. Wybrana forma opodatkowania
-      uniemożliwia skorzystanie z ulgi.
+    - IP Box nie łączy się z ryczałtem ewidencjonowanym. Wybrana forma opodatkowania uniemożliwia skorzystanie z ulgi.

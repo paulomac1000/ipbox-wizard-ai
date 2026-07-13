@@ -4,31 +4,27 @@ meta:
   provider: openrouter
   model: google/gemini-3.5-flash
   fingerprint: v2_be9aedbd727271f4_d6806e47f244d02f_openrouter_8d99798a_spc2c5afcf
-  recorded_at: '2026-07-13T01:38:14.449874+00:00'
-  recording_duration_seconds: 2.71
+  recorded_at: '2026-07-13T22:24:39.059048+00:00'
+  recording_duration_seconds: 3.7
   prompt_tokens_estimate: 14519
-  response_tokens_estimate: 220
+  response_tokens_estimate: 258
   algorithm_hash: be9aedbd727271f4
   cassette_format_version: 3
 turns:
 - role: user
   prompt: ''
-  response: "{\n  \"result\": {\n    \"rok\": 2025,\n    \"przychody_roczne\": {\n\
-    \      \"IP\": 18000.0,\n      \"NIE\": 2000.0\n    },\n    \"nexus\": {\n   \
-    \   \"A\": 0.0,\n      \"B\": 0.0,\n      \"C\": 0.0,\n      \"D\": 0.0,\n   \
-    \   \"poza_nexus\": 8.9,\n      \"wartość\": 0.0\n    },\n    \"podatek\": {\n\
-    \      \"podatek_IP\": 0,\n      \"podatek_NIE_finalny\": 363\n    }\n  },\n \
-    \ \"classifications\": [\n    {\n      \"opis\": \"Abonament internet\",\n   \
-    \   \"basket\": \"MIX\",\n      \"nexus_basket\": \"poza_nexus\",\n      \"nexus_amount\"\
-    : 0.0\n    }\n  ],\n  \"monthly_W\": {\n    \"2025-01\": 90.0\n  },\n  \"tests\"\
-    : {\n    \"TEST_1\": \"PASS\",\n    \"TEST_2\": \"PASS\",\n    \"TEST_3\": \"\
-    PASS\",\n    \"TEST_4\": \"PASS\",\n    \"TEST_5\": \"PASS\",\n    \"TEST_6\"\
-    : \"PASS\",\n    \"TEST_7\": \"PASS\",\n    \"TEST_8\": \"PASS\",\n    \"TEST_9\"\
-    : \"PASS\"\n  },\n  \"stops_reviews\": {\n    \"stops\": [],\n    \"reviews\"\
-    : [\n      \"REVIEW_03\",\n      \"REVIEW_09\",\n      \"REVIEW_20\"\n    ],\n\
-    \    \"warnings\": []\n  }\n}"
+  response: "{\n  \"result\": {\n    \"rok\": 2025,\n    \"przychody_roczne\": {\n      \"IP\": 18000.0,\n      \"NIE\": 2000.0\n\
+    \    },\n    \"nexus\": 1.0,\n    \"podatek\": {\n      \"podatek_IP\": 900,\n      \"podatek_NIE_finalny\": 363,\n  \
+    \    \"podatek_całościowy\": 1263\n    },\n    \"dochód_IP\": 18000.0,\n    \"dochód_NIE\": 1911.0,\n    \"klucz_MIX\"\
+    : {\n      \"metoda\": \"przychodowa_roczna\",\n      \"źródło\": \"domyślna_wizard\"\n    }\n  },\n  \"classifications\"\
+    : [\n    \"Abonament internet: basket=MIX, nexus_basket=poza_nexus\"\n  ],\n  \"monthly_W\": {\n    \"2025-01\": 90.0\n\
+    \  },\n  \"tests\": {\n    \"TEST_1_BILANS\": \"PASS\",\n    \"TEST_2_KOSZTY_PRYWATNE\": \"PASS\",\n    \"TEST_3_ANTY_DUBEL_ZUS\"\
+    : \"PASS\",\n    \"TEST_4_KASKADA\": \"PASS\",\n    \"TEST_5_PODATEK_IP\": \"PASS\",\n    \"TEST_6_NADPŁATA\": \"PASS\"\
+    ,\n    \"TEST_7_SPÓJNOŚĆ_POLITYKI_ALOKACJI\": \"PASS\",\n    \"TEST_8_DOCHÓD_IP_VS_NEXUS\": \"PASS\",\n    \"TEST_9_PORÓWNANIE_METOD\"\
+    : \"PASS\"\n  },\n  \"stops_reviews\": {\n    \"reviews\": [\n      \"REVIEW_02\",\n      \"REVIEW_03\",\n      \"REVIEW_09\"\
+    ,\n      \"REVIEW_20\"\n    ],\n    \"stops\": [],\n    \"warnings\": []\n  }\n}"
   prompt_hash: fdc0c240120b4d94
-  request_hash: 426a32bf2a01571f
+  request_hash: 0d7d0b446cc8efad
   system_prompt_hash: c2c5afcf900231f7
 parsed:
   result_yaml:
@@ -36,37 +32,35 @@ parsed:
     przychody_roczne:
       IP: 18000.0
       NIE: 2000.0
-    nexus:
-      A: 0.0
-      B: 0.0
-      C: 0.0
-      D: 0.0
-      poza_nexus: 8.9
-      wartość: 0.0
+    nexus: 1.0
     podatek:
-      podatek_IP: 0
+      podatek_IP: 900
       podatek_NIE_finalny: 363
+      podatek_całościowy: 1263
+    dochód_IP: 18000.0
+    dochód_NIE: 1911.0
+    klucz_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
   classifications:
-  - opis: Abonament internet
-    basket: MIX
-    nexus_basket: poza_nexus
-    nexus_amount: 0.0
+  - 'Abonament internet: basket=MIX, nexus_basket=poza_nexus'
   monthly_W:
     2025-01: 90.0
   tests:
-    TEST_1: PASS
-    TEST_2: PASS
-    TEST_3: PASS
-    TEST_4: PASS
-    TEST_5: PASS
-    TEST_6: PASS
-    TEST_7: PASS
-    TEST_8: PASS
-    TEST_9: PASS
+    TEST_1_BILANS: PASS
+    TEST_2_KOSZTY_PRYWATNE: PASS
+    TEST_3_ANTY_DUBEL_ZUS: PASS
+    TEST_4_KASKADA: PASS
+    TEST_5_PODATEK_IP: PASS
+    TEST_6_NADPŁATA: PASS
+    TEST_7_SPÓJNOŚĆ_POLITYKI_ALOKACJI: PASS
+    TEST_8_DOCHÓD_IP_VS_NEXUS: PASS
+    TEST_9_PORÓWNANIE_METOD: PASS
   stops_reviews:
-    stops: []
     reviews:
+    - REVIEW_02
     - REVIEW_03
     - REVIEW_09
     - REVIEW_20
+    stops: []
     warnings: []

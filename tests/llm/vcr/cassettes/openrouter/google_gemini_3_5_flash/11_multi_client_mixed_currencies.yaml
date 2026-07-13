@@ -4,58 +4,61 @@ meta:
   provider: openrouter
   model: google/gemini-3.5-flash
   fingerprint: v2_be9aedbd727271f4_df97b983d541cfc2_openrouter_8d99798a_spc2c5afcf
-  recorded_at: '2026-07-13T01:37:59.515883+00:00'
-  recording_duration_seconds: 2.72
+  recorded_at: '2026-07-13T22:23:51.447995+00:00'
+  recording_duration_seconds: 4.01
   prompt_tokens_estimate: 14556
-  response_tokens_estimate: 182
+  response_tokens_estimate: 279
   algorithm_hash: be9aedbd727271f4
   cassette_format_version: 3
 turns:
 - role: user
   prompt: ''
-  response: "{\n  \"result\": {\n    \"rok\": 2025,\n    \"przychody_roczne\": {\n      \"IP\": 22891.80,\n      \"NIE\":\
-    \ 0.0\n    },\n    \"nexus\": {\n      \"A\": 0.0,\n      \"B\": 0.0,\n      \"C\": 0.0,\n      \"D\": 0.0,\n      \"\
-    poza_nexus\": 0.0,\n      \"wartość\": 1.0\n    },\n    \"podatek\": {\n      \"podatek_IP\": 1145,\n      \"podatek_NIE_finalny\"\
-    : 0\n    }\n  },\n  \"classifications\": [],\n  \"monthly_W\": {\n    \"2025-01\": 100.0\n  },\n  \"tests\": {\n    \"\
-    TEST_1\": \"PASS\",\n    \"TEST_2\": \"PASS\",\n    \"TEST_3\": \"PASS\",\n    \"TEST_4\": \"PASS\",\n    \"TEST_5\":\
-    \ \"PASS\",\n    \"TEST_6\": \"PASS\",\n    \"TEST_7\": \"PASS\",\n    \"TEST_8\": \"PASS\",\n    \"TEST_9\": \"PASS\"\
-    \n  },\n  \"stops_reviews\": {\n    \"stops\": [],\n    \"reviews\": [\n      \"REVIEW_04\",\n      \"REVIEW_20\"\n  \
-    \  ],\n    \"warnings\": []\n  }\n}\n}"
+  response: "{\n  \"result\": {\n    \"rok\": 2025,\n    \"przychody_roczne\": {\n      \"IP\": 22897.30,\n      \"NIE\":\
+    \ 0.0\n    },\n    \"nexus\": 1.0,\n    \"podatek\": {\n      \"podatek_IP\": 1145,\n      \"podatek_NIE_finalny\": 0,\n\
+    \      \"podatek_całościowy\": 1145\n    },\n    \"dochód_IP\": 22897.30,\n    \"dochód_NIE\": 0.0,\n    \"klucz_MIX\"\
+    : {\n      \"metoda\": \"przychodowa_roczna\",\n      \"źródło\": \"domyślna_wizard\"\n    }\n  },\n  \"classifications\"\
+    : [\n    \"Przychód z faktury FV/EUR/01 przeliczony kursem NBP z dnia 2024-12-30 (4.2991 PLN) = 12897.30 PLN\",\n    \"\
+    Przychód z faktury TechPL = 10000.00 PLN\"\n  ],\n  \"monthly_W\": {\n    \"2025-01\": 100.0\n  },\n  \"tests\": {\n \
+    \   \"TEST_1_BILANS\": \"PASS\",\n    \"TEST_2_KOSZTY_PRYWATNE\": \"PASS\",\n    \"TEST_3_ANTY_DUBEL_ZUS\": \"PASS\",\n\
+    \    \"TEST_4_KASKADA\": \"PASS\",\n    \"TEST_5_PODATEK_IP\": \"PASS\",\n    \"TEST_6_NADPŁATA\": \"PASS\",\n    \"TEST_7_SPÓJNOŚĆ_POLITYKI_ALOKACJI\"\
+    : \"PASS\",\n    \"TEST_8_DOCHÓD_IP_VS_NEXUS\": \"PASS\",\n    \"TEST_9_PORÓWNANIE_METOD\": \"PASS\"\n  },\n  \"stops_reviews\"\
+    : {\n    \"stops\": [],\n    \"warnings\": [\n      \"Brak interpretacji indywidualnej KIS - wysokie ryzyko zakwestionowania\
+    \ ulgi przez KAS.\"\n    ]\n  }\n}"
   prompt_hash: f0a7387c6ee12697
-  request_hash: 6d278f514bbe7fc8
+  request_hash: 9f59af56318b20cf
   system_prompt_hash: c2c5afcf900231f7
 parsed:
   result_yaml:
     rok: 2025
     przychody_roczne:
-      IP: 22891.8
+      IP: 22897.3
       NIE: 0.0
-    nexus:
-      A: 0.0
-      B: 0.0
-      C: 0.0
-      D: 0.0
-      poza_nexus: 0.0
-      wartość: 1.0
+    nexus: 1.0
     podatek:
       podatek_IP: 1145
       podatek_NIE_finalny: 0
-  classifications: []
+      podatek_całościowy: 1145
+    dochód_IP: 22897.3
+    dochód_NIE: 0.0
+    klucz_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+  classifications:
+  - Przychód z faktury FV/EUR/01 przeliczony kursem NBP z dnia 2024-12-30 (4.2991 PLN) = 12897.30 PLN
+  - Przychód z faktury TechPL = 10000.00 PLN
   monthly_W:
     2025-01: 100.0
   tests:
-    TEST_1: PASS
-    TEST_2: PASS
-    TEST_3: PASS
-    TEST_4: PASS
-    TEST_5: PASS
-    TEST_6: PASS
-    TEST_7: PASS
-    TEST_8: PASS
-    TEST_9: PASS
+    TEST_1_BILANS: PASS
+    TEST_2_KOSZTY_PRYWATNE: PASS
+    TEST_3_ANTY_DUBEL_ZUS: PASS
+    TEST_4_KASKADA: PASS
+    TEST_5_PODATEK_IP: PASS
+    TEST_6_NADPŁATA: PASS
+    TEST_7_SPÓJNOŚĆ_POLITYKI_ALOKACJI: PASS
+    TEST_8_DOCHÓD_IP_VS_NEXUS: PASS
+    TEST_9_PORÓWNANIE_METOD: PASS
   stops_reviews:
     stops: []
-    reviews:
-    - REVIEW_04
-    - REVIEW_20
-    warnings: []
+    warnings:
+    - Brak interpretacji indywidualnej KIS - wysokie ryzyko zakwestionowania ulgi przez KAS.
