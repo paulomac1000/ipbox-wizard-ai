@@ -43,8 +43,8 @@ class TestCostClassification:
         """Koszty > 10k wymagają review (fixed assets)."""
         item = CostItem(description="MacBook Pro", amount=15000.0)
         result = classify_cost(item, social_security_in_kpir=True, health_insurance_in_kpir=True)
-        assert result.basket == "?"
-        assert "depreciation" in result.note
+        assert result.basket == "WYKLUCZONE"
+        assert "WYKLUCZONE" in result.note
 
     @pytest.mark.unit
     @pytest.mark.P1

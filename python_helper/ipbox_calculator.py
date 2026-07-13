@@ -160,6 +160,11 @@ def convert_fx_invoice(
 
     IMPORTANT: exchange rate difference ALWAYS goes to NON-IP revenue/costs.
     """
+    # Validate method
+    valid_methods = {"accrual", "cash"}
+    if method not in valid_methods:
+        raise ValueError(f"Invalid FX method '{method}'. Must be one of: {', '.join(sorted(valid_methods))}")
+
     # Base date for exchange rate
     if method == "accrual":
         base_date = issue_date
@@ -377,10 +382,10 @@ def classify_cost(
 
     # Guard 4: Fixed assets > 10k
     if item.amount > asset_threshold:
-        item.basket = "?"
+        item.basket = "WYKLUCZONE"
         item.note = (
             f"Item > {asset_threshold:,.0f} PLN — "
-            "fixed asset? depreciation or one-time? (ask user)"
+            f"fixed asset (WYKLUCZONE, depreciation handled separately)"
         )
         return item
 
@@ -542,12 +547,15 @@ def tax_cascade(
     if not (0.0 <= nexus <= 1.0):
         raise ValueError(f"nexus must be between 0 and 1, got {nexus}")
 
+    if not math.isfinite(child_tax_credit) or child_tax_credit < 0:
+        raise ValueError(f"child_tax_credit must be a finite number >= 0, got {child_tax_credit}")
+
     valid_tax_forms = frozenset({"linear_19%", "scale"})
     if tax_form not in valid_tax_forms:
         raise ValueError(f"Invalid tax_form: {tax_form!r}. Must be one of {sorted(valid_tax_forms)}")
 
     steps = []
-    remaining = non_ip_income
+    remaining = max(0, non_ip_income)  # Guard: cannot deduct from negative base
 
     # Step 2: Losses
     if previous_losses > 0:

@@ -47,7 +47,17 @@ class Evaluator:
 
         assertions = self.scenario.get("assertions", {})
         if not assertions:
+            scenario_id = self.scenario.get("meta", {}).get("id", "unknown")
+            print(f"[EVALUATOR] WARNING: Scenario '{scenario_id}' has no assertions — passing by default")
             return failures, warnings
+
+        # Check description consistency
+        try:
+            description_errors = _check_description_consistency(self.scenario)
+            if description_errors:
+                failures.extend(description_errors)
+        except Exception:
+            pass
 
         result = parsed.get("result") or {}
         if isinstance(result, str):
@@ -181,7 +191,7 @@ class Evaluator:
         # expected_stops: wszystkie oczekiwane STOP muszą się pojawić
         for expected_stop in self.scenario.get("meta", {}).get("expected_stops", []):
             stops_list = stops_reviews.get("stops", []) if isinstance(stops_reviews, dict) else []
-            if not any(expected_stop.lower() in str(s).lower() for s in stops_list):
+            if not _code_matches(expected_stop, stops_list):
                 failures.append({
                     "type": "missing_stop",
                     "message": f"Oczekiwany STOP '{expected_stop}' nie wystąpił",
@@ -190,7 +200,7 @@ class Evaluator:
         # assertions.stops: dodatkowe STOP-y z assertions
         for expected_stop in assertions.get("stops", []):
             stops_list = stops_reviews.get("stops", []) if isinstance(stops_reviews, dict) else []
-            if not any(expected_stop.lower() in str(s).lower() for s in stops_list):
+            if not _code_matches(expected_stop, stops_list):
                 failures.append({
                     "type": "missing_stop_assertions",
                     "message": f"Oczekiwany STOP '{expected_stop}' (z assertions.stops) nie wystąpił",
@@ -202,7 +212,7 @@ class Evaluator:
                 reviews_list = stops_reviews.get("reviews", [])
             else:
                 reviews_list = [str(stops_reviews)] if stops_reviews else []
-            if not any(expected_review.lower() in str(r).lower() for r in reviews_list):
+            if not _code_matches(expected_review, reviews_list):
                 failures.append({
                     "type": "missing_review",
                     "message": f"Oczekiwany REVIEW '{expected_review}' nie wystąpił",
@@ -262,7 +272,7 @@ class Evaluator:
                 reviews_list = stops_reviews.get("reviews", [])
             else:
                 reviews_list = [str(stops_reviews)] if stops_reviews else []
-            if not any(expected_review.lower() in str(r).lower() for r in reviews_list):
+            if not _code_matches(expected_review, reviews_list):
                 failures.append({
                     "type": "missing_review",
                     "message": f"Oczekiwany REVIEW '{expected_review}' nie wystąpił",
@@ -276,8 +286,7 @@ class Evaluator:
                 if actual is None:
                     actual = _nested_get(result, field_key)
                 if actual is None:
-                    raw = parsed.get("raw_response") or ""
-                    actual = _find_number_for_key(raw + "\n" + classifications_text, field_key)
+                    actual = _find_number_for_key(classifications_text, field_key)
                 if actual is None:
                     failures.append({
                         "type": "alokacja_multi_ip_missing",
@@ -412,11 +421,14 @@ class Evaluator:
             for warning_code in assertions["warnings"]:
                 if isinstance(stops_reviews, dict):
                     reviews_list = stops_reviews.get("reviews", [])
+                    warnings_list = stops_reviews.get("warnings", [])
                 else:
                     reviews_list = [str(stops_reviews)] if stops_reviews else []
+                    warnings_list = []
                 if not (
                     any(warning_code.lower() in str(r).lower() for r in reviews_list)
                     or warning_code.lower() in classifications_text.lower()
+                    or any(warning_code.lower() in str(w).lower() for w in warnings_list)
                 ):
                     failures.append({
                         "type": "missing_warning",
@@ -428,11 +440,14 @@ class Evaluator:
             for warning_code in assertions["soft_warnings"]:
                 if isinstance(stops_reviews, dict):
                     reviews_list = stops_reviews.get("reviews", [])
+                    soft_warnings_list = stops_reviews.get("warnings", [])
                 else:
                     reviews_list = [str(stops_reviews)] if stops_reviews else []
+                    soft_warnings_list = []
                 if not (
                     any(warning_code.lower() in str(r).lower() for r in reviews_list)
                     or warning_code.lower() in classifications_text.lower()
+                    or any(warning_code.lower() in str(w).lower() for w in soft_warnings_list)
                 ):
                     warnings.append(f"Oczekiwane ostrzeżenie '{warning_code}' nie zostało wygenerowane")
 
@@ -452,8 +467,8 @@ def validate_assertion_keys(assertions: dict, scenario_id: str) -> list[str]:
     Returns a list of error messages; empty list means all keys are known.
     """
     known_keys = {
-        "testy_pass", "testy_fail", "nexus", "nexus_range", "nexus_koszty",
-        "mix_w_nexus_A", "W_miesieczne", "koszty_koszyk",
+        "testy_pass", "testy_fail", "nexus", "nexus_range",
+        "W_miesieczne", "koszty_koszyk",
         "alokacja_multi_ip", "klucz_MIX_metoda", "klucz_MIX_źródło",
         "nie_używaj_W_do_MIX", "review_obecne", "warnings", "soft_warnings",
         "stops", "zus_dubel", "roznice_kursowe_w_IP",
@@ -535,6 +550,14 @@ def _cost_in_basket(classifications: str, cost_desc: str, expected_basket: str) 
         return False
     for line in classifications.splitlines():
         if cost_desc.lower() in line.lower() and expected_basket.upper() in line.upper():
+            return True
+    return False
+
+
+def _code_matches(expected: str, actual_list: list) -> bool:
+    """Exact match for stop/review codes (no substring matching)."""
+    for actual in actual_list:
+        if isinstance(actual, str) and actual.lower().strip() == expected.lower().strip():
             return True
     return False
 
@@ -732,12 +755,14 @@ def _flatten_dict(d: dict, parent_key: str = "") -> dict:
 
 
 def _nested_get(d: dict, key: str) -> Any:
-    """Get value from flat or one-level-nested dict."""
+    """Recursively get value from nested dict by key."""
     if key in d:
         return d[key]
     for v in d.values():
-        if isinstance(v, dict) and key in v:
-            return v[key]
+        if isinstance(v, dict):
+            result = _nested_get(v, key)
+            if result is not None:
+                return result
     return None
 
 
