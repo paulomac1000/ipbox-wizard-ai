@@ -1,5 +1,6 @@
 import pytest
-from python_helper.ipbox_calculator import aggregate_nexus_costs, CostItem, nexus_classify
+
+from python_helper.ipbox_calculator import CostItem, aggregate_nexus_costs, nexus_classify
 
 
 class TestNexusClassification:

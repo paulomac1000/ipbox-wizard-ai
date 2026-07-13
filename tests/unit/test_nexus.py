@@ -1,5 +1,7 @@
 import pytest
+
 from python_helper.ipbox_calculator import calculate_nexus
+
 
 class TestNexus:
     """Testy współczynnika NEXUS (Faza 7.3)."""

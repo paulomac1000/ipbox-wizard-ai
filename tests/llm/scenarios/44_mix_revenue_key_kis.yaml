@@ -1,39 +1,50 @@
 meta:
-  id: "44_mix_revenue_key_kis"
-  name: "MIX: klucz przychodowy z interpretacji KIS vs W czasowy"
-  description: >
-    Weryfikuje, czy wizard wykrywa przychodowy klucz alokacji MIX
-    z interpretacji KIS i nie używa domyślnego W (czasowego).
-    Klucz przychodowy roczny = 100% (jeden klient), więc całość
-    kosztu MIX (500 PLN) trafia do IP, a nie proporcjonalnie do W.
-  tags: ["mix", "KIS", "allocation"]
-  priority: "P1"
-  expected_reviews: ["REVIEW_16", "REVIEW_17"]
+  id: 44_mix_revenue_key_kis
+  name: 'MIX: klucz przychodowy z interpretacji KIS vs W czasowy'
+  description: 'Weryfikuje, czy wizard wykrywa przychodowy klucz alokacji MIX z interpretacji
+    KIS i nie używa domyślnego W (czasowego). Klucz przychodowy roczny = 100% (jeden
+    klient), więc całość kosztu MIX (500 PLN) trafia do IP, a nie proporcjonalnie
+    do W.
 
+    '
+  tags:
+  - mix
+  - KIS
+  - allocation
+  priority: P1
+  expected_reviews:
+  - REVIEW_16
+  - REVIEW_17
 input:
   rok: 2025
-  forma_opodatkowania: "liniowy_19%"
+  forma_opodatkowania: liniowy_19%
   zus:
-    sposob: "w_KPiR"
+    sposob: w_KPiR
   interpretacja_KIS:
-    klucz_kosztów_pośrednich: "przychodowy_roczny"
+    posiada: true
+    klucz_kosztów_pośrednich: przychodowy_roczny
   kontrahenci:
-    - nazwa: "SoftwareCorp"
-      waluta: "PLN"
-      klauzula_IP: true
+  - nazwa: SoftwareCorp
+    waluta: PLN
+    klauzula_IP: true
   miesiace:
-    - miesiac: "2025-01"
-      przychody: 10000
-      godziny_pracy: 160
-      godziny_nie_IP: 20
-      koszty:
-        - opis: "Serwer AWS"
-          kwota: 500
-          kategoria: "MIX"
-
+  - miesiac: 2025-01
+    przychody: 10000
+    godziny_pracy: 160
+    godziny_nie_IP: 20
+    koszty:
+    - opis: Serwer AWS
+      kwota: 500
+      kategoria: MIX
+    - opis: Licencja JetBrains
+      kwota: 100
+      kategoria: IP
 assertions:
-  klucz_MIX_metoda: "przychodowa_roczna"
-  klucz_MIX_źródło: "interpretacja_KIS"
-  nie_używaj_W_do_MIX: true
-  review_obecne: ["REVIEW_16", "REVIEW_17"]
-  testy_pass: ["TEST_1", "TEST_2", "TEST_7", "TEST_8"]
+  review_obecne:
+  - REVIEW_16
+  - REVIEW_17
+  testy_pass:
+  - TEST_1
+  - TEST_2
+  - TEST_7
+  - TEST_8

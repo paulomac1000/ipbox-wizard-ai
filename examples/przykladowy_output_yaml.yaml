@@ -32,6 +32,30 @@ koszty_roczne:
   NIE: 3210.85
   WYKLUCZONE: 0.00                   # kary, ST >10k, etc.
 
+polityka_alokacji:
+  źródło: "interpretacja_KIS"
+  opis: "Stosowanie przychodowego rocznego klucza alokacji dla kosztów pośrednich MIX zgodnie z interpretacją KIS"
+  spójna_z_interpretacją_KIS: true
+
+klucze_alokacji_roczne:
+  przychód_IP:
+    metoda: "dokumentowa"
+    klucz_efektywny: 0.9689
+  koszty_MIX:
+    metoda: "przychodowa_roczna"
+    klucz_efektywny: 0.9689
+    przychód_IP_roczny: 181687.42
+    przychód_całkowity_roczny: 187519.52
+
+porównanie_metod:
+  metoda_użyta:
+    nazwa: "przychodowa_roczna"
+    podatek_łączny: 8430
+  metoda_alternatywna:
+    nazwa: "czasowa_W"
+    podatek_łączny: 8441
+  różnica_podatku: 11
+
 nexus:
   A: 13096.34                        # własna działalność (bez pytania o B/C/D, bo brak)
   B: 0
@@ -90,15 +114,67 @@ wynik:
   typ: "nadpłata"
 
 testy:
-  test_1_bilans_KPiR: "PASS"
+  test_1_bilans: "PASS"
   test_2_koszty_prywatne: "PASS"     # żadnych kosztów prywatnych w IP Box
   test_3_anty_dubel_ZUS: "PASS"      # ZUS w KPiR i odliczenie = 0
   test_4_kaskada: "PASS"             # kolejność + max(0, ...) + carry-over >= 0
   test_5_podatek_IP: "PASS"          # round(168591 * 0.05) = 8430
   test_6_nadpłata: "PASS"            # 35964 - 8430 = 27534
+  test_7_spójność_polityki_alokacji: "PASS"
+  test_8_dochód_IP_vs_NEXUS: "PASS"
+  test_9_porównanie_metod: "PASS"
 
 review_do_weryfikacji:
   - REVIEW_09: "Jeden kontrahent = 100% przychodów IP. Udokumentuj autonomię."
 
-# Wartości przykładowe. Dla Twojego rozliczenia kwoty będą inne.
-# Jeśli Twój output znacząco różni się od tej struktury — zgłoś jako issue.
+miesiące:
+  - miesiąc: "2025-01"
+    kontrahent:
+      nazwa: "Klient Software House Sp. z o.o."
+      NIP: "0000000000"
+    kwalifikowane_IP:
+      typ: "autorskie prawo do programu komputerowego"
+      opis: "Moduł raportowania i analityki danych w systemie CRM"
+    ewidencja_czasu:
+      godziny_pracy: 160
+      godziny_nie_IP: 8
+      procent_faktury_IP: 100
+      W: 95.00
+    przychody:
+      podstawowy_PLN: 15000.00
+      z_faktur_FX_przeliczony: 0.00
+      rozne_kursowe_do_NIE: 0.00
+      alokacja_IP: 14535.00
+      alokacja_NIE: 465.00
+    alokacja:
+      przychód:
+        metoda: "dokumentowa"
+        źródło: "domyślna_wizard"
+        klucz: 0.9690
+        uzasadnienie: "Wydzielono przychód na podstawie dokumentacji projektowej"
+      koszty_MIX:
+        metoda: "przychodowa_roczna"
+        źródło: "interpretacja_KIS"
+        klucz: null
+        uzasadnienie: "Alokacja rocznym kluczem przychodowym; odroczona do końca roku"
+    koszty:
+      IP_bezpośrednie: 1000.00
+      NIE_bezpośrednie: 200.00
+      MIX: 500.00
+      MIX_do_IP: 0.00
+      MIX_do_NIE: 0.00
+      MIX_deferred: 500.00
+      MIX_status: "DEFERRED"
+      IP_obliczone: 1000.00
+      NIE_obliczone: 200.00
+      WYKLUCZONE: 0.00
+    nexus_koszty:
+      A: 1000.00
+      B: 0.00
+      C: 0.00
+      D: 0.00
+      poza_nexus: 700.00
+    dochody:
+      IP_Box: 13535.00
+      NIE_IP: 265.00
+      status: "PROVISIONAL"

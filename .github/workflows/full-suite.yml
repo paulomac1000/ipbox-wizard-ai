@@ -9,6 +9,19 @@ on:
     - cron: "0 6 * * 1"
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install ruff
+        run: pip install ruff
+      - name: Run ruff check
+        run: ruff check .
+
   unit:
     uses: ./.github/workflows/unit-tests.yml
 
@@ -19,19 +32,34 @@ jobs:
     if: github.event_name == 'push' || github.event_name == 'pull_request'
 
   summary:
-    needs: [unit, llm]
+    needs: [lint, unit, llm]
     runs-on: ubuntu-latest
     if: always()
     steps:
-      - name: Report status
+      - name: Check all jobs passed
+        if: always()
         run: |
+          echo "Lint check:    ${{ needs.lint.result }}"
           echo "Unit tests:    ${{ needs.unit.result }}"
           echo "LLM tests:     ${{ needs.llm.result }}"
+          if [[ "${{ needs.llm.result }}" == "cancelled" ]]; then
+            echo "LLM tests were cancelled"
+            exit 1
+          fi
+          if [ "${{ needs.lint.result }}" != "success" ]; then
+            echo "::error::Linting nie przeszło!"
+            exit 1
+          fi
           if [ "${{ needs.unit.result }}" != "success" ]; then
             echo "::error::Testy jednostkowe nie przeszły!"
             exit 1
           fi
           if [ "${{ needs.llm.result }}" == "failure" ]; then
-            echo "::warning::Testy LLM nie przeszły — sprawdź artefakty."
+            echo "::error::Testy LLM nie przeszły — sprawdź artefakty."
+            exit 1
+          fi
+          if [ "${{ needs.llm.result }}" == "skipped" ] && [ "${{ github.event_name }}" != "schedule" ]; then
+            echo "::error::Testy LLM zostały pominięte (oczekiwane tylko dla schedule)."
+            exit 1
           fi
           echo "Pipeline zakończony."

@@ -1,7 +1,7 @@
 name: "LLM Scenario Tests"
 
 env:
-  GEMINI_MODEL: google/gemini-3.5-flash
+  LLM_MODEL: google/gemini-3.5-flash
 
 on:
   workflow_call:
@@ -102,8 +102,9 @@ jobs:
     if: github.event_name != 'pull_request'
 
     env:
-      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-      GEMINI_MODEL: ${{ vars.GEMINI_MODEL || 'google/gemini-3.5-flash' }}
+      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+      LLM_MODEL: ${{ vars.LLM_MODEL || 'google/gemini-3.5-flash' }}
+      LLM_PROVIDER: openrouter
       LLM_MAX_CALLS_PER_RUN: ${{ github.event.inputs.max_scenarios || '0' }}
       # VCR auto mode: use cassettes if valid, record if stale
       VCR_MODE: auto
@@ -123,11 +124,11 @@ jobs:
 
       - name: Validate API key
         run: |
-          if [ -z "$GEMINI_API_KEY" ]; then
-            echo "::error::Brak GEMINI_API_KEY — dodaj go jako GitHub Secret."
+          if [ -z "$OPENROUTER_API_KEY" ]; then
+            echo "::error::Brak OPENROUTER_API_KEY — dodaj go jako GitHub Secret."
             exit 1
           fi
-          echo "GEMINI_MODEL=${GEMINI_MODEL:-google/gemini-3.5-flash}"
+          echo "LLM_MODEL=${LLM_MODEL:-google/gemini-3.5-flash}"
 
       - name: Budget check
         run: |

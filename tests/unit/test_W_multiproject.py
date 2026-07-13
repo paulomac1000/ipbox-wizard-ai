@@ -1,5 +1,7 @@
 import pytest
+
 from python_helper.ipbox_calculator import aggregate_w_multiproject
+
 
 class TestWMultiproject:
     """Testy wieloprojektowości w jednym miesiącu."""

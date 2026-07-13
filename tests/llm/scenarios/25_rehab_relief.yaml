@@ -26,4 +26,16 @@ input:
   ulgi:
     ulga_rehabilitacyjna_dochod: 3000
 assertions:
-  nexus: 1.0
+  nexus: 0.0
+  podatek_IP_range:
+  - 0
+  - 0
+  podatek_NIE_range:
+  - 363
+  - 363
+  przychod_IP_roczny_range:
+  - 18000
+  - 18000
+  przychod_NIE_roczny_range:
+  - 2000
+  - 2000

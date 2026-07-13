@@ -1,139 +1,147 @@
 entries:
   01_basic_linear:
-    file: 01_basic_linear_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_3893459fc7f178da_87a24bb22c10fcb2_google_993fbcd8
-    recorded_at: '2026-04-20T20:40:10.827840+00:00'
+    file: 01_basic_linear.yaml
+    fingerprint: v2_be9aedbd727271f4_87a24bb22c10fcb2_openrouter_8d99798a_spc2c5afcf
+    recorded_at: '2026-07-13T01:27:34.575007+00:00'
   02_basic_scale_single_client:
-    file: 02_basic_scale_single_client_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_3893459fc7f178da_e5f529d484295bc9_google_993fbcd8
-    recorded_at: '2026-04-20T20:40:15.023008+00:00'
+    file: 02_basic_scale_single_client.yaml
+    fingerprint: v2_be9aedbd727271f4_bacdd3c059514342_openrouter_8d99798a_spc2c5afcf
+    recorded_at: '2026-07-13T01:37:56.758051+00:00'
   03_fx_usd_single_client:
-    file: 03_fx_usd_single_client_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_3893459fc7f178da_f079ae7362765116_google_993fbcd8
-    recorded_at: '2026-04-20T20:40:19.531538+00:00'
+    file: 03_fx_usd_single_client.yaml
+    fingerprint: v2_be9aedbd727271f4_f079ae7362765116_openrouter_8d99798a_spc2c5afcf
+    recorded_at: '2026-07-13T01:27:39.774022+00:00'
   11_multi_client_mixed_currencies:
-    file: 11_multi_client_mixed_currencies_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_3893459fc7f178da_16066a276e59296c_google_993fbcd8
-    recorded_at: '2026-04-20T20:40:23.587075+00:00'
+    file: 11_multi_client_mixed_currencies.yaml
+    fingerprint: v2_be9aedbd727271f4_df97b983d541cfc2_openrouter_8d99798a_spc2c5afcf
+    recorded_at: '2026-07-13T01:37:59.519624+00:00'
   12_zus_in_pit_path:
-    file: 12_zus_in_pit_path_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_3893459fc7f178da_5ebfeea019440ed8_google_993fbcd8
-    recorded_at: '2026-04-20T20:40:28.305613+00:00'
+    file: 12_zus_in_pit_path.yaml
+    fingerprint: v2_be9aedbd727271f4_8d91ae79dc84d1a4_openrouter_8d99798a_spc2c5afcf
+    recorded_at: '2026-07-13T01:38:02.449980+00:00'
   13_income_from_employment_impact:
-    file: 13_income_from_employment_impact_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_3893459fc7f178da_60539fdafcf7e025_google_993fbcd8
-    recorded_at: '2026-04-20T20:40:32.487429+00:00'
+    file: 13_income_from_employment_impact.yaml
+    fingerprint: v2_be9aedbd727271f4_60539fdafcf7e025_openrouter_8d99798a_spc2c5afcf
+    recorded_at: '2026-07-13T01:27:47.418660+00:00'
   14_lump_sum_ineligible_check:
-    file: 14_lump_sum_ineligible_check_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_3893459fc7f178da_d0241fd5bed76bcc_google_993fbcd8
-    recorded_at: '2026-04-20T20:40:35.075962+00:00'
+    file: 14_lump_sum_ineligible_check.yaml
+    fingerprint: v2_be9aedbd727271f4_00539dcd852041de_openrouter_8d99798a_spc2c5afcf
+    recorded_at: '2026-07-13T01:27:49.760637+00:00'
   15_vacation_sick_mix:
-    file: 15_vacation_sick_mix_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_3893459fc7f178da_4c00640c55ae20eb_google_993fbcd8
-    recorded_at: '2026-04-20T20:40:38.801157+00:00'
+    file: 15_vacation_sick_mix.yaml
+    fingerprint: v2_be9aedbd727271f4_78bee12c031be194_openrouter_8d99798a_spc2c5afcf
+    recorded_at: '2026-07-13T01:27:52.445604+00:00'
   16_high_w_review:
-    file: 16_high_w_review_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_3893459fc7f178da_5868ecab9223c3e4_google_993fbcd8
-    recorded_at: '2026-04-20T20:40:42.492654+00:00'
+    file: 16_high_w_review.yaml
+    fingerprint: v2_be9aedbd727271f4_5ba8a22da3302168_openrouter_8d99798a_spc2c5afcf
+    recorded_at: '2026-07-13T01:27:55.104710+00:00'
   17_low_w_review:
-    file: 17_low_w_review_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_3893459fc7f178da_0fa3ab369fb863a3_google_993fbcd8
-    recorded_at: '2026-04-20T20:40:47.259116+00:00'
+    file: 17_low_w_review.yaml
+    fingerprint: v2_be9aedbd727271f4_0fa3ab369fb863a3_openrouter_8d99798a_spc2c5afcf
+    recorded_at: '2026-07-13T01:27:57.537487+00:00'
   18_logic_zero_work_hours:
-    file: 18_logic_zero_work_hours_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_3893459fc7f178da_ffd3a5dbff0ca978_google_993fbcd8
-    recorded_at: '2026-04-20T20:40:50.985342+00:00'
+    file: 18_logic_zero_work_hours.yaml
+    fingerprint: v2_be9aedbd727271f4_ffd3a5dbff0ca978_openrouter_8d99798a_spc2c5afcf
+    recorded_at: '2026-07-13T01:28:00.617562+00:00'
   21_monthly_loss_impact:
-    file: 21_monthly_loss_impact_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_3893459fc7f178da_23f866d52e53d80e_google_993fbcd8
-    recorded_at: '2026-04-20T20:40:54.800982+00:00'
+    file: 21_monthly_loss_impact.yaml
+    fingerprint: v2_be9aedbd727271f4_ab5cef6aa837026e_openrouter_8d99798a_spc2c5afcf
+    recorded_at: '2026-07-13T01:38:06.492348+00:00'
   22_related_parties_nexus_reduction:
-    file: 22_related_parties_nexus_reduction_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_3893459fc7f178da_1a4c9b20d39f3707_google_993fbcd8
-    recorded_at: '2026-04-20T20:40:59.237603+00:00'
+    file: 22_related_parties_nexus_reduction.yaml
+    fingerprint: v2_be9aedbd727271f4_1a4c9b20d39f3707_openrouter_8d99798a_spc2c5afcf
+    recorded_at: '2026-07-13T01:28:06.106316+00:00'
   23_loss_carry_forward:
-    file: 23_loss_carry_forward_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_3893459fc7f178da_f4a71a1c5c2557a6_google_993fbcd8
-    recorded_at: '2026-04-20T20:41:03.662393+00:00'
+    file: 23_loss_carry_forward.yaml
+    fingerprint: v2_be9aedbd727271f4_b78674b2686aa11a_openrouter_8d99798a_spc2c5afcf
+    recorded_at: '2026-07-13T01:38:09.001353+00:00'
   24_donations_relief:
-    file: 24_donations_relief_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_3893459fc7f178da_fc54b8657f97d211_google_993fbcd8
-    recorded_at: '2026-04-20T20:41:07.947883+00:00'
+    file: 24_donations_relief.yaml
+    fingerprint: v2_be9aedbd727271f4_5e6b4061284b99d5_openrouter_8d99798a_spc2c5afcf
+    recorded_at: '2026-07-13T01:38:11.715267+00:00'
   25_rehab_relief:
-    file: 25_rehab_relief_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_3893459fc7f178da_8d2bc72ccf92c9cf_google_993fbcd8
-    recorded_at: '2026-04-20T20:41:12.290807+00:00'
+    file: 25_rehab_relief.yaml
+    fingerprint: v2_be9aedbd727271f4_d6806e47f244d02f_openrouter_8d99798a_spc2c5afcf
+    recorded_at: '2026-07-13T01:38:14.453593+00:00'
   26_rd_relief_nexus:
-    file: 26_rd_relief_nexus_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_3893459fc7f178da_08c8d76e72149d89_google_993fbcd8
-    recorded_at: '2026-04-20T20:41:16.819599+00:00'
+    file: 26_rd_relief_nexus.yaml
+    fingerprint: v2_be9aedbd727271f4_76eaa49236399620_openrouter_8d99798a_spc2c5afcf
+    recorded_at: '2026-07-13T01:28:17.182845+00:00'
   27_termomodernizacja_full:
-    file: 27_termomodernizacja_full_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_3893459fc7f178da_8c47b7c5211b8036_google_993fbcd8
-    recorded_at: '2026-04-20T20:41:21.358445+00:00'
+    file: 27_termomodernizacja_full.yaml
+    fingerprint: v2_be9aedbd727271f4_e258ce4782ccc393_openrouter_8d99798a_spc2c5afcf
+    recorded_at: '2026-07-13T01:38:17.196444+00:00'
   28_edge_multiple_carry-overs:
-    file: 28_edge_multiple_carry-overs_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_3893459fc7f178da_8ff6ce2d4e566e0b_google_993fbcd8
-    recorded_at: '2026-04-20T20:41:25.997809+00:00'
+    file: 28_edge_multiple_carry-overs.yaml
+    fingerprint: v2_be9aedbd727271f4_f297ed0373121baa_openrouter_8d99798a_spc2c5afcf
+    recorded_at: '2026-07-13T01:28:22.984821+00:00'
   29_edge_related_parties_nexus_0:
-    file: 29_edge_related_parties_nexus_0_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_3893459fc7f178da_fcd9003138de7965_google_993fbcd8
-    recorded_at: '2026-04-20T20:41:30.471865+00:00'
+    file: 29_edge_related_parties_nexus_0.yaml
+    fingerprint: v2_be9aedbd727271f4_701e1c0501662ba1_openrouter_8d99798a_spc2c5afcf
+    recorded_at: '2026-07-13T01:38:20.068006+00:00'
   30_edge_related_parties_nexus_mixed:
-    file: 30_edge_related_parties_nexus_mixed_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_3893459fc7f178da_ec227b329456f454_google_993fbcd8
-    recorded_at: '2026-04-20T20:41:35.210950+00:00'
+    file: 30_edge_related_parties_nexus_mixed.yaml
+    fingerprint: v2_be9aedbd727271f4_7977f315b26645dd_openrouter_8d99798a_spc2c5afcf
+    recorded_at: '2026-07-13T01:38:24.087271+00:00'
   31_zus_double_dip_fail:
-    file: 31_zus_double_dip_fail_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_3893459fc7f178da_dbc2c5a84bd73664_google_993fbcd8
-    recorded_at: '2026-04-20T20:41:39.196246+00:00'
+    file: 31_zus_double_dip_fail.yaml
+    fingerprint: v2_be9aedbd727271f4_6b357ed46dbf4d16_openrouter_8d99798a_spc2c5afcf
+    recorded_at: '2026-07-13T07:59:09.057310+00:00'
   32_private_costs_ip_fail:
-    file: 32_private_costs_ip_fail_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_3893459fc7f178da_c6f8688155417c7e_google_993fbcd8
-    recorded_at: '2026-04-20T20:41:43.193908+00:00'
+    file: 32_private_costs_ip_fail.yaml
+    fingerprint: v2_be9aedbd727271f4_c6f8688155417c7e_openrouter_8d99798a_spc2c5afcf
+    recorded_at: '2026-07-13T01:28:32.503773+00:00'
   33_kpir_balance_fail:
-    file: 33_kpir_balance_fail_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_3893459fc7f178da_0a5acbd6e237136a_google_993fbcd8
-    recorded_at: '2026-04-20T20:41:47.078231+00:00'
+    file: 33_kpir_balance_fail.yaml
+    fingerprint: v2_be9aedbd727271f4_9466b28311fc4719_openrouter_8d99798a_spc2c5afcf
+    recorded_at: '2026-07-13T01:28:35.194727+00:00'
   34_verify_fixed_asset_threshold_fail:
-    file: 34_verify_fixed_asset_threshold_fail_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_3893459fc7f178da_a315136ccf3e8a5f_google_993fbcd8
-    recorded_at: '2026-04-20T20:41:51.692086+00:00'
+    file: 34_verify_fixed_asset_threshold_fail.yaml
+    fingerprint: v2_be9aedbd727271f4_a315136ccf3e8a5f_openrouter_8d99798a_spc2c5afcf
+    recorded_at: '2026-07-13T01:28:38.585650+00:00'
   35_verify_monthly_w_jump_inconsistency:
-    file: 35_verify_monthly_w_jump_inconsistency_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_3893459fc7f178da_9862390246558a24_google_993fbcd8
-    recorded_at: '2026-04-20T20:41:55.617795+00:00'
+    file: 35_verify_monthly_w_jump_inconsistency.yaml
+    fingerprint: v2_be9aedbd727271f4_9862390246558a24_openrouter_8d99798a_spc2c5afcf
+    recorded_at: '2026-07-13T01:28:42.790166+00:00'
   36_verify_negative_income_error:
-    file: 36_verify_negative_income_error_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_3893459fc7f178da_b64a2d1f780eb1ef_google_993fbcd8
-    recorded_at: '2026-04-20T20:41:59.792715+00:00'
+    file: 36_verify_negative_income_error.yaml
+    fingerprint: v2_be9aedbd727271f4_b64a2d1f780eb1ef_openrouter_8d99798a_spc2c5afcf
+    recorded_at: '2026-07-13T01:28:46.062085+00:00'
   37_verify_invalid_tax_form_stop:
-    file: 37_verify_invalid_tax_form_stop_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_3893459fc7f178da_6ac4d61af1d0d462_google_993fbcd8
-    recorded_at: '2026-04-20T20:42:02.570293+00:00'
+    file: 37_verify_invalid_tax_form_stop.yaml
+    fingerprint: v2_be9aedbd727271f4_6ac4d61af1d0d462_openrouter_8d99798a_spc2c5afcf
+    recorded_at: '2026-07-13T01:28:48.571689+00:00'
   38_verify_missing_kpir_data:
-    file: 38_verify_missing_kpir_data_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_3893459fc7f178da_fe6c26e8dd5aea59_google_993fbcd8
-    recorded_at: '2026-04-20T20:42:06.754102+00:00'
+    file: 38_verify_missing_kpir_data.yaml
+    fingerprint: v2_be9aedbd727271f4_fe6c26e8dd5aea59_openrouter_8d99798a_spc2c5afcf
+    recorded_at: '2026-07-13T01:28:50.874401+00:00'
   39_multi_project_weighted_W:
-    file: 39_multi_project_weighted_W_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_3893459fc7f178da_73c21ec4ce094cd8_google_993fbcd8
-    recorded_at: '2026-04-20T20:42:10.926768+00:00'
+    file: 39_multi_project_weighted_W.yaml
+    fingerprint: v2_be9aedbd727271f4_73c21ec4ce094cd8_openrouter_8d99798a_spc2c5afcf
+    recorded_at: '2026-07-13T01:28:54.611616+00:00'
   40_mixed_ip_clause:
-    file: 40_mixed_ip_clause_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_3893459fc7f178da_0fe5c9314cdf26b4_google_993fbcd8
-    recorded_at: '2026-04-20T20:42:14.987076+00:00'
+    file: 40_mixed_ip_clause.yaml
+    fingerprint: v2_be9aedbd727271f4_0fe5c9314cdf26b4_openrouter_8d99798a_spc2c5afcf
+    recorded_at: '2026-07-13T01:28:58.032074+00:00'
   41_ikze_cascade:
-    file: 41_ikze_cascade_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_3893459fc7f178da_e28dbe587108877c_google_993fbcd8
-    recorded_at: '2026-04-20T20:42:18.908502+00:00'
+    file: 41_ikze_cascade.yaml
+    fingerprint: v2_be9aedbd727271f4_47ec5a162c79d761_openrouter_8d99798a_spc2c5afcf
+    recorded_at: '2026-07-13T01:38:27.075643+00:00'
   42_stop_08_no_documentation:
-    file: 42_stop_08_no_documentation_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_3893459fc7f178da_a5c0955680a3b89e_google_993fbcd8
-    recorded_at: '2026-04-20T20:42:23.556909+00:00'
+    file: 42_stop_08_no_documentation.yaml
+    fingerprint: v2_be9aedbd727271f4_4a02c1a767d9aa6c_openrouter_8d99798a_spc2c5afcf
+    recorded_at: '2026-07-13T01:38:30.103178+00:00'
   43_review_09_single_client_100pct:
-    file: 43_review_09_single_client_100pct_google_gemini_3_1_flash_lite_preview.yaml
-    fingerprint: v1_3893459fc7f178da_ed00c5790c76eb77_google_993fbcd8
-    recorded_at: '2026-04-20T20:42:28.419440+00:00'
-generated_at: '2026-04-20T20:42:28.419458+00:00'
+    file: 43_review_09_single_client_100pct.yaml
+    fingerprint: v2_be9aedbd727271f4_ed00c5790c76eb77_openrouter_8d99798a_spc2c5afcf
+    recorded_at: '2026-07-13T01:29:07.168145+00:00'
+  44_mix_revenue_key_kis:
+    file: 44_mix_revenue_key_kis.yaml
+    fingerprint: v2_be9aedbd727271f4_06be7f742249e456_openrouter_8d99798a_spc2c5afcf
+    recorded_at: '2026-07-13T01:29:10.110098+00:00'
+  45_multi_ip_two_stage:
+    file: 45_multi_ip_two_stage.yaml
+    fingerprint: v2_be9aedbd727271f4_b3d10a397b534957_openrouter_8d99798a_spc2c5afcf
+    recorded_at: '2026-07-13T01:29:13.453980+00:00'
+generated_at: '2026-07-13T07:59:09.057330+00:00'
 manifest_version: 1

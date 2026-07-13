@@ -1,29 +1,39 @@
 meta:
-  id: "21_monthly_loss_impact"
-  name: "Brzegowy: Strata w miesiącu"
-  description: "Weryfikacja czy strata miesięczna nie psuje agregacji rocznej"
-  tags: ["edge", "loss"]
-  priority: "P1"
-
+  id: 21_monthly_loss_impact
+  name: 'Brzegowy: Strata w miesiącu'
+  description: Weryfikacja czy strata miesięczna nie psuje agregacji rocznej
+  tags:
+  - edge
+  - loss
+  priority: P1
 input:
   rok: 2025
-  forma_opodatkowania: "liniowy_19%"
+  forma_opodatkowania: liniowy_19%
   zus:
-    sposob: "w_KPiR"
+    sposob: w_KPiR
   miesiace:
-    - miesiac: "2025-01"
-      przychody: 0 # Brak przychodu
-      godziny_pracy: 160
-      godziny_nie_IP: 0
-      koszty:
-        - opis: "Leasing"
-          kwota: 5000
-    - miesiac: "2025-02"
-      przychody: 20000
-      godziny_pracy: 160
-      godziny_nie_IP: 0
-      koszty: []
-
+  - miesiac: 2025-01
+    przychody: 0
+    godziny_pracy: 160
+    godziny_nie_IP: 0
+    koszty:
+    - opis: Leasing
+      kwota: 5000
+  - miesiac: 2025-02
+    przychody: 20000
+    godziny_pracy: 160
+    godziny_nie_IP: 0
+    koszty: []
 assertions:
-  testy_pass: ["TEST_4"]
-  podatek_IP_range: [700, 800] # (20000 - 5000) * 0.05 = 750
+  testy_pass:
+  - TEST_4
+  nexus: 0.0
+  podatek_IP_range:
+  - 0
+  - 0
+  przychod_IP_roczny_range:
+  - 20000
+  - 20000
+  podatek_NIE_range:
+  - 2850
+  - 2850

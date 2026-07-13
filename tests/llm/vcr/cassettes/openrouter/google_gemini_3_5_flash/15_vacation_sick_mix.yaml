@@ -1,0 +1,73 @@
+meta:
+  scenario_id: 15_vacation_sick_mix
+  scenario_name: 'Logika: Urlop + L4'
+  provider: openrouter
+  model: google/gemini-3.5-flash
+  fingerprint: v2_be9aedbd727271f4_78bee12c031be194_openrouter_8d99798a_spc2c5afcf
+  recorded_at: '2026-07-13T01:27:52.441583+00:00'
+  recording_duration_seconds: 2.65
+  prompt_tokens_estimate: 14455
+  response_tokens_estimate: 227
+  algorithm_hash: be9aedbd727271f4
+  cassette_format_version: 3
+turns:
+- role: user
+  prompt: ''
+  response: "{\n  \"result\": {\n    \"rok\": 2025,\n    \"przychody_roczne\": {\n\
+    \      \"IP\": 0.0,\n      \"NIE\": 0.0\n    },\n    \"nexus\": {\n      \"A\"\
+    : 0.0,\n      \"B\": 0.0,\n      \"C\": 0.0,\n      \"D\": 0.0,\n      \"poza_nexus\"\
+    : 0.0,\n      \"wartość\": 0.0\n    },\n    \"podatek\": {\n      \"podatek_IP\"\
+    : 0,\n      \"podatek_NIE_finalny\": 0\n    }\n  },\n  \"classifications\": [],\n\
+    \  \"monthly_W\": {\n    \"2025-01\": 90.0\n  },\n  \"tests\": {\n    \"TEST_1\"\
+    : \"PASS\",\n    \"TEST_2\": \"PASS\",\n    \"TEST_3\": \"PASS\",\n    \"TEST_4\"\
+    : \"PASS\",\n    \"TEST_5\": \"PASS\",\n    \"TEST_6\": \"PASS\",\n    \"TEST_7\"\
+    : \"FAIL\",\n    \"TEST_8\": \"PASS\",\n    \"TEST_9\": \"PASS\"\n  },\n  \"stops_reviews\"\
+    : {\n    \"stops\": [\n      \"STOP_03\",\n      \"STOP_08\",\n      \"STOP_10\"\
+    ,\n      \"STOP_11\"\n    ],\n    \"reviews\": [\n      \"REVIEW_02\",\n     \
+    \ \"REVIEW_20\"\n    ],\n    \"warnings\": [\n      \"Brak interpretacji indywidualnej\
+    \ KIS\",\n      \"Brak ewidencji przychodów i kosztów dla podanego miesiąca\"\n\
+    \    ]\n  }\n}"
+  prompt_hash: e46f2fd8ce48878f
+  request_hash: ff06a338050c5247
+  system_prompt_hash: c2c5afcf900231f7
+parsed:
+  result_yaml:
+    rok: 2025
+    przychody_roczne:
+      IP: 0.0
+      NIE: 0.0
+    nexus:
+      A: 0.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 0.0
+      wartość: 0.0
+    podatek:
+      podatek_IP: 0
+      podatek_NIE_finalny: 0
+  classifications: []
+  monthly_W:
+    2025-01: 90.0
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+    TEST_3: PASS
+    TEST_4: PASS
+    TEST_5: PASS
+    TEST_6: PASS
+    TEST_7: FAIL
+    TEST_8: PASS
+    TEST_9: PASS
+  stops_reviews:
+    stops:
+    - STOP_03
+    - STOP_08
+    - STOP_10
+    - STOP_11
+    reviews:
+    - REVIEW_02
+    - REVIEW_20
+    warnings:
+    - Brak interpretacji indywidualnej KIS
+    - Brak ewidencji przychodów i kosztów dla podanego miesiąca

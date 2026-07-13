@@ -28,4 +28,6 @@ input:
   ulgi:
     ulga_BR: 10000
 assertions:
-  nexus: 1.0
+  nexus: 0.0
+  podatek_IP_range: [0, 0]
+  przychod_IP_roczny_range: [20000, 20000]

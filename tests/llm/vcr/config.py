@@ -37,13 +37,12 @@ class VCRConfig:
 
     def __init__(self):
         self.mode = VCRMode(environ.get("VCR_MODE", "auto"))
-        self.cassettes_dir = Path(
+        self.cassettes_root = Path(
             environ.get(
-                "VCR_CASSETTES_DIR",
+                "VCR_CASSETTES_ROOT",
                 str(Path(__file__).parent / "cassettes"),
             )
         )
-        self.manifest_path = self.cassettes_dir / "_manifest.yaml"
 
         # Staleness threshold in days (0 = never stale)
         self.max_age_days = int(environ.get("VCR_MAX_AGE_DAYS", "30"))
@@ -54,8 +53,8 @@ class VCRConfig:
         ).lower() == "true"
 
         # LLM provider configuration
-        self.provider = environ.get("LLM_PROVIDER", "google")
-        self.model = environ.get("GEMINI_MODEL", "google/gemma-4-31b-it")
+        self.provider = environ.get("LLM_PROVIDER", "openrouter")
+        self.model = environ.get("LLM_MODEL") or environ.get("GEMINI_MODEL") or "google/gemini-3.5-flash"
 
     @property
     def is_playback(self) -> bool:
@@ -80,10 +79,11 @@ class VCRConfig:
 
     def cassette_path(self, scenario_id: str) -> Path:
         """Get path to cassette for a given scenario."""
-        # Include provider and model in filename for multi-provider support
         model_slug = self._model_slug()
-        filename = f"{scenario_id}_{self.provider}_{model_slug}.yaml"
-        return self.cassettes_dir / filename
+        model_dir = self.cassettes_root / self.provider / model_slug
+        model_dir.mkdir(parents=True, exist_ok=True)
+        filename = f"{scenario_id}.yaml"
+        return model_dir / filename
 
     def _model_slug(self) -> str:
         """Create filesystem-safe model identifier."""
@@ -98,6 +98,6 @@ class VCRConfig:
     def __repr__(self) -> str:
         return (
             f"VCRConfig(mode={self.mode.value}, "
-            f"cassettes={self.cassettes_dir}, "
+            f"cassettes={self.cassettes_root}, "
             f"max_age={self.max_age_days}d)"
         )

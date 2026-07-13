@@ -1,0 +1,66 @@
+meta:
+  scenario_id: 33_kpir_balance_fail
+  scenario_name: 'Weryfikacja: Bilans KPiR (FAIL)'
+  provider: openrouter
+  model: google/gemini-3.5-flash
+  fingerprint: v2_be9aedbd727271f4_9466b28311fc4719_openrouter_8d99798a_spc2c5afcf
+  recorded_at: '2026-07-13T01:28:35.191056+00:00'
+  recording_duration_seconds: 2.67
+  prompt_tokens_estimate: 14461
+  response_tokens_estimate: 217
+  algorithm_hash: be9aedbd727271f4
+  cassette_format_version: 3
+turns:
+- role: user
+  prompt: ''
+  response: "{\n  \"result\": {\n    \"rok\": 2025,\n    \"przychody_roczne\": {\n\
+    \      \"IP\": 90000.0,\n      \"NIE\": 10000.0\n    },\n    \"nexus\": {\n  \
+    \    \"A\": 0.0,\n      \"B\": 0.0,\n      \"C\": 0.0,\n      \"D\": 0.0,\n  \
+    \    \"poza_nexus\": 50000.0,\n      \"wartość\": 0.0\n    },\n    \"podatek\"\
+    : {\n      \"podatek_IP\": 0,\n      \"podatek_NIE_finalny\": 0\n    }\n  },\n\
+    \  \"classifications\": [\n    {\n      \"opis\": \"Koszty ogólne z KPiR (MIX)\"\
+    ,\n      \"basket\": \"MIX\",\n      \"nexus_basket\": \"poza_nexus\",\n     \
+    \ \"nexus_amount\": 0.0\n    }\n  ],\n  \"monthly_W\": {\n    \"2025-01\": 90.0\n\
+    \  },\n  \"tests\": {\n    \"TEST_1\": \"PASS\",\n    \"TEST_2\": \"PASS\"\n \
+    \ },\n  \"stops_reviews\": {\n    \"stops\": [\n      \"STOP_11\"\n    ],\n  \
+    \  \"reviews\": [\n      \"REVIEW_03\",\n      \"REVIEW_20\"\n    ],\n    \"warnings\"\
+    : [\n      \"Brak interpretacji indywidualnej KIS\",\n      \"Wskaźnik NEXUS wynosi\
+    \ 0 z powodu braku kosztów kwalifikowanych B+R\"\n    ]\n  }\n}\n}"
+  prompt_hash: 01dff82ea89bc7e8
+  request_hash: 5e0118fac7e4e614
+  system_prompt_hash: c2c5afcf900231f7
+parsed:
+  result_yaml:
+    rok: 2025
+    przychody_roczne:
+      IP: 90000.0
+      NIE: 10000.0
+    nexus:
+      A: 0.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 50000.0
+      wartość: 0.0
+    podatek:
+      podatek_IP: 0
+      podatek_NIE_finalny: 0
+  classifications:
+  - opis: Koszty ogólne z KPiR (MIX)
+    basket: MIX
+    nexus_basket: poza_nexus
+    nexus_amount: 0.0
+  monthly_W:
+    2025-01: 90.0
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+  stops_reviews:
+    stops:
+    - STOP_11
+    reviews:
+    - REVIEW_03
+    - REVIEW_20
+    warnings:
+    - Brak interpretacji indywidualnej KIS
+    - Wskaźnik NEXUS wynosi 0 z powodu braku kosztów kwalifikowanych B+R

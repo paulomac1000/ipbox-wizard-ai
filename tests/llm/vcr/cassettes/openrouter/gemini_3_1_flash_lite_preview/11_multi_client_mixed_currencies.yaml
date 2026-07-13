@@ -1,0 +1,60 @@
+meta:
+  scenario_id: 11_multi_client_mixed_currencies
+  scenario_name: 'Logika: 2 klientów (PLN + EUR)'
+  provider: openrouter
+  model: gemini-3.1-flash-lite-preview
+  fingerprint: v2_be9aedbd727271f4_52d9b76323beb3e9_openrouter_993fbcd8_spc2c5afcf
+  recorded_at: '2026-07-13T01:18:05.300575+00:00'
+  recording_duration_seconds: 1.54
+  prompt_tokens_estimate: 14556
+  response_tokens_estimate: 225
+  algorithm_hash: be9aedbd727271f4
+  cassette_format_version: 3
+turns:
+- role: user
+  prompt: ''
+  response: "{\n  \"result\": {\n    \"rok\": 2025,\n    \"przychody_roczne\": {\n      \"IP\": 0.0,\n      \"NIE\": 0.0\n\
+    \    },\n    \"nexus\": {\n      \"A\": 0.0,\n      \"B\": 0.0,\n      \"C\": 0.0,\n      \"D\": 0.0,\n      \"poza_nexus\"\
+    : 0.0,\n      \"wartość\": 0.0\n    },\n    \"podatek\": {\n      \"podatek_IP\": 0,\n      \"podatek_NIE_finalny\": 0\n\
+    \    }\n  },\n  \"classifications\": [\n    {\n      \"opis\": \"Brak danych o kosztach w KPiR\",\n      \"basket\": \"\
+    MIX\",\n      \"nexus_basket\": \"poza_nexus\",\n      \"nexus_amount\": 0.0\n    }\n  ],\n  \"monthly_W\": {\n    \"\
+    2025-01\": 100.0\n  },\n  \"stops_reviews\": {\n    \"stops\": [],\n    \"reviews\": [\n      \"REVIEW_20: Brak interpretacji\
+    \ KIS, zastosowano domyślną politykę\",\n      \"REVIEW_04: Miesiąc wieloprojektowy, wymagana szczegółowa ewidencja\"\n\
+    \    ],\n    \"warnings\": [\n      \"Brak danych o kosztach KPiR uniemożliwia obliczenie dochodu IP\"\n    ]\n  },\n\
+    \  \"tests\": {\n    \"TEST_1\": \"FAIL\",\n    \"TEST_2\": \"PASS\"\n  }\n}"
+  prompt_hash: f0a7387c6ee12697
+  request_hash: f52970df1e09a557
+  system_prompt_hash: c2c5afcf900231f7
+parsed:
+  result_yaml:
+    rok: 2025
+    przychody_roczne:
+      IP: 0.0
+      NIE: 0.0
+    nexus:
+      A: 0.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 0.0
+      wartość: 0.0
+    podatek:
+      podatek_IP: 0
+      podatek_NIE_finalny: 0
+  classifications:
+  - opis: Brak danych o kosztach w KPiR
+    basket: MIX
+    nexus_basket: poza_nexus
+    nexus_amount: 0.0
+  monthly_W:
+    2025-01: 100.0
+  tests:
+    TEST_1: FAIL
+    TEST_2: PASS
+  stops_reviews:
+    stops: []
+    reviews:
+    - 'REVIEW_20: Brak interpretacji KIS, zastosowano domyślną politykę'
+    - 'REVIEW_04: Miesiąc wieloprojektowy, wymagana szczegółowa ewidencja'
+    warnings:
+    - Brak danych o kosztach KPiR uniemożliwia obliczenie dochodu IP

@@ -1,0 +1,61 @@
+meta:
+  scenario_id: 12_zus_in_pit_path
+  scenario_name: 'Logika: ZUS odliczany w PIT'
+  provider: openrouter
+  model: gemini-3.1-flash-lite-preview
+  fingerprint: v2_be9aedbd727271f4_12556cfde687502c_openrouter_993fbcd8_spc2c5afcf
+  recorded_at: '2026-07-13T01:18:06.751796+00:00'
+  recording_duration_seconds: 1.42
+  prompt_tokens_estimate: 14502
+  response_tokens_estimate: 216
+  algorithm_hash: be9aedbd727271f4
+  cassette_format_version: 3
+turns:
+- role: user
+  prompt: ''
+  response: "{\n  \"result\": {\n    \"rok\": 2025,\n    \"przychody_roczne\": {\n      \"IP\": 180000.0,\n      \"NIE\":\
+    \ 0.0\n    },\n    \"nexus\": {\n      \"A\": 0.0,\n      \"B\": 0.0,\n      \"C\": 0.0,\n      \"D\": 0.0,\n      \"\
+    poza_nexus\": 0.0,\n      \"wartość\": 0.0\n    },\n    \"podatek\": {\n      \"podatek_IP\": 0,\n      \"podatek_NIE_finalny\"\
+    : 0\n    }\n  },\n  \"classifications\": [\n    {\n      \"opis\": \"Brak kosztów kwalifikowanych w NEXUS A\",\n     \
+    \ \"basket\": \"IP\",\n      \"nexus_basket\": \"poza_nexus\",\n      \"nexus_amount\": 0.0\n    }\n  ],\n  \"monthly_W\"\
+    : {\n    \"2025-01\": 100.0\n  },\n  \"tests\": {\n    \"TEST_1\": \"PASS\",\n    \"TEST_2\": \"PASS\"\n  },\n  \"stops_reviews\"\
+    : {\n    \"stops\": [],\n    \"reviews\": [\n      \"REVIEW_20\",\n      \"REVIEW_09\"\n    ],\n    \"warnings\": [\n\
+    \      \"NEXUS value is 0.0 due to lack of documented B+R costs (A, B, C, D). IP Box benefit cannot be applied without\
+    \ qualifying costs.\"\n    ]\n  }\n}"
+  prompt_hash: 5afc9a40d00ce0da
+  request_hash: dda023e78472e0ee
+  system_prompt_hash: c2c5afcf900231f7
+parsed:
+  result_yaml:
+    rok: 2025
+    przychody_roczne:
+      IP: 180000.0
+      NIE: 0.0
+    nexus:
+      A: 0.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 0.0
+      wartość: 0.0
+    podatek:
+      podatek_IP: 0
+      podatek_NIE_finalny: 0
+  classifications:
+  - opis: Brak kosztów kwalifikowanych w NEXUS A
+    basket: IP
+    nexus_basket: poza_nexus
+    nexus_amount: 0.0
+  monthly_W:
+    2025-01: 100.0
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+  stops_reviews:
+    stops: []
+    reviews:
+    - REVIEW_20
+    - REVIEW_09
+    warnings:
+    - NEXUS value is 0.0 due to lack of documented B+R costs (A, B, C, D). IP Box benefit cannot be applied without qualifying
+      costs.

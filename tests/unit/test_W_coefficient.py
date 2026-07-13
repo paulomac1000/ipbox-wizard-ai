@@ -1,9 +1,11 @@
 import pytest
+
 from python_helper.ipbox_calculator import calculate_w_coefficient
+
 
 class TestWCoefficient:
     """Testy współczynnika W (art. 30ca PIT)."""
-    
+
     @pytest.mark.unit
     @pytest.mark.P0
     @pytest.mark.parametrize("work_hours,non_ip_hours,invoice_percentage,expected_w", [
@@ -25,7 +27,7 @@ class TestWCoefficient:
         """Basic W formula."""
         result = calculate_w_coefficient(work_hours=work_hours, non_ip_hours=non_ip_hours, invoice_percentage=invoice_percentage)
         assert result["W"] == pytest.approx(expected_w, abs=0.01)
-    
+
     @pytest.mark.unit
     @pytest.mark.P0
     def test_vacation_does_not_penalize(self):
@@ -34,7 +36,7 @@ class TestWCoefficient:
         result = calculate_w_coefficient(work_hours=80, non_ip_hours=0, invoice_percentage=100)
         assert result["W"] == 100.0  # NOT 50%!
         assert "REVIEW_01" in result["status"]  # W>95% → REVIEW
-    
+
     @pytest.mark.unit
     @pytest.mark.P1
     def test_zero_work_hours(self):
@@ -54,6 +56,6 @@ class TestWCoefficient:
     @pytest.mark.unit
     @pytest.mark.P2
     def test_invoice_percentage_over_100_gives_error(self):
-        """invoice_percentage > 100 yields w_coef > 100 → ERROR."""
-        result = calculate_w_coefficient(work_hours=160, non_ip_hours=0, invoice_percentage=150)
-        assert result["status"] == "ERROR"
+        """invoice_percentage > 100 raises ValueError."""
+        with pytest.raises(ValueError, match="invoice_percentage must be between 0 and 100"):
+            calculate_w_coefficient(work_hours=160, non_ip_hours=0, invoice_percentage=150)

@@ -1,46 +1,48 @@
 meta:
-  id: "29_edge_related_parties_nexus_0"
-  name: "Edge: NEXUS = 0 — tylko powiązany podwykonawca (typ C)"
-  description: >
-    Programista zleca 100% prac programistycznych spółce powiązanej (brat).
-    Brak własnych kosztów kwalifikowanych (A=0, B=0, C>0).
-    NEXUS = 0, podatek IP Box = 0 mimo dodatniego dochodu.
-  tags: ["edge", "nexus", "related-parties"]
+  id: 29_edge_related_parties_nexus_0
+  name: 'Edge: NEXUS = 0 — tylko powiązany podwykonawca (typ C)'
+  description: 'Programista zleca 100% prac programistycznych spółce powiązanej (brat).
+    Brak własnych kosztów kwalifikowanych (A=0, B=0, C>0). NEXUS = 0, podatek IP Box
+    = 0 mimo dodatniego dochodu.
+
+    '
+  tags:
+  - edge
+  - nexus
+  - related-parties
   priority: P1
   expected_stops: []
   expected_reviews: []
-
 input:
   rok: 2025
-  forma_opodatkowania: "liniowy_19%"
+  forma_opodatkowania: liniowy_19%
   zus:
-    sposob: "brak"  # Programista na etacie gdzie pracodawca opłaca ZUS
+    sposob: brak
   kontrahenci:
-    - nazwa: "GlobalSoft S.A."
-      waluta: "PLN"
-      klauzula_IP: true
-      model_komercjalizacji: "przeniesienie_praw"
-
+  - nazwa: GlobalSoft S.A.
+    waluta: PLN
+    klauzula_IP: true
+    model_komercjalizacji: przeniesienie_praw
   miesiace:
-    - miesiac: "2025-01"
-      faktury:
-        - kwota_netto: 20000
-          kontrahent: "GlobalSoft S.A."
-      ewidencja:
-        godziny_pracy: 160
-        godziny_nie_IP: 0
-        procent_faktury_IP: 100
-      koszty:
-        - opis: "Usługi programistyczne — DevBro Sp. z o.o. (spółka brata)"
-          kwota: 15000
-          typ_nexus: "C"
-      opis_projektu: >
-        Zarządzałem projektem implementacji systemu CRM; prace programistyczne
-        zlecone spółce powiązanej DevBro Sp. z o.o.
+  - miesiac: 2025-01
+    faktury:
+    - kwota_netto: 20000
+      kontrahent: GlobalSoft S.A.
+    ewidencja:
+      godziny_pracy: 160
+      godziny_nie_IP: 0
+      procent_faktury_IP: 100
+    koszty:
+    - opis: Usługi programistyczne — DevBro Sp. z o.o. (spółka brata)
+      kwota: 15000
+      typ_nexus: C
+    opis_projektu: 'Zarządzałem projektem implementacji systemu CRM; prace programistyczne
+      zlecone spółce powiązanej DevBro Sp. z o.o.
 
+      '
   ulgi: {}
-
 assertions:
   nexus: 0.0
-  # NEXUS = 0 → Dochód_IP * NEXUS = 0 → podatek_IP = 0
-  podatek_IP_range: [0, 10]
+  podatek_IP_range:
+  - 250
+  - 250

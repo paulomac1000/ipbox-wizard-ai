@@ -6,7 +6,7 @@ significantly reducing API costs and enabling deterministic testing.
 
 Usage:
     from tests.llm.vcr import VCRRecorder, VCRConfig, VCRMode
-    
+
     recorder = VCRRecorder(VCRConfig())
     response = recorder.get_or_record(
         scenario_id="01_basic_linear",
@@ -16,17 +16,17 @@ Usage:
     )
 """
 
+from .cassette import Cassette, CassetteManifest
 from .config import VCRConfig, VCRMode
 from .fingerprint import compute_fingerprint, fingerprint_changed
-from .cassette import Cassette, CassetteManifest
 from .recorder import VCRRecorder
 
 __all__ = [
-    "VCRConfig",
-    "VCRMode",
-    "compute_fingerprint",
-    "fingerprint_changed",
     "Cassette",
     "CassetteManifest",
+    "VCRConfig",
+    "VCRMode",
     "VCRRecorder",
+    "compute_fingerprint",
+    "fingerprint_changed",
 ]

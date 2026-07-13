@@ -37,6 +37,22 @@
 
 ---
 
+## 🔌 Obsługiwani providerzy i modele AI
+
+System korzysta z **OpenRouter** jako głównego proxy API, co pozwala na wybór spośród wielu modeli bez zmiany kodu:
+
+| Provider | Zmienna środowiskowa | Przykładowy model |
+|---|---|---|
+| **OpenRouter** (rekomendowany) | `OPENROUTER_API_KEY` + `LLM_MODEL` (lub `GEMINI_MODEL`) | `google/gemini-3.5-flash` |
+| **Google Gemini** (direct) | `GEMINI_API_KEY` + `GEMINI_MODEL` | `gemini-3.1-flash-lite-preview` |
+
+Domyślny model: `google/gemini-3.5-flash` przez OpenRouter.
+
+> [!NOTE]
+> `LLM_PROVIDER` i `LLM_MODEL` są preferowanymi zmiennymi. `GEMINI_MODEL` i `GEMINI_API_KEY` pozostają jako aliasy dla kompatybilności wstecznej.
+
+---
+
 ## Dla kogo
 
 | Profil | Pasuje? |
@@ -169,7 +185,7 @@ Algorytm ewoluował poprzez dziesiątki iteracji testowych, uwzględniając najc
 - **Współczynnik W**: Wykorzystanie faktycznego czasu pracy jako dzielnika (brak kary za urlop).
 - **Weryfikacja matematyczna**: Wprowadzenie 6 testów kontrolnych (szanty/balance check).
 
-Każda zmiana w algorytmie jest weryfikowana przez system testów LLM. Wykorzystujemy mechanizm **VCR (Virtual Cassette Recorder)**, który nagrywa odpowiedzi modeli Gemini i porównuje je z oczekiwanymi wynikami (NEXUS, podatek, klasyfikacje). Obecnie posiadamy bazę **34 scenariuszy testowych**, co gwarantuje stabilność algorytmu nawet przy zmianach w modelach AI.
+Każda zmiana w algorytmie jest weryfikowana przez system testów LLM. Wykorzystujemy mechanizm **VCR (Virtual Cassette Recorder)**, który nagrywa odpowiedzi modeli AI (przez OpenRouter lub bezpośrednio Gemini) i porównuje je z oczekiwanymi wynikami (NEXUS, podatek, klasyfikacje). Obecnie posiadamy bazę **36 scenariuszy testowych**, co gwarantuje stabilność algorytmu nawet przy zmianach w modelach AI.
 
 ### Orzecznictwo
 

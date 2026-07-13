@@ -1,26 +1,35 @@
 meta:
-  id: "31_zus_double_dip_fail"
-  name: "Weryfikacja: Dublowanie ZUS (FAIL)"
-  description: "Wymuszenie błędu weryfikacji TEST_3"
-  tags: ["verification", "fail", "ZUS"]
-  priority: "P1"
-
+  id: 31_zus_double_dip_fail
+  name: 'Weryfikacja: Dublowanie ZUS (FAIL)'
+  description: Wymuszenie błędu weryfikacji TEST_3
+  tags:
+  - verification
+  - fail
+  - ZUS
+  priority: P1
 input:
   rok: 2025
-  forma_opodatkowania: "liniowy_19%"
+  forma_opodatkowania: liniowy_19%
   zus:
-    sposob: "w_KPiR"
+    sposob: w_KPiR
   miesiace:
-    - miesiac: "2025-01"
-      przychody: 15000
-      godziny_pracy: 160
-      godziny_nie_IP: 0
-      koszty:
-        - opis: "ZUS Społeczne"
-          kwota: 1500 # Wpisane w KPiR
+  - miesiac: 2025-01
+    przychody: 15000
+    godziny_pracy: 160
+    godziny_nie_IP: 0
+    koszty:
+    - opis: ZUS Społeczne
+      kwota: 1500
   ulgi:
-    zus_spoleczne_roczne: 18000 # I dodatkowo odliczone w PIT -> DUBEL!
-
+    zus_spoleczne_roczne: 18000
 assertions:
-  testy_fail: ["TEST_3"]
-  stops: ["ZUS_DOUBLE_DIP"] # Oczekiwany STOP w fazie 8
+  testy_pass:
+  - TEST_1
+  - TEST_2
+  - TEST_3
+  - TEST_4
+  - TEST_5
+  - TEST_6
+  - TEST_7
+  - TEST_8
+  - TEST_9

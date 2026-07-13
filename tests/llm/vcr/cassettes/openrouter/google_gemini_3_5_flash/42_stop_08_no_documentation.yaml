@@ -1,0 +1,72 @@
+meta:
+  scenario_id: 42_stop_08_no_documentation
+  scenario_name: 'STOP_08: 100% IP deklarowane, brak ewidencji godzin'
+  provider: openrouter
+  model: google/gemini-3.5-flash
+  fingerprint: v2_be9aedbd727271f4_4a02c1a767d9aa6c_openrouter_8d99798a_spc2c5afcf
+  recorded_at: '2026-07-13T01:38:30.097573+00:00'
+  recording_duration_seconds: 3.0
+  prompt_tokens_estimate: 14573
+  response_tokens_estimate: 275
+  algorithm_hash: be9aedbd727271f4
+  cassette_format_version: 3
+turns:
+- role: user
+  prompt: ''
+  response: "{\n  \"result\": {\n    \"rok\": 2025,\n    \"przychody_roczne\": {\n      \"IP\": 20000.00,\n      \"NIE\":\
+    \ 0.00\n    },\n    \"nexus\": {\n      \"A\": 0.00,\n      \"B\": 0.00,\n      \"C\": 0.00,\n      \"D\": 0.00,\n   \
+    \   \"poza_nexus\": 1418.48,\n      \"wartość\": 0.00\n    },\n    \"podatek\": {\n      \"podatek_IP\": 1000,\n     \
+    \ \"podatek_NIE_finalny\": 0\n    }\n  },\n  \"classifications\": [\n    {\n      \"opis\": \"Składki ZUS społeczne\"\
+    ,\n      \"basket\": \"MIX\",\n      \"nexus_basket\": \"poza_nexus\",\n      \"nexus_amount\": 1418.48\n    }\n  ],\n\
+    \  \"monthly_W\": {\n    \"2025-01\": 0.00\n  },\n  \"tests\": {\n    \"TEST_1\": \"PASS\",\n    \"TEST_2\": \"PASS\"\
+    ,\n    \"TEST_3\": \"PASS\",\n    \"TEST_4\": \"PASS\",\n    \"TEST_5\": \"PASS\",\n    \"TEST_6\": \"PASS\",\n    \"\
+    TEST_7\": \"PASS\",\n    \"TEST_8\": \"PASS\",\n    \"TEST_9\": \"PASS\"\n  },\n  \"stops_reviews\": {\n    \"stops\"\
+    : [\n      \"STOP_04\"\n    ],\n    \"reviews\": [\n      \"REVIEW_03\",\n      \"REVIEW_09\",\n      \"REVIEW_20\"\n\
+    \    ],\n    \"warnings\": [\n      \"Brak godzin pracy w ewidencji czasu pracy uniemożliwia prawidłowe wyliczenie współczynnika\
+    \ W (W = 0.00%). Miesiąc 2025-01 podlega wykluczeniu z ulgi IP Box (STOP_04).\"\n    ]\n  }\n}"
+  prompt_hash: 3d976432308c6b49
+  request_hash: 2575be625affde32
+  system_prompt_hash: c2c5afcf900231f7
+parsed:
+  result_yaml:
+    rok: 2025
+    przychody_roczne:
+      IP: 20000.0
+      NIE: 0.0
+    nexus:
+      A: 0.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 1418.48
+      wartość: 0.0
+    podatek:
+      podatek_IP: 1000
+      podatek_NIE_finalny: 0
+  classifications:
+  - opis: Składki ZUS społeczne
+    basket: MIX
+    nexus_basket: poza_nexus
+    nexus_amount: 1418.48
+  monthly_W:
+    2025-01: 0.0
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+    TEST_3: PASS
+    TEST_4: PASS
+    TEST_5: PASS
+    TEST_6: PASS
+    TEST_7: PASS
+    TEST_8: PASS
+    TEST_9: PASS
+  stops_reviews:
+    stops:
+    - STOP_04
+    reviews:
+    - REVIEW_03
+    - REVIEW_09
+    - REVIEW_20
+    warnings:
+    - Brak godzin pracy w ewidencji czasu pracy uniemożliwia prawidłowe wyliczenie współczynnika W (W = 0.00%). Miesiąc 2025-01
+      podlega wykluczeniu z ulgi IP Box (STOP_04).

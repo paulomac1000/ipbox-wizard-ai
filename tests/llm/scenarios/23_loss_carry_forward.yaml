@@ -27,3 +27,12 @@ input:
     straty_poprzednie: 50000
 assertions:
   nexus: 1.0
+  podatek_IP_range:
+  - 996
+  - 996
+  przychod_IP_roczny_range:
+  - 20000
+  - 20000
+  przychod_NIE_roczny_range:
+  - 0
+  - 0

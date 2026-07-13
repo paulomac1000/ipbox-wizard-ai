@@ -29,28 +29,32 @@ def discover_scenarios() -> list:
         # Mark basic scenarios as smoke
         if path.name.startswith("01_") or path.name.startswith("02_"):
             marks.append(pytest.mark.smoke)
-        
+
         params.append(pytest.param(f, marks=marks, id=path.stem))
-    
+
     return params
 
 
 @pytest.fixture(scope="session")
 def llm_client(request):
     is_vs_code = request.config.pluginmanager.has_plugin("vscode_pytest") or os.getenv("TERM_PROGRAM") == "vscode"
-    
+
     if not request.config.getoption("--run-llm") and not is_vs_code:
         pytest.skip("Skipped LLM tests — run with flag --run-llm")
-    
+
     vcr_mode = request.config.getoption("--vcr-mode") or os.getenv("VCR_MODE") or "auto"
-    
+
+    # Reset VCR singleton between mode changes
+    from .runner import _reset_vcr
+    _reset_vcr()
+
     # In playback mode we don't need the real API key
     if vcr_mode == "playback":
-        return LLMClient()
+        return LLMClient(require_api_key=False)
 
-    api_key = os.getenv("GEMINI_API_KEY")
+    api_key = os.getenv("OPENROUTER_API_KEY") or os.getenv("GEMINI_API_KEY")
     if not api_key:
-        pytest.fail("GEMINI_API_KEY not set — required for LLM tests in non-playback mode")
+        pytest.fail("OPENROUTER_API_KEY or GEMINI_API_KEY not set — required for LLM tests in non-playback mode")
     return LLMClient()
 
 

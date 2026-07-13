@@ -16,6 +16,7 @@ from collections.abc import Callable
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
+from ..request_spec import LLMRequestSpec
 from .cassette import Cassette, CassetteManifest, CassetteMeta, CassetteTurn
 from .config import VCRConfig
 from .fingerprint import (
@@ -31,7 +32,7 @@ class VCRRecorder:
 
     def __init__(self, config: VCRConfig):
         self.config = config
-        self.manifest = CassetteManifest.load(config.manifest_path)
+        self.manifest = CassetteManifest.load(config.cassettes_root / "_manifest.yaml")
         self._stats = {
             "playback_hits": 0,
             "recordings": 0,
@@ -71,7 +72,7 @@ class VCRRecorder:
             scenario_path=scenario_path,
             provider=self.config.provider,
             model=self.config.model,
-            system_prompt="",
+            system_prompt=system_prompt,
         )
 
         cassette_path = self.config.cassette_path(scenario_id)
@@ -190,6 +191,29 @@ class VCRRecorder:
                     f"Run in record mode to update the cassette."
                 )
 
+        # Check request_hash (v3+ cassettes require it)
+        stored_request_hash = cassette.turns[0].request_hash if cassette.turns else ""
+        if not stored_request_hash:
+            raise ValueError(
+                f"Cassette {scenario_id} has no request_hash (format version < 3). "
+                f"Re-record with cassette_format_version=3."
+            )
+        current_spec = LLMRequestSpec(
+            provider=self.config.provider,
+            model=self.config.model,
+            system_prompt=system_prompt,
+            user_prompt=prompt,
+            temperature=0.0,
+            max_tokens=16000,
+        )
+        current_request_hash = current_spec.compute_hash()
+        if stored_request_hash != current_request_hash:
+            raise ValueError(
+                f"Request hash mismatch for '{scenario_id}': "
+                f"stored={stored_request_hash}, current={current_request_hash}. "
+                f"This indicates the full request specification has changed."
+            )
+
         self._stats["playback_hits"] += 1
         recorded_date = cassette.meta.recorded_at[:10]
         print(f"  ▶️  Playback: {scenario_id} (recorded: {recorded_date})")
@@ -227,8 +251,15 @@ class VCRRecorder:
         prompt_hash = hashlib.sha256(
             prompt.encode("utf-8")
         ).hexdigest()[:16]
-        request_payload = f"{system_prompt}\0{prompt}" if system_prompt else prompt
-        request_hash = hashlib.sha256(request_payload.encode("utf-8")).hexdigest()[:16]
+        spec = LLMRequestSpec(
+            provider=self.config.provider,
+            model=self.config.model,
+            system_prompt=system_prompt,
+            user_prompt=prompt,
+            temperature=0.0,
+            max_tokens=16000,
+        )
+        request_hash = spec.compute_hash()
         system_prompt_hash = hashlib.sha256(system_prompt.encode("utf-8")).hexdigest()[:16] if system_prompt else ""
 
         turn = CassetteTurn(
@@ -279,7 +310,7 @@ class VCRRecorder:
             fingerprint=fingerprint,
             filename=cassette_path.name,
         )
-        self.manifest.save(self.config.manifest_path)
+        self.manifest.save(self.config.cassettes_root / "_manifest.yaml")
 
         self._stats["recordings"] += 1
         print(f"  💾 Saved: {cassette_path.name} ({duration:.1f}s)")

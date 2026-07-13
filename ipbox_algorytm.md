@@ -130,13 +130,13 @@ Poproś o przesłanie:
 | Kontrahent: klient końcowy / agencja IT / body leasing | — | agencja = REVIEW (sprawdź back-to-back) |
 
 **Z KPiR wywnioskuj:**
-- Forma opodatkowania (liniowy / skala; jeśli ryczałt — **STOP**, IP Box nie łączy się z ryczałtem ewidencjonowanym).
+- Forma opodatkowania (liniowy / skala; jeśli ryczałt — **STOP_12**, IP Box nie łączy się z ryczałtem ewidencjonowanym).
 
 ## 0.3 Pytania weryfikacyjne (tylko jeśli brak danych w dokumentach)
 
 | # | Pytanie | STOP gdy |
 |---|---|---|
-| 0.1 | Forma opodatkowania? (liniowy 19% PIT-36L / skala 12–32% PIT-36 / ryczałt) | ryczałt = STOP |
+| 0.1 | Forma opodatkowania? (liniowy 19% PIT-36L / skala 12–32% PIT-36 / ryczałt) | ryczałt = STOP_12 |
 | 0.2 | Czy tworzysz nowe rozwiązania (algorytmy, architektury), czy tylko implementujesz gotowe specyfikacje? | tylko implementacja = STOP |
 | 0.3 | Czy efektem Twojej pracy są programy komputerowe? | NIE = STOP |
 | 0.4 | Czy jesteś twórcą, czy nabywasz prawa od kogoś? | nabywam = dodatkowa walidacja |
@@ -554,10 +554,10 @@ Jeśli użytkownik ma interpretację KIS — stosuj katalog z interpretacji. Dom
 ```
 Przychód_podstawowy  = Σ(kwoty netto faktur PLN + faktury walutowe przeliczone na PLN)
 
-Przychód_IP   = Przychód_podstawowy × Klucz_przychodu_IP
-Przychód_NIE  = Przychód_podstawowy × (1 − Klucz_przychodu_IP)
+Przychód_IP   = Przychód_podstawowy × Klucz_Przychodu_IP
+Przychód_NIE  = Przychód_podstawowy × (1 − Klucz_Przychodu_IP)
 
-gdzie Klucz_przychodu_IP pochodzi z Fazy 2A.3:
+gdzie Klucz_Przychodu_IP pochodzi z Fazy 2A.3:
 - dokumentowy (z umowy/faktury): użyj wartości z dokumentu,
 - produktowy/SaaS: wydziel support, maintenance, wdrożenia jako NIE,
 - czasowy W: użyj W/100 tylko jeśli Phase 2A jawnie ustaliła revenue_method="czasowa_W" na podstawie ewidencji czasu i braku dokumentowego rozdziału przychodu,
@@ -689,6 +689,7 @@ Dla każdego miesiąca opis jest akceptowalny, gdy:
 | STOP_09 | Brak jakichkolwiek dowodów (zero commitów/ticketów) przez 3+ miesiące z rzędu |
 | STOP_10 | Brak możliwości ustalenia przychodu IP/NIE żadną obiektywną metodą |
 | STOP_11 | Brak ewidencji pozwalającej ustalić przychody, koszty i dochód/stratę przypadające na kwalifikowane IP |
+| STOP_12 | Nieobsługiwana forma opodatkowania (np. ryczałt) |
 
 ## REVIEW — wpisz, ale odnotuj i monitoruj
 
@@ -962,7 +963,7 @@ Zaokrąglenia do pełnych zł zgodne z zasadami PIT
 ## TEST 7 — spójność polityki alokacji
 
 ```
-- Każdy przychód ma zdefiniowaną metodę alokacji (Klucz_przychodu_IP).
+- Każdy przychód ma zdefiniowaną metodę alokacji (Klucz_Przychodu_IP).
 - Każdy koszt MIX ma zdefiniowany Klucz_MIX.
 - Klucz_MIX ≠ W, chyba że metoda = "czasowa_W" i ma uzasadnienie.
 - Jeśli interpretacja KIS wskazuje metodę → wynik używa tej metody (FAIL jeśli nie).

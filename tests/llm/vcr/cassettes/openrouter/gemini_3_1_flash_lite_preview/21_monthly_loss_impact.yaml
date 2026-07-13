@@ -1,0 +1,60 @@
+meta:
+  scenario_id: 21_monthly_loss_impact
+  scenario_name: 'Brzegowy: Strata w miesiącu'
+  provider: openrouter
+  model: gemini-3.1-flash-lite-preview
+  fingerprint: v2_be9aedbd727271f4_cb760f8192564a6e_openrouter_993fbcd8_spc2c5afcf
+  recorded_at: '2026-07-13T01:18:16.052485+00:00'
+  recording_duration_seconds: 1.35
+  prompt_tokens_estimate: 14507
+  response_tokens_estimate: 200
+  algorithm_hash: be9aedbd727271f4
+  cassette_format_version: 3
+turns:
+- role: user
+  prompt: ''
+  response: "{\n  \"result\": {\n    \"rok\": 2025,\n    \"przychody_roczne\": {\n      \"IP\": 20000.0,\n      \"NIE\": 0.0\n\
+    \    },\n    \"nexus\": {\n      \"A\": 0.0,\n      \"B\": 0.0,\n      \"C\": 0.0,\n      \"D\": 0.0,\n      \"poza_nexus\"\
+    : 5000.0,\n      \"wartość\": 0.0\n    },\n    \"podatek\": {\n      \"podatek_IP\": 0,\n      \"podatek_NIE_finalny\"\
+    : 0\n    }\n  },\n  \"classifications\": [\n    {\n      \"opis\": \"Leasing\",\n      \"basket\": \"MIX\",\n      \"\
+    nexus_basket\": \"poza_nexus\",\n      \"nexus_amount\": 0.0\n    }\n  ],\n  \"monthly_W\": {\n    \"2025-01\": 100.0,\n\
+    \    \"2025-02\": 100.0\n  },\n  \"tests\": {\n    \"TEST_1\": \"PASS\",\n    \"TEST_2\": \"PASS\"\n  },\n  \"stops_reviews\"\
+    : {\n    \"stops\": [\n      \"STOP_08\"\n    ],\n    \"reviews\": [\n      \"REVIEW_20\"\n    ],\n    \"warnings\": [\n\
+    \      \"Brak kosztów kwalifikowanych w NEXUS A przy dodatnim przychodzie IP\"\n    ]\n  }\n}"
+  prompt_hash: c7c46ca29c881664
+  request_hash: d887ec26f2e8986b
+  system_prompt_hash: c2c5afcf900231f7
+parsed:
+  result_yaml:
+    rok: 2025
+    przychody_roczne:
+      IP: 20000.0
+      NIE: 0.0
+    nexus:
+      A: 0.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 5000.0
+      wartość: 0.0
+    podatek:
+      podatek_IP: 0
+      podatek_NIE_finalny: 0
+  classifications:
+  - opis: Leasing
+    basket: MIX
+    nexus_basket: poza_nexus
+    nexus_amount: 0.0
+  monthly_W:
+    2025-01: 100.0
+    2025-02: 100.0
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+  stops_reviews:
+    stops:
+    - STOP_08
+    reviews:
+    - REVIEW_20
+    warnings:
+    - Brak kosztów kwalifikowanych w NEXUS A przy dodatnim przychodzie IP

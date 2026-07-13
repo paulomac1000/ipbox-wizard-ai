@@ -1,0 +1,64 @@
+meta:
+  scenario_id: 13_income_from_employment_impact
+  scenario_name: 'Logika: Dochody z UoP'
+  provider: openrouter
+  model: google/gemini-3.5-flash
+  fingerprint: v2_be9aedbd727271f4_60539fdafcf7e025_openrouter_8d99798a_spc2c5afcf
+  recorded_at: '2026-07-13T01:27:47.414756+00:00'
+  recording_duration_seconds: 2.79
+  prompt_tokens_estimate: 14465
+  response_tokens_estimate: 219
+  algorithm_hash: be9aedbd727271f4
+  cassette_format_version: 3
+turns:
+- role: user
+  prompt: ''
+  response: "{\n  \"result\": {\n    \"rok\": 2025,\n    \"przychody_roczne\": {\n      \"IP\": 0.0,\n      \"NIE\": 50000.0\n\
+    \    },\n    \"nexus\": {\n      \"A\": 0.0,\n      \"B\": 0.0,\n      \"C\": 0.0,\n      \"D\": 0.0,\n      \"poza_nexus\"\
+    : 0.0,\n      \"wartość\": 0.0\n    },\n    \"podatek\": {\n      \"podatek_IP\": 0,\n      \"podatek_NIE_finalny\": 18800\n\
+    \    }\n  },\n  \"classifications\": [],\n  \"monthly_W\": {\n    \"2025-01\": 0.0\n  },\n  \"tests\": {\n    \"TEST_1\"\
+    : \"PASS\",\n    \"TEST_2\": \"PASS\",\n    \"TEST_3\": \"PASS\",\n    \"TEST_4\": \"PASS\",\n    \"TEST_5\": \"PASS\"\
+    ,\n    \"TEST_6\": \"PASS\",\n    \"TEST_7\": \"PASS\",\n    \"TEST_8\": \"PASS\",\n    \"TEST_9\": \"PASS\"\n  },\n \
+    \ \"stops_reviews\": {\n    \"stops\": [\n      \"STOP_04\",\n      \"STOP_08\"\n    ],\n    \"reviews\": [\n      \"\
+    REVIEW_20\"\n    ],\n    \"warnings\": [\n      \"Brak ewidencji czasu pracy i godzin B+R skutkuje zerowym współczynnikiem\
+    \ W i brakiem kwalifikacji przychodu do IP Box.\"\n    ]\n  }\n}"
+  prompt_hash: 43b9520d5c361c2c
+  request_hash: a30a2fb8c4de401b
+  system_prompt_hash: c2c5afcf900231f7
+parsed:
+  result_yaml:
+    rok: 2025
+    przychody_roczne:
+      IP: 0.0
+      NIE: 50000.0
+    nexus:
+      A: 0.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 0.0
+      wartość: 0.0
+    podatek:
+      podatek_IP: 0
+      podatek_NIE_finalny: 18800
+  classifications: []
+  monthly_W:
+    2025-01: 0.0
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+    TEST_3: PASS
+    TEST_4: PASS
+    TEST_5: PASS
+    TEST_6: PASS
+    TEST_7: PASS
+    TEST_8: PASS
+    TEST_9: PASS
+  stops_reviews:
+    stops:
+    - STOP_04
+    - STOP_08
+    reviews:
+    - REVIEW_20
+    warnings:
+    - Brak ewidencji czasu pracy i godzin B+R skutkuje zerowym współczynnikiem W i brakiem kwalifikacji przychodu do IP Box.

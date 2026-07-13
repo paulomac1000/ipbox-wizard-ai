@@ -1,0 +1,61 @@
+meta:
+  scenario_id: 27_termomodernizacja_full
+  scenario_name: 'Brzegowy: Termomodernizacja — pełna pula'
+  provider: openrouter
+  model: gemini-3.1-flash-lite-preview
+  fingerprint: v2_be9aedbd727271f4_78531bdbb8d7d54b_openrouter_993fbcd8_spc2c5afcf
+  recorded_at: '2026-07-13T01:18:25.168326+00:00'
+  recording_duration_seconds: 1.42
+  prompt_tokens_estimate: 14522
+  response_tokens_estimate: 209
+  algorithm_hash: be9aedbd727271f4
+  cassette_format_version: 3
+turns:
+- role: user
+  prompt: ''
+  response: "{\n  \"result\": {\n    \"rok\": 2025,\n    \"przychody_roczne\": {\n      \"IP\": 240000.0,\n      \"NIE\":\
+    \ 0.0\n    },\n    \"nexus\": {\n      \"A\": 0.0,\n      \"B\": 0.0,\n      \"C\": 0.0,\n      \"D\": 0.0,\n      \"\
+    poza_nexus\": 1068.0,\n      \"wartość\": 0.0\n    },\n    \"podatek\": {\n      \"podatek_IP\": 0,\n      \"podatek_NIE_finalny\"\
+    : 45477\n    }\n  },\n  \"classifications\": [\n    {\n      \"opis\": \"Abonament internet\",\n      \"basket\": \"MIX\"\
+    ,\n      \"nexus_basket\": \"poza_nexus\",\n      \"nexus_amount\": 0.0\n    }\n  ],\n  \"monthly_W\": {\n    \"2025-01\"\
+    : 90.0\n  },\n  \"tests\": {\n    \"TEST_1\": \"PASS\",\n    \"TEST_2\": \"PASS\"\n  },\n  \"stops_reviews\": {\n    \"\
+    stops\": [],\n    \"reviews\": [\n      \"REVIEW_20\",\n      \"REVIEW_09\"\n    ],\n    \"warnings\": [\n      \"Brak\
+    \ interpretacji KIS - stosuję domyślną politykę\",\n      \"Brak kosztów w NEXUS A przy dodatnim dochodzie IP\"\n    ]\n\
+    \  }\n}"
+  prompt_hash: 5af1baabe751bbc5
+  request_hash: 272ae3317fd5e6e4
+  system_prompt_hash: c2c5afcf900231f7
+parsed:
+  result_yaml:
+    rok: 2025
+    przychody_roczne:
+      IP: 240000.0
+      NIE: 0.0
+    nexus:
+      A: 0.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 1068.0
+      wartość: 0.0
+    podatek:
+      podatek_IP: 0
+      podatek_NIE_finalny: 45477
+  classifications:
+  - opis: Abonament internet
+    basket: MIX
+    nexus_basket: poza_nexus
+    nexus_amount: 0.0
+  monthly_W:
+    2025-01: 90.0
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+  stops_reviews:
+    stops: []
+    reviews:
+    - REVIEW_20
+    - REVIEW_09
+    warnings:
+    - Brak interpretacji KIS - stosuję domyślną politykę
+    - Brak kosztów w NEXUS A przy dodatnim dochodzie IP

@@ -51,7 +51,27 @@ class LLMTestRunner:
         self.algorithm_path = algorithm_path
 
     def build_prompt(self, algorithm: str, scenario: dict) -> str:
+        import json as _json
+
         input_yaml = yaml.dump(scenario.get("input", {}), allow_unicode=True)
+        json_example = _json.dumps(
+            {
+                "result": {
+                    "rok": 2025,
+                    "przychody_roczne": {"IP": 0.0, "NIE": 0.0},
+                    "nexus": {"A": 0.0, "B": 0.0, "C": 0.0, "D": 0.0, "poza_nexus": 0.0, "wartość": 0.0},
+                    "podatek": {"podatek_IP": 0, "podatek_NIE_finalny": 0},
+                },
+                "classifications": [
+                    {"opis": "example", "basket": "IP", "nexus_basket": "A", "nexus_amount": 0.0},
+                ],
+                "monthly_W": {"2025-01": 90.0},
+                "tests": {"TEST_1": "PASS", "TEST_2": "FAIL"},
+                "stops_reviews": {"stops": [], "reviews": [], "warnings": []},
+            },
+            indent=2,
+            ensure_ascii=False,
+        )
         return f"""Jesteś agentem AI wykonującym algorytm IP Box w trybie BATCH.
 
 ALGORYTM:
@@ -61,28 +81,11 @@ DANE WEJŚCIOWE:
 {input_yaml}
 
 WYMAGANY FORMAT ODPOWIEDZI:
-Wykonaj wszystkie fazy algorytmu (0-10) i zwróć wyniki w poniższych tagach.
+Zwróć wyłącznie czysty JSON zgodny z poniższym schematem.
+Bez żadnych tagów, znaczników XML, formatowania Markdown, bold, tabel, ani tekstu przed/po JSON.
+Klucze po polsku, liczby jako liczby.
 
-<result>
-# Pełny YAML z Fazy 10.2 - raport roczny z kluczami po polsku
-</result>
-
-<classifications>
-# Lista pozycji KPiR: opis -> koszyk (IP / MIX / NIE / WYKLUCZONE)
-</classifications>
-
-<monthly_W>
-# Tabela: miesiąc -> współczynnik W (np. 2025-01: 90.48)
-</monthly_W>
-
-<tests>
-# Wyniki testów weryfikacyjnych: TEST_1: PASS/FAIL, TEST_2: PASS/FAIL, itd.
-</tests>
-
-<stops_reviews>
-stops: []
-reviews: []
-</stops_reviews>
+{json_example}
 """
 
     def run_scenario(self, scenario_path: str) -> dict:
@@ -133,6 +136,31 @@ reviews: []
         }
 
     def _extract_tags(self, text: str) -> dict[str, Any]:
+        """Parse response — try JSON first (structured output), fallback to XML tags."""
+        import json
+
+        # Try strict JSON first
+        try:
+            data = json.loads(text)
+            if isinstance(data, dict) and "result" in data:
+                return data
+        except (json.JSONDecodeError, ValueError):
+            pass
+
+        # Fallback: find first { and try progressively shorter suffixes
+        start = text.find("{")
+        if start >= 0:
+            end = text.rfind("}")
+            while end > start:
+                try:
+                    data = json.loads(text[start : end + 1])
+                    if isinstance(data, dict) and "result" in data:
+                        return data
+                except (json.JSONDecodeError, ValueError):
+                    pass
+                end = text.rfind("}", 0, end)
+
+        # Fallback: original regex tag extraction
         extracted: dict[str, Any] = {}
         for tag in TAGS:
             match = re.search(rf"<{tag}>(.*?)</{tag}>", text, re.DOTALL)

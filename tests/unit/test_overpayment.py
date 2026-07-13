@@ -1,5 +1,7 @@
 import pytest
+
 from python_helper.ipbox_calculator import calculate_overpayment_or_underpayment
+
 
 class TestOverpayment:
     """Testy obliczania nadpłaty/dopłaty (Faza 7.4)."""

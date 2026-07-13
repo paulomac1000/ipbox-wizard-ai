@@ -1,5 +1,7 @@
 import pytest
-from python_helper.ipbox_calculator import classify_cost, CostItem
+
+from python_helper.ipbox_calculator import CostItem, classify_cost
+
 
 class TestCostClassification:
     """Testy klasyfikacji kosztów (Faza 3)."""
@@ -60,7 +62,7 @@ class TestCostClassification:
         item1 = CostItem(description="ZUS społeczne", amount=1000)
         res1 = classify_cost(item1, social_security_in_kpir=True, health_insurance_in_kpir=True)
         assert res1.basket == "MIX"
-        
+
         # Path B: Social Security in PIT
         item2 = CostItem(description="ZUS społeczne", amount=1000)
         res2 = classify_cost(item2, social_security_in_kpir=False, health_insurance_in_kpir=True)

@@ -30,3 +30,9 @@ input:
     ikze: 9388.8
 assertions:
   nexus: 1.0
+  podatek_IP_range:
+  - 1000
+  - 1000
+  przychod_IP_roczny_range:
+  - 20000
+  - 20000

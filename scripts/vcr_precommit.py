@@ -18,7 +18,7 @@ from tests.llm.vcr import CassetteManifest, VCRConfig, compute_fingerprint
 def check_vcr_freshness() -> int:
     """Check if cassettes are fresh. Returns 0 if OK, 1 if stale."""
     config = VCRConfig()
-    manifest = CassetteManifest.load(config.manifest_path)
+    manifest = CassetteManifest.load(config.cassettes_root / "_manifest.yaml")
 
     scenarios_dir = Path("tests/llm/scenarios")
     Path("ipbox_algorytm.md")

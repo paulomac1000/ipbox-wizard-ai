@@ -9,6 +9,37 @@ class Evaluator:
     def __init__(self, scenario: dict[str, Any]):
         self.scenario = scenario
 
+    @staticmethod
+    def _normalize_tests(tests: Any) -> str:
+        if isinstance(tests, str):
+            return tests
+        if isinstance(tests, dict):
+            return "\n".join(f"{k}: {v}" for k, v in tests.items())
+        return str(tests) if tests else ""
+
+    @staticmethod
+    def _normalize_classifications(classifications: Any) -> str:
+        if isinstance(classifications, str):
+            return classifications
+        if isinstance(classifications, list):
+            lines = []
+            for item in classifications:
+                if isinstance(item, dict):
+                    parts = [f"{k}: {v}" for k, v in item.items()]
+                    lines.append(" | ".join(parts))
+                else:
+                    lines.append(str(item))
+            return "\n".join(lines)
+        return str(classifications) if classifications else ""
+
+    @staticmethod
+    def _normalize_monthly_w(monthly_w: Any) -> str:
+        if isinstance(monthly_w, str):
+            return monthly_w
+        if isinstance(monthly_w, dict):
+            return "\n".join(f"{k}: {v}" for k, v in monthly_w.items())
+        return str(monthly_w) if monthly_w else ""
+
     def evaluate(self, parsed: dict[str, Any]) -> tuple[list[dict], list[str]]:
         """Return (failures, warnings). failures = HARD/RANGE errors, warnings = SOFT."""
         failures: list[dict] = []
@@ -25,11 +56,70 @@ class Evaluator:
 
         stops_reviews = parsed.get("stops_reviews") or {}
 
+        raw_tests = parsed.get("tests") or ""
+        raw_classifications = parsed.get("classifications") or ""
+        raw_monthly_w = parsed.get("monthly_W") or ""
+        tests_text = self._normalize_tests(raw_tests)
+        classifications_text = self._normalize_classifications(raw_classifications)
+        monthly_w_text = self._normalize_monthly_w(raw_monthly_w)
+
+        # --- Per-section validation ---
+        needs_result = any(k in assertions for k in (
+            "nexus", "nexus_range", "podatek_IP_range", "podatek_NIE_range",
+            "przychod_IP_roczny_range", "przychod_NIE_roczny_range",
+            "alokacja_multi_ip", "klucz_MIX_metoda", "klucz_MIX_źródło",
+        ))
+        needs_monthly_w = "W_miesieczne" in assertions
+        needs_tests = bool(assertions.get("testy_pass") or assertions.get("testy_fail"))
+        needs_stops_reviews = any(k in assertions for k in (
+            "stops", "review_obecne", "warnings", "soft_warnings",
+        )) or bool(self.scenario.get("meta", {}).get("expected_stops")
+                  or self.scenario.get("meta", {}).get("expected_reviews"))
+        needs_classifications = any(k in assertions for k in (
+            "koszty_koszyk", "nie_używaj_W_do_MIX",
+        )) or assertions.get("roznice_kursowe_w_IP") is False
+
+        if needs_result and not result:
+            failures.append({
+                "type": "section_missing_result",
+                "message": "Brak sekcji <result>, a scenariusz wymaga danych wynikowych",
+            })
+        if needs_monthly_w and not raw_monthly_w:
+            failures.append({
+                "type": "section_missing_monthly_w",
+                "message": "Brak sekcji <monthly_W>, a scenariusz wymaga W_miesieczne",
+            })
+        if needs_tests and not tests_text:
+            failures.append({
+                "type": "section_missing_tests",
+                "message": "Brak sekcji <tests>, a scenariusz wymaga weryfikacji testów",
+            })
+        if needs_stops_reviews and not stops_reviews:
+            failures.append({
+                "type": "section_missing_stops_reviews",
+                "message": "Brak sekcji <stops_reviews>, a scenariusz wymaga STOP/REVIEW",
+            })
+        if needs_classifications and not raw_classifications:
+            # Only fail if the assertion actually needs to check something
+            if assertions.get("koszty_koszyk") or (assertions.get("roznice_kursowe_w_IP") is False and not result):
+                failures.append({
+                    "type": "section_missing_classifications",
+                    "message": "Brak sekcji <classifications>, a scenariusz wymaga klasyfikacji kosztów",
+                })
+
+        # --- Validate assertion keys ---
+        scenario_id = self.scenario.get("meta", {}).get("id", "unknown")
+        key_errors = validate_assertion_keys(assertions, scenario_id)
+        for err in key_errors:
+            failures.append({
+                "type": "unknown_assertion_key",
+                "message": err,
+            })
+
         # --- HARD checks ---
 
         # zus_dubel: TEST_3 musi być PASS gdy zus_dubel=False
         if assertions.get("zus_dubel") is False:
-            tests_text = parsed.get("tests") or ""
             if _test_failed(tests_text, "TEST_3") or _test_failed(tests_text, "TEST 3"):
                 failures.append({
                     "type": "zus_double_dip",
@@ -38,17 +128,51 @@ class Evaluator:
 
         # testy_pass: każdy wymieniony test musi być PASS
         for test_id in assertions.get("testy_pass", []):
-            tests_text = parsed.get("tests") or ""
-            if _test_failed(tests_text, test_id):
+            if not tests_text:
+                failures.append({
+                    "type": f"test_missing_{test_id}",
+                    "message": f"Blok <tests> jest pusty lub brak wyników testów, a oczekiwano {test_id}",
+                })
+            elif not _test_passed(tests_text, test_id):
                 failures.append({
                     "type": f"test_fail_{test_id}",
-                    "message": f"{test_id} powinien być PASS, ale jest FAIL",
+                    "message": f"{test_id} powinien być PASS, ale jest FAIL lub brak jawnego PASS",
+                })
+
+        # testy_fail: każdy wymieniony test musi być FAIL
+        for test_id in assertions.get("testy_fail", []):
+            if not tests_text:
+                failures.append({
+                    "type": f"test_fail_missing_tests_{test_id}",
+                    "message": f"Brak bloku <tests>, a oczekiwano FAIL dla {test_id}",
+                })
+            elif _test_failed(tests_text, test_id):
+                pass  # success — test is FAIL as expected
+            elif _test_passed(tests_text, test_id):
+                failures.append({
+                    "type": f"test_fail_unexpected_pass_{test_id}",
+                    "message": f"{test_id} powinien być FAIL, a jest PASS",
+                })
+            else:
+                failures.append({
+                    "type": f"test_fail_missing_{test_id}",
+                    "message": f"{test_id} powinien być FAIL, ale nie występuje w <tests>",
+                })
+
+        # --- Unexpected FAIL: every TEST_n FAIL not in testy_fail → error ---
+        fail_ids = assertions.get("testy_fail", [])
+        fail_ids_normalized = {normalize_test_key(fid) for fid in fail_ids}
+        tests_map = _parse_tests_map(tests_text)
+        for test_id_norm, status in tests_map.items():
+            if status == "FAIL" and test_id_norm not in fail_ids_normalized:
+                failures.append({
+                    "type": f"unexpected_fail_{test_id_norm}",
+                    "message": f"{test_id_norm} jest FAIL, ale nie ma go w testy_fail — możliwy błąd algorytmu",
                 })
 
         # roznice_kursowe_w_IP: różnice kursowe nie mogą trafić do koszyka IP
         if assertions.get("roznice_kursowe_w_IP") is False:
-            classifications = parsed.get("classifications") or ""
-            if _fx_diff_in_ip(classifications):
+            if _fx_diff_in_ip(classifications_text):
                 failures.append({
                     "type": "fx_diff_in_ip",
                     "message": "Różnice kursowe trafiły do koszyka IP — powinny być w NIE",
@@ -61,6 +185,15 @@ class Evaluator:
                 failures.append({
                     "type": "missing_stop",
                     "message": f"Oczekiwany STOP '{expected_stop}' nie wystąpił",
+                })
+
+        # assertions.stops: dodatkowe STOP-y z assertions
+        for expected_stop in assertions.get("stops", []):
+            stops_list = stops_reviews.get("stops", []) if isinstance(stops_reviews, dict) else []
+            if not any(expected_stop.lower() in str(s).lower() for s in stops_list):
+                failures.append({
+                    "type": "missing_stop_assertions",
+                    "message": f"Oczekiwany STOP '{expected_stop}' (z assertions.stops) nie wystąpił",
                 })
 
         # expected_reviews: wszystkie oczekiwane REVIEW muszą się pojawić
@@ -115,8 +248,7 @@ class Evaluator:
                 m = str(actual_method).strip().lower()
                 if "czasow" in m and ("w" in m.replace("_", "").replace("-", "") or "w_" in m):
                     w_used = True
-            classifications = parsed.get("classifications") or ""
-            if _w_used_for_mix(classifications):
+            if _w_used_for_mix(classifications_text):
                 w_used = True
             if w_used:
                 failures.append({
@@ -139,7 +271,6 @@ class Evaluator:
         # alokacja_multi_ip: sprawdzenie wartości alokacji dwustopniowej
         alokacja_multi = assertions.get("alokacja_multi_ip", {})
         if alokacja_multi:
-            classifications_text = parsed.get("classifications") or ""
             for field_key, expected_value in alokacja_multi.items():
                 actual = _find_value(result, [field_key, f"alokacja_{field_key}", f"multi_ip_{field_key}"])
                 if actual is None:
@@ -147,7 +278,12 @@ class Evaluator:
                 if actual is None:
                     raw = parsed.get("raw_response") or ""
                     actual = _find_number_for_key(raw + "\n" + classifications_text, field_key)
-                if actual is not None:
+                if actual is None:
+                    failures.append({
+                        "type": "alokacja_multi_ip_missing",
+                        "message": f"alokacja_multi_ip.{field_key}: nie znaleziono wartości w wyniku",
+                    })
+                else:
                     try:
                         if abs(float(actual) - float(expected_value)) > 0.5:
                             failures.append({
@@ -155,12 +291,14 @@ class Evaluator:
                                 "message": f"alokacja_multi_ip.{field_key}: oczekiwano {expected_value}, otrzymano {actual}",
                             })
                     except (ValueError, TypeError):
-                        pass
+                        failures.append({
+                            "type": "alokacja_multi_ip_invalid",
+                            "message": f"alokacja_multi_ip.{field_key}: niepoprawny format wartości '{actual}'",
+                        })
 
         # koszty_koszyk: sprawdzenie przypisania wybranych pozycji do koszyków
         for cost_desc, expected_basket in assertions.get("koszty_koszyk", {}).items():
-            classifications = parsed.get("classifications") or ""
-            if not _cost_in_basket(classifications, cost_desc, expected_basket):
+            if not _cost_in_basket(classifications_text, cost_desc, expected_basket):
                 failures.append({
                     "type": "cost_classification",
                     "message": f"Koszt '{cost_desc}' powinien być w koszyku {expected_basket}",
@@ -169,19 +307,43 @@ class Evaluator:
         # nexus: dokładność ±0.001
         if "nexus" in assertions:
             actual = _find_nexus(result)
-            if actual is not None:
-                if abs(actual - float(assertions["nexus"])) > 0.001:
-                    failures.append({
-                        "type": "nexus_mismatch",
-                        "message": f"NEXUS: oczekiwano {assertions['nexus']}, otrzymano {actual}",
-                    })
+            if actual is None:
+                failures.append({
+                    "type": "nexus_missing",
+                    "message": "NEXUS: nie znaleziono wartości w wyniku",
+                })
+            elif abs(actual - float(assertions["nexus"])) > 0.001:
+                failures.append({
+                    "type": "nexus_mismatch",
+                    "message": f"NEXUS: oczekiwano {assertions['nexus']}, otrzymano {actual}",
+                })
+
+        # nexus_range: zakres ±0.001
+        if "nexus_range" in assertions:
+            low, high = assertions["nexus_range"]
+            actual = _find_nexus(result)
+            if actual is None:
+                failures.append({
+                    "type": "nexus_range_missing",
+                    "message": "NEXUS: nie znaleziono wartości w wyniku",
+                })
+            elif not (low <= actual <= high):
+                failures.append({
+                    "type": "nexus_range_mismatch",
+                    "message": f"NEXUS {actual:.3f} poza zakresem [{low}, {high}]",
+                })
 
         # --- RANGE checks ---
 
         if "podatek_IP_range" in assertions:
             low, high = assertions["podatek_IP_range"]
             actual = _find_ip_tax(result)
-            if actual is not None and not (low <= actual <= high):
+            if actual is None:
+                failures.append({
+                    "type": "podatek_IP_missing",
+                    "message": "Nie znaleziono podatku IP w wyniku",
+                })
+            elif not (low <= actual <= high):
                 failures.append({
                     "type": "tax_ip_out_of_range",
                     "message": f"Podatek IP {actual:.2f} poza zakresem [{low}, {high}]",
@@ -190,7 +352,12 @@ class Evaluator:
         if "podatek_NIE_range" in assertions:
             low, high = assertions["podatek_NIE_range"]
             actual = _find_non_ip_tax(result)
-            if actual is not None and not (low <= actual <= high):
+            if actual is None:
+                failures.append({
+                    "type": "podatek_NIE_missing",
+                    "message": "Nie znaleziono podatku NIE w wyniku",
+                })
+            elif not (low <= actual <= high):
                 failures.append({
                     "type": "tax_non_ip_out_of_range",
                     "message": f"Podatek NIE {actual:.2f} poza zakresem [{low}, {high}]",
@@ -199,17 +366,40 @@ class Evaluator:
         if "przychod_IP_roczny_range" in assertions:
             low, high = assertions["przychod_IP_roczny_range"]
             actual = _find_value(result, ["przychod_IP", "revenue_ip", "przychody_IP"])
-            if actual is not None and not (low <= actual <= high):
+            if actual is None:
+                failures.append({
+                    "type": "przychod_IP_missing",
+                    "message": "Nie znaleziono przychodu IP w wyniku",
+                })
+            elif not (low <= actual <= high):
                 failures.append({
                     "type": "revenue_ip_out_of_range",
                     "message": f"Przychód IP {actual:.2f} poza zakresem [{low}, {high}]",
                 })
 
+        if "przychod_NIE_roczny_range" in assertions:
+            low, high = assertions["przychod_NIE_roczny_range"]
+            actual = _find_value(result, ["przychod_NIE", "przychod_nie", "revenue_non_ip", "przychody_NIE"])
+            if actual is None:
+                failures.append({
+                    "type": "przychod_NIE_missing",
+                    "message": "Nie znaleziono przychodu NIE w wyniku",
+                })
+            elif not (low <= actual <= high):
+                failures.append({
+                    "type": "revenue_nie_out_of_range",
+                    "message": f"Przychód NIE {actual:.2f} poza zakresem [{low}, {high}]",
+                })
+
         # W_miesieczne: tolerancja ±2pp
         for month, expected_w in assertions.get("W_miesieczne", {}).items():
-            monthly_w_text = parsed.get("monthly_W") or ""
             actual_w = _find_monthly_w(monthly_w_text, month)
-            if actual_w is not None:
+            if actual_w is None:
+                failures.append({
+                    "type": "monthly_w_missing",
+                    "message": f"W dla {month}: nie znaleziono wartości w wyniku",
+                })
+            else:
                 diff = abs(actual_w - float(expected_w))
                 if diff > 2.0:
                     failures.append({
@@ -217,31 +407,112 @@ class Evaluator:
                         "message": f"W dla {month}: oczekiwano {expected_w}%, otrzymano {actual_w:.2f}% (różnica {diff:.2f}pp > 2pp)",
                     })
 
-        # --- SOFT checks (warnings) ---
-
+        # --- HARD warnings ---
         if assertions.get("warnings"):
             for warning_code in assertions["warnings"]:
                 if isinstance(stops_reviews, dict):
                     reviews_list = stops_reviews.get("reviews", [])
                 else:
                     reviews_list = [str(stops_reviews)] if stops_reviews else []
-                classifications = parsed.get("classifications") or ""
                 if not (
                     any(warning_code.lower() in str(r).lower() for r in reviews_list)
-                    or warning_code.lower() in classifications.lower()
+                    or warning_code.lower() in classifications_text.lower()
+                ):
+                    failures.append({
+                        "type": "missing_warning",
+                        "message": f"Oczekiwane ostrzeżenie '{warning_code}' nie zostało wygenerowane",
+                    })
+
+        # --- SOFT warnings (non-blocking) ---
+        if assertions.get("soft_warnings"):
+            for warning_code in assertions["soft_warnings"]:
+                if isinstance(stops_reviews, dict):
+                    reviews_list = stops_reviews.get("reviews", [])
+                else:
+                    reviews_list = [str(stops_reviews)] if stops_reviews else []
+                if not (
+                    any(warning_code.lower() in str(r).lower() for r in reviews_list)
+                    or warning_code.lower() in classifications_text.lower()
                 ):
                     warnings.append(f"Oczekiwane ostrzeżenie '{warning_code}' nie zostało wygenerowane")
 
         return failures, warnings
 
 
+def normalize_test_key(raw: str) -> str:
+    """Normalize TEST keys: TEST_1, TEST 1, test_1_bilans → TEST_1."""
+    import re
+    m = re.search(r"[Tt][Ee][Ss][Tt][_ ]?(\d+)", raw)
+    return f"TEST_{m.group(1)}" if m else raw.upper()
+
+
+def validate_assertion_keys(assertions: dict, scenario_id: str) -> list[str]:
+    """Check that every key in assertions is a known, handled key.
+
+    Returns a list of error messages; empty list means all keys are known.
+    """
+    known_keys = {
+        "testy_pass", "testy_fail", "nexus", "nexus_range", "nexus_koszty",
+        "mix_w_nexus_A", "W_miesieczne", "koszty_koszyk",
+        "alokacja_multi_ip", "klucz_MIX_metoda", "klucz_MIX_źródło",
+        "nie_używaj_W_do_MIX", "review_obecne", "warnings", "soft_warnings",
+        "stops", "zus_dubel", "roznice_kursowe_w_IP",
+        "podatek_IP_range", "podatek_NIE_range",
+        "przychod_IP_roczny_range", "przychod_NIE_roczny_range",
+    }
+    errors = []
+    for key in assertions:
+        if key not in known_keys and not key.startswith("meta."):
+            errors.append(f"Unknown assertion key '{key}' in scenario '{scenario_id}'")
+    return errors
+
+
 # ---------------------------------------------------------------------------
 # Helper parsers
 # ---------------------------------------------------------------------------
 
+def _normalize_test_id(value: str) -> str:
+    """Normalize test IDs like 'TEST 1', 'test_1_bilans' → 'TEST_1'."""
+    import re
+    match = re.search(r"\bTEST[\s_-]*(\d+)", value, re.IGNORECASE)
+    if not match:
+        return value
+    return f"TEST_{int(match.group(1))}"
+
+
+def _parse_tests_map(tests_text: str) -> dict[str, str]:
+    """Build a dict of normalized test ID → PASS/FAIL from the tests block."""
+    import re
+    result = {}
+    for line in tests_text.splitlines():
+        m = re.search(r"(TEST[\s_-]*\d+[^:\n]*)\s*[:_]\s*(PASS|FAIL)", line, re.IGNORECASE)
+        if m:
+            try:
+                nid = _normalize_test_id(m.group(1))
+                result[nid] = m.group(2).upper()
+            except ValueError:
+                pass
+    return result
+
+
+def _test_passed(tests_text: str, test_id: str) -> bool:
+    """Return True if test_id appears with PASS in the tests block."""
+    import re
+    nid = _normalize_test_id(test_id)
+    tests_map = _parse_tests_map(tests_text)
+    if nid in tests_map:
+        return tests_map[nid] == "PASS"
+    pattern = rf"{re.escape(test_id)}\s*[:_]?\s*PASS\b"
+    return bool(re.search(pattern, tests_text, re.IGNORECASE))
+
+
 def _test_failed(tests_text: str, test_id: str) -> bool:
     """Return True if test_id appears with FAIL in the tests block."""
     import re
+    nid = _normalize_test_id(test_id)
+    tests_map = _parse_tests_map(tests_text)
+    if nid in tests_map:
+        return tests_map[nid] == "FAIL"
     pattern = rf"{re.escape(test_id)}\s*[:_]?\s*FAIL"
     return bool(re.search(pattern, tests_text, re.IGNORECASE))
 
@@ -263,10 +534,48 @@ def _cost_in_basket(classifications: str, cost_desc: str, expected_basket: str) 
     if not classifications:
         return False
     for line in classifications.splitlines():
-        if cost_desc.lower() in line.lower():
-            if expected_basket.upper() in line.upper():
-                return True
+        if cost_desc.lower() in line.lower() and expected_basket.upper() in line.upper():
+            return True
     return False
+
+
+def _check_description_consistency(scenario: dict) -> list[str]:
+    """Check that scenario description matches what assertions actually verify.
+
+    If assertions only specify ``stops`` (no ``review_obecne``), the description
+    should not mention REVIEW as an alternative expected outcome. Conversely,
+    if assertions specify reviews, their codes should appear in the description.
+
+    Returns a list of error messages (empty = consistent).
+    """
+    import re
+
+    errors: list[str] = []
+    meta = scenario.get("meta", {})
+    assertions = scenario.get("assertions", {})
+    description = (meta.get("description") or "").strip()
+    if not description:
+        return errors
+
+    expected_stops = meta.get("expected_stops", []) or []
+    assertion_stops = assertions.get("stops", []) or []
+    expected_reviews = meta.get("expected_reviews", []) or []
+    assertion_reviews = assertions.get("review_obecne", []) or []
+
+    has_stops = bool(expected_stops or assertion_stops)
+    has_reviews = bool(expected_reviews or assertion_reviews)
+
+    # If only stops are expected, description should not suggest REVIEW as an
+    # alternative outcome (e.g. "stop or emit REVIEW")
+    if has_stops and not has_reviews:
+        if re.search(r'\breview\b', description, re.IGNORECASE):
+            errors.append(
+                f"Scenario '{meta.get('id', '?')}' only expects stops "
+                f"({expected_stops or assertion_stops}) but description "
+                f"mentions REVIEW: '{description}'"
+            )
+
+    return errors
 
 
 def _find_nexus(result: dict) -> float | None:
@@ -274,7 +583,7 @@ def _find_nexus(result: dict) -> float | None:
         val = result.get(key)
         if val is not None:
             if isinstance(val, dict):
-                val = val.get("wartość") or val.get("wartosc") or val.get("value")
+                val = val.get("wartość", val.get("wartosc", val.get("value")))
             if val is not None:
                 try:
                     return float(val)
@@ -295,7 +604,7 @@ def _find_ip_tax(result: dict) -> float | None:
 
 
 def _find_non_ip_tax(result: dict) -> float | None:
-    for key in ("podatek_NIE", "non_ip_tax", "tax_non_ip", "podatek_nie"):
+    for key in ("podatek_NIE", "non_ip_tax", "tax_non_ip", "podatek_nie", "podatek_NIE_finalny"):
         val = _nested_get(result, key)
         if val is not None:
             try:
@@ -311,6 +620,22 @@ def _find_value(result: dict, keys: list[str]) -> float | None:
         if val is not None:
             try:
                 return float(str(val).replace("zł", "").replace(" ", "").replace(",", "."))
+            except (ValueError, TypeError):
+                pass
+    # Fallback: probe przychody_roczne.{IP,NIE} when flat keys didn't match
+    # Match only whole-word _IP / _NIE to avoid "REVENUE_NON_IP" triggering IP lookup
+    przychody = result.get("przychody_roczne", {})
+    if isinstance(przychody, dict):
+        wants_ip = any(k.upper().replace("_","").endswith("IP") and "NON" not in k.upper() for k in keys)
+        wants_nie = any("_NIE" in k.upper() or k.upper().endswith("NIE") for k in keys)
+        if wants_ip and "IP" in przychody:
+            try:
+                return float(str(przychody["IP"]).replace("zł", "").replace(" ", "").replace(",", "."))
+            except (ValueError, TypeError):
+                pass
+        if wants_nie and "NIE" in przychody:
+            try:
+                return float(str(przychody["NIE"]).replace("zł", "").replace(" ", "").replace(",", "."))
             except (ValueError, TypeError):
                 pass
     return None
@@ -334,7 +659,6 @@ def _find_klucz_mix_field(result: dict, field: str) -> str | None:
     Looks in: alokacja.koszty_MIX.<field>, klucze_alokacji_roczne.koszty_MIX.<field>,
     and any direct key containing 'klucz' + field.
     """
-    import re
 
     # Check alokacja.koszty_MIX.<field>
     alokacja = result.get("alokacja") or {}

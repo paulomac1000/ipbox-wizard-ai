@@ -28,7 +28,7 @@ class CassetteMeta:
     prompt_tokens_estimate: int = 0
     response_tokens_estimate: int = 0
     algorithm_hash: str = ""
-    cassette_format_version: int = 2
+    cassette_format_version: int = 3  # was 2
 
     def __post_init__(self):
         if not self.recorded_at:

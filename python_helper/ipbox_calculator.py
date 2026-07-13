@@ -11,6 +11,7 @@ License: MIT
 
 from __future__ import annotations
 
+import math
 import re
 from dataclasses import dataclass
 from datetime import datetime, timedelta
@@ -33,6 +34,13 @@ def calculate_w_coefficient(
 
     W = ((work_hours - non_ip_hours) * invoice_percentage/100) / work_hours * 100
     """
+    if work_hours < 0:
+        raise ValueError(f"work_hours must be >= 0, got {work_hours}")
+    if non_ip_hours < 0:
+        raise ValueError(f"non_ip_hours must be >= 0, got {non_ip_hours}")
+    if not (0 <= invoice_percentage <= 100):
+        raise ValueError(f"invoice_percentage must be between 0 and 100, got {invoice_percentage}")
+
     if work_hours <= 0:
         return {
             "status": "ERROR",
@@ -96,10 +104,10 @@ def aggregate_w_multiproject(projects: list[dict]) -> float:
 # Currencies and exchange rate differences (Phase 4.2, 4.3)
 # ============================================================================
 
-def get_nbp_rate(currency: str, date_str: str) -> float | None:
+def get_nbp_rate(currency: str, date_str: str, _depth: int = 0) -> float | None:
     """
     Get the average NBP rate from table A for a given currency and date (YYYY-MM-DD).
-    If date = weekend/holiday -> goes back to the previous business day.
+    If date = weekend/holiday -> goes back to the previous business day (max 10 days).
     """
     try:
         import requests
@@ -107,16 +115,18 @@ def get_nbp_rate(currency: str, date_str: str) -> float | None:
         print("⚠️  'requests' library unavailable. Download rate manually from nbp.pl")
         return None
 
-    url = f"http://api.nbp.pl/api/exchangerates/rates/a/{currency.lower()}/{date_str}/?format=json"
+    url = f"https://api.nbp.pl/api/exchangerates/rates/a/{currency.lower()}/{date_str}/?format=json"
     try:
         response = requests.get(url, timeout=5)
         if response.status_code == 200:
             return response.json()["rates"][0]["mid"]
         elif response.status_code == 404:
+            if _depth >= 10:
+                return None
             # Weekend/holiday — go back one day
             prev_date = datetime.strptime(date_str, "%Y-%m-%d") - timedelta(days=1)
             prev = prev_date.strftime("%Y-%m-%d")
-            return get_nbp_rate(currency, prev)
+            return get_nbp_rate(currency, prev, _depth=_depth + 1)
         else:
             return None
     except Exception as e:
@@ -194,6 +204,8 @@ class CostItem:
     nexus_amount: float | None = None  # explicit amount for NEXUS (None = use item.amount)
 
     def __post_init__(self) -> None:
+        if self.amount < 0:
+            raise ValueError(f"amount must be >= 0, got {self.amount}")
         if self.nexus_amount is not None:
             if not (0 <= self.nexus_amount <= self.amount):
                 raise ValueError(
@@ -235,6 +247,8 @@ class AllocationPolicy:
 
     def __post_init__(self) -> None:
         """Validate policy fields."""
+        if not self.policy_id or not self.policy_id.strip():
+            raise ValueError("policy_id must not be empty")
         aliases = {
             "przychodowy_roczny": "przychodowa_roczna",
             "przychodowy": "przychodowa_roczna",
@@ -461,6 +475,10 @@ def calculate_nexus(A: float, B: float = 0, C: float = 0, D: float = 0) -> dict[
     """
     Calculate the annual NEXUS (art. 30ca ust. 7 PIT).
     """
+    for name, val in [("A", A), ("B", B), ("C", C), ("D", D)]:
+        if val < 0:
+            raise ValueError(f"NEXUS component {name} must be >= 0, got {val}")
+
     denominator = A + B + C + D
     if denominator == 0:
         return {
@@ -507,6 +525,9 @@ def tax_cascade(
     """
     Full tax cascade in the binding order.
     """
+    if not (0.0 <= nexus <= 1.0):
+        raise ValueError(f"nexus must be between 0 and 1, got {nexus}")
+
     valid_tax_forms = frozenset({"linear_19%", "scale"})
     if tax_form not in valid_tax_forms:
         raise ValueError(f"Invalid tax_form: {tax_form!r}. Must be one of {sorted(valid_tax_forms)}")
@@ -645,40 +666,25 @@ def verify_kpir_balance(
 
 
 def verify_private_costs(
-    allocated_costs: dict[str, float],
-    non_direct_sum: float,
+    private_costs_allocated_to_ip: float,
+    *,
+    tolerance: float = 0.02,
 ) -> dict[str, Any]:
-    """
-    VERIFY 2: No Private Costs in IP.
-    Ensures that costs in the NON basket did not leak into IP costs.
-    In our allocation logic, this is true by construction, but we verify
-    if non_direct costs (NON basket) are properly isolated.
-    """
-    tolerance = 0.02
-    leak_detected = False
-    details = []
-
-    # Check 1: If non_direct_sum > tolerance, we have private costs present
-    if non_direct_sum > tolerance:
-        # Check if any value in allocated_costs with IP-related keys might indicate leakage
-        ip_related = {k: v for k, v in allocated_costs.items() if "ip" in k.lower()}
-        if ip_related and any(v > tolerance for v in ip_related.values()):
-            leak_detected = True
-            details.append(
-                f"Non-direct costs ({non_direct_sum}) found alongside IP costs {ip_related}"
-            )
-
-    if leak_detected:
+    if not math.isfinite(private_costs_allocated_to_ip) or private_costs_allocated_to_ip < 0:
+        raise ValueError(
+            f"private_costs_allocated_to_ip must be a finite non-negative number, "
+            f"got {private_costs_allocated_to_ip!r}"
+        )
+    if private_costs_allocated_to_ip > tolerance:
         return {
             "test": "VERIFY 2 — Private Costs",
             "status": "FAIL",
-            "details": "; ".join(details),
+            "private_costs_allocated_to_ip": private_costs_allocated_to_ip,
         }
-
     return {
         "test": "VERIFY 2 — Private Costs",
         "status": "PASS",
-        "non_direct_sum": round(non_direct_sum, 2),
+        "private_costs_allocated_to_ip": private_costs_allocated_to_ip,
     }
 
 
@@ -739,7 +745,7 @@ def verify_ip_tax(
     """
     VERIFY 5: IP Tax calculation.
     """
-    expected_base = round(ip_income * nexus)
+    expected_base = round(max(0, ip_income * nexus))
     expected_tax = round(expected_base * 0.05)
 
     if expected_base != declared_base:

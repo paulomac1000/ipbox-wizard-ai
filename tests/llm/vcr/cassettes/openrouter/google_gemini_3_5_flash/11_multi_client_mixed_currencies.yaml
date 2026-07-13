@@ -1,0 +1,61 @@
+meta:
+  scenario_id: 11_multi_client_mixed_currencies
+  scenario_name: 'Logika: 2 klientów (PLN + EUR)'
+  provider: openrouter
+  model: google/gemini-3.5-flash
+  fingerprint: v2_be9aedbd727271f4_df97b983d541cfc2_openrouter_8d99798a_spc2c5afcf
+  recorded_at: '2026-07-13T01:37:59.515883+00:00'
+  recording_duration_seconds: 2.72
+  prompt_tokens_estimate: 14556
+  response_tokens_estimate: 182
+  algorithm_hash: be9aedbd727271f4
+  cassette_format_version: 3
+turns:
+- role: user
+  prompt: ''
+  response: "{\n  \"result\": {\n    \"rok\": 2025,\n    \"przychody_roczne\": {\n      \"IP\": 22891.80,\n      \"NIE\":\
+    \ 0.0\n    },\n    \"nexus\": {\n      \"A\": 0.0,\n      \"B\": 0.0,\n      \"C\": 0.0,\n      \"D\": 0.0,\n      \"\
+    poza_nexus\": 0.0,\n      \"wartość\": 1.0\n    },\n    \"podatek\": {\n      \"podatek_IP\": 1145,\n      \"podatek_NIE_finalny\"\
+    : 0\n    }\n  },\n  \"classifications\": [],\n  \"monthly_W\": {\n    \"2025-01\": 100.0\n  },\n  \"tests\": {\n    \"\
+    TEST_1\": \"PASS\",\n    \"TEST_2\": \"PASS\",\n    \"TEST_3\": \"PASS\",\n    \"TEST_4\": \"PASS\",\n    \"TEST_5\":\
+    \ \"PASS\",\n    \"TEST_6\": \"PASS\",\n    \"TEST_7\": \"PASS\",\n    \"TEST_8\": \"PASS\",\n    \"TEST_9\": \"PASS\"\
+    \n  },\n  \"stops_reviews\": {\n    \"stops\": [],\n    \"reviews\": [\n      \"REVIEW_04\",\n      \"REVIEW_20\"\n  \
+    \  ],\n    \"warnings\": []\n  }\n}\n}"
+  prompt_hash: f0a7387c6ee12697
+  request_hash: 6d278f514bbe7fc8
+  system_prompt_hash: c2c5afcf900231f7
+parsed:
+  result_yaml:
+    rok: 2025
+    przychody_roczne:
+      IP: 22891.8
+      NIE: 0.0
+    nexus:
+      A: 0.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 0.0
+      wartość: 1.0
+    podatek:
+      podatek_IP: 1145
+      podatek_NIE_finalny: 0
+  classifications: []
+  monthly_W:
+    2025-01: 100.0
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+    TEST_3: PASS
+    TEST_4: PASS
+    TEST_5: PASS
+    TEST_6: PASS
+    TEST_7: PASS
+    TEST_8: PASS
+    TEST_9: PASS
+  stops_reviews:
+    stops: []
+    reviews:
+    - REVIEW_04
+    - REVIEW_20
+    warnings: []

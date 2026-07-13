@@ -23,7 +23,7 @@ total=0
 skipped_nontext=0
 skipped_excluded=0
 
-# Find all files, then filter by extension and exclusion paths
+# Find all files, pruning forbidden directories, then filter by extension and exclusion paths
 while IFS= read -r -d '' f; do
     rel="${f#$ABS_PATH/}"
     [ -z "$rel" ] && continue
@@ -33,17 +33,9 @@ while IFS= read -r -d '' f; do
         continue
     fi
 
-    # Skip real .env files with secrets
+    # Skip dotenv files (including .env.example, .env.test, etc.)
     case "$rel" in
-        .env|*/.env)
-            skipped_excluded=$((skipped_excluded+1))
-            continue
-            ;;
-    esac
-
-    # Skip known binary-heavy / non-project directories
-    case "$rel" in
-        tools/multiqc-venv/*|tools/fastqc/FastQC/*|tools/fastqc/*.zip|tools/downloads/*|tools/seqkit/seqkit)
+        .env*|*/.env*)
             skipped_excluded=$((skipped_excluded+1))
             continue
             ;;
@@ -56,13 +48,14 @@ while IFS= read -r -d '' f; do
     fi
 
     total=$((total+1))
-    echo "## $rel" >> "$OUTPUT_FILE"
+    sanitized_rel="$rel"
+    echo "## $sanitized_rel" >> "$OUTPUT_FILE"
     echo '```' >> "$OUTPUT_FILE"
     cat "$f" >> "$OUTPUT_FILE"
     echo >> "$OUTPUT_FILE"
     echo '```' >> "$OUTPUT_FILE"
     echo "" >> "$OUTPUT_FILE"
-done < <(find "$ABS_PATH" -type f -print0 2>/dev/null)
+done < <(find "$ABS_PATH" -mindepth 1 \( -name .git -o -name input -o -name .pytest_cache -o -name .vscode -o -name .omo -o -name reports -o -name tmp \) -prune -o -type f -print0 2>/dev/null)
 
 echo "--- Statistics ---" >> "$OUTPUT_FILE"
 echo "- Total text files dumped: $total" >> "$OUTPUT_FILE"

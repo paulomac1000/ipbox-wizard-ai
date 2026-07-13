@@ -1,31 +1,48 @@
-import os
 import time
+from os import environ
 
-import google.generativeai as genai
+import requests
+
+# OpenRouter API base URL
+OPENROUTER_BASE = "https://openrouter.ai/api/v1/chat/completions"
 
 
 class LLMClient:
-    def __init__(self):
-        api_key = os.environ.get("GEMINI_API_KEY")
-        if not api_key:
-            raise ValueError("GEMINI_API_KEY not set")
-        self.model_name = os.environ.get("GEMINI_MODEL", "gemini-2.0-flash")
-        genai.configure(api_key=api_key)
+    def __init__(self, require_api_key: bool = True):
+        # Use OPENROUTER_API_KEY first, fall back to GEMINI_API_KEY for backward compat
+        api_key = environ.get("OPENROUTER_API_KEY") or environ.get("GEMINI_API_KEY")
+        if require_api_key and not api_key:
+            raise ValueError("OPENROUTER_API_KEY or GEMINI_API_KEY not set")
+        self.api_key = api_key
+        self.model_name = environ.get("LLM_MODEL") or environ.get("GEMINI_MODEL") or "google/gemini-3.5-flash"
 
     def call(self, system_prompt: str, user_prompt: str, timeout: int = 120) -> str:
-        model = genai.GenerativeModel(
-            model_name=self.model_name,
-            system_instruction=system_prompt,
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json",
+        }
+        messages = []
+        if system_prompt:
+            messages.append({"role": "system", "content": system_prompt})
+        messages.append({"role": "user", "content": user_prompt})
+
+        payload = {
+            "model": self.model_name,
+            "messages": messages,
+            "temperature": 0.0,
+            "max_tokens": 16000,
+            "response_format": {"type": "json_object"},
+        }
+
+        response = requests.post(
+            OPENROUTER_BASE,
+            headers=headers,
+            json=payload,
+            timeout=timeout,
         )
-        response = model.generate_content(
-            user_prompt,
-            generation_config=genai.GenerationConfig(
-                temperature=0.0,
-                max_output_tokens=16000,
-            ),
-            request_options={"timeout": timeout},
-        )
-        return response.text
+        response.raise_for_status()
+        data = response.json()
+        return data["choices"][0]["message"]["content"]
 
     def call_with_retry(
         self,

@@ -1,0 +1,61 @@
+meta:
+  scenario_id: 33_kpir_balance_fail
+  scenario_name: 'Weryfikacja: Bilans KPiR (FAIL)'
+  provider: openrouter
+  model: gemini-3.1-flash-lite-preview
+  fingerprint: v2_be9aedbd727271f4_0a5acbd6e237136a_openrouter_993fbcd8_spc2c5afcf
+  recorded_at: '2026-07-13T01:18:32.841570+00:00'
+  recording_duration_seconds: 1.41
+  prompt_tokens_estimate: 14461
+  response_tokens_estimate: 218
+  algorithm_hash: be9aedbd727271f4
+  cassette_format_version: 3
+turns:
+- role: user
+  prompt: ''
+  response: "{\n  \"result\": {\n    \"rok\": 2025,\n    \"przychody_roczne\": {\n      \"IP\": 90000.0,\n      \"NIE\": 10000.0\n\
+    \    },\n    \"nexus\": {\n      \"A\": 0.0,\n      \"B\": 0.0,\n      \"C\": 0.0,\n      \"D\": 0.0,\n      \"poza_nexus\"\
+    : 50000.0,\n      \"wartość\": 0.0\n    },\n    \"podatek\": {\n      \"podatek_IP\": 0,\n      \"podatek_NIE_finalny\"\
+    : 0\n    }\n  },\n  \"classifications\": [\n    {\n      \"opis\": \"Koszty ogólne KPiR\",\n      \"basket\": \"MIX\"\
+    ,\n      \"nexus_basket\": \"poza_nexus\",\n      \"nexus_amount\": 50000.0\n    }\n  ],\n  \"monthly_W\": {\n    \"2025-01\"\
+    : 0.0\n  },\n  \"tests\": {\n    \"TEST_1\": \"PASS\",\n    \"TEST_2\": \"PASS\"\n  },\n  \"stops_reviews\": {\n    \"\
+    stops\": [\n      \"STOP_03\",\n      \"STOP_11\"\n    ],\n    \"reviews\": [\n      \"REVIEW_20\"\n    ],\n    \"warnings\"\
+    : [\n      \"Brak interpretacji KIS oraz brak ewidencji czasu pracy uniemożliwia rzetelne wyliczenie wskaźnika NEXUS i\
+    \ alokację kosztów.\"\n    ]\n  }\n}"
+  prompt_hash: 01dff82ea89bc7e8
+  request_hash: 026343a2ec2f6540
+  system_prompt_hash: c2c5afcf900231f7
+parsed:
+  result_yaml:
+    rok: 2025
+    przychody_roczne:
+      IP: 90000.0
+      NIE: 10000.0
+    nexus:
+      A: 0.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 50000.0
+      wartość: 0.0
+    podatek:
+      podatek_IP: 0
+      podatek_NIE_finalny: 0
+  classifications:
+  - opis: Koszty ogólne KPiR
+    basket: MIX
+    nexus_basket: poza_nexus
+    nexus_amount: 50000.0
+  monthly_W:
+    2025-01: 0.0
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+  stops_reviews:
+    stops:
+    - STOP_03
+    - STOP_11
+    reviews:
+    - REVIEW_20
+    warnings:
+    - Brak interpretacji KIS oraz brak ewidencji czasu pracy uniemożliwia rzetelne wyliczenie wskaźnika NEXUS i alokację kosztów.

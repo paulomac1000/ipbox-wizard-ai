@@ -82,16 +82,37 @@ class TestVerificationTests:
     def test_verify_private_costs_forbidden(self):
         """TC-VT-002: Prywatne koszty nie mogą być w IP."""
         # Non-direct costs present alongside IP costs -> leak detected
-        res = verify_private_costs({"costs_ip": 100}, 50)
+        res = verify_private_costs(50)
         assert res["status"] == "FAIL"
 
         # Clean case: no non-direct costs
-        res = verify_private_costs({"costs_ip": 0}, 0)
+        res = verify_private_costs(0)
         assert res["status"] == "PASS"
 
         # Clean case: non-direct sum below tolerance
-        res = verify_private_costs({"costs_ip": 0}, 0.01)
+        res = verify_private_costs(0.01)
         assert res["status"] == "PASS"
+
+    @pytest.mark.unit
+    @pytest.mark.P1
+    def test_verify_private_costs_negative_raises(self):
+        """TC-VT-XXX: Negative costs must raise ValueError."""
+        with pytest.raises(ValueError, match="private_costs_allocated_to_ip"):
+            verify_private_costs(-1)
+
+    @pytest.mark.unit
+    @pytest.mark.P1
+    def test_verify_private_costs_nan_raises(self):
+        """TC-VT-XXX: NaN must raise ValueError."""
+        with pytest.raises(ValueError, match="private_costs_allocated_to_ip"):
+            verify_private_costs(float("nan"))
+
+    @pytest.mark.unit
+    @pytest.mark.P1
+    def test_verify_private_costs_inf_raises(self):
+        """TC-VT-XXX: Infinity must raise ValueError."""
+        with pytest.raises(ValueError, match="private_costs_allocated_to_ip"):
+            verify_private_costs(float("inf"))
 
     @pytest.mark.unit
     @pytest.mark.P0

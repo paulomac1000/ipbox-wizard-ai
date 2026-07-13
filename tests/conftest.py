@@ -1,4 +1,5 @@
-import os
+from os import environ, getenv
+
 import pytest
 from dotenv import load_dotenv
 
@@ -23,7 +24,7 @@ def pytest_collection_modifyitems(config, items):
     """Propagate VCR mode to environment variable."""
     vcr_mode = config.getoption("--vcr-mode", default=None)
     if vcr_mode:
-        os.environ["VCR_MODE"] = vcr_mode
+        environ["VCR_MODE"] = vcr_mode
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -33,9 +34,9 @@ def load_env():
 
 @pytest.fixture(scope="session")
 def gemini_api_key():
-    return os.getenv("GEMINI_API_KEY")
+    return getenv("GEMINI_API_KEY")
 
 
 @pytest.fixture(scope="session")
 def gemini_model():
-    return os.getenv("GEMINI_MODEL", "gemini-2.0-flash")
+    return getenv("GEMINI_MODEL", "google/gemma-4-31b-it")

@@ -27,3 +27,9 @@ input:
     darowizny: 5000
 assertions:
   nexus: 1.0
+  podatek_IP_range:
+  - 996
+  - 996
+  przychod_IP_roczny_range:
+  - 20000
+  - 20000

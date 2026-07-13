@@ -1,14 +1,17 @@
 meta:
-  id: "16_high_w_review"
-  name: "Logika: W > 95%"
-  description: "Weryfikacja flagi REVIEW_01"
-  tags: ["core", "review"]
-  priority: "P1"
+  id: 16_high_w_review
+  name: 'Logika: W > 95%'
+  description: Weryfikacja flagi REVIEW_01
+  tags:
+  - core
+  - review
+  priority: P1
 input:
   rok: 2025
   miesiace:
-    - miesiac: "2025-01"
-      godziny_pracy: 160
-      godziny_nie_IP: 2
+  - miesiac: 2025-01
+    godziny_pracy: 160
+    godziny_nie_IP: 2
 assertions:
-  warnings: ["REVIEW_01"]
+  testy_fail:
+  - TEST_7

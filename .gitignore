@@ -21,6 +21,7 @@ __pycache__/
 
 # --- Testing & Coverage ---
 .pytest_cache/
+.ruff_cache/
 .coverage
 coverage.xml
 htmlcov/
@@ -36,6 +37,9 @@ tests/llm/expected/
 
 # --- Agent runtime state ---
 .omo/
+
+# --- Generated / auto-saved files ---
+ipbox-wizard-ai.md
 
 # --- System ---
 .DS_Store

@@ -1,29 +1,36 @@
 meta:
-  id: "12_zus_in_pit_path"
-  name: "Logika: ZUS odliczany w PIT"
-  description: "Weryfikacja ścieżki B (ZUS nie w KPiR)"
-  tags: ["core", "ZUS"]
-  priority: "P1"
-
+  id: 12_zus_in_pit_path
+  name: 'Logika: ZUS odliczany w PIT'
+  description: Weryfikacja ścieżki B (ZUS nie w KPiR)
+  tags:
+  - core
+  - ZUS
+  priority: P1
 input:
   rok: 2025
-  forma_opodatkowania: "liniowy_19%"
+  forma_opodatkowania: liniowy_19%
   zus:
-    sposob: "PIT" # Ścieżka B
+    sposob: PIT
   kontrahenci:
-    - nazwa: "ClientA"
-      waluta: "PLN"
-      klauzula_IP: true
+  - nazwa: ClientA
+    waluta: PLN
+    klauzula_IP: true
   miesiace:
-    - miesiac: "2025-01"
-      przychody: 15000
-      godziny_pracy: 160
-      godziny_nie_IP: 0
-      koszty: []
+  - miesiac: 2025-01
+    przychody: 15000
+    godziny_pracy: 160
+    godziny_nie_IP: 0
+    koszty: []
   ulgi:
-    zus_spoleczne_roczne: 18000 # Odliczenie w kaskadzie
-
+    zus_spoleczne_roczne: 18000
 assertions:
   zus_dubel: false
-  testy_pass: ["TEST_3"]
-  podatek_IP_range: [700, 800]
+  testy_pass:
+  - TEST_3
+  nexus: 1.0
+  podatek_IP_range:
+  - 750
+  - 750
+  przychod_IP_roczny_range:
+  - 15000
+  - 15000
