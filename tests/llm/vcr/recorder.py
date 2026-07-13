@@ -171,8 +171,12 @@ class VCRRecorder:
 
         # Check prompt hash
         current_prompt_hash = hashlib.sha256(prompt.encode("utf-8")).hexdigest()[:16]
-        stored_prompt_hash = cassette.turns[0].prompt_hash if cassette.turns else None
-        if stored_prompt_hash and stored_prompt_hash != current_prompt_hash:
+        stored_prompt_hash = cassette.turns[0].prompt_hash if cassette.turns else ""
+        if not stored_prompt_hash:
+            raise ValueError(
+                f"Cassette {scenario_id} has no prompt_hash — re-record with current format."
+            )
+        if stored_prompt_hash != current_prompt_hash:
             raise ValueError(
                 f"Prompt hash mismatch for '{scenario_id}': "
                 f"stored={stored_prompt_hash}, current={current_prompt_hash}. "
@@ -184,7 +188,11 @@ class VCRRecorder:
         if system_prompt:
             current_system_prompt_hash = hashlib.sha256(system_prompt.encode("utf-8")).hexdigest()[:16]  # noqa: E501
             stored_system_prompt_hash = cassette.turns[0].system_prompt_hash if cassette.turns else ""  # noqa: E501
-            if stored_system_prompt_hash and stored_system_prompt_hash != current_system_prompt_hash:  # noqa: E501
+            if not stored_system_prompt_hash:
+                raise ValueError(
+                    f"Cassette {scenario_id} has no system_prompt_hash — re-record."
+                )
+            if stored_system_prompt_hash != current_system_prompt_hash:
                 raise ValueError(
                     f"System prompt hash mismatch for '{scenario_id}': "
                     f"stored={stored_system_prompt_hash}, current={current_system_prompt_hash}. "
@@ -249,6 +257,12 @@ class VCRRecorder:
 
         duration = time.time() - start_time
 
+        if not response or not response.strip():
+            self._stats["errors"] += 1
+            raise RecordingError(
+                f"Empty response for {scenario_id} — cassette not saved."
+            )
+
         # Create turn with response
         prompt_hash = hashlib.sha256(
             prompt.encode("utf-8")
@@ -304,16 +318,30 @@ class VCRRecorder:
             parsed_stops_reviews=parsed.get("stops_reviews"),
         )
 
-        # Save cassette
-        cassette.save(cassette_path)
+        # Atomic write: save cassette to temp file, then rename
+        import tempfile
+        cassette_dir = cassette_path.parent
+        cassette_dir.mkdir(parents=True, exist_ok=True)
+        with tempfile.NamedTemporaryFile(
+            mode="w", dir=cassette_dir, suffix=".tmp",
+            prefix=cassette_path.stem + "_", delete=False
+        ) as tmp_file:
+            cassette.save(Path(tmp_file.name))
+        Path(tmp_file.name).replace(cassette_path)
 
-        # Update manifest
+        # Update manifest atomically
+        manifest_path = self.config.cassettes_root / "_manifest.yaml"
         self.manifest.update(
             scenario_id=scenario_id,
             fingerprint=fingerprint,
             filename=cassette_path.name,
         )
-        self.manifest.save(self.config.cassettes_root / "_manifest.yaml")
+        with tempfile.NamedTemporaryFile(
+            mode="w", dir=self.config.cassettes_root, suffix=".tmp",
+            prefix="_manifest_", delete=False
+        ) as tmp_manifest:
+            self.manifest.save(Path(tmp_manifest.name))
+        Path(tmp_manifest.name).replace(manifest_path)
 
         self._stats["recordings"] += 1
         print(f"  💾 Saved: {cassette_path.name} ({duration:.1f}s)")

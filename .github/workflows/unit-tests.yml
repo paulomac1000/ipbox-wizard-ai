@@ -2,15 +2,6 @@ name: "🧪 Unit Tests (Calculator)"
 
 on:
   workflow_call:
-  push:
-    paths:
-      - "python_helper/**"
-      - "tests/unit/**"
-      - "tests/conftest.py"
-  pull_request:
-    paths:
-      - "python_helper/**"
-      - "tests/unit/**"
 
 jobs:
   unit-tests:

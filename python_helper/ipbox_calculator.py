@@ -15,7 +15,12 @@ import math
 import re
 from dataclasses import dataclass
 from datetime import datetime, timedelta
+from decimal import ROUND_HALF_UP, Decimal
 from typing import Any
+
+
+def tax_round(value: float) -> float:
+    return float(Decimal(str(value)).quantize(Decimal("1"), rounding=ROUND_HALF_UP))
 
 # ============================================================================
 # W Coefficient (Phase 2)
@@ -602,25 +607,25 @@ def tax_cascade(
     thermo_carry_over = thermomodernization_pool - thermo_used
 
     # Step 6: Non-IP Tax
-    non_ip_base_rounded = round(max(0, remaining))
+    non_ip_base_rounded = tax_round(max(0, remaining))
 
     if tax_form == "linear_19%":
-        non_ip_tax_before_relief = round(non_ip_base_rounded * 0.19)
+        non_ip_tax_before_relief = tax_round(non_ip_base_rounded * 0.19)
     else:  # scale
-        total_scale_base = non_ip_base_rounded + round(extra_income_scale)
+        total_scale_base = non_ip_base_rounded + tax_round(extra_income_scale)
         if total_scale_base <= 120_000:
-            scale_tax = max(0, round(total_scale_base * 0.12 - 3_600))
+            scale_tax = max(0, tax_round(total_scale_base * 0.12 - 3_600))
         else:
-            scale_tax = round(10_800 + (total_scale_base - 120_000) * 0.32)
+            scale_tax = tax_round(10_800 + (total_scale_base - 120_000) * 0.32)
 
         if total_scale_base > 0:
-            non_ip_tax_before_relief = round(scale_tax * (non_ip_base_rounded / total_scale_base))
+            non_ip_tax_before_relief = tax_round(scale_tax * (non_ip_base_rounded / total_scale_base))  # noqa: E501
         else:
             non_ip_tax_before_relief = 0
 
     # Step 7: IP Tax
-    ip_base_rounded = round(max(0, ip_income * nexus))
-    ip_tax = round(ip_base_rounded * 0.05)
+    ip_base_rounded = tax_round(max(0, ip_income * nexus))
+    ip_tax = tax_round(ip_base_rounded * 0.05)
 
     # Step 8: Child Credit
     non_ip_tax_after_relief = max(0, non_ip_tax_before_relief - child_tax_credit)
@@ -765,8 +770,8 @@ def verify_ip_tax(
     """
     VERIFY 5: IP Tax calculation.
     """
-    expected_base = round(max(0, ip_income * nexus))
-    expected_tax = round(expected_base * 0.05)
+    expected_base = tax_round(max(0, ip_income * nexus))
+    expected_tax = tax_round(expected_base * 0.05)
 
     if expected_base != declared_base:
         return {

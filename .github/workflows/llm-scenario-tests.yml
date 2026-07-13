@@ -5,17 +5,6 @@ env:
 
 on:
   workflow_call:
-  push:
-    branches: [ main ]
-    paths:
-      - "ipbox_algorytm.md"
-      - "python_helper/**"
-      - "tests/llm/**"
-  pull_request:
-    paths:
-      - "ipbox_algorytm.md"
-      - "python_helper/**"
-      - "tests/llm/**"
   workflow_dispatch:
     inputs:
       max_scenarios:
@@ -72,22 +61,35 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            let log = '';
-            try { log = fs.readFileSync('reports/llm-output.log', 'utf8'); } catch {}
-            const passed = (log.match(/\d+ passed/g) || []).join(', ');
-            const failed = (log.match(/\d+ failed/g) || []).join(', ');
-            const status = failed ? '❌' : '✅';
-            const model = "VCR Playback";
-            const body = [
-              `## ${status} LLM Scenario Tests (VCR Playback)`,
-              `**Mode**: \`playback\``,
-              passed ? `**Passed**: ${passed}` : '',
-              failed ? `**Failed**: ${failed}` : '',
-              '',
-              '<details><summary>Log (ostatnie 80 linii)</summary>\n\n```',
-              log.split('\n').slice(-80).join('\n'),
-              '```\n</details>',
-            ].filter(Boolean).join('\n');
+            let body = '## LLM Scenario Tests (VCR Playback)\n\n';
+            try {
+              const xml = fs.readFileSync('reports/llm-playback.xml', 'utf8');
+              const testsMatch = xml.match(/tests="(\d+)"/);
+              const failuresMatch = xml.match(/failures="(\d+)"/);
+              const errorsMatch = xml.match(/errors="(\d+)"/);
+              const skippedMatch = xml.match(/skipped="(\d+)"/);
+              const total = testsMatch ? testsMatch[1] : '0';
+              const failures = failuresMatch ? failuresMatch[1] : '0';
+              const errors = errorsMatch ? errorsMatch[1] : '0';
+              const skipped = skippedMatch ? skippedMatch[1] : '0';
+              if (parseInt(failures) > 0 || parseInt(errors) > 0) {
+                body = '## \u274C LLM Scenario Tests (VCR Playback)\n\n';
+              } else {
+                body = '## \u2705 LLM Scenario Tests (VCR Playback)\n\n';
+              }
+              body += '**Total**: ' + total + ' | **Passed**: ' + (total - failures - errors - skipped) + ' | **Failed**: ' + failures + ' | **Errors**: ' + errors + ' | **Skipped**: ' + skipped + '\n';
+            } catch (e) {
+              let log = '';
+              try { log = fs.readFileSync('reports/llm-output.log', 'utf8'); } catch {}
+              const passed = (log.match(/(\d+) passed/) || [])[1] || '?';
+              const failed = (log.match(/(\d+) failed/) || [])[1] || '?';
+              const icon = (failed !== '0' && failed !== '?') ? '\u274C' : '\u2705';
+              body = '## ' + icon + ' LLM Scenario Tests (VCR Playback)\n\n';
+              body += '**Passed**: ' + passed + ' | **Failed**: ' + failed + '\n';
+              if (log) {
+                body += '\n<details><summary>Log (last 80 lines)</summary>\n\n```\n' + log.split('\n').slice(-80).join('\n') + '\n```\n</details>\n';
+              }
+            }
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,

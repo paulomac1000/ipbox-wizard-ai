@@ -831,13 +831,40 @@ def _oracle_test_4(parsed: dict, scenario: dict) -> bool:
 
 
 def _oracle_test_5(parsed: dict, scenario: dict) -> bool:
-    """TEST 5: Overpayment check — stub, always True for now."""
-    return True
+    """TEST 5: Total tax consistency — podatek_całościowy = IP + NIE."""
+    result = parsed.get("result", {})
+    podatek = result.get("podatek", {})
+    try:
+        ip = float(podatek.get("podatek_IP", 0) or 0)
+        nie = float(podatek.get("podatek_NIE_finalny", 0) or 0)
+        cal = float(podatek.get("podatek_całościowy", 0) or 0)
+        return abs(ip + nie - cal) < 1.0
+    except (ValueError, TypeError):
+        return False
 
 
 def _oracle_test_6(parsed: dict, scenario: dict) -> bool:
-    """TEST 6: KPiR balance — stub, always True for now."""
-    return True
+    """TEST 6: KPiR balance — monthly sums match annual summary."""
+    kpir = scenario.get("podsumowanie_kpir") or scenario.get("input", {}).get("podsumowanie_kpir")
+    if not kpir:
+        return True
+    expected_revenue = kpir.get("przychody", 0)
+    expected_costs = kpir.get("koszty", 0)
+    miesiace = scenario.get("miesiace", []) or scenario.get("input", {}).get("miesiace", [])
+    if not miesiace:
+        return True
+    monthly_revenue = 0
+    monthly_costs = 0
+    for m in miesiace:
+        if not isinstance(m, dict):
+            continue
+        monthly_revenue += float(m.get("przychody", 0) or 0)
+        for cost in m.get("koszty", []):
+            if isinstance(cost, dict):
+                monthly_costs += float(cost.get("kwota", 0) or 0)
+    revenue_match = abs(monthly_revenue - float(expected_revenue)) < 1.0
+    costs_match = abs(monthly_costs - float(expected_costs)) < 1.0
+    return revenue_match and costs_match
 
 
 def _oracle_test_7(parsed: dict, scenario: dict) -> bool:
@@ -852,8 +879,22 @@ def _oracle_test_7(parsed: dict, scenario: dict) -> bool:
 
 
 def _oracle_test_8(parsed: dict, scenario: dict) -> bool:
-    """TEST 8: MIX allocation — stub, always True for now."""
-    return True
+    """TEST 8: MIX allocation — all costs classified, no orphans."""
+    classifications = parsed.get("classifications", [])
+    if isinstance(classifications, str):
+        classifications = [classifications]
+    miesiace = scenario.get("miesiace", []) or scenario.get("input", {}).get("miesiace", [])
+    if not miesiace:
+        return True
+    input_cost_count = 0
+    for m in miesiace:
+        if not isinstance(m, dict):
+            continue
+        input_cost_count += len(m.get("koszty", []))
+    if input_cost_count == 0:
+        return True
+    classified_lines = [l for l in classifications if isinstance(l, str) and l.strip()]
+    return len(classified_lines) >= input_cost_count
 
 
 def _oracle_test_9(parsed: dict, scenario: dict) -> bool:
