@@ -893,7 +893,7 @@ def _oracle_test_8(parsed: dict, scenario: dict) -> bool:
         input_cost_count += len(m.get("koszty", []))
     if input_cost_count == 0:
         return True
-    classified_lines = [l for l in classifications if isinstance(l, str) and l.strip()]
+    classified_lines = [line for line in classifications if isinstance(line, str) and line.strip()]
     return len(classified_lines) >= input_cost_count
 
 
