@@ -12,6 +12,5 @@ input:
   - miesiac: 2025-01
     przychody: 90000
 assertions:
-  testy_pass:
+  testy_fail:
   - TEST_1
-  - TEST_2

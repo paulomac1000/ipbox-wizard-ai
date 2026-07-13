@@ -11,7 +11,7 @@ meta:
   - fail-fast
   priority: P0
   expected_stops:
-  - STOP_04
+  - STOP_08
 input:
   rok: 2025
   forma_opodatkowania: liniowy_19%

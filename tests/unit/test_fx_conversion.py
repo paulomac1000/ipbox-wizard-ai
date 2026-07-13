@@ -162,7 +162,8 @@ class TestFXConversion:
         assert get_nbp_rate("USD", "2025-01-14") is None
 
         # Exception
-        mock_get.side_effect = Exception("API error")
+        import requests
+        mock_get.side_effect = requests.exceptions.RequestException("API error")
         assert get_nbp_rate("USD", "2025-01-14") is None
 
     @pytest.mark.unit

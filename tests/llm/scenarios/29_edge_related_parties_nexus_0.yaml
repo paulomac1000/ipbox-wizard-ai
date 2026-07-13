@@ -43,6 +43,7 @@ input:
   ulgi: {}
 assertions:
   nexus: 0.0
+  # NEXUS = 0 → Dochód_IP * NEXUS = 0 → podatek_IP = 0
   podatek_IP_range:
-  - 250
-  - 250
+  - 0
+  - 10

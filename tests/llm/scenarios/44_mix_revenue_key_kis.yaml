@@ -40,6 +40,9 @@ input:
       kwota: 100
       kategoria: IP
 assertions:
+  klucz_MIX_metoda: "przychodowa_roczna"
+  klucz_MIX_źródło: "interpretacja_KIS"
+  nie_używaj_W_do_MIX: true
   review_obecne:
   - REVIEW_16
   - REVIEW_17

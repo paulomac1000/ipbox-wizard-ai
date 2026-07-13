@@ -13,5 +13,5 @@ input:
     godziny_pracy: 160
     godziny_nie_IP: 2
 assertions:
-  testy_fail:
-  - TEST_7
+  warnings:
+  - REVIEW_01

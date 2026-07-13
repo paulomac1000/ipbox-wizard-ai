@@ -26,9 +26,7 @@ input:
     ikze: 0
 assertions:
   nexus: 1.0
-  podatek_IP_range:
-  - 375
-  - 375
+  podatek_IP_range: [700, 800]  # 15000 * 5% = 750
   przychod_IP_roczny_range:
   - 15000
   - 15000

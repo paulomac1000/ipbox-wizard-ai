@@ -34,10 +34,10 @@ def calculate_w_coefficient(
 
     W = ((work_hours - non_ip_hours) * invoice_percentage/100) / work_hours * 100
     """
-    if work_hours < 0:
-        raise ValueError(f"work_hours must be >= 0, got {work_hours}")
-    if non_ip_hours < 0:
-        raise ValueError(f"non_ip_hours must be >= 0, got {non_ip_hours}")
+    if not math.isfinite(work_hours) or work_hours < 0:
+        raise ValueError(f"work_hours must be a finite number >= 0, got {work_hours}")
+    if not math.isfinite(non_ip_hours) or non_ip_hours < 0:
+        raise ValueError(f"non_ip_hours must be a finite number >= 0, got {non_ip_hours}")
     if not (0 <= invoice_percentage <= 100):
         raise ValueError(f"invoice_percentage must be between 0 and 100, got {invoice_percentage}")
 
@@ -93,6 +93,17 @@ def aggregate_w_multiproject(projects: list[dict]) -> float:
 
     projects = [{"revenue": 10000, "W": 75}, {"revenue": 5000, "W": 90}, ...]
     """
+    if not projects:
+        raise ValueError("projects list cannot be empty")
+
+    for i, p in enumerate(projects):
+        revenue = p.get("revenue", 0)
+        w_val = p.get("W", 0)
+        if not math.isfinite(revenue) or revenue < 0:
+            raise ValueError(f"project[{i}] revenue must be a finite number >= 0, got {revenue}")
+        if not math.isfinite(w_val) or not (0 <= w_val <= 100):
+            raise ValueError(f"project[{i}] W must be a finite number between 0 and 100, got {w_val}")
+
     total_revenue = sum(p["revenue"] for p in projects)
     if total_revenue == 0:
         return 0.0
@@ -129,8 +140,11 @@ def get_nbp_rate(currency: str, date_str: str, _depth: int = 0) -> float | None:
             return get_nbp_rate(currency, prev, _depth=_depth + 1)
         else:
             return None
-    except Exception as e:
-        print(f"⚠️  NBP API Error: {e}")
+    except requests.exceptions.RequestException as e:
+        print(f"⚠️  NBP API Network Error: {e}")
+        return None
+    except (KeyError, IndexError, ValueError) as e:
+        print(f"⚠️  NBP API Data Error: {e}")
         return None
 
 
@@ -204,8 +218,8 @@ class CostItem:
     nexus_amount: float | None = None  # explicit amount for NEXUS (None = use item.amount)
 
     def __post_init__(self) -> None:
-        if self.amount < 0:
-            raise ValueError(f"amount must be >= 0, got {self.amount}")
+        if not math.isfinite(self.amount) or self.amount < 0:
+            raise ValueError(f"amount must be a finite number >= 0, got {self.amount}")
         if self.nexus_amount is not None:
             if not (0 <= self.nexus_amount <= self.amount):
                 raise ValueError(
@@ -476,8 +490,8 @@ def calculate_nexus(A: float, B: float = 0, C: float = 0, D: float = 0) -> dict[
     Calculate the annual NEXUS (art. 30ca ust. 7 PIT).
     """
     for name, val in [("A", A), ("B", B), ("C", C), ("D", D)]:
-        if val < 0:
-            raise ValueError(f"NEXUS component {name} must be >= 0, got {val}")
+        if not math.isfinite(val) or val < 0:
+            raise ValueError(f"NEXUS component {name} must be a finite number >= 0, got {val}")
 
     denominator = A + B + C + D
     if denominator == 0:

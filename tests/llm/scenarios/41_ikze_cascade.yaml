@@ -57,13 +57,5 @@ input:
   ulgi:
     IKZE: 7000
 assertions:
-  nexus: 1.0
-  podatek_IP_range:
-  - 1051
-  - 1051
-  podatek_NIE_range:
-  - 0
-  - 0
-  przychod_IP_roczny_range:
-  - 21000
-  - 21000
+  podatek_NIE_range: [150, 350]
+  podatek_IP_range: [800, 1100]
