@@ -8,6 +8,12 @@ from tests.llm.evaluator import (
     _find_nexus,
     _find_non_ip_tax,
     _find_value,
+    _oracle_test_1,
+    _oracle_test_2,
+    _oracle_test_3,
+    _oracle_test_4,
+    _oracle_test_7,
+    _oracle_test_9,
     _test_failed,
     _test_passed,
     normalize_test_key,
@@ -400,6 +406,7 @@ class TestEvaluatorSuccessCase:
         e = Evaluator(scenario)
         failures, _ = e.evaluate({
             "result": {
+                "nexus": 0.75,
                 "alokacja": {"koszty_MIX": {"metoda": "przychodowa_roczna", "źródło": "interpretacja_KIS"}},
             },
             "tests": "TEST_1: PASS\nTEST_7: PASS",

@@ -451,6 +451,32 @@ class Evaluator:
                 ):
                     warnings.append(f"Oczekiwane ostrzeżenie '{warning_code}' nie zostało wygenerowane")
 
+        # --- Oracle verification: independently compute TEST 1-9 ---
+        oracle_map = {
+            "TEST_1": _oracle_test_1,
+            "TEST_2": _oracle_test_2,
+            "TEST_3": _oracle_test_3,
+            "TEST_4": _oracle_test_4,
+            "TEST_5": _oracle_test_5,
+            "TEST_6": _oracle_test_6,
+            "TEST_7": _oracle_test_7,
+            "TEST_8": _oracle_test_8,
+            "TEST_9": _oracle_test_9,
+        }
+        all_expected_tests = set(assertions.get("testy_pass", []) + assertions.get("testy_fail", []))
+        for test_id in all_expected_tests:
+            normalized = _normalize_test_id(test_id)
+            oracle_fn = oracle_map.get(normalized)
+            if oracle_fn and tests_text:
+                oracle_result = oracle_fn(parsed, self.scenario)
+                model_passed = _test_passed(tests_text, test_id)
+                if oracle_result != model_passed:
+                    failures.append({
+                        "type": "oracle_mismatch",
+                        "message": f"Oracle {normalized}: oracle={'PASS' if oracle_result else 'FAIL'} "
+                                  f"model={'PASS' if model_passed else 'FAIL'}",
+                    })
+
         return failures, warnings
 
 
@@ -752,6 +778,99 @@ def _flatten_dict(d: dict, parent_key: str = "") -> dict:
         else:
             items[new_key] = v
     return items
+
+
+# ---------------------------------------------------------------------------
+# Oracle functions — deterministic TEST recomputation
+# ---------------------------------------------------------------------------
+
+def _oracle_test_1(parsed: dict, scenario: dict) -> bool:
+    """TEST 1: NEXUS must be in [0, 1]."""
+    nexus = parsed.get("result", {}).get("nexus")
+    if nexus is None:
+        return False
+    try:
+        val = float(nexus)
+        return 0.0 <= val <= 1.0
+    except (ValueError, TypeError):
+        return False
+
+
+def _oracle_test_2(parsed: dict, scenario: dict) -> bool:
+    """TEST 2: podatek_IP = dochód_IP x 5%."""
+    result = parsed.get("result", {})
+    podatek_ip = result.get("podatek", {}).get("podatek_IP")
+    dochód_ip = result.get("dochód_IP")
+    if podatek_ip is None or dochód_ip is None:
+        return False
+    try:
+        return abs(float(podatek_ip) - float(dochód_ip) * 0.05) < 1.0
+    except (ValueError, TypeError):
+        return False
+
+
+def _oracle_test_3(parsed: dict, scenario: dict) -> bool:
+    """TEST 3: No ZUS double-dip (ZUS in KPiR AND annual ulga)."""
+    ulgi = scenario.get("ulgi", {})
+    has_annual_zus = bool(ulgi.get("zus_spoleczne_roczne"))
+    miesiace = scenario.get("miesiace", [])
+    zus_in_kpir = False
+    for m in miesiace:
+        for cost in m.get("koszty", []):
+            if isinstance(cost, dict) and "zus" in cost.get("opis", "").lower():
+                zus_in_kpir = True
+                break
+    return not (has_annual_zus and zus_in_kpir)
+
+
+def _oracle_test_4(parsed: dict, scenario: dict) -> bool:
+    """TEST 4: Tax cascade valid — non-negative + sum matches."""
+    result = parsed.get("result", {})
+    podatek = result.get("podatek", {})
+    try:
+        ip = float(podatek.get("podatek_IP", 0) or 0)
+        nie = float(podatek.get("podatek_NIE_finalny", 0) or 0)
+        cal = float(podatek.get("podatek_całościowy", 0) or 0)
+        return ip >= 0 and nie >= 0 and abs(ip + nie - cal) < 1.0
+    except (ValueError, TypeError):
+        return False
+
+
+def _oracle_test_5(parsed: dict, scenario: dict) -> bool:
+    """TEST 5: Overpayment check — stub, always True for now."""
+    return True
+
+
+def _oracle_test_6(parsed: dict, scenario: dict) -> bool:
+    """TEST 6: KPiR balance — stub, always True for now."""
+    return True
+
+
+def _oracle_test_7(parsed: dict, scenario: dict) -> bool:
+    """TEST 7: No private costs in IP/MIX/NIE baskets."""
+    classifications = parsed.get("classifications", [])
+    if isinstance(classifications, str):
+        classifications = [classifications]
+    for line in classifications:
+        if isinstance(line, str) and "prywatny" in line.lower():
+            if "IP" in line or "MIX" in line or "NIE" in line:
+                return False
+    return True
+
+
+def _oracle_test_8(parsed: dict, scenario: dict) -> bool:
+    """TEST 8: MIX allocation — stub, always True for now."""
+    return True
+
+
+def _oracle_test_9(parsed: dict, scenario: dict) -> bool:
+    """TEST 9: All months have project descriptions."""
+    for m in scenario.get("miesiace", []):
+        if not isinstance(m, dict):
+            continue
+        if not m.get("opis_projektu", "").strip():
+            return False
+    return True
 
 
 def _nested_get(d: dict, key: str) -> Any:
