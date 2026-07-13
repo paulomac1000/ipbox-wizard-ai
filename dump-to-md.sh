@@ -12,6 +12,9 @@ if [ ! -d "$INPUT_PATH" ]; then
 fi
 
 ABS_PATH=$(realpath "$INPUT_PATH")
+
+# Create output dir if missing
+mkdir -p "$OUTPUT_DIR"
 FOLDER_NAME=$(basename "$ABS_PATH")
 OUTPUT_FILE="${OUTPUT_DIR}/${FOLDER_NAME}.md"
 OUTPUT_NAME=$(basename "$OUTPUT_FILE")
@@ -42,20 +45,34 @@ while IFS= read -r -d '' f; do
     esac
 
     # Only include text file extensions
+    # Also match known files without extension: Makefile, Dockerfile, docker-compose.yml
+    basename_only=$(basename "$rel")
     if ! echo "$rel" | grep -qiE "${TEXT_EXTS}$" 2>/dev/null; then
-        skipped_nontext=$((skipped_nontext+1))
-        continue
+        case "$basename_only" in
+            Makefile|Dockerfile|docker-compose.yml|docker-compose.yaml|Gemfile|Rakefile|Procfile)
+                ;;
+            *)
+                skipped_nontext=$((skipped_nontext+1))
+                continue
+                ;;
+        esac
     fi
 
     total=$((total+1))
     sanitized_rel="$rel"
     echo "## $sanitized_rel" >> "$OUTPUT_FILE"
-    echo '```' >> "$OUTPUT_FILE"
+    # Use filetype fence with extra delimiter to avoid breaking markdown
+    ext="${f##*.}"
+    echo '````' >> "$OUTPUT_FILE"
+    if [ ${#ext} -le 10 ] && [ "$ext" != "$f" ]; then
+        echo -n "$ext" >> "$OUTPUT_FILE"
+    fi
+    echo >> "$OUTPUT_FILE"
     cat "$f" >> "$OUTPUT_FILE"
     echo >> "$OUTPUT_FILE"
-    echo '```' >> "$OUTPUT_FILE"
+    echo '````' >> "$OUTPUT_FILE"
     echo "" >> "$OUTPUT_FILE"
-done < <(find "$ABS_PATH" -mindepth 1 \( -name .git -o -name input -o -name .pytest_cache -o -name .vscode -o -name .omo -o -name reports -o -name tmp \) -prune -o -type f -print0 2>/dev/null)
+done < <(find "$ABS_PATH" -mindepth 1 \( -name .git -o -name input -o -name .pytest_cache -o -name .vscode -o -name .omo -o -name reports -o -name tmp -o -name .venv -o -name .ruff_cache -o -name htmlcov -o -name node_modules -o -name cassettes.old -o -name cassettes.new \) -prune -o -type f -print0 2>/dev/null)
 
 echo "--- Statistics ---" >> "$OUTPUT_FILE"
 echo "- Total text files dumped: $total" >> "$OUTPUT_FILE"
