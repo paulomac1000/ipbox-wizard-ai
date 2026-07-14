@@ -51,12 +51,13 @@ jobs:
         working-directory: /tmp/reviewed-tree
         run: pip install -r requirements.txt -r requirements-test.txt
 
-      - name: Canonical Ruff format
+      - name: Format Python
         working-directory: /tmp/reviewed-tree
-        run: |
-          set -euo pipefail
-          ruff format .
-          ruff format --check .
+        run: ruff format .
+
+      - name: Check Python format
+        working-directory: /tmp/reviewed-tree
+        run: ruff format --check .
 
       - name: Ruff lint
         working-directory: /tmp/reviewed-tree
