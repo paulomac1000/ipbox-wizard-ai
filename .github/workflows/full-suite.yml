@@ -22,7 +22,6 @@ jobs:
       - name: Reconstruct reviewed source
         run: |
           set -euo pipefail
-          wc -c .delivery/part-*
           cat .delivery/part-* > /tmp/payload.b64
           python3 - <<'PY'
           import base64
@@ -31,27 +30,11 @@ jobs:
           from pathlib import Path
 
           payload = Path('/tmp/payload.b64').read_bytes()
-          print(f'payload_bytes={len(payload)}')
-          try:
-              archive_bytes = base64.b64decode(payload, validate=True)
-          except Exception as exc:
-              print(f'base64_error={exc!r}')
-              raise
-          actual = hashlib.sha256(archive_bytes).hexdigest()
-          print(f'archive_bytes={len(archive_bytes)}')
-          print(f'archive_sha256={actual}')
+          archive_bytes = base64.b64decode(payload, validate=True)
+          print(f'archive_sha256={hashlib.sha256(archive_bytes).hexdigest()}')
           Path('/tmp/ipbox-final-reviewed.tar.gz').write_bytes(archive_bytes)
-          with tarfile.open('/tmp/ipbox-final-reviewed.tar.gz', 'r:gz') as tf:
-              names = tf.getnames()
-              print(f'archive_members={len(names)}')
-          PY
-          rm -rf /tmp/reviewed-tree
-          mkdir -p /tmp/reviewed-tree
-          python3 - <<'PY'
-          import tarfile
-          from pathlib import Path
-
           root = Path('/tmp/reviewed-tree').resolve()
+          root.mkdir(parents=True, exist_ok=True)
           with tarfile.open('/tmp/ipbox-final-reviewed.tar.gz', 'r:gz') as tf:
               for member in tf.getmembers():
                   target = (root / member.name).resolve()
@@ -68,16 +51,34 @@ jobs:
         working-directory: /tmp/reviewed-tree
         run: pip install -r requirements.txt -r requirements-test.txt
 
-      - name: Validate reviewed tree
+      - name: Ruff format
+        working-directory: /tmp/reviewed-tree
+        run: ruff format --check .
+
+      - name: Ruff lint
+        working-directory: /tmp/reviewed-tree
+        run: ruff check .
+
+      - name: Compile
+        working-directory: /tmp/reviewed-tree
+        run: python -m compileall -q python_helper tests scripts
+
+      - name: Unit tests and coverage
+        working-directory: /tmp/reviewed-tree
+        run: pytest tests/unit --cov=python_helper --cov-report=term-missing --cov-fail-under=90
+
+      - name: Full free suite
+        working-directory: /tmp/reviewed-tree
+        run: pytest -q
+
+      - name: Cassette policy
+        working-directory: /tmp/reviewed-tree
+        run: python scripts/check_cassette_policy.py
+
+      - name: Shell syntax
         working-directory: /tmp/reviewed-tree
         run: |
           set -euo pipefail
-          ruff format --check .
-          ruff check .
-          python -m compileall -q python_helper tests scripts
-          pytest tests/unit --cov=python_helper --cov-report=term-missing --cov-fail-under=90
-          pytest -q
-          python scripts/check_cassette_policy.py
           for script in scripts/*.sh dump-to-md.sh; do
             bash -n "$script"
           done
