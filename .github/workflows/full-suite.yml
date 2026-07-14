@@ -49,78 +49,36 @@ jobs:
         working-directory: /tmp/reviewed-tree
         run: pip install -r requirements.txt -r requirements-test.txt
 
-      - name: Format python_helper and scripts
-        working-directory: /tmp/reviewed-tree
-        run: ruff format python_helper scripts tests/__init__.py tests/conftest.py
+      - name: Capture oracle formatter diagnostics
+        run: |
+          set +e
+          cd /tmp/reviewed-tree
+          ruff format tests/llm/oracle.py > /tmp/oracle-ruff.log 2>&1
+          code=$?
+          set -e
+          cat /tmp/oracle-ruff.log
+          if [ "$code" -ne 0 ]; then
+            cp /tmp/oracle-ruff.log "$GITHUB_WORKSPACE/.delivery/oracle-ruff.log"
+            cd "$GITHUB_WORKSPACE"
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add .delivery/oracle-ruff.log
+            git commit -m "chore: capture oracle formatter diagnostic"
+            git push origin HEAD:fix/decouple-mix-allocation-from-w
+            exit "$code"
+          fi
 
-      - name: Format LLM init
-        working-directory: /tmp/reviewed-tree
-        run: ruff format tests/llm/__init__.py
-
-      - name: Format LLM client
-        working-directory: /tmp/reviewed-tree
-        run: ruff format tests/llm/client.py
-
-      - name: Format LLM evaluator
-        working-directory: /tmp/reviewed-tree
-        run: ruff format tests/llm/evaluator.py
-
-      - name: Format LLM models
-        working-directory: /tmp/reviewed-tree
-        run: ruff format tests/llm/models.py
-
-      - name: Format LLM oracle
-        working-directory: /tmp/reviewed-tree
-        run: ruff format tests/llm/oracle.py
-
-      - name: Format LLM schema
-        working-directory: /tmp/reviewed-tree
-        run: ruff format tests/llm/output_schema.py
-
-      - name: Format LLM request
-        working-directory: /tmp/reviewed-tree
-        run: ruff format tests/llm/request_spec.py
-
-      - name: Format LLM runner
-        working-directory: /tmp/reviewed-tree
-        run: ruff format tests/llm/runner.py
-
-      - name: Format LLM scenarios test
-        working-directory: /tmp/reviewed-tree
-        run: ruff format tests/llm/test_scenarios.py
-
-      - name: Format VCR and unit tests
-        working-directory: /tmp/reviewed-tree
-        run: ruff format tests/llm/vcr tests/unit
-
-      - name: Check Python format
-        working-directory: /tmp/reviewed-tree
-        run: ruff format --check python_helper scripts tests
-
-      - name: Ruff lint
-        working-directory: /tmp/reviewed-tree
-        run: ruff check python_helper scripts tests
-
-      - name: Compile
-        working-directory: /tmp/reviewed-tree
-        run: python -m compileall -q python_helper tests scripts
-
-      - name: Unit tests and coverage
-        working-directory: /tmp/reviewed-tree
-        run: pytest tests/unit --cov=python_helper --cov-report=term-missing --cov-fail-under=90
-
-      - name: Full free suite
-        working-directory: /tmp/reviewed-tree
-        run: pytest -q
-
-      - name: Cassette policy
-        working-directory: /tmp/reviewed-tree
-        run: python scripts/check_cassette_policy.py
-
-      - name: Shell syntax
+      - name: Remaining quality gates
         working-directory: /tmp/reviewed-tree
         run: |
           set -euo pipefail
+          ruff format python_helper scripts tests
+          ruff format --check python_helper scripts tests
+          ruff check python_helper scripts tests
+          python -m compileall -q python_helper tests scripts
+          pytest tests/unit --cov=python_helper --cov-report=term-missing --cov-fail-under=90
+          pytest -q
+          python scripts/check_cassette_policy.py
           for script in scripts/*.sh dump-to-md.sh; do
             bash -n "$script"
           done
