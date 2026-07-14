@@ -1,4 +1,4 @@
-name: Diagnose reviewed unit tests
+name: Diagnose delivery chunks
 
 on:
   pull_request:
@@ -11,7 +11,7 @@ jobs:
   diagnose:
     if: github.head_ref == 'fix/decouple-mix-allocation-from-w'
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
         with:
@@ -19,51 +19,38 @@ jobs:
           fetch-depth: 1
           show-progress: false
 
-      - name: Reconstruct and repair reviewed tree
+      - name: Compare delivery blob hashes
         run: |
-          set -euo pipefail
-          cat .delivery/part-* > /tmp/payload.b64
           python3 - <<'PY'
-          import base64
-          import tarfile
+          import hashlib
           from pathlib import Path
-          archive = Path('/tmp/reviewed.tar.gz')
-          archive.write_bytes(base64.b64decode(Path('/tmp/payload.b64').read_bytes(), validate=True))
-          root = Path('/tmp/reviewed-tree')
-          root.mkdir(parents=True, exist_ok=True)
-          with tarfile.open(archive, 'r:gz') as tf:
-              tf.extractall(root)
+
+          expected = {
+              'part-00': '45848972025cc5af31337c4fa856851cc9e4e81e',
+              'part-01': '0af87621b08127b43b3e0de9608ae04672e5fc1d',
+              'part-02': 'b518f18067e27091ec1c0bc467b3087f3543178b',
+              'part-03': '1a8fe562ce641d49316cc858054904fc8db3945b',
+              'part-04': '08524886ab28a1a6714b574472a2197b0a884148',
+              'part-05': 'c371f47e54250ff5856078bb28c382d13f5ccae4',
+              'part-06': '6366895354adef76c53803103972dcbe1be6726d',
+              'part-07': 'aa1d3af19d1a3e011b50919cff6a657747714983',
+              'part-08': '3996bbdd922415cb8291ccf390b4caf784da9b3c',
+              'part-09': '8124667d33f81890e46e4ddada18c9ebb141fe1a',
+              'part-10': '287354a05ea418171ae22f910a0732819dac4cd6',
+              'part-11': '2dd1c9a88b22b1bdde760a75bbd8df0c5ee2abdc',
+              'part-12': '7741f734009dbb72435cbeab111fddb5a156b991',
+          }
+          lines = []
+          for name, wanted in expected.items():
+              path = Path('.delivery') / name
+              data = path.read_bytes()
+              actual = hashlib.sha1(f'blob {len(data)}\0'.encode() + data).hexdigest()
+              lines.append(f'{name} size={len(data)} expected={wanted} actual={actual} match={actual == wanted}')
+          Path('transport-part-diagnostic.txt').write_text('\n'.join(lines) + '\n', encoding='utf-8')
+          print('\n'.join(lines))
           PY
-          cat .delivery/remote-oracle-part-00 .delivery/remote-oracle-part-01 \
-              .delivery/remote-oracle-part-02 .delivery/remote-oracle-part-03 \
-              .delivery/oracle-fix-part-04 .delivery/oracle-fix-part-05 \
-            | base64 --decode > /tmp/reviewed-tree/tests/llm/oracle.py
 
-      - uses: actions/setup-python@v5
+      - uses: actions/upload-artifact@v4
         with:
-          python-version: "3.12"
-
-      - name: Install dependencies
-        working-directory: /tmp/reviewed-tree
-        run: pip install -q -r requirements.txt -r requirements-test.txt
-
-      - name: Run unit tests
-        id: unit
-        continue-on-error: true
-        working-directory: /tmp/reviewed-tree
-        run: |
-          mkdir -p reports
-          ruff format . > reports/format.log 2>&1
-          pytest tests/unit --cov=python_helper --cov-report=term-missing --cov-fail-under=90 -vv > reports/unit.log 2>&1
-
-      - name: Upload diagnostic
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: unit-test-diagnostic
-          path: /tmp/reviewed-tree/reports/
-          if-no-files-found: error
-
-      - name: Fail after upload
-        if: steps.unit.outcome != 'success'
-        run: exit 1
+          name: transport-part-diagnostic
+          path: transport-part-diagnostic.txt
