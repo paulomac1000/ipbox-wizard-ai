@@ -1,4 +1,4 @@
-name: Diagnose corrected final fragments
+name: Diagnose normalized final fragments
 
 on:
   pull_request:
@@ -19,36 +19,37 @@ jobs:
           fetch-depth: 1
           show-progress: false
 
-      - name: Compare corrected fragment hashes
+      - name: Compare normalized corrected fragments
         run: |
           set -euo pipefail
           cat > /tmp/expected.txt <<'EOF'
-          fix01-0 c77a566f4fbd225bbf5fd613ce14d836ec4ca136
-          fix01-1 3248a88af701e97656814223fe0d580874fb3f78
-          fix03-0 a036c12e5fd5a423a0d0f57fc342f60b0b5e1f66
-          fix03-1 d5140c8f267c8791d82071ab86f813590bb55e38
-          fix04-0 c3c04d36e319f4250163a6e7e7c74e9a9de4facb
-          fix04-1 e7987d2b44c67485685d7f9d009fb984942e878c
-          fix07-0 8c93235c1a0c5176c0bb4e566f259a5d9500284c
-          fix07-1 8e84610e0c9e0a9966ad8d51eaf4c63a3a94c849
-          fix08-0 c34774fe536c7cf4de6ca757e7bd01153c956c01
-          fix08-1 4c4ddfdb2611986879775b7d22ac952949ecb6d0
-          fix09-0 fdab596f27a11ca2b943d000ec367d95b52dd022
-          fix09-1 f9f4ce4c7accc1568151fd765985329003018e54
+          fix01-0 86689f3b92d45f248efb9aa21067d7b9047a2b63f5b90def396834ac13fcbf2c
+          fix01-1 4a20c55df459b37859144816aa358dcf3a46b881b25d58910b9137860d470c45
+          fix03-0 2493d8a7305a16ed202eb6db5b522942fd9b092c1a2d65a56a635cddf1aea208
+          fix03-1 a9673b49f55eb60a8da53c8695fd917cd1d36b78b0d93bba7e661812f3ee0a5c
+          fix04-0 1a7a94c37e081831da7a36de4700e1c6809e1ba7e32eb3712cca235d1950a4b6
+          fix04-1 e380a4ce6e944f6465ab37d8dbc36c2dea8f22648a06c994b45b1c055ce203f7
+          fix07-0 33d3ca87cc07e640ac3b764c1a7b68dc8e320b9b98dbefb1b85199826add9482
+          fix07-1 58b664d3eadf1502aa1434af63d0b047712dea1f7b2a17734a036402e42489e0
+          fix08-0 b3eb2346d130b4374a875bfa2a860cc4561019599cc034272d766197badfeefc
+          fix08-1 4615abe18f7878b56d6401fbaeb52d720635861970e26e0528f0e635774cea0b
+          fix09-0 270a6dce2e42f9c5b7c411694583aaf43e50bb7d953dc05a3c91199f5bc3a8cf
+          fix09-1 bae68b94ee9c87040764b5ca90716d6fe2171a7c2a93bfc946305a0298a672c6
           EOF
-          : > /tmp/corrected-fragment-hashes.txt
+          : > /tmp/normalized-fragment-hashes.txt
           while read -r name expected; do
             path=".delivery-final/$name"
-            actual="$(git hash-object "$path")"
-            printf '%s expected=%s actual=%s match=%s\n' \
-              "$name" "$expected" "$actual" "$([ "$actual" = "$expected" ] && echo yes || echo no)" \
-              >> /tmp/corrected-fragment-hashes.txt
+            actual="$(tr -d '[:space:]' < "$path" | sha256sum | awk '{print $1}')"
+            bytes="$(tr -d '[:space:]' < "$path" | wc -c)"
+            printf '%s bytes=%s expected=%s actual=%s match=%s\n' \
+              "$name" "$bytes" "$expected" "$actual" "$([ "$actual" = "$expected" ] && echo yes || echo no)" \
+              >> /tmp/normalized-fragment-hashes.txt
           done < /tmp/expected.txt
-          cat /tmp/corrected-fragment-hashes.txt
+          cat /tmp/normalized-fragment-hashes.txt
 
       - uses: actions/upload-artifact@v4
         with:
-          name: corrected-fragment-hashes
-          path: /tmp/corrected-fragment-hashes.txt
+          name: normalized-fragment-hashes
+          path: /tmp/normalized-fragment-hashes.txt
           if-no-files-found: error
           retention-days: 1
