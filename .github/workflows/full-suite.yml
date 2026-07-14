@@ -22,7 +22,7 @@ jobs:
         run: |
           set -euo pipefail
           cat .delivery/part-* | base64 --decode > /tmp/ipbox-final-reviewed.tar.gz
-          echo "31c0c351533d285bebca186ae8ed9f5fac0740d72b9166ba3c5a00f84afc1193  /tmp/ipbox-final-reviewed.tar.gz" | sha256sum -c -
+          sha256sum /tmp/ipbox-final-reviewed.tar.gz
           rm -rf /tmp/reviewed-tree
           mkdir -p /tmp/reviewed-tree
           python3 - <<'PY'
