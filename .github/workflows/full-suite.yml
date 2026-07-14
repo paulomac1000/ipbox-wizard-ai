@@ -16,26 +16,47 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: fix/decouple-mix-allocation-from-w
-          fetch-depth: 0
+          fetch-depth: 1
+          show-progress: false
 
       - name: Reconstruct reviewed source
         run: |
           set -euo pipefail
-          cat .delivery/part-* | base64 --decode > /tmp/ipbox-final-reviewed.tar.gz
-          sha256sum /tmp/ipbox-final-reviewed.tar.gz
+          wc -c .delivery/part-*
+          cat .delivery/part-* > /tmp/payload.b64
+          python3 - <<'PY'
+          import base64
+          import hashlib
+          import tarfile
+          from pathlib import Path
+
+          payload = Path('/tmp/payload.b64').read_bytes()
+          print(f'payload_bytes={len(payload)}')
+          try:
+              archive_bytes = base64.b64decode(payload, validate=True)
+          except Exception as exc:
+              print(f'base64_error={exc!r}')
+              raise
+          actual = hashlib.sha256(archive_bytes).hexdigest()
+          print(f'archive_bytes={len(archive_bytes)}')
+          print(f'archive_sha256={actual}')
+          Path('/tmp/ipbox-final-reviewed.tar.gz').write_bytes(archive_bytes)
+          with tarfile.open('/tmp/ipbox-final-reviewed.tar.gz', 'r:gz') as tf:
+              names = tf.getnames()
+              print(f'archive_members={len(names)}')
+          PY
           rm -rf /tmp/reviewed-tree
           mkdir -p /tmp/reviewed-tree
           python3 - <<'PY'
           import tarfile
           from pathlib import Path
 
-          archive = Path("/tmp/ipbox-final-reviewed.tar.gz")
-          root = Path("/tmp/reviewed-tree").resolve()
-          with tarfile.open(archive, "r:gz") as tf:
+          root = Path('/tmp/reviewed-tree').resolve()
+          with tarfile.open('/tmp/ipbox-final-reviewed.tar.gz', 'r:gz') as tf:
               for member in tf.getmembers():
                   target = (root / member.name).resolve()
                   if target != root and root not in target.parents:
-                      raise SystemExit(f"unsafe archive path: {member.name}")
+                      raise SystemExit(f'unsafe archive path: {member.name}')
               tf.extractall(root)
           PY
 
