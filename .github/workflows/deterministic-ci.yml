@@ -35,10 +35,21 @@ jobs:
           part-09 8720ae527231dddd0ea9598cb8e520ed2836a40e
           part-10 012a63f5a8c0a49ce52c5579a527a03c0b20f857
           EOF
+          : > /tmp/fragment-hashes.txt
           while read -r name expected; do
             path=".delivery-final/$name"
             actual="$(git hash-object "$path")"
             bytes="$(wc -c < "$path")"
             printf '%s bytes=%s expected=%s actual=%s match=%s\n' \
-              "$name" "$bytes" "$expected" "$actual" "$([ "$actual" = "$expected" ] && echo yes || echo no)"
+              "$name" "$bytes" "$expected" "$actual" "$([ "$actual" = "$expected" ] && echo yes || echo no)" \
+              >> /tmp/fragment-hashes.txt
           done < /tmp/expected.txt
+          cat /tmp/fragment-hashes.txt
+
+      - name: Upload fragment report
+        uses: actions/upload-artifact@v4
+        with:
+          name: final-fragment-hashes
+          path: /tmp/fragment-hashes.txt
+          if-no-files-found: error
+          retention-days: 1
