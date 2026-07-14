@@ -1,0 +1,80 @@
+name: Deterministic CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  checks: write
+
+concurrency:
+  group: deterministic-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deterministic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements-test.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt -r requirements-test.txt
+
+      - name: Ruff format
+        run: ruff format --check .
+
+      - name: Ruff lint
+        run: ruff check .
+
+      - name: Compile Python
+        run: python -m compileall -q python_helper tests scripts
+
+      - name: Unit tests with coverage
+        run: |
+          mkdir -p reports
+          pytest tests/unit \
+            --cov=python_helper \
+            --cov-report=term-missing \
+            --cov-report=xml:reports/coverage-py${{ matrix.python-version }}.xml \
+            --cov-fail-under=90 \
+            --junitxml=reports/unit-py${{ matrix.python-version }}.xml
+
+      - name: Full free suite (skip paid LLM)
+        run: pytest -q
+
+      - name: Cassette policy
+        run: python scripts/check_cassette_policy.py
+
+      - name: Shell syntax check
+        run: |
+          set -euo pipefail
+          for script in scripts/*.sh dump-to-md.sh; do
+            bash -n "$script"
+          done
+
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: deterministic-reports-py${{ matrix.python-version }}
+          path: reports/
+          if-no-files-found: warn
+          retention-days: 14

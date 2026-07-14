@@ -1,0 +1,126 @@
+name: Paid multi-model LLM benchmark
+
+on:
+  workflow_dispatch:
+    inputs:
+      model:
+        description: "Benchmark model (or 'all' for the full 3-model matrix)"
+        required: true
+        type: choice
+        default: "all"
+        options:
+          - "all"
+          - "google/gemini-3.5-flash"
+          - "openai/gpt-5-mini"
+          - "anthropic/claude-haiku-4.5"
+      max-cost-usd:
+        description: "Soft per-model cost cap in USD (0 disables the guard)"
+        required: true
+        type: string
+        default: "5"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: llm-benchmark-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+      LLM_PROVIDER: openrouter
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements-test.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt -r requirements-test.txt
+
+      - name: Validate API key
+        run: |
+          set -euo pipefail
+          test -n "$OPENROUTER_API_KEY" || {
+            echo "::error::OPENROUTER_API_KEY secret is not configured"
+            exit 1
+          }
+
+      - name: Validate cost cap
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os, sys
+          raw = os.environ.get("INPUT_MAX_COST_USD", "5").strip()
+          try:
+              value = float(raw)
+          except ValueError as exc:
+              print(f"::error::max-cost-usd must be a number, got {raw!r}", file=sys.stderr)
+              raise SystemExit(1) from exc
+          if value < 0:
+              print(f"::error::max-cost-usd must be >= 0, got {value}", file=sys.stderr)
+              raise SystemExit(1)
+          print(f"Soft per-model cost cap: ${value:.6f}")
+          PY
+        env:
+          INPUT_MAX_COST_USD: ${{ inputs.max-cost-usd }}
+
+      - name: Deterministic gates before paid calls
+        run: |
+          set -euo pipefail
+          ruff format --check .
+          ruff check .
+          python -m compileall -q python_helper tests scripts
+          pytest tests/unit \
+            --cov=python_helper \
+            --cov-report=term-missing \
+            --cov-fail-under=90
+          pytest -q
+          python scripts/check_cassette_policy.py
+
+      - name: Record cassettes
+        run: |
+          set -uo pipefail
+          mkdir -p reports
+          if [ "${{ inputs.model }}" = "all" ]; then
+            ./scripts/record_all_models.sh --max-cost-usd "${{ inputs.max-cost-usd }}"
+          else
+            python scripts/record_model.py \
+              --model "${{ inputs.model }}" \
+              --max-cost-usd "${{ inputs.max-cost-usd }}"
+          fi
+
+      - name: Offline verification (no API key)
+        run: |
+          set -euo pipefail
+          unset OPENROUTER_API_KEY || true
+          ./scripts/verify_all_models.sh
+          python scripts/benchmark_report.py
+          python scripts/vcr_precommit.py --all-models
+          python scripts/check_cassette_policy.py
+
+      - name: Upload benchmark report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: llm-benchmark-report-${{ github.run_id }}
+          path: reports/
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Block merge on incomplete matrix
+        run: |
+          set -euo pipefail
+          python scripts/check_cassette_policy.py
+          python scripts/benchmark_report.py
