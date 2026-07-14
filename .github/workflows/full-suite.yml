@@ -39,14 +39,9 @@ jobs:
                       raise SystemExit(f'unsafe archive path: {member.name}')
               tf.extractall(root)
           PY
-
-          cat \
-            .delivery/remote-oracle-part-00 \
-            .delivery/remote-oracle-part-01 \
-            .delivery/remote-oracle-part-02 \
-            .delivery/remote-oracle-part-03 \
-            .delivery/oracle-fix-part-04 \
-            .delivery/oracle-fix-part-05 \
+          cat .delivery/remote-oracle-part-00 .delivery/remote-oracle-part-01 \
+              .delivery/remote-oracle-part-02 .delivery/remote-oracle-part-03 \
+              .delivery/oracle-fix-part-04 .delivery/oracle-fix-part-05 \
             | base64 --decode > /tmp/reviewed-tree/tests/llm/oracle.py
           echo "d4c2634c324eafeaf7be7a7b7c935ac7812e04d55ab87c33761f94ac4e445c3b  /tmp/reviewed-tree/tests/llm/oracle.py" | sha256sum -c -
 
@@ -58,17 +53,36 @@ jobs:
         working-directory: /tmp/reviewed-tree
         run: pip install -r requirements.txt -r requirements-test.txt
 
-      - name: Quality gates
+      - name: Format
+        working-directory: /tmp/reviewed-tree
+        run: |
+          ruff format .
+          ruff format --check .
+
+      - name: Lint
+        working-directory: /tmp/reviewed-tree
+        run: ruff check .
+
+      - name: Compile
+        working-directory: /tmp/reviewed-tree
+        run: python -m compileall -q python_helper tests scripts
+
+      - name: Unit tests and coverage
+        working-directory: /tmp/reviewed-tree
+        run: pytest tests/unit --cov=python_helper --cov-report=term-missing --cov-fail-under=90
+
+      - name: Full free suite
+        working-directory: /tmp/reviewed-tree
+        run: pytest -q
+
+      - name: Cassette policy
+        working-directory: /tmp/reviewed-tree
+        run: python scripts/check_cassette_policy.py
+
+      - name: Shell syntax
         working-directory: /tmp/reviewed-tree
         run: |
           set -euo pipefail
-          ruff format .
-          ruff format --check .
-          ruff check .
-          python -m compileall -q python_helper tests scripts
-          pytest tests/unit --cov=python_helper --cov-report=term-missing --cov-fail-under=90
-          pytest -q
-          python scripts/check_cassette_policy.py
           for script in scripts/*.sh dump-to-md.sh; do
             bash -n "$script"
           done
