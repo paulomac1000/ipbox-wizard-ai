@@ -1,0 +1,93 @@
+meta:
+  scenario_id: 23_loss_carry_forward
+  scenario_name: Strata z lat ubiegłych
+  provider: openrouter
+  requested_model: anthropic/claude-haiku-4.5
+  returned_model: anthropic/claude-haiku-4.5
+  fingerprint: v3_c2ff86d93a7c8459c70ee4370308d309214732086c6cfdd98fbe399f51e875b6
+  request_hash: aed038526e61b567de8bd1fceaef99f830d8d2cd8260c60fa6952c1021660cc3
+  recorded_at: '2026-07-14T22:41:15.008547+00:00'
+  request_id: gen-1784065887-IvIeuQ9Ko7bIA0MYGgq9
+  finish_reason: stop
+  native_finish_reason: null
+  system_fingerprint: null
+  prompt_tokens: 7747
+  completion_tokens: 753
+  total_tokens: 8500
+  cost: 0.011512
+  recording_duration_seconds: 0.0
+  cassette_format_version: 3
+response: '{"status": "FINAL", "result": {"rok": 2025, "przychody_roczne": {"IP": 18000.0, "NIE": 2000.0}, "koszty_roczne":
+  {"IP": 89.0, "NIE": 0.0, "MIX": 0.0, "WYKLUCZONE": 0.0}, "nexus_koszty": {"A": 89.0, "B": 0.0, "C": 0.0, "D": 0.0, "poza_nexus":
+  0.0}, "nexus": 1.0, "dochód_IP": 17911.0, "dochód_NIE": 2000.0, "klucz_MIX": {"metoda": "przychodowa_roczna", "źródło":
+  "domyślna_wizard", "wartość": null, "status": "NOT_APPLICABLE"}, "alokacja_multi_ip": null, "podatek": {"podstawa_IP": 17911.0,
+  "podstawa_NIE": 0.0, "podatek_IP": 896.0, "podatek_NIE_finalny": 0.0, "podatek_całościowy": 896.0, "nadpłata_lub_dopłata":
+  -896.0}}, "classifications": [{"opis": "Licencja IDE", "amount": 89.0, "basket": "IP", "allocation_method": "direct", "allocation_source":
+  "dokument", "allocation_key": 1.0, "ip_amount": 89.0, "non_ip_amount": 0.0, "nexus_source": "own_br", "nexus_basket": "A",
+  "nexus_amount": 89.0}], "monthly_W": [{"miesiąc": "2025-01", "wartość": 90.0}], "tests": {"TEST_1": "PASS", "TEST_2": "PASS",
+  "TEST_3": "PASS", "TEST_4": "PASS", "TEST_5": "PASS", "TEST_6": "PASS", "TEST_7": "PASS", "TEST_8": "PASS", "TEST_9": "PASS"},
+  "stops_reviews": {"stops": [], "reviews": ["REVIEW_09"], "warnings": []}}'
+parsed_response:
+  status: FINAL
+  result:
+    rok: 2025
+    przychody_roczne:
+      IP: 18000.0
+      NIE: 2000.0
+    koszty_roczne:
+      IP: 89.0
+      NIE: 0.0
+      MIX: 0.0
+      WYKLUCZONE: 0.0
+    nexus_koszty:
+      A: 89.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 0.0
+    nexus: 1.0
+    dochód_IP: 17911.0
+    dochód_NIE: 2000.0
+    klucz_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      wartość: null
+      status: NOT_APPLICABLE
+    alokacja_multi_ip: null
+    podatek:
+      podstawa_IP: 17911.0
+      podstawa_NIE: 0.0
+      podatek_IP: 896.0
+      podatek_NIE_finalny: 0.0
+      podatek_całościowy: 896.0
+      nadpłata_lub_dopłata: -896.0
+  classifications:
+  - opis: Licencja IDE
+    amount: 89.0
+    basket: IP
+    allocation_method: direct
+    allocation_source: dokument
+    allocation_key: 1.0
+    ip_amount: 89.0
+    non_ip_amount: 0.0
+    nexus_source: own_br
+    nexus_basket: A
+    nexus_amount: 89.0
+  monthly_W:
+  - miesiąc: 2025-01
+    wartość: 90.0
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+    TEST_3: PASS
+    TEST_4: PASS
+    TEST_5: PASS
+    TEST_6: PASS
+    TEST_7: PASS
+    TEST_8: PASS
+    TEST_9: PASS
+  stops_reviews:
+    stops: []
+    reviews:
+    - REVIEW_09
+    warnings: []

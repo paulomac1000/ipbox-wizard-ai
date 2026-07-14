@@ -1,0 +1,81 @@
+meta:
+  scenario_id: 33_kpir_balance_fail
+  scenario_name: Niespójny bilans KPiR
+  provider: openrouter
+  requested_model: openai/gpt-5-mini
+  returned_model: openai/gpt-5-mini
+  fingerprint: v3_470f736d82251f3eaed19e45aa5166adc9a70d838bf292d0f69aae1a0747cdef
+  request_hash: d375e0a60ddbc57f431107b90d69d4750e55bd464d473d640b4d9748ef5c4e29
+  recorded_at: '2026-07-14T22:41:14.777066+00:00'
+  request_id: gen-1784065699-V6lffmq5mLjIy9R0AVx3
+  finish_reason: stop
+  native_finish_reason: null
+  system_fingerprint: null
+  prompt_tokens: 4973
+  completion_tokens: 370
+  total_tokens: 5343
+  cost: 0.00094645
+  recording_duration_seconds: 0.0
+  cassette_format_version: 3
+response: '{"status": "FINAL", "result": {"rok": 2025, "przychody_roczne": {"IP": 90000.0, "NIE": 0.0}, "koszty_roczne": {"IP":
+  0.0, "NIE": 0.0, "MIX": 0.0, "WYKLUCZONE": 0.0}, "nexus_koszty": {"A": 0.0, "B": 0.0, "C": 0.0, "D": 0.0, "poza_nexus":
+  0.0}, "nexus": 0.0, "dochód_IP": 90000.0, "dochód_NIE": 0.0, "klucz_MIX": {"metoda": "przychodowa_roczna", "źródło": "domyślna_wizard",
+  "wartość": null, "status": "NOT_APPLICABLE"}, "alokacja_multi_ip": null, "podatek": {"podstawa_IP": 0, "podstawa_NIE": 0,
+  "podatek_IP": 0, "podatek_NIE_finalny": 0, "podatek_całościowy": 0, "nadpłata_lub_dopłata": -0.0}}, "classifications": [],
+  "monthly_W": [{"miesiąc": "2025-01", "wartość": 100.0}], "tests": {"TEST_1": "FAIL", "TEST_2": "PASS", "TEST_3": "PASS",
+  "TEST_4": "PASS", "TEST_5": "PASS", "TEST_6": "PASS", "TEST_7": "PASS", "TEST_8": "PASS", "TEST_9": "PASS"}, "stops_reviews":
+  {"stops": [], "reviews": ["REVIEW_09", "REVIEW_01"], "warnings": []}}'
+parsed_response:
+  status: FINAL
+  result:
+    rok: 2025
+    przychody_roczne:
+      IP: 90000.0
+      NIE: 0.0
+    koszty_roczne:
+      IP: 0.0
+      NIE: 0.0
+      MIX: 0.0
+      WYKLUCZONE: 0.0
+    nexus_koszty:
+      A: 0.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 0.0
+    nexus: 0.0
+    dochód_IP: 90000.0
+    dochód_NIE: 0.0
+    klucz_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      wartość: null
+      status: NOT_APPLICABLE
+    alokacja_multi_ip: null
+    podatek:
+      podstawa_IP: 0
+      podstawa_NIE: 0
+      podatek_IP: 0
+      podatek_NIE_finalny: 0
+      podatek_całościowy: 0
+      nadpłata_lub_dopłata: -0.0
+  classifications: []
+  monthly_W:
+  - miesiąc: 2025-01
+    wartość: 100.0
+  tests:
+    TEST_1: FAIL
+    TEST_2: PASS
+    TEST_3: PASS
+    TEST_4: PASS
+    TEST_5: PASS
+    TEST_6: PASS
+    TEST_7: PASS
+    TEST_8: PASS
+    TEST_9: PASS
+  stops_reviews:
+    stops: []
+    reviews:
+    - REVIEW_09
+    - REVIEW_01
+    warnings: []

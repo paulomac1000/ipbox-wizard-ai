@@ -1,0 +1,106 @@
+meta:
+  scenario_id: 11_multi_client_mixed_currencies
+  scenario_name: Wiele klientów i walut
+  provider: openrouter
+  requested_model: anthropic/claude-haiku-4.5
+  returned_model: anthropic/claude-haiku-4.5
+  fingerprint: v3_0176a5031faee2ffb5af72548f80a5ea1b0cf2ea360d18944041c041857ecee7
+  request_hash: 83d91181484f8c09f40503e6bef140028329d68787c6ab16dd884593af8a922f
+  recorded_at: '2026-07-14T22:41:14.921404+00:00'
+  request_id: gen-1784065819-f1YXg9jvmblWmp8lOZFf
+  finish_reason: stop
+  native_finish_reason: null
+  system_fingerprint: null
+  prompt_tokens: 7893
+  completion_tokens: 889
+  total_tokens: 8782
+  cost: 0.012338
+  recording_duration_seconds: 0.0
+  cassette_format_version: 3
+response: '{"status": "FINAL", "result": {"rok": 2025, "przychody_roczne": {"IP": 22900.0, "NIE": 0.0}, "koszty_roczne": {"IP":
+  300.0, "NIE": 50.0, "MIX": 0.0, "WYKLUCZONE": 0.0}, "nexus_koszty": {"A": 300.0, "B": 0.0, "C": 0.0, "D": 0.0, "poza_nexus":
+  50.0}, "nexus": 1.0, "dochód_IP": 22600.0, "dochód_NIE": -50.0, "klucz_MIX": {"metoda": "przychodowa_roczna", "źródło":
+  "domyślna_wizard", "wartość": null, "status": "NOT_APPLICABLE"}, "alokacja_multi_ip": null, "podatek": {"podstawa_IP": 22600,
+  "podstawa_NIE": 0, "podatek_IP": 1130, "podatek_NIE_finalny": 0, "podatek_całościowy": 1130, "nadpłata_lub_dopłata": -1130.0}},
+  "classifications": [{"opis": "Repozytorium kodu", "amount": 300.0, "basket": "IP", "allocation_method": "direct", "allocation_source":
+  "dokument", "allocation_key": 1.0, "ip_amount": 300.0, "non_ip_amount": 0.0, "nexus_source": "own_br", "nexus_basket": "A",
+  "nexus_amount": 300.0}, {"opis": "Ujemna różnica kursowa", "amount": 50.0, "basket": "NON", "allocation_method": "direct",
+  "allocation_source": "dokument", "allocation_key": 0.0, "ip_amount": 0.0, "non_ip_amount": 50.0, "nexus_source": "outside_nexus",
+  "nexus_basket": "poza_nexus", "nexus_amount": 0.0}], "monthly_W": [{"miesiąc": "2025-01", "wartość": 100.0}], "tests": {"TEST_1":
+  "PASS", "TEST_2": "PASS", "TEST_3": "PASS", "TEST_4": "PASS", "TEST_5": "PASS", "TEST_6": "PASS", "TEST_7": "PASS", "TEST_8":
+  "PASS", "TEST_9": "PASS"}, "stops_reviews": {"stops": [], "reviews": ["REVIEW_01"], "warnings": []}}'
+parsed_response:
+  status: FINAL
+  result:
+    rok: 2025
+    przychody_roczne:
+      IP: 22900.0
+      NIE: 0.0
+    koszty_roczne:
+      IP: 300.0
+      NIE: 50.0
+      MIX: 0.0
+      WYKLUCZONE: 0.0
+    nexus_koszty:
+      A: 300.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 50.0
+    nexus: 1.0
+    dochód_IP: 22600.0
+    dochód_NIE: -50.0
+    klucz_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      wartość: null
+      status: NOT_APPLICABLE
+    alokacja_multi_ip: null
+    podatek:
+      podstawa_IP: 22600
+      podstawa_NIE: 0
+      podatek_IP: 1130
+      podatek_NIE_finalny: 0
+      podatek_całościowy: 1130
+      nadpłata_lub_dopłata: -1130.0
+  classifications:
+  - opis: Repozytorium kodu
+    amount: 300.0
+    basket: IP
+    allocation_method: direct
+    allocation_source: dokument
+    allocation_key: 1.0
+    ip_amount: 300.0
+    non_ip_amount: 0.0
+    nexus_source: own_br
+    nexus_basket: A
+    nexus_amount: 300.0
+  - opis: Ujemna różnica kursowa
+    amount: 50.0
+    basket: NON
+    allocation_method: direct
+    allocation_source: dokument
+    allocation_key: 0.0
+    ip_amount: 0.0
+    non_ip_amount: 50.0
+    nexus_source: outside_nexus
+    nexus_basket: poza_nexus
+    nexus_amount: 0.0
+  monthly_W:
+  - miesiąc: 2025-01
+    wartość: 100.0
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+    TEST_3: PASS
+    TEST_4: PASS
+    TEST_5: PASS
+    TEST_6: PASS
+    TEST_7: PASS
+    TEST_8: PASS
+    TEST_9: PASS
+  stops_reviews:
+    stops: []
+    reviews:
+    - REVIEW_01
+    warnings: []

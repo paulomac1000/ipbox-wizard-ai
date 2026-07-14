@@ -1,0 +1,95 @@
+meta:
+  scenario_id: 17_low_w_review
+  scenario_name: W poniżej 50 procent
+  provider: openrouter
+  requested_model: openai/gpt-5-mini
+  returned_model: openai/gpt-5-mini
+  fingerprint: v3_76844411398890f6b5f26a1d93dd9ba1124f5796ade12f35a2f255b0a77d2357
+  request_hash: 1f16b0aeef5b9d282dce2a2f3b732854eee777f651111efbca97f76e0ceb7061
+  recorded_at: '2026-07-14T22:41:14.652089+00:00'
+  request_id: gen-1784065596-JDAvVVPuhXJsGsvqZW8n
+  finish_reason: stop
+  native_finish_reason: null
+  system_fingerprint: null
+  prompt_tokens: 5076
+  completion_tokens: 465
+  total_tokens: 5541
+  cost: 0.0011334
+  recording_duration_seconds: 0.0
+  cassette_format_version: 3
+response: '{"status": "FINAL", "result": {"rok": 2025, "przychody_roczne": {"IP": 8750.0, "NIE": 11250.0}, "koszty_roczne":
+  {"IP": 131.25, "NIE": 168.75, "MIX": 300.0, "WYKLUCZONE": 0.0}, "nexus_koszty": {"A": 0.0, "B": 0.0, "C": 0.0, "D": 0.0,
+  "poza_nexus": 300.0}, "nexus": 0.0, "dochód_IP": 8618.75, "dochód_NIE": 11081.25, "klucz_MIX": {"metoda": "przychodowa_roczna",
+  "źródło": "domyślna_wizard", "wartość": 0.4375, "status": "FINAL"}, "alokacja_multi_ip": null, "podatek": {"podstawa_IP":
+  0, "podstawa_NIE": 11081, "podatek_IP": 0, "podatek_NIE_finalny": 2105, "podatek_całościowy": 2105, "nadpłata_lub_dopłata":
+  -2105.0}}, "classifications": [{"opis": "Księgowość", "amount": 300.0, "basket": "MIX", "allocation_method": "przychodowa_roczna",
+  "allocation_source": "domyślna_wizard", "allocation_key": 0.4375, "ip_amount": 131.25, "non_ip_amount": 168.75, "nexus_source":
+  "outside_nexus", "nexus_basket": "poza_nexus", "nexus_amount": 0.0}], "monthly_W": [{"miesiąc": "2025-01", "wartość": 43.75}],
+  "tests": {"TEST_1": "PASS", "TEST_2": "PASS", "TEST_3": "PASS", "TEST_4": "PASS", "TEST_5": "PASS", "TEST_6": "PASS", "TEST_7":
+  "PASS", "TEST_8": "PASS", "TEST_9": "PASS"}, "stops_reviews": {"stops": [], "reviews": ["REVIEW_09", "REVIEW_02"], "warnings":
+  []}}'
+parsed_response:
+  status: FINAL
+  result:
+    rok: 2025
+    przychody_roczne:
+      IP: 8750.0
+      NIE: 11250.0
+    koszty_roczne:
+      IP: 131.25
+      NIE: 168.75
+      MIX: 300.0
+      WYKLUCZONE: 0.0
+    nexus_koszty:
+      A: 0.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 300.0
+    nexus: 0.0
+    dochód_IP: 8618.75
+    dochód_NIE: 11081.25
+    klucz_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      wartość: 0.4375
+      status: FINAL
+    alokacja_multi_ip: null
+    podatek:
+      podstawa_IP: 0
+      podstawa_NIE: 11081
+      podatek_IP: 0
+      podatek_NIE_finalny: 2105
+      podatek_całościowy: 2105
+      nadpłata_lub_dopłata: -2105.0
+  classifications:
+  - opis: Księgowość
+    amount: 300.0
+    basket: MIX
+    allocation_method: przychodowa_roczna
+    allocation_source: domyślna_wizard
+    allocation_key: 0.4375
+    ip_amount: 131.25
+    non_ip_amount: 168.75
+    nexus_source: outside_nexus
+    nexus_basket: poza_nexus
+    nexus_amount: 0.0
+  monthly_W:
+  - miesiąc: 2025-01
+    wartość: 43.75
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+    TEST_3: PASS
+    TEST_4: PASS
+    TEST_5: PASS
+    TEST_6: PASS
+    TEST_7: PASS
+    TEST_8: PASS
+    TEST_9: PASS
+  stops_reviews:
+    stops: []
+    reviews:
+    - REVIEW_09
+    - REVIEW_02
+    warnings: []

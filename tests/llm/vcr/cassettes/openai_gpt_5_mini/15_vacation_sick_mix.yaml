@@ -1,0 +1,99 @@
+meta:
+  scenario_id: 15_vacation_sick_mix
+  scenario_name: Urlop i L4 nie zwiększają mianownika W
+  provider: openrouter
+  requested_model: openai/gpt-5-mini
+  returned_model: openai/gpt-5-mini
+  fingerprint: v3_99946196443f050ff6c04671af05b57782b04f1a90ba4fea5b16b34a8c170d1a
+  request_hash: 3918513970baeffe9e62d5c4c95b41abf3540eaab35eba2f13e02ac48cf6dc04
+  recorded_at: '2026-07-14T22:41:58.298540+00:00'
+  request_id: gen-1784068911-lF47OOzzDUuv2BPm0wzh
+  finish_reason: stop
+  native_finish_reason: completed
+  system_fingerprint: null
+  prompt_tokens: 5061
+  completion_tokens: 656
+  total_tokens: 5717
+  cost: 0.00145405
+  recording_duration_seconds: 6.849
+  cassette_format_version: 3
+response: "{\n  \"status\": \"FINAL\",\n  \"result\": {\n    \"rok\": 2025,\n    \"przychody_roczne\": {\n      \"IP\": 9000.0,\n\
+  \      \"NIE\": 1000.0\n    },\n    \"koszty_roczne\": {\n      \"IP\": 270.0,\n      \"NIE\": 30.0,\n      \"MIX\": 300.0,\n\
+  \      \"WYKLUCZONE\": 0.0\n    },\n    \"nexus_koszty\": {\n      \"A\": 0.0,\n      \"B\": 0.0,\n      \"C\": 0.0,\n \
+  \     \"D\": 0.0,\n      \"poza_nexus\": 300.0\n    },\n    \"nexus\": 0.0,\n    \"dochód_IP\": 8730.0,\n    \"dochód_NIE\"\
+  : 970.0,\n    \"klucz_MIX\": {\n      \"metoda\": \"przychodowa_roczna\",\n      \"źródło\": \"domyślna_wizard\",\n    \
+  \  \"wartość\": 0.9,\n      \"status\": \"FINAL\"\n    },\n    \"alokacja_multi_ip\": null,\n    \"podatek\": {\n      \"\
+  podstawa_IP\": 0,\n      \"podstawa_NIE\": 970,\n      \"podatek_IP\": 0,\n      \"podatek_NIE_finalny\": 184,\n      \"\
+  podatek_całościowy\": 184,\n      \"nadpłata_lub_dopłata\": -184.0\n    }\n  },\n  \"classifications\": [\n    {\n     \
+  \ \"opis\": \"Hosting\",\n      \"amount\": 300.0,\n      \"basket\": \"MIX\",\n      \"allocation_method\": \"przychodowa_roczna\"\
+  ,\n      \"allocation_source\": \"domyślna_wizard\",\n      \"allocation_key\": 0.9,\n      \"ip_amount\": 270.0,\n    \
+  \  \"non_ip_amount\": 30.0,\n      \"nexus_source\": \"outside_nexus\",\n      \"nexus_basket\": \"poza_nexus\",\n     \
+  \ \"nexus_amount\": 0.0\n    }\n  ],\n  \"monthly_W\": [\n    {\n      \"miesiąc\": \"2025-01\",\n      \"wartość\": 90.0\n\
+  \    }\n  ],\n  \"tests\": {\n    \"TEST_1\": \"PASS\",\n    \"TEST_2\": \"PASS\",\n    \"TEST_3\": \"PASS\",\n    \"TEST_4\"\
+  : \"PASS\",\n    \"TEST_5\": \"PASS\",\n    \"TEST_6\": \"PASS\",\n    \"TEST_7\": \"PASS\",\n    \"TEST_8\": \"PASS\",\n\
+  \    \"TEST_9\": \"PASS\"\n  },\n  \"stops_reviews\": {\n    \"stops\": [],\n    \"reviews\": [\n      \"REVIEW_09\"\n \
+  \   ],\n    \"warnings\": []\n  }\n}"
+parsed_response:
+  status: FINAL
+  result:
+    rok: 2025
+    przychody_roczne:
+      IP: 9000.0
+      NIE: 1000.0
+    koszty_roczne:
+      IP: 270.0
+      NIE: 30.0
+      MIX: 300.0
+      WYKLUCZONE: 0.0
+    nexus_koszty:
+      A: 0.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 300.0
+    nexus: 0.0
+    dochód_IP: 8730.0
+    dochód_NIE: 970.0
+    klucz_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      wartość: 0.9
+      status: FINAL
+    alokacja_multi_ip: null
+    podatek:
+      podstawa_IP: 0
+      podstawa_NIE: 970
+      podatek_IP: 0
+      podatek_NIE_finalny: 184
+      podatek_całościowy: 184
+      nadpłata_lub_dopłata: -184.0
+  classifications:
+  - opis: Hosting
+    amount: 300.0
+    basket: MIX
+    allocation_method: przychodowa_roczna
+    allocation_source: domyślna_wizard
+    allocation_key: 0.9
+    ip_amount: 270.0
+    non_ip_amount: 30.0
+    nexus_source: outside_nexus
+    nexus_basket: poza_nexus
+    nexus_amount: 0.0
+  monthly_W:
+  - miesiąc: 2025-01
+    wartość: 90.0
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+    TEST_3: PASS
+    TEST_4: PASS
+    TEST_5: PASS
+    TEST_6: PASS
+    TEST_7: PASS
+    TEST_8: PASS
+    TEST_9: PASS
+  stops_reviews:
+    stops: []
+    reviews:
+    - REVIEW_09
+    warnings: []

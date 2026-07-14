@@ -1,0 +1,125 @@
+meta:
+  scenario_id: 43_review_09_single_client_100pct
+  scenario_name: Jeden klient odpowiada za 100 procent przychodów
+  provider: openrouter
+  requested_model: google/gemini-3.5-flash
+  returned_model: google/gemini-3.5-flash
+  fingerprint: v3_fd2c48d2cf2dd39129c50c59b99546b882088cf3e22290eecf08981e4aaacc7b
+  request_hash: 9e33bf28cc982823502307a46396b61d07ea591500592a8ea32b7e2ceacc0381
+  recorded_at: '2026-07-14T22:41:14.536698+00:00'
+  request_id: gen-1784068850-XzFGhs4zHKjNTD11WCdN
+  finish_reason: stop
+  native_finish_reason: null
+  system_fingerprint: null
+  prompt_tokens: 7267
+  completion_tokens: 811
+  total_tokens: 8078
+  cost: 0.0181995
+  recording_duration_seconds: 0.0
+  cassette_format_version: 3
+response: '{"status": "FINAL", "result": {"rok": 2025, "przychody_roczne": {"IP": 60000.0, "NIE": 0.0}, "koszty_roczne": {"IP":
+  30.0, "NIE": 0.0, "MIX": 0.0, "WYKLUCZONE": 0.0}, "nexus_koszty": {"A": 30.0, "B": 0.0, "C": 0.0, "D": 0.0, "poza_nexus":
+  0.0}, "nexus": 1.0, "dochód_IP": 59970.0, "dochód_NIE": 0.0, "klucz_MIX": {"metoda": "przychodowa_roczna", "źródło": "domyślna_wizard",
+  "wartość": null, "status": "NOT_APPLICABLE"}, "alokacja_multi_ip": null, "podatek": {"podstawa_IP": 59970, "podstawa_NIE":
+  0, "podatek_IP": 2999, "podatek_NIE_finalny": 0, "podatek_całościowy": 2999, "nadpłata_lub_dopłata": -2999}}, "classifications":
+  [{"opis": "IDE 1", "amount": 10.0, "basket": "IP", "allocation_method": "direct", "allocation_source": "dokument", "allocation_key":
+  1.0, "ip_amount": 10.0, "non_ip_amount": 0.0, "nexus_source": "own_br", "nexus_basket": "A", "nexus_amount": 10.0}, {"opis":
+  "IDE 2", "amount": 10.0, "basket": "IP", "allocation_method": "direct", "allocation_source": "dokument", "allocation_key":
+  1.0, "ip_amount": 10.0, "non_ip_amount": 0.0, "nexus_source": "own_br", "nexus_basket": "A", "nexus_amount": 10.0}, {"opis":
+  "IDE 3", "amount": 10.0, "basket": "IP", "allocation_method": "direct", "allocation_source": "dokument", "allocation_key":
+  1.0, "ip_amount": 10.0, "non_ip_amount": 0.0, "nexus_source": "own_br", "nexus_basket": "A", "nexus_amount": 10.0}], "monthly_W":
+  [{"miesiąc": "2025-01", "wartość": 100.0}, {"miesiąc": "2025-02", "wartość": 100.0}, {"miesiąc": "2025-03", "wartość": 100.0}],
+  "tests": {"TEST_1": "PASS", "TEST_2": "PASS", "TEST_3": "PASS", "TEST_4": "PASS", "TEST_5": "PASS", "TEST_6": "PASS", "TEST_7":
+  "PASS", "TEST_8": "PASS", "TEST_9": "PASS"}, "stops_reviews": {"stops": [], "reviews": ["REVIEW_09", "REVIEW_01"], "warnings":
+  []}}'
+parsed_response:
+  status: FINAL
+  result:
+    rok: 2025
+    przychody_roczne:
+      IP: 60000.0
+      NIE: 0.0
+    koszty_roczne:
+      IP: 30.0
+      NIE: 0.0
+      MIX: 0.0
+      WYKLUCZONE: 0.0
+    nexus_koszty:
+      A: 30.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 0.0
+    nexus: 1.0
+    dochód_IP: 59970.0
+    dochód_NIE: 0.0
+    klucz_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      wartość: null
+      status: NOT_APPLICABLE
+    alokacja_multi_ip: null
+    podatek:
+      podstawa_IP: 59970
+      podstawa_NIE: 0
+      podatek_IP: 2999
+      podatek_NIE_finalny: 0
+      podatek_całościowy: 2999
+      nadpłata_lub_dopłata: -2999
+  classifications:
+  - opis: IDE 1
+    amount: 10.0
+    basket: IP
+    allocation_method: direct
+    allocation_source: dokument
+    allocation_key: 1.0
+    ip_amount: 10.0
+    non_ip_amount: 0.0
+    nexus_source: own_br
+    nexus_basket: A
+    nexus_amount: 10.0
+  - opis: IDE 2
+    amount: 10.0
+    basket: IP
+    allocation_method: direct
+    allocation_source: dokument
+    allocation_key: 1.0
+    ip_amount: 10.0
+    non_ip_amount: 0.0
+    nexus_source: own_br
+    nexus_basket: A
+    nexus_amount: 10.0
+  - opis: IDE 3
+    amount: 10.0
+    basket: IP
+    allocation_method: direct
+    allocation_source: dokument
+    allocation_key: 1.0
+    ip_amount: 10.0
+    non_ip_amount: 0.0
+    nexus_source: own_br
+    nexus_basket: A
+    nexus_amount: 10.0
+  monthly_W:
+  - miesiąc: 2025-01
+    wartość: 100.0
+  - miesiąc: 2025-02
+    wartość: 100.0
+  - miesiąc: 2025-03
+    wartość: 100.0
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+    TEST_3: PASS
+    TEST_4: PASS
+    TEST_5: PASS
+    TEST_6: PASS
+    TEST_7: PASS
+    TEST_8: PASS
+    TEST_9: PASS
+  stops_reviews:
+    stops: []
+    reviews:
+    - REVIEW_09
+    - REVIEW_01
+    warnings: []

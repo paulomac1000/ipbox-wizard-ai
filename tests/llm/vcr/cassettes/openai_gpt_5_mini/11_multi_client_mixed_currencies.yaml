@@ -1,0 +1,113 @@
+meta:
+  scenario_id: 11_multi_client_mixed_currencies
+  scenario_name: Wiele klientów i walut
+  provider: openrouter
+  requested_model: openai/gpt-5-mini
+  returned_model: openai/gpt-5-mini
+  fingerprint: v3_5af3915fcd848fbae55378eae1e3d7a2b36598b8136e66127d053f6f5d5b3370
+  request_hash: fd977ca73a0478912ff731b7808cd701c189e30d8461b9df6f10099eb968dcb0
+  recorded_at: '2026-07-14T22:41:34.566706+00:00'
+  request_id: gen-1784068886-KY9S6d757mEJDsazATZF
+  finish_reason: stop
+  native_finish_reason: completed
+  system_fingerprint: null
+  prompt_tokens: 5186
+  completion_tokens: 766
+  total_tokens: 5952
+  cost: 0.0016765
+  recording_duration_seconds: 8.304
+  cassette_format_version: 3
+response: "{\n  \"status\": \"FINAL\",\n  \"result\": {\n    \"rok\": 2025,\n    \"przychody_roczne\": {\n      \"IP\": 22900.0,\n\
+  \      \"NIE\": 0.0\n    },\n    \"koszty_roczne\": {\n      \"IP\": 300.0,\n      \"NIE\": 50.0,\n      \"MIX\": 0.0,\n\
+  \      \"WYKLUCZONE\": 0.0\n    },\n    \"nexus_koszty\": {\n      \"A\": 300.0,\n      \"B\": 0.0,\n      \"C\": 0.0,\n\
+  \      \"D\": 0.0,\n      \"poza_nexus\": 50.0\n    },\n    \"nexus\": 1.0,\n    \"dochód_IP\": 22600.0,\n    \"dochód_NIE\"\
+  : -50.0,\n    \"klucz_MIX\": {\n      \"metoda\": \"przychodowa_roczna\",\n      \"źródło\": \"domyślna_wizard\",\n    \
+  \  \"wartość\": null,\n      \"status\": \"NOT_APPLICABLE\"\n    },\n    \"alokacja_multi_ip\": null,\n    \"podatek\":\
+  \ {\n      \"podstawa_IP\": 22600,\n      \"podstawa_NIE\": 0,\n      \"podatek_IP\": 1130,\n      \"podatek_NIE_finalny\"\
+  : 0,\n      \"podatek_całościowy\": 1130,\n      \"nadpłata_lub_dopłata\": -1130.0\n    }\n  },\n  \"classifications\":\
+  \ [\n    {\n      \"opis\": \"Repozytorium kodu\",\n      \"amount\": 300.0,\n      \"basket\": \"IP\",\n      \"allocation_method\"\
+  : \"direct\",\n      \"allocation_source\": \"dokument\",\n      \"allocation_key\": 1.0,\n      \"ip_amount\": 300.0,\n\
+  \      \"non_ip_amount\": 0.0,\n      \"nexus_source\": \"own_br\",\n      \"nexus_basket\": \"A\",\n      \"nexus_amount\"\
+  : 300.0\n    },\n    {\n      \"opis\": \"Ujemna różnica kursowa\",\n      \"amount\": 50.0,\n      \"basket\": \"NON\"\
+  ,\n      \"allocation_method\": \"direct\",\n      \"allocation_source\": \"dokument\",\n      \"allocation_key\": 0.0,\n\
+  \      \"ip_amount\": 0.0,\n      \"non_ip_amount\": 50.0,\n      \"nexus_source\": \"outside_nexus\",\n      \"nexus_basket\"\
+  : \"poza_nexus\",\n      \"nexus_amount\": 0.0\n    }\n  ],\n  \"monthly_W\": [\n    {\n      \"miesiąc\": \"2025-01\",\n\
+  \      \"wartość\": 100.0\n    }\n  ],\n  \"tests\": {\n    \"TEST_1\": \"PASS\",\n    \"TEST_2\": \"PASS\",\n    \"TEST_3\"\
+  : \"PASS\",\n    \"TEST_4\": \"PASS\",\n    \"TEST_5\": \"PASS\",\n    \"TEST_6\": \"PASS\",\n    \"TEST_7\": \"PASS\",\n\
+  \    \"TEST_8\": \"PASS\",\n    \"TEST_9\": \"PASS\"\n  },\n  \"stops_reviews\": {\n    \"stops\": [],\n    \"reviews\"\
+  : [\n      \"REVIEW_01\"\n    ],\n    \"warnings\": []\n  }\n}"
+parsed_response:
+  status: FINAL
+  result:
+    rok: 2025
+    przychody_roczne:
+      IP: 22900.0
+      NIE: 0.0
+    koszty_roczne:
+      IP: 300.0
+      NIE: 50.0
+      MIX: 0.0
+      WYKLUCZONE: 0.0
+    nexus_koszty:
+      A: 300.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 50.0
+    nexus: 1.0
+    dochód_IP: 22600.0
+    dochód_NIE: -50.0
+    klucz_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      wartość: null
+      status: NOT_APPLICABLE
+    alokacja_multi_ip: null
+    podatek:
+      podstawa_IP: 22600
+      podstawa_NIE: 0
+      podatek_IP: 1130
+      podatek_NIE_finalny: 0
+      podatek_całościowy: 1130
+      nadpłata_lub_dopłata: -1130.0
+  classifications:
+  - opis: Repozytorium kodu
+    amount: 300.0
+    basket: IP
+    allocation_method: direct
+    allocation_source: dokument
+    allocation_key: 1.0
+    ip_amount: 300.0
+    non_ip_amount: 0.0
+    nexus_source: own_br
+    nexus_basket: A
+    nexus_amount: 300.0
+  - opis: Ujemna różnica kursowa
+    amount: 50.0
+    basket: NON
+    allocation_method: direct
+    allocation_source: dokument
+    allocation_key: 0.0
+    ip_amount: 0.0
+    non_ip_amount: 50.0
+    nexus_source: outside_nexus
+    nexus_basket: poza_nexus
+    nexus_amount: 0.0
+  monthly_W:
+  - miesiąc: 2025-01
+    wartość: 100.0
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+    TEST_3: PASS
+    TEST_4: PASS
+    TEST_5: PASS
+    TEST_6: PASS
+    TEST_7: PASS
+    TEST_8: PASS
+    TEST_9: PASS
+  stops_reviews:
+    stops: []
+    reviews:
+    - REVIEW_01
+    warnings: []

@@ -1,0 +1,95 @@
+meta:
+  scenario_id: 40_mixed_ip_clause
+  scenario_name: Klient z klauzulą i bez klauzuli IP
+  provider: openrouter
+  requested_model: google/gemini-3.5-flash
+  returned_model: google/gemini-3.5-flash
+  fingerprint: v3_c27e039e1c9ca1c0430495d4215f4df3e235bfc95cb813055efad03e62f26c73
+  request_hash: 8f50316a18c24a44d26d5441ef263ed10eb3050de7b98d7b10ec513d5bbd115d
+  recorded_at: '2026-07-14T22:41:14.508124+00:00'
+  request_id: gen-1784068840-ZHkYacZ9FaGFcJvEhu4K
+  finish_reason: stop
+  native_finish_reason: null
+  system_fingerprint: null
+  prompt_tokens: 6978
+  completion_tokens: 487
+  total_tokens: 7465
+  cost: 0.0094311
+  recording_duration_seconds: 0.0
+  cassette_format_version: 3
+response: '{"status": "FINAL", "result": {"rok": 2025, "przychody_roczne": {"IP": 32000.0, "NIE": 8000.0}, "koszty_roczne":
+  {"IP": 100.0, "NIE": 0.0, "MIX": 0.0, "WYKLUCZONE": 0.0}, "nexus_koszty": {"A": 100.0, "B": 0.0, "C": 0.0, "D": 0.0, "poza_nexus":
+  0.0}, "nexus": 1.0, "dochód_IP": 31900.0, "dochód_NIE": 8000.0, "klucz_MIX": {"metoda": "przychodowa_roczna", "źródło":
+  "domyślna_wizard", "wartość": null, "status": "NOT_APPLICABLE"}, "alokacja_multi_ip": null, "podatek": {"podstawa_IP": 31900,
+  "podstawa_NIE": 8000, "podatek_IP": 1595, "podatek_NIE_finalny": 1520, "podatek_całościowy": 3115, "nadpłata_lub_dopłata":
+  -3115.0}}, "classifications": [{"opis": "IDE", "amount": 100.0, "basket": "IP", "allocation_method": "direct", "allocation_source":
+  "dokument", "allocation_key": 1.0, "ip_amount": 100.0, "non_ip_amount": 0.0, "nexus_source": "own_br", "nexus_basket": "A",
+  "nexus_amount": 100.0}], "monthly_W": [{"miesiąc": "2025-01", "wartość": 100.0}, {"miesiąc": "2025-02", "wartość": 100.0}],
+  "tests": {"TEST_1": "PASS", "TEST_2": "PASS", "TEST_3": "PASS", "TEST_4": "PASS", "TEST_5": "PASS", "TEST_6": "PASS", "TEST_7":
+  "PASS", "TEST_8": "PASS", "TEST_9": "PASS"}, "stops_reviews": {"stops": [], "reviews": ["REVIEW_01"], "warnings": []}}'
+parsed_response:
+  status: FINAL
+  result:
+    rok: 2025
+    przychody_roczne:
+      IP: 32000.0
+      NIE: 8000.0
+    koszty_roczne:
+      IP: 100.0
+      NIE: 0.0
+      MIX: 0.0
+      WYKLUCZONE: 0.0
+    nexus_koszty:
+      A: 100.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 0.0
+    nexus: 1.0
+    dochód_IP: 31900.0
+    dochód_NIE: 8000.0
+    klucz_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      wartość: null
+      status: NOT_APPLICABLE
+    alokacja_multi_ip: null
+    podatek:
+      podstawa_IP: 31900
+      podstawa_NIE: 8000
+      podatek_IP: 1595
+      podatek_NIE_finalny: 1520
+      podatek_całościowy: 3115
+      nadpłata_lub_dopłata: -3115.0
+  classifications:
+  - opis: IDE
+    amount: 100.0
+    basket: IP
+    allocation_method: direct
+    allocation_source: dokument
+    allocation_key: 1.0
+    ip_amount: 100.0
+    non_ip_amount: 0.0
+    nexus_source: own_br
+    nexus_basket: A
+    nexus_amount: 100.0
+  monthly_W:
+  - miesiąc: 2025-01
+    wartość: 100.0
+  - miesiąc: 2025-02
+    wartość: 100.0
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+    TEST_3: PASS
+    TEST_4: PASS
+    TEST_5: PASS
+    TEST_6: PASS
+    TEST_7: PASS
+    TEST_8: PASS
+    TEST_9: PASS
+  stops_reviews:
+    stops: []
+    reviews:
+    - REVIEW_01
+    warnings: []

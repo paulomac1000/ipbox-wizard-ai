@@ -1,0 +1,11 @@
+manifest_format_version: 2
+model: openai/gpt-5-mini
+generated_at: '2026-07-14T22:42:04.949665+00:00'
+entries:
+  16_high_w_review:
+    file: 16_high_w_review.yaml
+    fingerprint: v3_570dadd882bc2cc28deaa0fb772e4a7acc6e5bab6f576a64917085d1b0d1597e
+    request_hash: 66617c862b7909b6832b4ae85740f4c391c1a3c16978812305633bfb36a34778
+    recorded_at: '2026-07-14T22:42:04.942391+00:00'
+    returned_model: openai/gpt-5-mini
+    cost: 0.0010403

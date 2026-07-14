@@ -1,0 +1,93 @@
+meta:
+  scenario_id: 25_rehab_relief
+  scenario_name: Ulga rehabilitacyjna
+  provider: openrouter
+  requested_model: anthropic/claude-haiku-4.5
+  returned_model: anthropic/claude-haiku-4.5
+  fingerprint: v3_c1a30eb07c002a690d95f26be75baffb41c7be2601a73d420c4cdf857dedcc4a
+  request_hash: 930cea14946a2c725328ecf680e61b7d6c64068d1004a23f0af3a37173edd77f
+  recorded_at: '2026-07-14T22:41:15.029957+00:00'
+  request_id: gen-1784065900-bUQdHhr3DGVAVdasTUiB
+  finish_reason: stop
+  native_finish_reason: null
+  system_fingerprint: null
+  prompt_tokens: 7751
+  completion_tokens: 746
+  total_tokens: 8497
+  cost: 0.011481
+  recording_duration_seconds: 0.0
+  cassette_format_version: 3
+response: '{"status": "FINAL", "result": {"rok": 2025, "przychody_roczne": {"IP": 18000.0, "NIE": 2000.0}, "koszty_roczne":
+  {"IP": 89.0, "NIE": 0.0, "MIX": 0.0, "WYKLUCZONE": 0.0}, "nexus_koszty": {"A": 89.0, "B": 0.0, "C": 0.0, "D": 0.0, "poza_nexus":
+  0.0}, "nexus": 1.0, "dochód_IP": 17911.0, "dochód_NIE": 2000.0, "klucz_MIX": {"metoda": "przychodowa_roczna", "źródło":
+  "domyślna_wizard", "wartość": null, "status": "NOT_APPLICABLE"}, "alokacja_multi_ip": null, "podatek": {"podstawa_IP": 17911,
+  "podstawa_NIE": 1000, "podatek_IP": 896, "podatek_NIE_finalny": 190, "podatek_całościowy": 1086, "nadpłata_lub_dopłata":
+  -1086.0}}, "classifications": [{"opis": "Licencja IDE", "amount": 89.0, "basket": "IP", "allocation_method": "direct", "allocation_source":
+  "dokument", "allocation_key": 1.0, "ip_amount": 89.0, "non_ip_amount": 0.0, "nexus_source": "own_br", "nexus_basket": "A",
+  "nexus_amount": 89.0}], "monthly_W": [{"miesiąc": "2025-01", "wartość": 90.0}], "tests": {"TEST_1": "PASS", "TEST_2": "PASS",
+  "TEST_3": "PASS", "TEST_4": "PASS", "TEST_5": "PASS", "TEST_6": "PASS", "TEST_7": "PASS", "TEST_8": "PASS", "TEST_9": "PASS"},
+  "stops_reviews": {"stops": [], "reviews": ["REVIEW_09"], "warnings": []}}'
+parsed_response:
+  status: FINAL
+  result:
+    rok: 2025
+    przychody_roczne:
+      IP: 18000.0
+      NIE: 2000.0
+    koszty_roczne:
+      IP: 89.0
+      NIE: 0.0
+      MIX: 0.0
+      WYKLUCZONE: 0.0
+    nexus_koszty:
+      A: 89.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 0.0
+    nexus: 1.0
+    dochód_IP: 17911.0
+    dochód_NIE: 2000.0
+    klucz_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      wartość: null
+      status: NOT_APPLICABLE
+    alokacja_multi_ip: null
+    podatek:
+      podstawa_IP: 17911
+      podstawa_NIE: 1000
+      podatek_IP: 896
+      podatek_NIE_finalny: 190
+      podatek_całościowy: 1086
+      nadpłata_lub_dopłata: -1086.0
+  classifications:
+  - opis: Licencja IDE
+    amount: 89.0
+    basket: IP
+    allocation_method: direct
+    allocation_source: dokument
+    allocation_key: 1.0
+    ip_amount: 89.0
+    non_ip_amount: 0.0
+    nexus_source: own_br
+    nexus_basket: A
+    nexus_amount: 89.0
+  monthly_W:
+  - miesiąc: 2025-01
+    wartość: 90.0
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+    TEST_3: PASS
+    TEST_4: PASS
+    TEST_5: PASS
+    TEST_6: PASS
+    TEST_7: PASS
+    TEST_8: PASS
+    TEST_9: PASS
+  stops_reviews:
+    stops: []
+    reviews:
+    - REVIEW_09
+    warnings: []

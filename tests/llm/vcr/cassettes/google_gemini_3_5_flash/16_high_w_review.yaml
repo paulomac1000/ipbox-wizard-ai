@@ -1,0 +1,94 @@
+meta:
+  scenario_id: 16_high_w_review
+  scenario_name: W powyżej 95 procent
+  provider: openrouter
+  requested_model: google/gemini-3.5-flash
+  returned_model: google/gemini-3.5-flash
+  fingerprint: v3_be7b79de8d7aaa66a2558a9db6533f5f02c8568e1a065f52e415e622d199ad49
+  request_hash: 3dc2ff99ca462f219ffae7e597fbe0b61a00a7752fac5ae72336dac47f530ed5
+  recorded_at: '2026-07-14T22:41:14.300805+00:00'
+  request_id: gen-1784068752-0j9ZFu0TbD4qBWCj9rvk
+  finish_reason: stop
+  native_finish_reason: null
+  system_fingerprint: null
+  prompt_tokens: 6804
+  completion_tokens: 469
+  total_tokens: 7273
+  cost: 0.014427
+  recording_duration_seconds: 0.0
+  cassette_format_version: 3
+response: '{"status": "FINAL", "result": {"rok": 2025, "przychody_roczne": {"IP": 9875.0, "NIE": 125.0}, "koszty_roczne":
+  {"IP": 200.0, "NIE": 0.0, "MIX": 0.0, "WYKLUCZONE": 0.0}, "nexus_koszty": {"A": 200.0, "B": 0.0, "C": 0.0, "D": 0.0, "poza_nexus":
+  0.0}, "nexus": 1.0, "dochód_IP": 9675.0, "dochód_NIE": 125.0, "klucz_MIX": {"metoda": "przychodowa_roczna", "źródło": "domyślna_wizard",
+  "wartość": null, "status": "NOT_APPLICABLE"}, "alokacja_multi_ip": null, "podatek": {"podstawa_IP": 9675.0, "podstawa_NIE":
+  125.0, "podatek_IP": 484.0, "podatek_NIE_finalny": 24.0, "podatek_całościowy": 508.0, "nadpłata_lub_dopłata": -508.0}},
+  "classifications": [{"opis": "IDE", "amount": 200.0, "basket": "IP", "allocation_method": "direct", "allocation_source":
+  "dokument", "allocation_key": 1.0, "ip_amount": 200.0, "non_ip_amount": 0.0, "nexus_source": "own_br", "nexus_basket": "A",
+  "nexus_amount": 200.0}], "monthly_W": [{"miesiąc": "2025-01", "wartość": 98.75}], "tests": {"TEST_1": "PASS", "TEST_2":
+  "PASS", "TEST_3": "PASS", "TEST_4": "PASS", "TEST_5": "PASS", "TEST_6": "PASS", "TEST_7": "PASS", "TEST_8": "PASS", "TEST_9":
+  "PASS"}, "stops_reviews": {"stops": [], "reviews": ["REVIEW_01", "REVIEW_09"], "warnings": []}}'
+parsed_response:
+  status: FINAL
+  result:
+    rok: 2025
+    przychody_roczne:
+      IP: 9875.0
+      NIE: 125.0
+    koszty_roczne:
+      IP: 200.0
+      NIE: 0.0
+      MIX: 0.0
+      WYKLUCZONE: 0.0
+    nexus_koszty:
+      A: 200.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 0.0
+    nexus: 1.0
+    dochód_IP: 9675.0
+    dochód_NIE: 125.0
+    klucz_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      wartość: null
+      status: NOT_APPLICABLE
+    alokacja_multi_ip: null
+    podatek:
+      podstawa_IP: 9675.0
+      podstawa_NIE: 125.0
+      podatek_IP: 484.0
+      podatek_NIE_finalny: 24.0
+      podatek_całościowy: 508.0
+      nadpłata_lub_dopłata: -508.0
+  classifications:
+  - opis: IDE
+    amount: 200.0
+    basket: IP
+    allocation_method: direct
+    allocation_source: dokument
+    allocation_key: 1.0
+    ip_amount: 200.0
+    non_ip_amount: 0.0
+    nexus_source: own_br
+    nexus_basket: A
+    nexus_amount: 200.0
+  monthly_W:
+  - miesiąc: 2025-01
+    wartość: 98.75
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+    TEST_3: PASS
+    TEST_4: PASS
+    TEST_5: PASS
+    TEST_6: PASS
+    TEST_7: PASS
+    TEST_8: PASS
+    TEST_9: PASS
+  stops_reviews:
+    stops: []
+    reviews:
+    - REVIEW_01
+    - REVIEW_09
+    warnings: []

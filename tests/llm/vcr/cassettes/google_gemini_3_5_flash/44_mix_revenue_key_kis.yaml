@@ -1,0 +1,109 @@
+meta:
+  scenario_id: 44_mix_revenue_key_kis
+  scenario_name: Klucz przychodowy MIX z interpretacji KIS
+  provider: openrouter
+  requested_model: google/gemini-3.5-flash
+  returned_model: google/gemini-3.5-flash
+  fingerprint: v3_eded1d5f3e79729d849738e4da63858d9c9a045096d6f17961e84ea1cfe461f7
+  request_hash: ec876119fed878ba1477e072c8678a290fc78cb13ff05bb5ea8c9adf543824ee
+  recorded_at: '2026-07-14T22:41:14.549860+00:00'
+  request_id: gen-1784068855-2u2yOOv3SHhyZReGjGsA
+  finish_reason: stop
+  native_finish_reason: null
+  system_fingerprint: null
+  prompt_tokens: 6931
+  completion_tokens: 695
+  total_tokens: 7626
+  cost: 0.0166515
+  recording_duration_seconds: 0.0
+  cassette_format_version: 3
+response: '{"status": "FINAL", "result": {"rok": 2025, "przychody_roczne": {"IP": 8750.0, "NIE": 1250.0}, "koszty_roczne":
+  {"IP": 537.5, "NIE": 62.5, "MIX": 500.0, "WYKLUCZONE": 0.0}, "nexus_koszty": {"A": 100.0, "B": 0.0, "C": 0.0, "D": 0.0,
+  "poza_nexus": 500.0}, "nexus": 1.0, "dochód_IP": 8212.5, "dochód_NIE": 1187.5, "klucz_MIX": {"metoda": "przychodowa_roczna",
+  "źródło": "interpretacja_KIS", "wartość": 0.875, "status": "FINAL"}, "alokacja_multi_ip": null, "podatek": {"podstawa_IP":
+  8213, "podstawa_NIE": 1188, "podatek_IP": 411, "podatek_NIE_finalny": 226, "podatek_całościowy": 637, "nadpłata_lub_dopłata":
+  -637.0}}, "classifications": [{"opis": "Serwer AWS", "amount": 500.0, "basket": "MIX", "allocation_method": "przychodowa_roczna",
+  "allocation_source": "interpretacja_KIS", "allocation_key": 0.875, "ip_amount": 437.5, "non_ip_amount": 62.5, "nexus_source":
+  "outside_nexus", "nexus_basket": "poza_nexus", "nexus_amount": 0.0}, {"opis": "Licencja JetBrains", "amount": 100.0, "basket":
+  "IP", "allocation_method": "direct", "allocation_source": "dokument", "allocation_key": 1.0, "ip_amount": 100.0, "non_ip_amount":
+  0.0, "nexus_source": "own_br", "nexus_basket": "A", "nexus_amount": 100.0}], "monthly_W": [{"miesiąc": "2025-01", "wartość":
+  87.5}], "tests": {"TEST_1": "PASS", "TEST_2": "PASS", "TEST_3": "PASS", "TEST_4": "PASS", "TEST_5": "PASS", "TEST_6": "PASS",
+  "TEST_7": "PASS", "TEST_8": "PASS", "TEST_9": "PASS"}, "stops_reviews": {"stops": [], "reviews": ["REVIEW_09", "REVIEW_16",
+  "REVIEW_17"], "warnings": []}}'
+parsed_response:
+  status: FINAL
+  result:
+    rok: 2025
+    przychody_roczne:
+      IP: 8750.0
+      NIE: 1250.0
+    koszty_roczne:
+      IP: 537.5
+      NIE: 62.5
+      MIX: 500.0
+      WYKLUCZONE: 0.0
+    nexus_koszty:
+      A: 100.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 500.0
+    nexus: 1.0
+    dochód_IP: 8212.5
+    dochód_NIE: 1187.5
+    klucz_MIX:
+      metoda: przychodowa_roczna
+      źródło: interpretacja_KIS
+      wartość: 0.875
+      status: FINAL
+    alokacja_multi_ip: null
+    podatek:
+      podstawa_IP: 8213
+      podstawa_NIE: 1188
+      podatek_IP: 411
+      podatek_NIE_finalny: 226
+      podatek_całościowy: 637
+      nadpłata_lub_dopłata: -637.0
+  classifications:
+  - opis: Serwer AWS
+    amount: 500.0
+    basket: MIX
+    allocation_method: przychodowa_roczna
+    allocation_source: interpretacja_KIS
+    allocation_key: 0.875
+    ip_amount: 437.5
+    non_ip_amount: 62.5
+    nexus_source: outside_nexus
+    nexus_basket: poza_nexus
+    nexus_amount: 0.0
+  - opis: Licencja JetBrains
+    amount: 100.0
+    basket: IP
+    allocation_method: direct
+    allocation_source: dokument
+    allocation_key: 1.0
+    ip_amount: 100.0
+    non_ip_amount: 0.0
+    nexus_source: own_br
+    nexus_basket: A
+    nexus_amount: 100.0
+  monthly_W:
+  - miesiąc: 2025-01
+    wartość: 87.5
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+    TEST_3: PASS
+    TEST_4: PASS
+    TEST_5: PASS
+    TEST_6: PASS
+    TEST_7: PASS
+    TEST_8: PASS
+    TEST_9: PASS
+  stops_reviews:
+    stops: []
+    reviews:
+    - REVIEW_09
+    - REVIEW_16
+    - REVIEW_17
+    warnings: []
