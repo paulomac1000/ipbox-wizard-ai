@@ -5,11 +5,11 @@ on:
     branches: [main]
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   diagnose:
-    if: github.head_ref == 'fix/decouple-mix-allocation-from-w' && github.actor != 'github-actions[bot]'
+    if: github.head_ref == 'fix/decouple-mix-allocation-from-w'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -27,10 +27,9 @@ jobs:
           import base64
           import tarfile
           from pathlib import Path
-
           archive = Path('/tmp/reviewed.tar.gz')
           archive.write_bytes(base64.b64decode(Path('/tmp/payload.b64').read_bytes(), validate=True))
-          root = Path('/tmp/reviewed-tree').resolve()
+          root = Path('/tmp/reviewed-tree')
           root.mkdir(parents=True, exist_ok=True)
           with tarfile.open(archive, 'r:gz') as tf:
               tf.extractall(root)
@@ -46,21 +45,25 @@ jobs:
 
       - name: Install dependencies
         working-directory: /tmp/reviewed-tree
-        run: pip install -r requirements.txt -r requirements-test.txt
+        run: pip install -q -r requirements.txt -r requirements-test.txt
 
-      - name: Run and capture unit tests
+      - name: Run unit tests
+        id: unit
+        continue-on-error: true
+        working-directory: /tmp/reviewed-tree
         run: |
-          set +e
-          cd /tmp/reviewed-tree
-          ruff format . >/tmp/format.log 2>&1
-          pytest tests/unit --cov=python_helper --cov-report=term-missing --cov-fail-under=90 -vv > /tmp/unit.log 2>&1
-          code=$?
-          set -e
-          tail -n 180 /tmp/unit.log | sed -E 's/(OPENROUTER_API_KEY|Authorization):?[^ ]*/\1=[REDACTED]/g' > "$GITHUB_WORKSPACE/.delivery/unit-test-diagnostic.txt"
-          cat "$GITHUB_WORKSPACE/.delivery/unit-test-diagnostic.txt"
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add .delivery/unit-test-diagnostic.txt
-          git commit -m "chore: capture unit test diagnostic"
-          git push origin HEAD:fix/decouple-mix-allocation-from-w
-          exit "$code"
+          mkdir -p reports
+          ruff format . > reports/format.log 2>&1
+          pytest tests/unit --cov=python_helper --cov-report=term-missing --cov-fail-under=90 -vv > reports/unit.log 2>&1
+
+      - name: Upload diagnostic
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-diagnostic
+          path: /tmp/reviewed-tree/reports/
+          if-no-files-found: error
+
+      - name: Fail after upload
+        if: steps.unit.outcome != 'success'
+        run: exit 1
