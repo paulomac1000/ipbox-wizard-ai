@@ -1,4 +1,4 @@
-name: Apply reviewed production tree
+name: Diagnose reviewed production tree
 
 on:
   pull_request:
@@ -8,10 +8,10 @@ permissions:
   contents: write
 
 jobs:
-  apply:
+  diagnose:
     if: github.head_ref == 'fix/decouple-mix-allocation-from-w' && github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
         with:
@@ -19,81 +19,51 @@ jobs:
           fetch-depth: 1
           show-progress: false
 
-      - name: Reconstruct reviewed source
+      - name: Diagnose oracle transport bytes
         run: |
           set -euo pipefail
           cat .delivery/part-* > /tmp/payload.b64
           python3 - <<'PY'
           import base64
+          import hashlib
           import tarfile
           from pathlib import Path
 
-          payload = Path('/tmp/payload.b64').read_bytes()
-          archive_bytes = base64.b64decode(payload, validate=True)
-          Path('/tmp/ipbox-final-reviewed.tar.gz').write_bytes(archive_bytes)
-          root = Path('/tmp/reviewed-tree').resolve()
+          archive = Path('/tmp/reviewed.tar.gz')
+          archive.write_bytes(base64.b64decode(Path('/tmp/payload.b64').read_bytes(), validate=True))
+          root = Path('/tmp/reviewed-tree')
           root.mkdir(parents=True, exist_ok=True)
-          with tarfile.open('/tmp/ipbox-final-reviewed.tar.gz', 'r:gz') as tf:
-              for member in tf.getmembers():
-                  target = (root / member.name).resolve()
-                  if target != root and root not in target.parents:
-                      raise SystemExit(f'unsafe archive path: {member.name}')
+          with tarfile.open(archive, 'r:gz') as tf:
               tf.extractall(root)
+
+          path = root / 'tests/llm/oracle.py'
+          data = path.read_bytes()
+          lines = [
+              f'size={len(data)}',
+              f'sha256={hashlib.sha256(data).hexdigest()}',
+          ]
+          try:
+              data.decode('utf-8')
+              lines.append('utf8=valid')
+          except UnicodeDecodeError as exc:
+              start = max(0, exc.start - 32)
+              end = min(len(data), exc.end + 32)
+              lines.extend([
+                  'utf8=invalid',
+                  f'error_start={exc.start}',
+                  f'error_end={exc.end}',
+                  f'error_reason={exc.reason}',
+                  f'context_start={start}',
+                  f'context_end={end}',
+                  f'context_hex={data[start:end].hex()}',
+              ])
+          output = '\n'.join(lines) + '\n'
+          print(output)
+          Path('.delivery/oracle-byte-diagnostic.txt').write_text(output, encoding='utf-8')
           PY
 
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Install dependencies
-        working-directory: /tmp/reviewed-tree
-        run: pip install -r requirements.txt -r requirements-test.txt
-
-      - name: Capture oracle formatter diagnostics
-        run: |
-          set +e
-          cd /tmp/reviewed-tree
-          ruff format tests/llm/oracle.py > /tmp/oracle-ruff.log 2>&1
-          code=$?
-          set -e
-          cat /tmp/oracle-ruff.log
-          if [ "$code" -ne 0 ]; then
-            cp /tmp/oracle-ruff.log "$GITHUB_WORKSPACE/.delivery/oracle-ruff.log"
-            cd "$GITHUB_WORKSPACE"
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add .delivery/oracle-ruff.log
-            git commit -m "chore: capture oracle formatter diagnostic"
-            git push origin HEAD:fix/decouple-mix-allocation-from-w
-            exit "$code"
-          fi
-
-      - name: Remaining quality gates
-        working-directory: /tmp/reviewed-tree
-        run: |
-          set -euo pipefail
-          ruff format python_helper scripts tests
-          ruff format --check python_helper scripts tests
-          ruff check python_helper scripts tests
-          python -m compileall -q python_helper tests scripts
-          pytest tests/unit --cov=python_helper --cov-report=term-missing --cov-fail-under=90
-          pytest -q
-          python scripts/check_cassette_policy.py
-          for script in scripts/*.sh dump-to-md.sh; do
-            bash -n "$script"
-          done
-
-      - name: Replace branch with reviewed tree
-        run: |
-          set -euo pipefail
-          find . -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
-          cp -a /tmp/reviewed-tree/. .
-
-      - name: Commit production tree
-        run: |
-          set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
-          git commit -m "fix: make IP Box benchmark deterministic and multi-model"
+          git add .delivery/oracle-byte-diagnostic.txt
+          git commit -m "chore: capture oracle byte diagnostic"
           git push origin HEAD:fix/decouple-mix-allocation-from-w
