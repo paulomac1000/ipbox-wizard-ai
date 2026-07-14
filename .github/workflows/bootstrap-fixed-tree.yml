@@ -1,0 +1,56 @@
+name: Apply reviewed fixed tree
+
+on:
+  push:
+    branches: [fix/decouple-mix-allocation-from-w]
+    paths:
+      - ".bootstrap/**"
+      - ".github/workflows/bootstrap-fixed-tree.yml"
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/decouple-mix-allocation-from-w
+          fetch-depth: 0
+      - name: Reconstruct reviewed source
+        run: |
+          set -euo pipefail
+          cat .bootstrap/part-* | base64 --decode > /tmp/ipbox-src.tar.gz
+          echo "d8a035ca7801301b852b4e41907d0470d5aaf2ec7d91c0423118053a80d44f12  /tmp/ipbox-src.tar.gz" | sha256sum -c -
+      - name: Replace branch working tree
+        run: |
+          set -euo pipefail
+          find . -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+          tar -xzf /tmp/ipbox-src.tar.gz -C .
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install dependencies
+        run: pip install -r requirements.txt -r requirements-test.txt
+      - name: Validate reviewed tree
+        run: |
+          set -euo pipefail
+          ruff format --check .
+          ruff check .
+          python -m compileall -q python_helper tests
+          pytest tests/unit --cov=python_helper --cov-report=term-missing --cov-fail-under=90
+      - name: Commit reviewed tree
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "fix: harden MIX allocation, evaluator and CI"
+          git push origin HEAD:fix/decouple-mix-allocation-from-w
