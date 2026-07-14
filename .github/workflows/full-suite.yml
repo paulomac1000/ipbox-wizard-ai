@@ -25,13 +25,11 @@ jobs:
           cat .delivery/part-* > /tmp/payload.b64
           python3 - <<'PY'
           import base64
-          import hashlib
           import tarfile
           from pathlib import Path
 
           payload = Path('/tmp/payload.b64').read_bytes()
           archive_bytes = base64.b64decode(payload, validate=True)
-          print(f'archive_sha256={hashlib.sha256(archive_bytes).hexdigest()}')
           Path('/tmp/ipbox-final-reviewed.tar.gz').write_bytes(archive_bytes)
           root = Path('/tmp/reviewed-tree').resolve()
           root.mkdir(parents=True, exist_ok=True)
@@ -51,17 +49,25 @@ jobs:
         working-directory: /tmp/reviewed-tree
         run: pip install -r requirements.txt -r requirements-test.txt
 
-      - name: Format Python
+      - name: Format python_helper
         working-directory: /tmp/reviewed-tree
-        run: ruff format .
+        run: ruff format python_helper
+
+      - name: Format scripts
+        working-directory: /tmp/reviewed-tree
+        run: ruff format scripts
+
+      - name: Format tests
+        working-directory: /tmp/reviewed-tree
+        run: ruff format tests
 
       - name: Check Python format
         working-directory: /tmp/reviewed-tree
-        run: ruff format --check .
+        run: ruff format --check python_helper scripts tests
 
       - name: Ruff lint
         working-directory: /tmp/reviewed-tree
-        run: ruff check .
+        run: ruff check python_helper scripts tests
 
       - name: Compile
         working-directory: /tmp/reviewed-tree
