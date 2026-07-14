@@ -93,13 +93,19 @@ jobs:
             bash -n "$script"
           done
 
-      - name: Replace branch with reviewed tree
+      - name: Replace branch while preserving current workflows
         run: |
           set -euo pipefail
+          rm -rf /tmp/current-workflows
+          mkdir -p /tmp/current-workflows
+          cp -a .github/workflows/. /tmp/current-workflows/
           find . -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
           cp -a /tmp/reviewed-tree/. .
+          rm -rf .github/workflows
+          mkdir -p .github/workflows
+          cp -a /tmp/current-workflows/. .github/workflows/
 
-      - name: Commit production tree
+      - name: Commit production code
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
