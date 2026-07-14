@@ -35,6 +35,8 @@ Kody:
 
 Brak interpretacji KIS nie jest sam w sobie STOP. Powoduje ostrożność i ewentualny REVIEW.
 
+Każdy kod STOP jest niezależny. Dodaj tylko te, których konkretny warunek jest spełniony w danych. Nie kaskaduj — fakt, że jeden STOP wystąpił, nie oznacza, że pozostałe też.
+
 ## 3. Współczynnik W
 
 ```text
@@ -178,13 +180,15 @@ ZUS w KPiR oraz odliczenie PIT > 0 -> TEST_3 FAIL + ZUS_DOUBLE_DIP
 
 ## 11. REVIEW
 
-- `REVIEW_01` — W > 95%;
-- `REVIEW_02` — W < 50%;
-- `REVIEW_04` — wiele projektów/IP wymagających rozdzielenia;
-- `REVIEW_08` — skok W > 30 p.p.;
-- `REVIEW_09` — jeden kontrahent odpowiada za 100% przychodów w danych;
-- `REVIEW_16` — zastosowano metodę z interpretacji KIS;
-- `REVIEW_17` — potwierdź, że sposób implementacji odpowiada dokładnie treści interpretacji.
+Użyj `diagnostic_facts` z `deterministic_tool_output`, aby ustalić każdy REVIEW:
+
+- `REVIEW_01` — `diagnostic_facts.w_max > 95`;
+- `REVIEW_02` — `diagnostic_facts.w_min < 50`;
+- `REVIEW_04` — `diagnostic_facts.has_multiple_projects == true`;
+- `REVIEW_08` — `diagnostic_facts.max_w_jump_pp > 30`;
+- `REVIEW_09` — `diagnostic_facts.clients_with_positive_revenue == 1`;
+- `REVIEW_16` — `diagnostic_facts.uses_kis_interpretation == true`;
+- `REVIEW_17` — `diagnostic_facts.uses_kis_interpretation == true` (potwierdź zgodność implementacji z treścią interpretacji).
 
 REVIEW nie zmienia liczb. Informuje, co musi sprawdzić człowiek.
 

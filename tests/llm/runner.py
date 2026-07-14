@@ -34,6 +34,7 @@ def build_tool_context(reference: dict[str, Any]) -> dict[str, Any]:
         "validation_facts": {
             test_id: status == "PASS" for test_id, status in reference["tests"].items()
         },
+        "diagnostic_facts": reference.get("diagnostic_facts", {}),
     }
 
 
@@ -64,31 +65,73 @@ class LLMTestRunner:
             "ZASADY ODPOWIEDZI:\n"
             "1. Skopiuj liczby i klasyfikacje wyłącznie z deterministic_tool_output; "
             "nie przeliczaj ich.\n"
-            "2. Na podstawie danych i algorytmu wyznacz status, kody STOP/REVIEW/WARNING "
-            "oraz TEST_1..TEST_9.\n"
-            "3. Jeżeli jest STOP, status=STOPPED, a wyniki finansowe mają być zerowe "
+            "2. Na podstawie danych, diagnostic_facts i algorytmu wyznacz status, "
+            "kody STOP/REVIEW/WARNING oraz TEST_1..TEST_9.\n"
+            "3. Dla każdego REVIEW sprawdź odpowiadający mu fakt w diagnostic_facts "
+            "(patrz sekcja 11 algorytmu).\n"
+            "4. Każdy kod STOP jest niezależny — dodaj tylko te, których warunek "
+            "jest spełniony. Nie kaskaduj.\n"
+            "5. Jeżeli jest STOP, status=STOPPED, a wyniki finansowe mają być zerowe "
             "zgodnie z tool output.\n"
-            "4. Nie dodawaj komentarzy, markdownu ani pól spoza schematu. Zwróć tylko JSON.\n"
+            "6. Nie dodawaj komentarzy, markdownu ani pól spoza schematu. Zwróć tylko JSON.\n"
+            "\n"
+            "LISTA KONTROLNA REVIEW (sprawdź każdy warunek z diagnostic_facts):\n"
+            "- clients_with_positive_revenue == 1 → dodaj REVIEW_09\n"
+            "- w_max > 95 → dodaj REVIEW_01\n"
+            "- w_min < 50 → dodaj REVIEW_02\n"
+            "- max_w_jump_pp > 30 → dodaj REVIEW_08\n"
+            "- has_multiple_projects == true → dodaj REVIEW_04\n"
+            "- uses_kis_interpretation == true → dodaj REVIEW_16 + REVIEW_17\n"
+            "\n"
+            "LISTA KONTROLNA STOP:\n"
+            "- STOP_01: forma opodatkowania nieobsługiwana przez IP Box\n"
+            "- STOP_02: brak kwalifikowanego prawa IP\n"
+            "- STOP_03: brak dochodu z kwalifikowanego IP\n"
+            "- STOP_04: brak prac B+R\n"
+            "- STOP_08: przychód IP bez ewidencji lub dowodów B+R\n"
+            "- ZUS_DOUBLE_DIP: składki społeczne w KPiR i odliczenie PIT > 0\n"
+            "- HEALTH_DOUBLE_DIP: składka zdrowotna w kosztach i odliczenie > 0\n"
+            "STOP-y są niezależne — dodaj TYLKO te, których warunek spełniony.\n"
         )
 
     def request_spec(self, prompt: str, config: VCRConfig) -> LLMRequestSpec:
         profile = config.profile
+        if profile.response_format_type == "json_object":
+            response_format: dict[str, Any] = {"type": "json_object"}
+            system_prompt = (
+                SYSTEM_PROMPT
+                + "\n\nOczekiwany strict JSON Schema (zwróć dokładnie tę strukturę):\n"
+                + json.dumps(OUTPUT_JSON_SCHEMA["schema"], ensure_ascii=False, indent=2)
+            )
+        else:
+            response_format = {"type": "json_schema", "json_schema": OUTPUT_JSON_SCHEMA}
+            system_prompt = SYSTEM_PROMPT
         return LLMRequestSpec(
             provider=config.provider,
             model=config.model,
-            system_prompt=SYSTEM_PROMPT,
+            system_prompt=system_prompt,
             user_prompt=prompt,
             temperature=profile.temperature,
             max_tokens=profile.max_tokens,
-            response_format={"type": "json_schema", "json_schema": OUTPUT_JSON_SCHEMA},
+            response_format=response_format,
             provider_preferences=None,
             seed=None,
             reasoning=profile.reasoning,
         )
 
     def parse_response(self, content: str) -> dict[str, Any]:
+        stripped = content.strip()
+        if stripped.startswith("```"):
+            for fence in ("```json\n", "```JSON\n", "```\n"):
+                if stripped.startswith(fence):
+                    stripped = stripped[len(fence) :]
+                    break
+            close_pos = stripped.rfind("\n```")
+            if close_pos >= 0:
+                stripped = stripped[:close_pos]
+            stripped = stripped.strip()
         try:
-            parsed = json.loads(content)
+            parsed = json.loads(stripped)
         except json.JSONDecodeError as exc:
             raise ValueError("response must be pure JSON") from exc
         if not isinstance(parsed, dict):

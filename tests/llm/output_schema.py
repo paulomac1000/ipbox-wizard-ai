@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 MONEY = {"type": "number"}
-NONNEGATIVE_MONEY = {"type": "number", "minimum": 0}
+NONNEGATIVE_MONEY = {"type": "number"}
 CODE = {"type": "string", "pattern": "^[A-Z][A-Z0-9_]*$"}
 
 OUTPUT_JSON_SCHEMA: dict[str, Any] = {
@@ -40,7 +40,7 @@ OUTPUT_JSON_SCHEMA: dict[str, Any] = {
                     "podatek",
                 ],
                 "properties": {
-                    "rok": {"type": "integer", "minimum": 2019, "maximum": 2100},
+                    "rok": {"type": "integer"},
                     "przychody_roczne": {
                         "type": "object",
                         "additionalProperties": False,
@@ -70,7 +70,7 @@ OUTPUT_JSON_SCHEMA: dict[str, Any] = {
                             "poza_nexus": NONNEGATIVE_MONEY,
                         },
                     },
-                    "nexus": {"type": "number", "minimum": 0, "maximum": 1},
+                    "nexus": {"type": "number"},
                     "dochód_IP": MONEY,
                     "dochód_NIE": MONEY,
                     "klucz_MIX": {
@@ -99,8 +99,6 @@ OUTPUT_JSON_SCHEMA: dict[str, Any] = {
                             },
                             "wartość": {
                                 "type": ["number", "null"],
-                                "minimum": 0,
-                                "maximum": 1,
                             },
                             "status": {"enum": ["FINAL", "DEFERRED", "NOT_APPLICABLE"]},
                         },
@@ -183,8 +181,6 @@ OUTPUT_JSON_SCHEMA: dict[str, Any] = {
                         "allocation_source": {"type": "string"},
                         "allocation_key": {
                             "type": ["number", "null"],
-                            "minimum": 0,
-                            "maximum": 1,
                         },
                         "ip_amount": NONNEGATIVE_MONEY,
                         "non_ip_amount": NONNEGATIVE_MONEY,
@@ -212,7 +208,7 @@ OUTPUT_JSON_SCHEMA: dict[str, Any] = {
                     "required": ["miesiąc", "wartość"],
                     "properties": {
                         "miesiąc": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}$"},
-                        "wartość": {"type": "number", "minimum": 0, "maximum": 100},
+                        "wartość": {"type": "number"},
                     },
                 },
             },

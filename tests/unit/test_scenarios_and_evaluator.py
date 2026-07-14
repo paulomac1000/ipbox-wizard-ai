@@ -35,8 +35,11 @@ def test_exact_scenario_set_and_contracts() -> None:
 def test_oracle_output_matches_schema_and_self_evaluates(scenario_path: Path) -> None:
     scenario = load(scenario_path)
     reference = compute_reference(scenario)
-    errors = list(Draft202012Validator(OUTPUT_JSON_SCHEMA["schema"]).iter_errors(reference))
+    schema_validated = {k: v for k, v in reference.items() if k != "diagnostic_facts"}
+    errors = list(Draft202012Validator(OUTPUT_JSON_SCHEMA["schema"]).iter_errors(schema_validated))
     assert errors == []
+    assert "diagnostic_facts" in reference
+    assert "clients_with_positive_revenue" in reference["diagnostic_facts"]
     failures, _ = Evaluator(scenario).evaluate(reference)
     assert failures == []
 

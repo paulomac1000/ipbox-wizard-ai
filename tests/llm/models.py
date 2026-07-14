@@ -10,9 +10,10 @@ from typing import Any
 class ModelProfile:
     model_id: str
     label: str
-    max_tokens: int = 12000
+    max_tokens: int = 24000
     temperature: float | None = None
     reasoning: dict[str, Any] | None = None
+    response_format_type: str = "json_schema"
 
 
 MODEL_PROFILES: dict[str, ModelProfile] = {
@@ -30,6 +31,7 @@ MODEL_PROFILES: dict[str, ModelProfile] = {
         model_id="anthropic/claude-haiku-4.5",
         label="Anthropic Claude Haiku 4.5",
         temperature=0.0,
+        response_format_type="json_object",
     ),
 }
 

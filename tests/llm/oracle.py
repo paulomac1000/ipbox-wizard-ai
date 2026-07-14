@@ -186,6 +186,7 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
     month_w_map: dict[str, float] = {}
     invoices_by_month: dict[str, list[dict[str, Any]]] = {}
     positive_ip_claim = False
+    has_multiple_projects = False
 
     for raw_month in input_data.get("miesiace", []):
         month = _mapping(raw_month, "month")
@@ -226,6 +227,7 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
                 reviews.add("REVIEW_02")
             projects = evidence.get("projekty")
             if isinstance(projects, list) and len(projects) > 1:
+                has_multiple_projects = True
                 weighted_projects: list[dict[str, float]] = []
                 for project_index, raw_project in enumerate(projects):
                     project = _mapping(raw_project, f"project[{project_index}]")
@@ -586,5 +588,18 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
             "stops": sorted(stops),
             "reviews": sorted(reviews),
             "warnings": sorted(warnings),
+        },
+        "diagnostic_facts": {
+            "clients_with_positive_revenue": len(
+                [amount for amount in client_revenue.values() if amount > 0]
+            ),
+            "mix_policy_source": policy.source,
+            "uses_kis_interpretation": policy.source == "interpretacja_KIS",
+            "w_max": max(w_values) if w_values else None,
+            "w_min": min(w_values) if w_values else None,
+            "max_w_jump_pp": max(
+                (abs(left - right) for left, right in pairwise(w_values)), default=0.0
+            ),
+            "has_multiple_projects": has_multiple_projects,
         },
     }
