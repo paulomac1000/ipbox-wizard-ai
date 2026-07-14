@@ -61,9 +61,13 @@ jobs:
         working-directory: /tmp/reviewed-tree
         run: ruff format tests/__init__.py tests/conftest.py
 
-      - name: Format LLM tests
+      - name: Format LLM root files
         working-directory: /tmp/reviewed-tree
-        run: ruff format tests/llm
+        run: ruff format tests/llm/*.py
+
+      - name: Format VCR files
+        working-directory: /tmp/reviewed-tree
+        run: ruff format tests/llm/vcr
 
       - name: Format unit tests
         working-directory: /tmp/reviewed-tree
