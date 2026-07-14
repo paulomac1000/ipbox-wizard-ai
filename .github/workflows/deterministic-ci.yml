@@ -26,6 +26,21 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Export branch snapshot
+        if: matrix.python-version == '3.12'
+        run: |
+          set -euo pipefail
+          git archive --format=tar.gz --output=/tmp/ipbox-branch-snapshot.tar.gz HEAD
+
+      - name: Upload branch snapshot
+        if: matrix.python-version == '3.12'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ipbox-branch-snapshot
+          path: /tmp/ipbox-branch-snapshot.tar.gz
+          if-no-files-found: error
+          retention-days: 1
+
       - name: Setup Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
