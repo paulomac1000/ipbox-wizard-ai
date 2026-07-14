@@ -5,7 +5,7 @@
 ## 1. Zasady nadrzędne
 
 1. **Nie zgaduj danych.** Brak dowodu lub wartości oznacz STOP, REVIEW albo wynik `PROVISIONAL`.
-2. **Arytmetyka jest deterministyczna.** Liczby otrzymane z kalkulatora Python są źródłem prawdy; model ich nie przelicza i nie poprawia.
+2. **Arytmetyka jest deterministyczna.** Liczby otrzymane z kalkulatora Python są źródłem prawdy; model ich nie przelicza i nie przepisuje. Warstwa aplikacyjna dołącza je do wyniku po decyzji modelu.
 3. Każdą decyzję oznacz mentalnie jako:
    - `[PRAWO]` — reguła wynikająca z przepisu;
    - `[DOWÓD]` — umowa, KPiR, ewidencja, faktura lub interpretacja;
@@ -23,19 +23,27 @@
 
 Zbierz: rok, formę opodatkowania, kwalifikowane IP, sposób komercjalizacji, umowy, ewidencję B+R, KPiR i interpretację KIS.
 
-Kody:
+Narzędzie Python przekazuje atomowe `decision_facts`. Są one ustalane na danych wejściowych **przed** wyzerowaniem wyniku po STOP. Model nie odtwarza tych faktów z zerowych kwot i nie tworzy własnych przesłanek.
 
-- `STOP_01` — forma opodatkowania nieobsługiwana przez przebieg IP Box;
-- `STOP_02` — brak kwalifikowanego prawa IP;
-- `STOP_03` — brak dochodu z kwalifikowanego IP;
-- `STOP_04` — brak prac B+R w rozpatrywanym okresie;
-- `STOP_08` — zadeklarowany przychód IP bez wymaganej ewidencji lub dowodów B+R;
-- `ZUS_DOUBLE_DIP` — składki społeczne jednocześnie w KPiR i jako odliczenie w PIT;
-- `HEALTH_DOUBLE_DIP` — składka zdrowotna jednocześnie w kosztach i ponownym odliczeniu.
+Tabela jest jedynym mapowaniem fakt → kod STOP:
 
-Brak interpretacji KIS nie jest sam w sobie STOP. Powoduje ostrożność i ewentualny REVIEW.
+| `decision_facts` | Gdy `true`, dodaj | Znaczenie |
+|---|---|---|
+| `unsupported_tax_form` | `STOP_01` | forma opodatkowania nieobsługiwana przez przebieg IP Box |
+| `claimed_ip_without_qualified_right` | `STOP_02` | zadeklarowano przychód IP bez kwalifikowanego prawa |
+| `no_qualifying_ip_income_after_complete_evidence` | `STOP_03` | kompletne i niesprzeczne dane nie dają dodatniego przychodu kwalifikowanego IP |
+| `rd_work_absent` | `STOP_04` | dane jawnie wskazują brak prac B+R |
+| `ip_claim_without_required_records` | `STOP_08` | zadeklarowano przychód IP bez wymaganej ewidencji lub dowodów B+R |
+| `social_contributions_double_counted` | `ZUS_DOUBLE_DIP` | składki społeczne są równocześnie w KPiR i odliczeniu PIT |
+| `health_contribution_double_counted` | `HEALTH_DOUBLE_DIP` | składka zdrowotna jest równocześnie kosztem i odliczeniem |
 
-Każdy kod STOP jest niezależny. Dodaj tylko te, których konkretny warunek jest spełniony w danych. Nie kaskaduj — fakt, że jeden STOP wystąpił, nie oznacza, że pozostałe też.
+Reguły wykonania:
+
+1. Dodaj kod wtedy i tylko wtedy, gdy odpowiadający mu fakt ma wartość `true`.
+2. `STOP_03` jest faktem zastępczym dla przypadku z kompletną dokumentacją. Nie wolno go dodawać dlatego, że inne STOP-y wyzerowały wynik.
+3. `status = STOPPED`, jeśli co najmniej jeden fakt STOP jest `true`; w przeciwnym razie `status = FINAL`.
+4. Brak interpretacji KIS nie jest STOP-em.
+5. Kody są niezależne, ale nie wolno rozszerzać ich znaczenia. Przykładowo `godziny_pracy = 0` samo nie oznacza jednocześnie `STOP_03`, `STOP_04` i `STOP_08`.
 
 ## 3. Współczynnik W
 
@@ -46,7 +54,7 @@ W = ((godziny_pracy - godziny_nie_IP) × procent_faktury_IP / 100)
 
 Mianownik to faktyczne godziny pracy, nie nominalne 160 h.
 
-- `godziny_pracy = 0` — nie dziel; rozstrzygnij `STOP_04` albo `STOP_08` z dowodów;
+- `godziny_pracy = 0` — przyjmij `W=0`; kod STOP wynika wyłącznie z `decision_facts`: `rd_work_absent` albo `ip_claim_without_required_records`;
 - `W < 50%` — zawsze `REVIEW_02`;
 - `W > 95%` — zawsze `REVIEW_01`;
 - zmiana między kolejnymi aktywnymi miesiącami większa niż 30 p.p. — `REVIEW_08`;
@@ -156,9 +164,11 @@ Kalkulator wykonuje kolejno:
 
 Brak kosztów KPiR nie oznacza automatycznie podatku IP równego zero. O wyniku decydują przychód, dochód i NEXUS. Jednocześnie brak jakichkolwiek kwalifikowanych kosztów NEXUS daje NEXUS=0 — model nie może wymyślić A.
 
-## 10. TEST 1–9 — reguły deterministyczne
+## 10. TEST 1–9 — wynik deterministyczny
 
-Model nie ocenia sam siebie. Odczytuje booleany z narzędzia i mapuje je na PASS/FAIL.
+TEST-y nie są oceną dokonywaną przez model. Python oblicza je i warstwa aplikacyjna dołącza do finalnego raportu. Model decyzyjny nie otrzymuje obowiązku przepisywania TEST-ów.
+
+Znaczenie testów:
 
 - `TEST_1` — suma miesięcznych przychodów i kosztów jest zgodna z podsumowaniem KPiR w tolerancji 1 zł;
 - `TEST_2` — żaden koszt prywatny/osobisty nie pozostał w IP, MIX ani NON; musi być `WYKLUCZONE`;
@@ -170,34 +180,48 @@ Model nie ocenia sam siebie. Odczytuje booleany z narzędzia i mapuje je na PASS
 - `TEST_8` — alokacja dochodowa i NEXUS są rozdzielone, a każdy kwalifikowany MIX ma jawny `nexus_amount`;
 - `TEST_9` — każdy miesiąc z przychodem ma niepusty opis projektu.
 
-Przykłady:
-
-```text
-KPiR 100000, suma miesięcy 90000 -> TEST_1 FAIL
-"Kawa do domu" zadeklarowana jako IP -> TEST_2 FAIL
-ZUS w KPiR oraz odliczenie PIT > 0 -> TEST_3 FAIL + ZUS_DOUBLE_DIP
-```
+Model nie zmienia `FAIL` na `PASS`, nawet gdy uważa wynik za nietypowy.
 
 ## 11. REVIEW
 
-Użyj `diagnostic_facts` z `deterministic_tool_output`, aby ustalić każdy REVIEW:
+Kody REVIEW wynikają wyłącznie z poniższej tabeli. Model nie wyszukuje ponownie przesłanek w surowych danych.
 
-- `REVIEW_01` — `diagnostic_facts.w_max > 95`;
-- `REVIEW_02` — `diagnostic_facts.w_min < 50`;
-- `REVIEW_04` — `diagnostic_facts.has_multiple_projects == true`;
-- `REVIEW_08` — `diagnostic_facts.max_w_jump_pp > 30`;
-- `REVIEW_09` — `diagnostic_facts.clients_with_positive_revenue == 1`;
-- `REVIEW_16` — `diagnostic_facts.uses_kis_interpretation == true`;
-- `REVIEW_17` — `diagnostic_facts.uses_kis_interpretation == true` (potwierdź zgodność implementacji z treścią interpretacji).
+| `decision_facts` | Gdy `true`, dodaj |
+|---|---|
+| `w_above_95` | `REVIEW_01` |
+| `w_below_50` | `REVIEW_02` |
+| `multiple_projects_or_ips` | `REVIEW_04` |
+| `w_jump_above_30pp` | `REVIEW_08` |
+| `single_positive_revenue_client` | `REVIEW_09` |
+| `uses_kis_interpretation` | `REVIEW_16` |
+| `kis_implementation_requires_confirmation` | `REVIEW_17` |
 
-REVIEW nie zmienia liczb. Informuje, co musi sprawdzić człowiek.
+`multiple_projects_or_ips` obejmuje zarówno wiele projektów w ewidencji czasu, jak i dwustopniową alokację kosztów pomiędzy co najmniej dwa kwalifikowane IP. REVIEW nie zmienia liczb i może wystąpić także przy statusie `STOPPED`.
 
-## 12. Kontrakt odpowiedzi
+## 12. Granica odpowiedzialności modelu i kontrakt odpowiedzi
 
-Zwróć jeden czysty JSON zgodny z przekazanym strict JSON Schema. Nie używaj markdownu ani dodatkowego tekstu.
+System ma trzy warstwy:
 
-- liczby i klasyfikacje kopiuj z `deterministic_tool_output`;
-- `status`, TEST-y oraz kody STOP/REVIEW wyznaczaj według tego dokumentu;
-- nie dodawaj pól spoza schematu;
-- zachowaj kanoniczne nazwy `NON` i `WYKLUCZONE`;
-- przy STOP użyj wartości finansowych dostarczonych przez narzędzie, nie wcześniejszych obliczeń pośrednich.
+1. **Python/oracle** oblicza liczby, klasyfikacje kosztów, W, TEST 1–9 oraz atomowe `decision_facts`.
+2. **Model decyzyjny** otrzymuje wyłącznie `decision_facts` i zwraca małą kopertę:
+
+```json
+{
+  "status": "FINAL",
+  "stops": [],
+  "reviews": ["REVIEW_09"]
+}
+```
+
+3. **Warstwa aplikacyjna** dołącza kopertę do deterministycznego raportu i dopiero wtedy waliduje pełny wynik.
+
+Reguły modelu:
+
+- dodaj kod wtedy i tylko wtedy, gdy przypisany mu fakt ma wartość `true`;
+- nie analizuj ponownie surowych danych i nie wyprowadzaj nowych faktów z kwot;
+- `status=STOPPED`, gdy `stops` nie jest puste; w przeciwnym razie `status=FINAL`;
+- kolejność kodów nie ma znaczenia; nie zwracaj duplikatów;
+- nie zwracaj obliczeń, TEST-ów ani klasyfikacji — są dołączane deterministycznie;
+- nie dodawaj pól spoza schematu ani komentarzy.
+
+To nie jest uproszczenie reguł podatkowych. Jest to celowe rozdzielenie odpowiedzialności: model wykonuje klasyfikację wymagającą interpretacji, a kod odpowiada za arytmetykę, bilans i serializację pełnego raportu.

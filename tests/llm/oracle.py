@@ -28,6 +28,36 @@ class ScenarioError(ValueError):
     """Raised when a scenario contract is incomplete or contradictory."""
 
 
+STOP_FACT_TO_CODE = {
+    "unsupported_tax_form": "STOP_01",
+    "claimed_ip_without_qualified_right": "STOP_02",
+    "no_qualifying_ip_income_after_complete_evidence": "STOP_03",
+    "rd_work_absent": "STOP_04",
+    "ip_claim_without_required_records": "STOP_08",
+    "social_contributions_double_counted": "ZUS_DOUBLE_DIP",
+    "health_contribution_double_counted": "HEALTH_DOUBLE_DIP",
+}
+
+REVIEW_FACT_TO_CODE = {
+    "w_above_95": "REVIEW_01",
+    "w_below_50": "REVIEW_02",
+    "multiple_projects_or_ips": "REVIEW_04",
+    "w_jump_above_30pp": "REVIEW_08",
+    "single_positive_revenue_client": "REVIEW_09",
+    "uses_kis_interpretation": "REVIEW_16",
+    "kis_implementation_requires_confirmation": "REVIEW_17",
+}
+
+
+def derive_decision_codes(decision_facts: dict[str, bool]) -> tuple[set[str], set[str]]:
+    """Map atomic, pre-STOP facts to the canonical STOP and REVIEW code sets."""
+    stops = {code for fact, code in STOP_FACT_TO_CODE.items() if decision_facts.get(fact) is True}
+    reviews = {
+        code for fact, code in REVIEW_FACT_TO_CODE.items() if decision_facts.get(fact) is True
+    }
+    return stops, reviews
+
+
 def _mapping(value: Any, name: str) -> dict[str, Any]:
     if not isinstance(value, dict):
         raise ScenarioError(f"{name} must be a mapping")
@@ -170,11 +200,13 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
         justification=str(mix_policy.get("uzasadnienie", "")),
     )
 
-    stops: set[str] = set()
-    reviews: set[str] = set(meta.get("expected_reviews", []))
     warnings: set[str] = set()
-    if tax_form not in {"liniowy_19%", "skala"}:
-        stops.add("STOP_01")
+    unsupported_tax_form = tax_form not in {"liniowy_19%", "skala"}
+    claimed_ip_without_qualified_right = False
+    rd_work_absent = False
+    ip_claim_without_required_records = False
+    social_contributions_double_counted = False
+    health_contribution_double_counted = False
 
     clients = {
         str(client.get("nazwa")): bool(client.get("klauzula_IP", True))
@@ -187,6 +219,12 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
     invoices_by_month: dict[str, list[dict[str, Any]]] = {}
     positive_ip_claim = False
     has_multiple_projects = False
+    raw_multi_ip = input_data.get("alokacja_multi_ip")
+    has_multiple_ips = (
+        isinstance(raw_multi_ip, dict)
+        and isinstance(raw_multi_ip.get("przychody_IP"), dict)
+        and len(raw_multi_ip["przychody_IP"]) > 1
+    )
 
     for raw_month in input_data.get("miesiace", []):
         month = _mapping(raw_month, "month")
@@ -205,10 +243,10 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
 
         evidence = _month_evidence(month)
         if month.get("brak_ewidencji") is True or (evidence is None and eligible_amount > 0):
-            stops.add("STOP_08")
+            ip_claim_without_required_records = True
             value = 0.0
         elif month.get("brak_prac_br") is True:
-            stops.add("STOP_04")
+            rd_work_absent = True
             value = 0.0
         elif evidence is None:
             value = 0.0
@@ -221,10 +259,6 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
             )
             result = calculate_w_coefficient(work_hours, non_ip_hours, invoice_percentage)
             value = float(result["W"])
-            if result["status"] == "REVIEW_01":
-                reviews.add("REVIEW_01")
-            if result["status"] == "REVIEW_02":
-                reviews.add("REVIEW_02")
             projects = evidence.get("projekty")
             if isinstance(projects, list) and len(projects) > 1:
                 has_multiple_projects = True
@@ -243,20 +277,13 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
                         }
                     )
                 value = aggregate_w_multiproject(weighted_projects)
-                reviews.add("REVIEW_04")
         month_w.append({"miesiąc": month_id, "wartość": value})
         month_w_map[month_id] = value
 
     w_values = [entry["wartość"] for entry in month_w if entry["wartość"] > 0]
-    if any(abs(left - right) > 30 for left, right in pairwise(w_values)):
-        reviews.add("REVIEW_08")
-    if len([amount for amount in client_revenue.values() if amount > 0]) == 1 and client_revenue:
-        reviews.add("REVIEW_09")
-    if policy.source == "interpretacja_KIS":
-        reviews.update({"REVIEW_16", "REVIEW_17"})
 
     if positive_ip_claim and not input_data.get("kwalifikowane_IP", True):
-        stops.add("STOP_02")
+        claimed_ip_without_qualified_right = True
 
     annual_ip_revenue = Decimal("0")
     annual_non_revenue = Decimal("0")
@@ -299,10 +326,40 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
     health_in_kpir = bool(social.get("zdrowotna_w_KPiR", False))
     social_pit_deduction = _number(social.get("odliczenie_spoleczne_PIT", 0), "ZUS deduction")
     health_pit_deduction = _number(social.get("odliczenie_zdrowotne_PIT", 0), "health deduction")
-    if social_in_kpir and social_pit_deduction > 0:
-        stops.add("ZUS_DOUBLE_DIP")
-    if health_in_kpir and health_pit_deduction > 0:
-        stops.add("HEALTH_DOUBLE_DIP")
+    social_contributions_double_counted = social_in_kpir and social_pit_deduction > 0
+    health_contribution_double_counted = health_in_kpir and health_pit_deduction > 0
+
+    other_stop_condition = any(
+        (
+            unsupported_tax_form,
+            claimed_ip_without_qualified_right,
+            rd_work_absent,
+            ip_claim_without_required_records,
+            social_contributions_double_counted,
+            health_contribution_double_counted,
+        )
+    )
+    decision_facts = {
+        "unsupported_tax_form": unsupported_tax_form,
+        "claimed_ip_without_qualified_right": claimed_ip_without_qualified_right,
+        "no_qualifying_ip_income_after_complete_evidence": (
+            annual_ip_revenue == 0 and not other_stop_condition
+        ),
+        "rd_work_absent": rd_work_absent,
+        "ip_claim_without_required_records": ip_claim_without_required_records,
+        "social_contributions_double_counted": social_contributions_double_counted,
+        "health_contribution_double_counted": health_contribution_double_counted,
+        "w_above_95": bool(w_values) and max(w_values) > 95,
+        "w_below_50": bool(w_values) and min(w_values) < 50,
+        "multiple_projects_or_ips": has_multiple_projects or has_multiple_ips,
+        "w_jump_above_30pp": any(abs(left - right) > 30 for left, right in pairwise(w_values)),
+        "single_positive_revenue_client": (
+            len([amount for amount in client_revenue.values() if amount > 0]) == 1
+        ),
+        "uses_kis_interpretation": policy.source == "interpretacja_KIS",
+        "kis_implementation_requires_confirmation": policy.source == "interpretacja_KIS",
+    }
+    stops, reviews = derive_decision_codes(decision_facts)
 
     all_costs: list[CostItem] = []
     declared_private_business = False
@@ -348,9 +405,6 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
                 nexus_basket="poza_nexus",
             )
         )
-
-    if annual_ip_revenue == 0 and not stops:
-        stops.add("STOP_03")
 
     total_revenue = annual_ip_revenue + annual_non_revenue
     mix_total = sum(
@@ -589,17 +643,5 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
             "reviews": sorted(reviews),
             "warnings": sorted(warnings),
         },
-        "diagnostic_facts": {
-            "clients_with_positive_revenue": len(
-                [amount for amount in client_revenue.values() if amount > 0]
-            ),
-            "mix_policy_source": policy.source,
-            "uses_kis_interpretation": policy.source == "interpretacja_KIS",
-            "w_max": max(w_values) if w_values else None,
-            "w_min": min(w_values) if w_values else None,
-            "max_w_jump_pp": max(
-                (abs(left - right) for left, right in pairwise(w_values)), default=0.0
-            ),
-            "has_multiple_projects": has_multiple_projects,
-        },
+        "decision_facts": decision_facts,
     }

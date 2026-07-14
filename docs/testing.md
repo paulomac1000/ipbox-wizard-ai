@@ -1,8 +1,17 @@
 # Testowanie i nagrywanie kaset
 
-## 1. Bezpłatna bramka przed API
+## 1. Architektura benchmarku
 
-Uruchom dokładnie:
+Benchmark nie wymaga od modelu przepisywania pełnego raportu finansowego.
+
+1. Python oblicza wynik finansowy, klasyfikacje, W i TEST 1–9.
+2. Python tworzy atomowe `decision_facts` sprzed ewentualnego wyzerowania po STOP.
+3. Model zwraca wyłącznie małą kopertę `status`, `stops`, `reviews`.
+4. Runner dołącza kopertę do raportu deterministycznego i waliduje pełny wynik.
+
+Ta granica jest celowa. Model nie powinien ponownie wykonywać arytmetyki ani kopiować kilkuset pól, skoro ich prawidłową wartość zna kod. Benchmark sprawdza interpretację jawnych faktów, zgodność z protokołem oraz kompatybilność providera.
+
+## 2. Bezpłatna bramka przed API
 
 ```bash
 python -m venv .venv
@@ -17,24 +26,30 @@ pytest tests/unit \
   --cov-report=term-missing \
   --cov-fail-under=90
 pytest -q
+python scripts/check_cassette_policy.py
 ```
 
-Oczekiwany wynik: testy jednostkowe PASS, coverage >=90%, testy LLM oznaczone jako skipped bez `--run-llm`.
+Oczekiwany stan przed pierwszym nagraniem:
 
-## 2. Dlaczego stare kasety muszą być usunięte
+- wszystkie testy jednostkowe przechodzą;
+- coverage wynosi co najmniej 90%;
+- 36 testów LLM jest pominiętych bez `--run-llm`;
+- polityka kaset akceptuje pusty katalog.
 
-Tożsamość requestu obejmuje:
+## 3. Dlaczego wszystkie poprzednie kasety są nieaktualne
 
-- cały `ipbox_algorytm.md`;
-- scenariusz YAML;
-- system prompt i user prompt;
-- wynik narzędzia deterministycznego dołączony do promptu;
-- model, limit tokenów, reasoning/temperature;
-- pełny strict JSON Schema.
+Tożsamość requestu obejmuje między innymi:
 
-Zmiana któregokolwiek elementu unieważnia kasetę. Nie przenoś starych response, hashy ani manifestów.
+- protokół decyzji wygenerowany z map kodu;
+- `decision_facts` scenariusza;
+- system prompt;
+- model i jego profil;
+- mały JSON Schema decyzji;
+- wersję formatu kasety.
 
-## 3. Modele bramkowe
+Po zmianie z pełnego raportu na kopertę decyzji poprzednie 84 kasety nie reprezentują już tego samego requestu. Nie wolno kopiować ich odpowiedzi, hashy ani manifestów. Należy nagrać pełne **108 nowych kaset: 3 modele × 36 scenariuszy**.
+
+## 4. Modele bramkowe
 
 ```text
 google/gemini-3.5-flash
@@ -42,9 +57,9 @@ openai/gpt-5-mini
 anthropic/claude-haiku-4.5
 ```
 
-GPT-5 Mini jest świadomym wyborem zamiast Nano: zadanie wymaga ścisłego odwzorowania dużego JSON i wielu warunków. Różnica kosztu pełnego runu jest mała wobec czasu potrzebnego na analizę niestabilnych odpowiedzi.
+Każdy model ma zwrócić ten sam semantyczny wynik. Benchmark nie uznaje częściowego wyniku za sukces.
 
-## 4. Konkretna instrukcja dla agenta nagrywającego
+## 5. Nagranie całej macierzy
 
 ### Przygotowanie
 
@@ -57,9 +72,7 @@ pip install -r requirements.txt -r requirements-test.txt
 export OPENROUTER_API_KEY='WKLEJ_KLUCZ'
 ```
 
-Sprawdź saldo OpenRouter przed startem. Nie uruchamiaj trzech modeli równolegle; ogranicza to ryzyko rate-limitów i ułatwia kontrolę kosztu.
-
-### Nagrywanie wszystkich modeli
+Najpierw wykonaj bezpłatną bramkę z sekcji 2. Następnie:
 
 ```bash
 ./scripts/record_all_models.sh --max-cost-usd 5
@@ -67,16 +80,16 @@ Sprawdź saldo OpenRouter przed startem. Nie uruchamiaj trzech modeli równolegl
 
 Skrypt:
 
-1. uruchamia bezpłatne testy;
+1. nagrywa modele sekwencyjnie;
 2. nagrywa każdy scenariusz osobno;
-3. pomija kasetę już obecną po rzeczywistym offline playbacku, więc wznowienie nie płaci ponownie;
-4. kontynuuje kolejne modele nawet wtedy, gdy jeden model ma chwilowy błąd;
-5. zapisuje odrzucone odpowiedzi do `/tmp/ipbox_llm_rejected/`;
-6. stosuje miękki limit kosztu przed każdym następnym requestem;
-7. wykonuje offline playback i walidację manifestu;
-8. generuje `reports/benchmark-summary.json`.
+3. wznawia pracę bez ponownego opłacania poprawnych kaset;
+4. zapisuje odrzucone odpowiedzi do `/tmp/ipbox_llm_rejected/`;
+5. zapisuje pełne złożone wyniki do `/tmp/ipbox_llm_responses/`;
+6. stosuje miękki limit kosztu przed kolejnym requestem;
+7. wykonuje późniejszy playback bez klucza API;
+8. generuje raport benchmarku.
 
-### Nagrywanie jednego modelu
+### Jeden model
 
 ```bash
 python scripts/record_model.py \
@@ -84,42 +97,41 @@ python scripts/record_model.py \
   --max-cost-usd 5
 ```
 
-Potem:
-
 ```bash
-python scripts/record_model.py --model openai/gpt-5-mini
-python scripts/record_model.py --model anthropic/claude-haiku-4.5
+python scripts/record_model.py --model openai/gpt-5-mini --max-cost-usd 5
+python scripts/record_model.py --model anthropic/claude-haiku-4.5 --max-cost-usd 5
 ```
 
-### Wznowienie po błędzie 402/429/5xx
-
-Nie usuwaj poprawnych kaset. Po doładowaniu lub odczekaniu uruchom to samo polecenie. Skrypt pominie istniejące pliki i nagra wyłącznie brakujące.
-
-### Nagranie pojedynczego scenariusza
+### Jeden scenariusz
 
 ```bash
 python scripts/record_model.py \
   --model openai/gpt-5-mini \
-  --scenario 44_mix_revenue_key_kis
+  --scenario 45_multi_ip_two_stage \
+  --max-cost-usd 5
 ```
 
-### Pełne nagranie po zmianie requestu
+### Wznowienie po 402, 429 lub 5xx
 
-Tylko po zmianie algorytmu, schematu, promptu, profilu modelu lub scenariuszy:
+Nie usuwaj poprawnych kaset. Po doładowaniu konta albo odczekaniu uruchom to samo polecenie. Skrypt sprawdzi istniejące kasety offline i nagra tylko brakujące lub nieaktualne.
 
-```bash
-rm -rf tests/llm/vcr/cassettes/google_gemini_3_5_flash
-python scripts/record_model.py --model google/gemini-3.5-flash
-```
+`--force` stosuj wyłącznie po świadomej zmianie requestu. W normalnym wznowieniu jest zbędne i zwiększa koszt.
 
-Analogicznie dla pozostałych modeli. Opcja `--force` również nagrywa wszystko ponownie, ale jest droższa i powinna być używana wyłącznie świadomie.
+## 6. Weryfikacja offline
 
-## 5. Weryfikacja offline
-
-Dla jednego modelu:
+Po nagraniu usuń klucz z procesu:
 
 ```bash
 unset OPENROUTER_API_KEY
+./scripts/verify_all_models.sh
+python scripts/benchmark_report.py
+python scripts/vcr_precommit.py --all-models
+python scripts/check_cassette_policy.py
+```
+
+Dla pojedynczego modelu:
+
+```bash
 export LLM_PROVIDER=openrouter
 export LLM_MODEL=google/gemini-3.5-flash
 export VCR_MODE=playback
@@ -128,70 +140,64 @@ pytest tests/llm/test_scenarios.py --run-llm --vcr-mode=playback -v
 python scripts/vcr_precommit.py --model google/gemini-3.5-flash
 ```
 
-Dla całej macierzy:
+## 7. Kryterium zaliczenia
+
+Model zalicza benchmark tylko przy **36/36**. Każda kaseta musi:
+
+- zakończyć się kompletną odpowiedzią;
+- zawierać czysty JSON decyzji;
+- przejść mały strict JSON Schema;
+- wskazać dokładnie oczekiwane STOP i REVIEW, bez duplikatów i nadmiarowych kodów;
+- po złożeniu z raportem deterministycznym przejść pełny schema i evaluator;
+- mieć zgodny request hash i fingerprint;
+- przejść playback bez klucza API.
+
+Wynik 35/36 jest informacją diagnostyczną, a nie akceptowalną bramką produkcyjną.
+
+## 8. Analiza odrzuconej odpowiedzi
 
 ```bash
-./scripts/verify_all_models.sh
-```
-
-## 6. Kryterium zaliczenia
-
-Model zalicza benchmark tylko przy **36/36**. Odpowiedź musi jednocześnie:
-
-- zakończyć się `finish_reason=stop`;
-- być czystym JSON;
-- przejść strict JSON Schema;
-- zgadzać się z niezależnym oracle;
-- mieć poprawny request hash i fingerprint;
-- przejść późniejszy playback bez klucza API.
-
-13/36 albo 30/36 to wynik diagnostyczny, nie gotowa bramka produkcyjna.
-
-## 7. Analiza odrzuconych odpowiedzi
-
-```bash
-find /tmp/ipbox_llm_rejected -type f -maxdepth 3 -print
+find /tmp/ipbox_llm_rejected -maxdepth 3 -type f -print
 ```
 
 Dla każdej porażki ustal jedną kategorię:
 
-1. błąd scenariusza/asercji;
-2. błąd kalkulatora/oracle;
-3. niejasna instrukcja;
-4. błąd schematu lub integracji OpenRouter;
-5. ograniczenie modelu.
+1. błędny scenariusz lub asercja;
+2. błąd oracle albo kalkulatora;
+3. sprzeczne lub niewidoczne fakty decyzyjne;
+4. błąd schema/integracji providera;
+5. model dodał lub pominął kod mimo jednoznacznej tabeli.
 
-Nie poprawiaj asercji tylko dlatego, że model zwrócił inną liczbę. Najpierw przelicz prawdę deterministycznie i dodaj test regresyjny.
+Nie zmieniaj prawdy testowej pod odpowiedź modelu. Najpierw dodaj deterministyczny test regresyjny pokazujący, jaki powinien być fakt i kod.
 
-## 8. Przegląd przed commitem kaset
+Szczególnie sprawdź:
 
-```bash
-python scripts/benchmark_report.py
-python scripts/vcr_precommit.py --all-models
-git status --short
-git diff --stat
-```
+- 14 — wyłącznie `STOP_01`, bez kaskady;
+- 18 — `STOP_04`, a zero W nie tworzy dodatkowego STOP;
+- 31 — `ZUS_DOUBLE_DIP` i TEST_3 FAIL;
+- 38/42 — wyłącznie `STOP_08`;
+- 45 — `REVIEW_04`, `REVIEW_16`, `REVIEW_17` oraz alokacja 3000 + 5000.
 
-Sprawdź ręcznie szczególnie:
+## 9. Commit kaset
 
-- 11 — FX;
-- 23–27 — W=90% i ulgi;
-- 29–30 — NEXUS C i A+C;
-- 31–33 — TEST 1–3 FAIL;
-- 39 — ważona średnia W;
-- 44 — KIS/MIX bez automatycznego NEXUS A;
-- 45 — alokacja 8000 = 3000 + 5000.
-
-Repozytorium przyjmuje tylko dwa stany: brak kaset albo kompletna, poprawna macierz 3 × 36. `python scripts/check_cassette_policy.py` blokuje częściowy commit. Nie commituj `/tmp/ipbox_llm_rejected` ani raportów.
-
-## 9. Manualny workflow GitHub
-
-Workflow `Paid multi-model LLM benchmark` wymaga jawnego tekstu potwierdzającego koszt i ma miękki limit kosztu per model. Każdy model działa w osobnym, sekwencyjnym jobie. Pobierz trzy artefakty, skopiuj katalogi modeli do `tests/llm/vcr/cassettes/`, a następnie uruchom:
+Przed commitem:
 
 ```bash
 ./scripts/verify_all_models.sh
 python scripts/benchmark_report.py
+python scripts/vcr_precommit.py --all-models
 python scripts/check_cassette_policy.py
+git status --short
+git diff --stat
 ```
 
-Workflow nie commituję kaset automatycznie. Dzięki temu odrzucona odpowiedź ani częściowy zestaw nie może trafić na branch bez przeglądu.
+Repozytorium dopuszcza tylko dwa stany:
+
+- brak kaset;
+- kompletna i aktualna macierz 3 × 36.
+
+Nie commituj częściowej macierzy, katalogów `/tmp/ipbox_llm_rejected`, `/tmp/ipbox_llm_responses` ani lokalnych raportów diagnostycznych.
+
+## 10. Manualny workflow GitHub
+
+Workflow `Paid multi-model LLM benchmark` wymaga jawnego potwierdzenia kosztu. Każdy model działa osobno, a artefakty nie są automatycznie commitowane. Po pobraniu artefaktów skopiuj trzy katalogi modeli do `tests/llm/vcr/cassettes/` i ponownie wykonaj pełną weryfikację z sekcji 9.

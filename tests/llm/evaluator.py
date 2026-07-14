@@ -281,8 +281,26 @@ class Evaluator:
             )
         expected_reviews = _codes(expected_section.get("reviews"))
         actual_reviews = _codes(actual_section.get("reviews"))
-        for code in expected_reviews - actual_reviews:
-            failures.append(_failure("missing_review", code))
+        if actual_reviews != expected_reviews:
+            failures.append(
+                _failure(
+                    "reviews",
+                    "review codes differ",
+                    sorted(expected_reviews),
+                    sorted(actual_reviews),
+                )
+            )
+        expected_warnings = _codes(expected_section.get("warnings"))
+        actual_warnings = _codes(actual_section.get("warnings"))
+        if actual_warnings != expected_warnings:
+            failures.append(
+                _failure(
+                    "warnings",
+                    "warning codes differ",
+                    sorted(expected_warnings),
+                    sorted(actual_warnings),
+                )
+            )
 
     def _compare_classifications(
         self,

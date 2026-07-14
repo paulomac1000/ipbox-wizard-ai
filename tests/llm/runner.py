@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from copy import deepcopy
 from pathlib import Path
 from typing import Any
 
@@ -11,30 +12,60 @@ from jsonschema import Draft202012Validator
 
 from .client import LLMClient, LLMResponse
 from .evaluator import Evaluator
-from .oracle import compute_reference
-from .output_schema import OUTPUT_JSON_SCHEMA
+from .oracle import (
+    REVIEW_FACT_TO_CODE,
+    STOP_FACT_TO_CODE,
+    compute_reference,
+)
+from .output_schema import DECISION_JSON_SCHEMA, OUTPUT_JSON_SCHEMA
 from .request_spec import LLMRequestSpec
 from .vcr import VCRConfig, VCRRecorder
 
 SYSTEM_PROMPT = (
-    "Jesteś warstwą raportującą systemu IP Box. Nie wykonujesz arytmetyki w pamięci: "
-    "korzystasz z przekazanych wyników deterministycznego kalkulatora. Stosujesz reguły "
-    "STOP/REVIEW/TEST z algorytmu i zwracasz wyłącznie jeden obiekt JSON zgodny ze schematem."
+    "Jesteś warstwą decyzyjną systemu IP Box. Otrzymujesz atomowe fakty ustalone "
+    "przez deterministyczny kod. Nie wykonujesz arytmetyki, nie analizujesz ponownie "
+    "danych podatkowych i nie tworzysz dodatkowych przesłanek. Zwracasz wyłącznie "
+    "krótki obiekt JSON zgodny ze schematem decyzji."
 )
 RESPONSE_ROOT = Path("/tmp/ipbox_llm_responses")
 
 
 def build_tool_context(reference: dict[str, Any]) -> dict[str, Any]:
-    """Expose calculator output while leaving policy decisions for the model."""
-    result = reference["result"]
+    """Expose only authoritative atomic facts needed by the model decision layer."""
+    return {"decision_facts": reference["decision_facts"]}
+
+
+def build_decision_protocol() -> str:
+    """Render the exact code-owned decision table used by the benchmark prompt."""
+    lines = [
+        "PROTOKÓŁ DECYZYJNY:",
+        "- Dodaj kod wtedy i tylko wtedy, gdy przypisany mu fakt ma wartość true.",
+        "- Nie dodawaj kodów dla faktów false i nie wyprowadzaj nowych faktów.",
+        "- Kolejność kodów nie ma znaczenia, ale nie powtarzaj kodów.",
+        "- status=STOPPED, gdy lista stops nie jest pusta; inaczej status=FINAL.",
+        "",
+        "STOP:",
+    ]
+    lines.extend(f"- {fact}=true -> {code}" for fact, code in STOP_FACT_TO_CODE.items())
+    lines.append("")
+    lines.append("REVIEW:")
+    lines.extend(f"- {fact}=true -> {code}" for fact, code in REVIEW_FACT_TO_CODE.items())
+    return "\n".join(lines)
+
+
+def assemble_response(reference: dict[str, Any], decision: dict[str, Any]) -> dict[str, Any]:
+    """Merge the small model decision with the deterministic financial report."""
     return {
-        "calculator_result": result,
-        "cost_classifications": reference["classifications"],
-        "monthly_W": reference["monthly_W"],
-        "validation_facts": {
-            test_id: status == "PASS" for test_id, status in reference["tests"].items()
+        "status": decision["status"],
+        "result": deepcopy(reference["result"]),
+        "classifications": deepcopy(reference["classifications"]),
+        "monthly_W": deepcopy(reference["monthly_W"]),
+        "tests": deepcopy(reference["tests"]),
+        "stops_reviews": {
+            "stops": sorted(decision["stops"]),
+            "reviews": sorted(decision["reviews"]),
+            "warnings": deepcopy(reference["stops_reviews"]["warnings"]),
         },
-        "diagnostic_facts": reference.get("diagnostic_facts", {}),
     }
 
 
@@ -48,50 +79,21 @@ class LLMTestRunner:
     ) -> None:
         self.client = client
         self.algorithm_path = Path(algorithm_path)
-        self.validator = Draft202012Validator(OUTPUT_JSON_SCHEMA["schema"])
+        self.decision_validator = Draft202012Validator(DECISION_JSON_SCHEMA["schema"])
+        self.output_validator = Draft202012Validator(OUTPUT_JSON_SCHEMA["schema"])
 
     def build_prompt(self, algorithm: str, scenario: dict[str, Any]) -> str:
+        del (
+            algorithm
+        )  # Human documentation is tested separately; request rules come from code maps.
         reference = compute_reference(scenario)
-        payload = {
-            "scenario": scenario["input"],
-            "deterministic_tool_output": build_tool_context(reference),
-        }
+        payload = build_tool_context(reference)
         return (
-            "Wykonaj przypadek w trybie BATCH.\n\n"
-            "ALGORYTM OPERACYJNY:\n"
-            f"{algorithm}\n\n"
-            "DANE I WYNIK NARZĘDZIA PYTHON:\n"
+            f"{build_decision_protocol()}\n\n"
+            "AUTORYTATYWNE FAKTY:\n"
             f"{json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(',', ':'))}\n\n"
-            "ZASADY ODPOWIEDZI:\n"
-            "1. Skopiuj liczby i klasyfikacje wyłącznie z deterministic_tool_output; "
-            "nie przeliczaj ich.\n"
-            "2. Na podstawie danych, diagnostic_facts i algorytmu wyznacz status, "
-            "kody STOP/REVIEW/WARNING oraz TEST_1..TEST_9.\n"
-            "3. Dla każdego REVIEW sprawdź odpowiadający mu fakt w diagnostic_facts "
-            "(patrz sekcja 11 algorytmu).\n"
-            "4. Każdy kod STOP jest niezależny — dodaj tylko te, których warunek "
-            "jest spełniony. Nie kaskaduj.\n"
-            "5. Jeżeli jest STOP, status=STOPPED, a wyniki finansowe mają być zerowe "
-            "zgodnie z tool output.\n"
-            "6. Nie dodawaj komentarzy, markdownu ani pól spoza schematu. Zwróć tylko JSON.\n"
-            "\n"
-            "LISTA KONTROLNA REVIEW (sprawdź każdy warunek z diagnostic_facts):\n"
-            "- clients_with_positive_revenue == 1 → dodaj REVIEW_09\n"
-            "- w_max > 95 → dodaj REVIEW_01\n"
-            "- w_min < 50 → dodaj REVIEW_02\n"
-            "- max_w_jump_pp > 30 → dodaj REVIEW_08\n"
-            "- has_multiple_projects == true → dodaj REVIEW_04\n"
-            "- uses_kis_interpretation == true → dodaj REVIEW_16 + REVIEW_17\n"
-            "\n"
-            "LISTA KONTROLNA STOP:\n"
-            "- STOP_01: forma opodatkowania nieobsługiwana przez IP Box\n"
-            "- STOP_02: brak kwalifikowanego prawa IP\n"
-            "- STOP_03: brak dochodu z kwalifikowanego IP\n"
-            "- STOP_04: brak prac B+R\n"
-            "- STOP_08: przychód IP bez ewidencji lub dowodów B+R\n"
-            "- ZUS_DOUBLE_DIP: składki społeczne w KPiR i odliczenie PIT > 0\n"
-            "- HEALTH_DOUBLE_DIP: składka zdrowotna w kosztach i odliczenie > 0\n"
-            "STOP-y są niezależne — dodaj TYLKO te, których warunek spełniony.\n"
+            "Zwróć wyłącznie pola status, stops i reviews zgodnie ze schematem. "
+            "Nie zwracaj raportu finansowego — system dołączy go deterministycznie.\n"
         )
 
     def request_spec(self, prompt: str, config: VCRConfig) -> LLMRequestSpec:
@@ -100,11 +102,11 @@ class LLMTestRunner:
             response_format: dict[str, Any] = {"type": "json_object"}
             system_prompt = (
                 SYSTEM_PROMPT
-                + "\n\nOczekiwany strict JSON Schema (zwróć dokładnie tę strukturę):\n"
-                + json.dumps(OUTPUT_JSON_SCHEMA["schema"], ensure_ascii=False, indent=2)
+                + "\n\nOczekiwany strict JSON Schema:\n"
+                + json.dumps(DECISION_JSON_SCHEMA["schema"], ensure_ascii=False, indent=2)
             )
         else:
-            response_format = {"type": "json_schema", "json_schema": OUTPUT_JSON_SCHEMA}
+            response_format = {"type": "json_schema", "json_schema": DECISION_JSON_SCHEMA}
             system_prompt = SYSTEM_PROMPT
         return LLMRequestSpec(
             provider=config.provider,
@@ -119,7 +121,8 @@ class LLMTestRunner:
             reasoning=profile.reasoning,
         )
 
-    def parse_response(self, content: str) -> dict[str, Any]:
+    @staticmethod
+    def _strip_markdown_fence(content: str) -> str:
         stripped = content.strip()
         if stripped.startswith("```"):
             for fence in ("```json\n", "```JSON\n", "```\n"):
@@ -129,17 +132,26 @@ class LLMTestRunner:
             close_pos = stripped.rfind("\n```")
             if close_pos >= 0:
                 stripped = stripped[:close_pos]
-            stripped = stripped.strip()
+        return stripped.strip()
+
+    def parse_decision(self, content: str) -> dict[str, Any]:
         try:
-            parsed = json.loads(stripped)
+            parsed = json.loads(self._strip_markdown_fence(content))
         except json.JSONDecodeError as exc:
             raise ValueError("response must be pure JSON") from exc
         if not isinstance(parsed, dict):
             raise ValueError("response root must be an object")
-        errors = sorted(self.validator.iter_errors(parsed), key=lambda item: list(item.path))
+        errors = sorted(
+            self.decision_validator.iter_errors(parsed),
+            key=lambda item: list(item.path),
+        )
         if errors:
             details = "; ".join(error.message for error in errors[:8])
-            raise ValueError(f"response does not match strict schema: {details}")
+            raise ValueError(f"decision does not match strict schema: {details}")
+        for key in ("stops", "reviews"):
+            codes = parsed[key]
+            if len(codes) != len(set(codes)):
+                raise ValueError(f"decision contains duplicate {key} codes")
         return parsed
 
     def validate_semantics(
@@ -147,7 +159,16 @@ class LLMTestRunner:
         content: str,
         scenario: dict[str, Any],
     ) -> dict[str, Any]:
-        parsed = self.parse_response(content)
+        decision = self.parse_decision(content)
+        reference = compute_reference(scenario)
+        parsed = assemble_response(reference, decision)
+        schema_errors = sorted(
+            self.output_validator.iter_errors(parsed),
+            key=lambda item: list(item.path),
+        )
+        if schema_errors:
+            details = "; ".join(error.message for error in schema_errors[:8])
+            raise ValueError(f"assembled response does not match output schema: {details}")
         failures, _warnings = Evaluator(scenario).evaluate(parsed)
         if failures:
             details = "; ".join(

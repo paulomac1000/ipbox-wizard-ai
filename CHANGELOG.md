@@ -4,6 +4,10 @@
 
 ### Added
 
+- Atomic `decision_facts` contract and code-generated STOP/REVIEW protocol.
+- Decision-only model schema; the application assembles the final report deterministically.
+- Regression coverage for STOP cascades, multi-IP REVIEW visibility and hidden metadata leakage.
+
 - Deterministic-first LLM pipeline with Python tool context.
 - Independent full-output oracle and fail-closed evaluator.
 - 36 normalized scenarios with explicit allocation policies and NEXUS evidence.
@@ -13,6 +17,10 @@
 
 ### Changed
 
+- LLM responses contain only `status`, `stops` and `reviews`; max output is reduced to 1024 tokens.
+- STOP/REVIEW comparison is exact and rejects extra codes.
+- Cassette format is version 4 and all previous partial cassettes are invalidated.
+
 - Revenue, MIX and NEXUS are independent decisions.
 - Annual revenue MIX is deferred and reconciled at year end.
 - Canonical excluded-cost basket is `WYKLUCZONE`; legacy `EXCLUDED` is accepted only at the calculator boundary.
@@ -21,6 +29,10 @@
 - Standard GitHub CI is deterministic and free of API calls.
 
 ### Removed
+
+- Hidden `meta.expected_reviews` influence on oracle truth.
+- Full financial report copying from the LLM request/response path.
+- Partial 84/108 cassette matrix generated for the obsolete contract.
 
 - All stale and semantically failing historical cassettes.
 - Provider-prefixed cassette directories.

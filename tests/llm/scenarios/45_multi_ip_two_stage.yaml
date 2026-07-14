@@ -5,10 +5,6 @@ meta:
   tags:
   - regression
   priority: P1
-  expected_reviews:
-  - REVIEW_04
-  - REVIEW_16
-  - REVIEW_17
 input:
   rok: 2025
   forma_opodatkowania: liniowy_19%
@@ -61,6 +57,7 @@ assertions:
   review_obecne:
   - REVIEW_04
   - REVIEW_16
+  - REVIEW_17
   testy_pass:
   - TEST_7
   - TEST_8

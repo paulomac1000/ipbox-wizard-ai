@@ -9,7 +9,7 @@ from typing import Any
 
 import yaml
 
-CASSETTE_FORMAT_VERSION = 3
+CASSETTE_FORMAT_VERSION = 4
 MANIFEST_FORMAT_VERSION = 2
 
 

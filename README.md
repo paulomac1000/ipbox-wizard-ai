@@ -10,9 +10,10 @@ Model językowy nie powinien wykonywać krytycznej arytmetyki podatkowej „w g�
 
 1. `python_helper/ipbox_calculator.py` — walidacja, alokacje, NEXUS, zaokrąglenia i podatek;
 2. `tests/llm/oracle.py` — deterministyczny scenariuszowy oracle używany wyłącznie przez harness testowy;
-3. LLM — zastosowanie instrukcji, kodów STOP/REVIEW i wygenerowanie strict JSON na podstawie wyniku narzędzia;
-4. `tests/llm/evaluator.py` — fail-closed porównanie z oracle;
-5. VCR — zapisuje tylko odpowiedź, która przeszła schemat i semantykę.
+3. Python tworzy atomowe `decision_facts` oraz pełny raport finansowy;
+4. LLM — mapuje wyłącznie fakty na małą kopertę `status/stops/reviews`;
+5. runner dołącza decyzję do raportu, a `tests/llm/evaluator.py` porównuje całość fail-closed;
+6. VCR zapisuje tylko odpowiedź, która przeszła mały schema decyzji i pełną semantykę.
 
 Najważniejszy invariant z issue #1: **alokacja przychodu, kosztów MIX i NEXUS to trzy oddzielne decyzje**. Miesięczne W nie jest domyślnym kluczem MIX.
 
@@ -56,14 +57,14 @@ Szczegóły: [`docs/testing.md`](docs/testing.md).
 
 ## Struktura
 
-- `ipbox_algorytm.md` — instrukcja operacyjna dla modelu;
+- `ipbox_algorytm.md` — opis pełnego procesu i granicy odpowiedzialności modelu;
 - `python_helper/` — deterministyczny kalkulator;
 - `tests/llm/scenarios/` — 36 znormalizowanych przypadków;
-- `tests/llm/output_schema.py` — wspólny strict JSON Schema;
+- `tests/llm/output_schema.py` — mały schema decyzji i schema finalnego raportu;
 - `tests/llm/vcr/` — model-specific, fail-closed cassettes;
 - `scripts/record_model.py` — wznawialne nagrywanie z walidacją istniejących kaset i miękkim limitem kosztu;
 - `scripts/check_cassette_policy.py` — blokuje commit częściowej lub nieaktualnej macierzy kaset;
-- `.github/workflows/full-suite.yml` — bezpłatny CI;
+- `.github/workflows/deterministic-ci.yml` — bezpłatny CI;
 - `.github/workflows/llm-benchmark.yml` — ręczny, płatny benchmark.
 
 ## Stan wydań

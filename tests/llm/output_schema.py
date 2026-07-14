@@ -8,6 +8,22 @@ MONEY = {"type": "number"}
 NONNEGATIVE_MONEY = {"type": "number"}
 CODE = {"type": "string", "pattern": "^[A-Z][A-Z0-9_]*$"}
 
+
+DECISION_JSON_SCHEMA: dict[str, Any] = {
+    "name": "ipbox_decision",
+    "strict": True,
+    "schema": {
+        "type": "object",
+        "additionalProperties": False,
+        "required": ["status", "stops", "reviews"],
+        "properties": {
+            "status": {"enum": ["FINAL", "STOPPED"]},
+            "stops": {"type": "array", "items": CODE},
+            "reviews": {"type": "array", "items": CODE},
+        },
+    },
+}
+
 OUTPUT_JSON_SCHEMA: dict[str, Any] = {
     "name": "ipbox_wizard_result",
     "strict": True,
@@ -225,9 +241,9 @@ OUTPUT_JSON_SCHEMA: dict[str, Any] = {
                 "additionalProperties": False,
                 "required": ["stops", "reviews", "warnings"],
                 "properties": {
-                    "stops": {"type": "array", "items": CODE},
-                    "reviews": {"type": "array", "items": CODE},
-                    "warnings": {"type": "array", "items": CODE},
+                    "stops": {"type": "array", "items": CODE, "uniqueItems": True},
+                    "reviews": {"type": "array", "items": CODE, "uniqueItems": True},
+                    "warnings": {"type": "array", "items": CODE, "uniqueItems": True},
                 },
             },
         },

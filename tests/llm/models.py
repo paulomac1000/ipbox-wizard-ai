@@ -10,7 +10,7 @@ from typing import Any
 class ModelProfile:
     model_id: str
     label: str
-    max_tokens: int = 24000
+    max_tokens: int = 1024
     temperature: float | None = None
     reasoning: dict[str, Any] | None = None
     response_format_type: str = "json_schema"
