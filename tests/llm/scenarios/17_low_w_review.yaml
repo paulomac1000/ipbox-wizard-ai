@@ -1,30 +1,46 @@
 meta:
-  id: "17_low_w_review"
-  name: "Logika: W < 50% — flaga REVIEW_02"
-  description: "Weryfikacja czy algorytm generuje ostrzeżenie REVIEW_02 gdy W < 50%"
-  tags: ["core", "review", "W"]
-  priority: "P1"
-  expected_reviews: ["REVIEW_02"]
-
+  id: 17_low_w_review
+  name: W poniżej 50 procent
+  description: W poniżej 50 procent
+  tags:
+  - regression
+  priority: P1
+  expected_reviews:
+  - REVIEW_02
 input:
   rok: 2025
-  forma_opodatkowania: "liniowy_19%"
+  forma_opodatkowania: liniowy_19%
+  polityka_alokacji:
+    policy_id: scenario-policy
+    przychody:
+      metoda: czasowa_W
+    koszty_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      uzasadnienie: Jawna polityka testowa; przychody, MIX i NEXUS są rozdzielone.
   zus:
-    sposob: "w_KPiR"
+    sposob: brak
+  kontrahenci:
+  - nazwa: ClientA
+    klauzula_IP: true
   miesiace:
-    - miesiac: "2025-01"
-      faktury:
-        - kwota_netto: 20000
-          kontrahent: "TestCorp"
-      ewidencja:
-        godziny_pracy: 160
-        godziny_nie_IP: 90
-        procent_faktury_IP: 100
-      koszty:
-        - opis: "Księgowość"
-          kwota: 300
-
+  - miesiac: 2025-01
+    faktury:
+    - kwota_PLN: 20000
+      kontrahent: ClientA
+      kwalifikuje_IP: true
+    ewidencja:
+      godziny_pracy: 160
+      godziny_nie_IP: 90
+      procent_faktury_IP: 100
+    koszty:
+    - opis: Księgowość
+      kwota: 300
+      nexus_source: outside_nexus
+      kategoria: MIX
+    opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.
 assertions:
   W_miesieczne:
-    "2025-01": 43.75
-  warnings: ["REVIEW_02"]
+    2025-01: 43.75
+  review_obecne:
+  - REVIEW_02

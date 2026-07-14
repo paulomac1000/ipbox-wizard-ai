@@ -1,74 +1,238 @@
-"""
-Strict JSON Schema for LLM output validation.
-
-This schema defines the EXACT output shape the LLM must return.
-OpenRouter supports response_format=json_schema with strict=True.
-"""
+"""Strict JSON Schema shared by all benchmark models."""
 
 from __future__ import annotations
 
 from typing import Any
 
+MONEY = {"type": "number"}
+NONNEGATIVE_MONEY = {"type": "number", "minimum": 0}
+CODE = {"type": "string", "pattern": "^[A-Z][A-Z0-9_]*$"}
+
 OUTPUT_JSON_SCHEMA: dict[str, Any] = {
-    "name": "ipbox_output",
+    "name": "ipbox_wizard_result",
     "strict": True,
     "schema": {
         "type": "object",
-        "required": ["result", "classifications", "monthly_W", "tests", "stops_reviews"],
         "additionalProperties": False,
+        "required": [
+            "status",
+            "result",
+            "classifications",
+            "monthly_W",
+            "tests",
+            "stops_reviews",
+        ],
         "properties": {
+            "status": {"enum": ["FINAL", "PROVISIONAL", "STOPPED"]},
             "result": {
                 "type": "object",
-                "required": ["rok", "przychody_roczne", "nexus", "podatek"],
                 "additionalProperties": False,
+                "required": [
+                    "rok",
+                    "przychody_roczne",
+                    "koszty_roczne",
+                    "nexus_koszty",
+                    "nexus",
+                    "dochód_IP",
+                    "dochód_NIE",
+                    "klucz_MIX",
+                    "alokacja_multi_ip",
+                    "podatek",
+                ],
                 "properties": {
-                    "rok": {"type": "integer"},
+                    "rok": {"type": "integer", "minimum": 2019, "maximum": 2100},
                     "przychody_roczne": {
                         "type": "object",
+                        "additionalProperties": False,
                         "required": ["IP", "NIE"],
-                        "properties": {"IP": {"type": "number"}, "NIE": {"type": "number"}},
-                        "additionalProperties": False,
+                        "properties": {"IP": NONNEGATIVE_MONEY, "NIE": NONNEGATIVE_MONEY},
                     },
-                    "nexus": {"type": "number"},
-                    "podatek": {
+                    "koszty_roczne": {
                         "type": "object",
-                        "required": ["podatek_IP", "podatek_NIE_finalny", "podatek_całościowy"],
-                        "properties": {
-                            "podatek_IP": {"type": "number"},
-                            "podatek_NIE_finalny": {"type": "number"},
-                            "podatek_całościowy": {"type": "number"},
-                        },
                         "additionalProperties": False,
+                        "required": ["IP", "NIE", "MIX", "WYKLUCZONE"],
+                        "properties": {
+                            "IP": NONNEGATIVE_MONEY,
+                            "NIE": NONNEGATIVE_MONEY,
+                            "MIX": NONNEGATIVE_MONEY,
+                            "WYKLUCZONE": NONNEGATIVE_MONEY,
+                        },
                     },
-                    "dochód_IP": {"type": "number"},
-                    "dochód_NIE": {"type": "number"},
+                    "nexus_koszty": {
+                        "type": "object",
+                        "additionalProperties": False,
+                        "required": ["A", "B", "C", "D", "poza_nexus"],
+                        "properties": {
+                            "A": NONNEGATIVE_MONEY,
+                            "B": NONNEGATIVE_MONEY,
+                            "C": NONNEGATIVE_MONEY,
+                            "D": NONNEGATIVE_MONEY,
+                            "poza_nexus": NONNEGATIVE_MONEY,
+                        },
+                    },
+                    "nexus": {"type": "number", "minimum": 0, "maximum": 1},
+                    "dochód_IP": MONEY,
+                    "dochód_NIE": MONEY,
                     "klucz_MIX": {
                         "type": "object",
-                        "properties": {"metoda": {"type": "string"}, "źródło": {"type": "string"}},
                         "additionalProperties": False,
+                        "required": ["metoda", "źródło", "wartość", "status"],
+                        "properties": {
+                            "metoda": {
+                                "enum": [
+                                    "przychodowa_roczna",
+                                    "czasowa_W",
+                                    "metraż",
+                                    "licencje",
+                                    "projekt",
+                                    "custom",
+                                ]
+                            },
+                            "źródło": {
+                                "enum": [
+                                    "interpretacja_KIS",
+                                    "księgowa",
+                                    "poprzednie_rozliczenie",
+                                    "domyślna_wizard",
+                                    "użytkownik",
+                                ]
+                            },
+                            "wartość": {
+                                "type": ["number", "null"],
+                                "minimum": 0,
+                                "maximum": 1,
+                            },
+                            "status": {"enum": ["FINAL", "DEFERRED", "NOT_APPLICABLE"]},
+                        },
                     },
                     "alokacja_multi_ip": {
+                        "anyOf": [
+                            {"type": "null"},
+                            {
+                                "type": "object",
+                                "additionalProperties": False,
+                                "required": [
+                                    "stage1_software_share",
+                                    "stage1_non_software_share",
+                                    "allocations",
+                                ],
+                                "properties": {
+                                    "stage1_software_share": NONNEGATIVE_MONEY,
+                                    "stage1_non_software_share": NONNEGATIVE_MONEY,
+                                    "allocations": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "additionalProperties": False,
+                                            "required": ["ip", "amount"],
+                                            "properties": {
+                                                "ip": {"type": "string", "minLength": 1},
+                                                "amount": NONNEGATIVE_MONEY,
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        ]
+                    },
+                    "podatek": {
                         "type": "object",
-                        "properties": {
-                            "stage1_software_share": {"type": "number"},
-                            "IP_A": {"type": "number"},
-                            "IP_B": {"type": "number"},
-                        },
                         "additionalProperties": False,
+                        "required": [
+                            "podstawa_IP",
+                            "podstawa_NIE",
+                            "podatek_IP",
+                            "podatek_NIE_finalny",
+                            "podatek_całościowy",
+                            "nadpłata_lub_dopłata",
+                        ],
+                        "properties": {
+                            "podstawa_IP": NONNEGATIVE_MONEY,
+                            "podstawa_NIE": NONNEGATIVE_MONEY,
+                            "podatek_IP": NONNEGATIVE_MONEY,
+                            "podatek_NIE_finalny": NONNEGATIVE_MONEY,
+                            "podatek_całościowy": NONNEGATIVE_MONEY,
+                            "nadpłata_lub_dopłata": MONEY,
+                        },
                     },
                 },
             },
-            "classifications": {"type": "array", "items": {"type": "string"}},
-            "monthly_W": {"type": "object", "additionalProperties": {"type": "number"}},
-            "tests": {"type": "object", "additionalProperties": {"type": "string"}},
+            "classifications": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "additionalProperties": False,
+                    "required": [
+                        "opis",
+                        "amount",
+                        "basket",
+                        "allocation_method",
+                        "allocation_source",
+                        "allocation_key",
+                        "ip_amount",
+                        "non_ip_amount",
+                        "nexus_source",
+                        "nexus_basket",
+                        "nexus_amount",
+                    ],
+                    "properties": {
+                        "opis": {"type": "string", "minLength": 1},
+                        "amount": NONNEGATIVE_MONEY,
+                        "basket": {"enum": ["IP", "MIX", "NON", "WYKLUCZONE"]},
+                        "allocation_method": {"type": "string"},
+                        "allocation_source": {"type": "string"},
+                        "allocation_key": {
+                            "type": ["number", "null"],
+                            "minimum": 0,
+                            "maximum": 1,
+                        },
+                        "ip_amount": NONNEGATIVE_MONEY,
+                        "non_ip_amount": NONNEGATIVE_MONEY,
+                        "nexus_source": {
+                            "enum": [
+                                "own_br",
+                                "unrelated_br_contractor",
+                                "related_br_contractor",
+                                "acquired_ip",
+                                "outside_nexus",
+                                "indirect_or_general",
+                                "unknown",
+                            ]
+                        },
+                        "nexus_basket": {"enum": ["A", "B", "C", "D", "poza_nexus"]},
+                        "nexus_amount": NONNEGATIVE_MONEY,
+                    },
+                },
+            },
+            "monthly_W": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "additionalProperties": False,
+                    "required": ["miesiąc", "wartość"],
+                    "properties": {
+                        "miesiąc": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}$"},
+                        "wartość": {"type": "number", "minimum": 0, "maximum": 100},
+                    },
+                },
+            },
+            "tests": {
+                "type": "object",
+                "additionalProperties": False,
+                "required": [f"TEST_{number}" for number in range(1, 10)],
+                "properties": {
+                    f"TEST_{number}": {"enum": ["PASS", "FAIL"]} for number in range(1, 10)
+                },
+            },
             "stops_reviews": {
                 "type": "object",
-                "properties": {
-                    "stops": {"type": "array", "items": {"type": "string"}},
-                    "reviews": {"type": "array", "items": {"type": "string"}},
-                    "warnings": {"type": "array", "items": {"type": "string"}},
-                },
                 "additionalProperties": False,
+                "required": ["stops", "reviews", "warnings"],
+                "properties": {
+                    "stops": {"type": "array", "items": CODE},
+                    "reviews": {"type": "array", "items": CODE},
+                    "warnings": {"type": "array", "items": CODE},
+                },
             },
         },
     },

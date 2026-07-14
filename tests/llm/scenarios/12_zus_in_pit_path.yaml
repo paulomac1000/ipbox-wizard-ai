@@ -1,36 +1,50 @@
 meta:
   id: 12_zus_in_pit_path
-  name: 'Logika: ZUS odliczany w PIT'
-  description: Weryfikacja ścieżki B (ZUS nie w KPiR)
+  name: ZUS odliczany wyłącznie w PIT
+  description: ZUS odliczany wyłącznie w PIT
   tags:
-  - core
-  - ZUS
+  - regression
   priority: P1
 input:
   rok: 2025
   forma_opodatkowania: liniowy_19%
+  polityka_alokacji:
+    policy_id: scenario-policy
+    przychody:
+      metoda: czasowa_W
+    koszty_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      uzasadnienie: Jawna polityka testowa; przychody, MIX i NEXUS są rozdzielone.
   zus:
     sposob: PIT
+    odliczenie_spoleczne_PIT: 1800
   kontrahenci:
   - nazwa: ClientA
-    waluta: PLN
     klauzula_IP: true
   miesiace:
   - miesiac: 2025-01
-    przychody: 15000
-    godziny_pracy: 160
-    godziny_nie_IP: 0
-    koszty: []
-  ulgi:
-    zus_spoleczne_roczne: 18000
+    faktury:
+    - kwota_PLN: 15000
+      kontrahent: ClientA
+      kwalifikuje_IP: true
+    ewidencja:
+      godziny_pracy: 160
+      godziny_nie_IP: 0
+      procent_faktury_IP: 100
+    koszty:
+    - opis: Licencja IDE
+      kwota: 100
+      nexus_source: own_br
+      kategoria: IP
+    opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.
 assertions:
   zus_dubel: false
+  podatek_IP_range:
+  - 740
+  - 750
   testy_pass:
   - TEST_3
-  nexus: 1.0
-  podatek_IP_range:
-  - 750
-  - 750
-  przychod_IP_roczny_range:
-  - 15000
-  - 15000
+  - TEST_5
+  - TEST_8
+  - TEST_9

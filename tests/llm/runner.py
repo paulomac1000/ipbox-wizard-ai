@@ -1,204 +1,172 @@
-import re
+"""Provider-neutral deterministic-first LLM scenario runner."""
+
+from __future__ import annotations
+
+import json
 from pathlib import Path
 from typing import Any
 
 import yaml
+from jsonschema import Draft202012Validator
 
-from .client import LLMClient
+from .client import LLMClient, LLMResponse
+from .evaluator import Evaluator
+from .oracle import compute_reference
 from .output_schema import OUTPUT_JSON_SCHEMA
+from .request_spec import LLMRequestSpec
+from .vcr import VCRConfig, VCRRecorder
 
-_RESPONSE_DIR = Path("/tmp/ipbox_llm_responses")
-
-SYSTEM_PROMPT = "Jesteś ekspertem podatkowym specjalizującym się w IP Box (art. 30ca PIT). Wykonujesz obliczenia dokładnie i strukturalnie."  # noqa: E501
-
-TAGS = ["result", "classifications", "monthly_W", "tests", "stops_reviews"]
-
-# VCR integration (lazy import to avoid circular deps)
-_vcr_recorder = None
-_vcr_config = None
-
-
-def _reset_vcr():
-    """Reset VCR singleton — use between mode switches (record ↔ playback)."""
-    global _vcr_recorder, _vcr_config
-    _vcr_recorder = None
-    _vcr_config = None
+SYSTEM_PROMPT = (
+    "Jesteś warstwą raportującą systemu IP Box. Nie wykonujesz arytmetyki w pamięci: "
+    "korzystasz z przekazanych wyników deterministycznego kalkulatora. Stosujesz reguły "
+    "STOP/REVIEW/TEST z algorytmu i zwracasz wyłącznie jeden obiekt JSON zgodny ze schematem."
+)
+RESPONSE_ROOT = Path("/tmp/ipbox_llm_responses")
 
 
-def _get_vcr_recorder():
-    """Get or create VCR recorder singleton."""
-    global _vcr_recorder, _vcr_config
-    if _vcr_recorder is None:
-        from .vcr import VCRConfig, VCRRecorder
-
-        _vcr_config = VCRConfig()
-        _vcr_recorder = VCRRecorder(_vcr_config)
-    return _vcr_recorder
-
-
-def _get_vcr_config():
-    """Get VCR config singleton."""
-    global _vcr_config
-    if _vcr_config is None:
-        from .vcr import VCRConfig
-
-        _vcr_config = VCRConfig()
-    return _vcr_config
+def build_tool_context(reference: dict[str, Any]) -> dict[str, Any]:
+    """Expose calculator output while leaving policy decisions for the model."""
+    result = reference["result"]
+    return {
+        "calculator_result": result,
+        "cost_classifications": reference["classifications"],
+        "monthly_W": reference["monthly_W"],
+        "validation_facts": {
+            test_id: status == "PASS" for test_id, status in reference["tests"].items()
+        },
+    }
 
 
 class LLMTestRunner:
-    """Batch mode — LLM executes phases 0-10 in one pass."""
+    """Run one normalized scenario through an exact request and fail-closed VCR."""
 
-    def __init__(self, client: LLMClient, algorithm_path: str = "ipbox_algorytm.md"):
+    def __init__(
+        self,
+        client: LLMClient | None,
+        algorithm_path: str | Path = "ipbox_algorytm.md",
+    ) -> None:
         self.client = client
-        self.algorithm_path = algorithm_path
+        self.algorithm_path = Path(algorithm_path)
+        self.validator = Draft202012Validator(OUTPUT_JSON_SCHEMA["schema"])
 
-    def build_prompt(self, algorithm: str, scenario: dict) -> str:
-        import json as _json
-
-        input_yaml = yaml.dump(scenario.get("input", {}), allow_unicode=True)
-        json_example = _json.dumps(
-            {
-                "result": {
-                    "rok": 2025,
-                    "przychody_roczne": {"IP": 0.0, "NIE": 0.0},
-                    "nexus": {
-                        "A": 0.0,
-                        "B": 0.0,
-                        "C": 0.0,
-                        "D": 0.0,
-                        "poza_nexus": 0.0,
-                        "wartość": 0.0,
-                    },
-                    "podatek": {"podatek_IP": 0, "podatek_NIE_finalny": 0},
-                },
-                "classifications": [
-                    {"opis": "example", "basket": "IP", "nexus_basket": "A", "nexus_amount": 0.0},
-                ],
-                "monthly_W": {"2025-01": 90.0},
-                "tests": {"TEST_1": "PASS", "TEST_2": "FAIL"},
-                "stops_reviews": {"stops": [], "reviews": [], "warnings": []},
-            },
-            indent=2,
-            ensure_ascii=False,
+    def build_prompt(self, algorithm: str, scenario: dict[str, Any]) -> str:
+        reference = compute_reference(scenario)
+        payload = {
+            "scenario": scenario["input"],
+            "deterministic_tool_output": build_tool_context(reference),
+        }
+        return (
+            "Wykonaj przypadek w trybie BATCH.\n\n"
+            "ALGORYTM OPERACYJNY:\n"
+            f"{algorithm}\n\n"
+            "DANE I WYNIK NARZĘDZIA PYTHON:\n"
+            f"{json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(',', ':'))}\n\n"
+            "ZASADY ODPOWIEDZI:\n"
+            "1. Skopiuj liczby i klasyfikacje wyłącznie z deterministic_tool_output; "
+            "nie przeliczaj ich.\n"
+            "2. Na podstawie danych i algorytmu wyznacz status, kody STOP/REVIEW/WARNING "
+            "oraz TEST_1..TEST_9.\n"
+            "3. Jeżeli jest STOP, status=STOPPED, a wyniki finansowe mają być zerowe "
+            "zgodnie z tool output.\n"
+            "4. Nie dodawaj komentarzy, markdownu ani pól spoza schematu. Zwróć tylko JSON.\n"
         )
-        return f"""Jesteś agentem AI wykonującym algorytm IP Box w trybie BATCH.
 
-ALGORYTM:
-{algorithm}
+    def request_spec(self, prompt: str, config: VCRConfig) -> LLMRequestSpec:
+        profile = config.profile
+        return LLMRequestSpec(
+            provider=config.provider,
+            model=config.model,
+            system_prompt=SYSTEM_PROMPT,
+            user_prompt=prompt,
+            temperature=profile.temperature,
+            max_tokens=profile.max_tokens,
+            response_format={"type": "json_schema", "json_schema": OUTPUT_JSON_SCHEMA},
+            provider_preferences=None,
+            seed=None,
+            reasoning=profile.reasoning,
+        )
 
-DANE WEJŚCIOWE:
-{input_yaml}
+    def parse_response(self, content: str) -> dict[str, Any]:
+        try:
+            parsed = json.loads(content)
+        except json.JSONDecodeError as exc:
+            raise ValueError("response must be pure JSON") from exc
+        if not isinstance(parsed, dict):
+            raise ValueError("response root must be an object")
+        errors = sorted(self.validator.iter_errors(parsed), key=lambda item: list(item.path))
+        if errors:
+            details = "; ".join(error.message for error in errors[:8])
+            raise ValueError(f"response does not match strict schema: {details}")
+        return parsed
 
-WYMAGANY FORMAT ODPOWIEDZI:
-Zwróć wyłącznie czysty JSON zgodny z poniższym schematem.
-Bez żadnych tagów, znaczników XML, formatowania Markdown, bold, tabel, ani tekstu przed/po JSON.
-Klucze po polsku, liczby jako liczby.
-
-{json_example}
-"""
-
-    def run_scenario(self, scenario_path: str) -> dict:
-        with open(scenario_path, encoding="utf-8") as f:
-            scenario = yaml.safe_load(f)
-
-        with open(self.algorithm_path, encoding="utf-8") as f:
-            algorithm = f.read()
-
-        prompt = self.build_prompt(algorithm, scenario)
-
-        # Get VCR recorder and check if we should use it
-        scenario_id = scenario["meta"]["id"]
-        scenario_name = scenario["meta"].get("name", scenario_id)
-
-        # Try VCR first (if not in none mode)
-        config = _get_vcr_config()
-        if not config.is_none:
-            try:
-                recorder = _get_vcr_recorder()
-                response = recorder.get_or_record(
-                    scenario_id=scenario_id,
-                    scenario_path=Path(scenario_path),
-                    prompt=prompt,
-                    system_prompt=SYSTEM_PROMPT,
-                    api_call_fn=lambda p: self.client.call_with_retry(
-                        system_prompt=SYSTEM_PROMPT,
-                        user_prompt=p,
-                        json_schema=OUTPUT_JSON_SCHEMA,
-                    ),
-                    scenario_name=scenario_name,
-                )
-            except Exception as e:
-                print(f"  ❌ VCR failed for {scenario_id}: {e}")
-                raise
-        else:
-            # VCR disabled — always use live API
-            response = self.client.call_with_retry(
-                system_prompt=SYSTEM_PROMPT,
-                user_prompt=prompt,
-                json_schema=OUTPUT_JSON_SCHEMA,
+    def validate_semantics(
+        self,
+        content: str,
+        scenario: dict[str, Any],
+    ) -> dict[str, Any]:
+        parsed = self.parse_response(content)
+        failures, _warnings = Evaluator(scenario).evaluate(parsed)
+        if failures:
+            details = "; ".join(
+                f"{failure['type']}: {failure['message']}" for failure in failures[:12]
             )
+            raise ValueError(f"semantic evaluation failed: {details}")
+        return parsed
 
-        self._save_response(scenario["meta"]["id"], response)
-
+    def run_scenario(self, scenario_path: str | Path) -> dict[str, Any]:
+        path = Path(scenario_path)
+        scenario = yaml.safe_load(path.read_text(encoding="utf-8"))
+        algorithm = self.algorithm_path.read_text(encoding="utf-8")
+        prompt = self.build_prompt(algorithm, scenario)
+        config = VCRConfig()
+        request = self.request_spec(prompt, config)
+        recorder = VCRRecorder(config)
+        response, parsed = recorder.get_or_record(
+            scenario=scenario,
+            scenario_path=path,
+            request=request,
+            api_call=self._call_live if self.client is not None else None,
+            validate_response=lambda content: self.validate_semantics(content, scenario),
+        )
+        self._save_response(config.model_slug, str(scenario["meta"]["id"]), response, parsed)
         return {
-            "scenario_id": scenario["meta"]["id"],
-            "raw_response": response,
-            "parsed_data": self._extract_tags(response),
+            "scenario_id": str(scenario["meta"]["id"]),
+            "raw_response": response.content,
+            "parsed_data": parsed,
+            "response_metadata": response,
         }
 
-    def _extract_tags(self, text: str) -> dict[str, Any]:
-        """Parse response — try JSON first (structured output), fallback to XML tags."""
-        import json
+    def _call_live(self, request: LLMRequestSpec) -> LLMResponse:
+        if self.client is None:
+            raise ValueError("live mode requires LLMClient")
+        return self.client.call_with_retry(request.api_payload())
 
-        # Try strict JSON first
-        try:
-            data = json.loads(text)
-            if isinstance(data, dict) and "result" in data:
-                return data
-        except (json.JSONDecodeError, ValueError):
-            pass
-
-        # Fallback: find first { and try progressively shorter suffixes
-        start = text.find("{")
-        if start >= 0:
-            end = text.rfind("}")
-            while end > start:
-                try:
-                    data = json.loads(text[start : end + 1])
-                    if isinstance(data, dict) and "result" in data:
-                        return data
-                except (json.JSONDecodeError, ValueError):
-                    pass
-                end = text.rfind("}", 0, end)
-
-        # Fallback: original regex tag extraction
-        extracted: dict[str, Any] = {}
-        for tag in TAGS:
-            match = re.search(rf"<{tag}>(.*?)</{tag}>", text, re.DOTALL)
-            if not match:
-                extracted[tag] = None
-                continue
-            content = match.group(1).strip()
-            if tag in ("result", "stops_reviews"):
-                clean = _strip_code_block(content)
-                try:
-                    extracted[tag] = yaml.safe_load(clean)
-                except yaml.YAMLError:
-                    extracted[tag] = content
-            else:
-                extracted[tag] = content
-        return extracted
-
-    def _save_response(self, scenario_id: str, response: str) -> None:
-        try:
-            _RESPONSE_DIR.mkdir(parents=True, exist_ok=True)
-            path = _RESPONSE_DIR / f"{scenario_id}.txt"
-            path.write_text(response, encoding="utf-8")
-        except OSError:
-            pass
-
-
-def _strip_code_block(text: str) -> str:
-    m = re.search(r"```(?:yaml)?\n(.*?)\n```", text, re.DOTALL)
-    return m.group(1) if m else text
+    @staticmethod
+    def _save_response(
+        model_slug: str,
+        scenario_id: str,
+        response: LLMResponse,
+        parsed: dict[str, Any],
+    ) -> None:
+        directory = RESPONSE_ROOT / model_slug
+        directory.mkdir(parents=True, exist_ok=True)
+        (directory / f"{scenario_id}.json").write_text(
+            json.dumps(
+                {
+                    "response": parsed,
+                    "metadata": {
+                        "request_id": response.request_id,
+                        "requested_model": response.requested_model,
+                        "returned_model": response.returned_model,
+                        "finish_reason": response.finish_reason,
+                        "prompt_tokens": response.prompt_tokens,
+                        "completion_tokens": response.completion_tokens,
+                        "total_tokens": response.total_tokens,
+                        "cost": response.cost,
+                    },
+                },
+                ensure_ascii=False,
+                indent=2,
+            ),
+            encoding="utf-8",
+        )

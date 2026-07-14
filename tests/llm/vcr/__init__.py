@@ -1,32 +1,21 @@
-"""
-VCR (Virtual Cassette Recorder) module for LLM tests.
-
-This module provides recording and playback functionality for LLM responses,
-significantly reducing API costs and enabling deterministic testing.
-
-Usage:
-    from tests.llm.vcr import VCRRecorder, VCRConfig, VCRMode
-
-    recorder = VCRRecorder(VCRConfig())
-    response = recorder.get_or_record(
-        scenario_id="01_basic_linear",
-        scenario_path=Path("scenarios/01_basic_linear.yaml"),
-        prompt=prompt,
-        api_call_fn=lambda p: llm_client.call(p),
-    )
-"""
-
 from .cassette import Cassette, CassetteManifest
 from .config import VCRConfig, VCRMode
-from .fingerprint import compute_fingerprint, fingerprint_changed
-from .recorder import VCRRecorder
+from .recorder import (
+    CassetteError,
+    CassetteMissingError,
+    CassetteStaleError,
+    RecordingRejectedError,
+    VCRRecorder,
+)
 
 __all__ = [
     "Cassette",
+    "CassetteError",
     "CassetteManifest",
+    "CassetteMissingError",
+    "CassetteStaleError",
+    "RecordingRejectedError",
     "VCRConfig",
     "VCRMode",
     "VCRRecorder",
-    "compute_fingerprint",
-    "fingerprint_changed",
 ]

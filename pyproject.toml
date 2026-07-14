@@ -1,27 +1,14 @@
 [project]
 name = "ipbox-wizard-ai"
-version = "0.1.0"
+version = "0.2.0"
 requires-python = ">=3.11"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 markers = [
-    "unit: unit tests for ipbox_calculator.py",
-    "llm: scenario tests executed via LLM API",
-    "slow: tests that take >10s",
-    "smoke: minimal subset for quick validation",
-    "P0: Priority 0 (critical)",
-    "P1: Priority 1 (high)",
-    "P2: Priority 2 (medium)",
+  "llm: paid or cassette-backed LLM benchmark",
 ]
-addopts = [
-    "--strict-markers",
-    "--tb=short",
-    "-ra",
-]
-filterwarnings = [
-    'ignore::DeprecationWarning:pytest.*',
-]
+addopts = ["--strict-markers", "-ra"]
 
 [tool.coverage.run]
 source = ["python_helper"]
@@ -30,11 +17,7 @@ branch = true
 [tool.coverage.report]
 fail_under = 90
 show_missing = true
-exclude_lines = [
-    "pragma: no cover",
-    "if __name__",
-    "if TYPE_CHECKING",
-]
+exclude_lines = ["pragma: no cover", "if __name__", "if TYPE_CHECKING"]
 
 [tool.ruff]
 target-version = "py311"
@@ -42,4 +25,3 @@ line-length = 100
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "N", "UP", "B", "SIM", "RUF"]
-# No global ignores. Use per-line noqa for justified exceptions.

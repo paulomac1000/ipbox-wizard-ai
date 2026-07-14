@@ -1,8 +1,4 @@
-"""
-VCR Configuration — modes and environment variables.
-
-Defines how VCR behaves: playback, auto, record, or none.
-"""
+"""Safe VCR configuration for LLM benchmark recordings."""
 
 from __future__ import annotations
 
@@ -10,86 +6,58 @@ from enum import Enum
 from os import environ
 from pathlib import Path
 
+from ..models import DEFAULT_MODEL, get_model_profile
 
-class VCRMode(Enum):
-    """VCR operating modes."""
 
+class VCRMode(str, Enum):
     PLAYBACK = "playback"
-    # Always use cassettes. Fail if cassette missing or stale.
-    # Default for CI/CD (zero API cost).
-
-    AUTO = "auto"
-    # Use cassette if exists and valid (fingerprint match + not stale).
-    # Otherwise record new cassette.
-    # Default for local development.
-
     RECORD = "record"
-    # Always record (overwrite existing cassettes).
-    # Use after algorithm/model changes.
-
     NONE = "none"
-    # Bypass VCR — always call real API.
-    # Use for debugging only.
 
 
 class VCRConfig:
-    """VCR configuration loaded from environment variables."""
-
-    def __init__(self):
-        self.mode = VCRMode(environ.get("VCR_MODE", "auto"))
+    def __init__(self) -> None:
+        self.mode = VCRMode(environ.get("VCR_MODE", "playback"))
+        self.provider = environ.get("LLM_PROVIDER", "openrouter")
+        if self.provider != "openrouter":
+            raise ValueError("Only OpenRouter is supported by the benchmark harness")
+        self.model = environ.get("LLM_MODEL", DEFAULT_MODEL)
+        self.profile = get_model_profile(self.model)
         self.cassettes_root = Path(
             environ.get(
                 "VCR_CASSETTES_ROOT",
                 str(Path(__file__).parent / "cassettes"),
             )
         )
+        self.rejected_root = Path(environ.get("VCR_REJECTED_ROOT", "/tmp/ipbox_llm_rejected"))
 
-        # Staleness threshold in days (0 = never stale)
-        self.max_age_days = int(environ.get("VCR_MAX_AGE_DAYS", "30"))
+    @property
+    def model_slug(self) -> str:
+        return self.model.replace("/", "_").replace(".", "_").replace("-", "_")
 
-        # Whether to save full prompt in cassette (for debugging)
-        self.save_full_prompt = environ.get("VCR_SAVE_FULL_PROMPT", "false").lower() == "true"
+    @property
+    def model_directory(self) -> Path:
+        return self.cassettes_root / self.model_slug
 
-        # LLM provider configuration
-        self.provider = environ.get("LLM_PROVIDER", "openrouter")
-        self.model = environ.get("LLM_MODEL") or "google/gemini-3.5-flash"
+    @property
+    def manifest_path(self) -> Path:
+        return self.model_directory / "_manifest.yaml"
+
+    def cassette_path(self, scenario_id: str) -> Path:
+        return self.model_directory / f"{scenario_id}.yaml"
 
     @property
     def is_playback(self) -> bool:
-        return self.mode == VCRMode.PLAYBACK
+        return self.mode is VCRMode.PLAYBACK
 
     @property
     def is_record(self) -> bool:
-        return self.mode == VCRMode.RECORD
-
-    @property
-    def is_auto(self) -> bool:
-        return self.mode == VCRMode.AUTO
+        return self.mode is VCRMode.RECORD
 
     @property
     def is_none(self) -> bool:
-        return self.mode == VCRMode.NONE
+        return self.mode is VCRMode.NONE
 
     @property
     def needs_api_key(self) -> bool:
-        """Whether this mode requires an API key."""
-        return self.mode in (VCRMode.AUTO, VCRMode.RECORD, VCRMode.NONE)
-
-    def cassette_path(self, scenario_id: str) -> Path:
-        """Get path to cassette for a given scenario."""
-        model_slug = self._model_slug()
-        model_dir = self.cassettes_root / model_slug
-        model_dir.mkdir(parents=True, exist_ok=True)
-        filename = f"{scenario_id}.yaml"
-        return model_dir / filename
-
-    def _model_slug(self) -> str:
-        """Create filesystem-safe model identifier."""
-        return self.model.replace("/", "_").replace(".", "_").replace("-", "_")[:60]
-
-    def __repr__(self) -> str:
-        return (
-            f"VCRConfig(mode={self.mode.value}, "
-            f"cassettes={self.cassettes_root}, "
-            f"max_age={self.max_age_days}d)"
-        )
+        return not self.is_playback

@@ -1,17 +1,46 @@
 meta:
   id: 16_high_w_review
-  name: 'Logika: W > 95%'
-  description: Weryfikacja flagi REVIEW_01
+  name: W powyżej 95 procent
+  description: W powyżej 95 procent
   tags:
-  - core
-  - review
+  - regression
   priority: P1
+  expected_reviews:
+  - REVIEW_01
 input:
   rok: 2025
+  forma_opodatkowania: liniowy_19%
+  polityka_alokacji:
+    policy_id: scenario-policy
+    przychody:
+      metoda: czasowa_W
+    koszty_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      uzasadnienie: Jawna polityka testowa; przychody, MIX i NEXUS są rozdzielone.
+  zus:
+    sposob: brak
+  kontrahenci:
+  - nazwa: ClientA
+    klauzula_IP: true
   miesiace:
   - miesiac: 2025-01
-    godziny_pracy: 160
-    godziny_nie_IP: 2
+    faktury:
+    - kwota_PLN: 10000
+      kontrahent: ClientA
+      kwalifikuje_IP: true
+    ewidencja:
+      godziny_pracy: 160
+      godziny_nie_IP: 2
+      procent_faktury_IP: 100
+    koszty:
+    - opis: IDE
+      kwota: 200
+      nexus_source: own_br
+      kategoria: IP
+    opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.
 assertions:
-  warnings:
+  W_miesieczne:
+    2025-01: 98.75
+  review_obecne:
   - REVIEW_01

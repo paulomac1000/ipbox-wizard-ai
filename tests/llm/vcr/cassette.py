@@ -1,178 +1,127 @@
-"""
-Cassette model for VCR recordings.
-
-Cassette = recorded conversation turn(s) with metadata.
-Format: YAML (readable, git-diff friendly, committed to repo).
-Supports multi-turn for future wizard-mode compatibility.
-"""
+"""Versioned cassette and per-model manifest formats."""
 
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import Any
 
 import yaml
 
+CASSETTE_FORMAT_VERSION = 3
+MANIFEST_FORMAT_VERSION = 2
 
-@dataclass
+
+@dataclass(frozen=True, slots=True)
 class CassetteMeta:
-    """Metadata for a cassette recording."""
-
     scenario_id: str
     scenario_name: str
     provider: str
-    model: str
+    requested_model: str
+    returned_model: str | None
     fingerprint: str
-    recorded_at: str = ""  # ISO 8601
-    recording_duration_seconds: float = 0
-    prompt_tokens_estimate: int = 0
-    response_tokens_estimate: int = 0
-    algorithm_hash: str = ""
-    cassette_format_version: int = 3  # was 2
-
-    def __post_init__(self):
-        if not self.recorded_at:
-            self.recorded_at = datetime.now(UTC).isoformat()
-
-
-@dataclass
-class CassetteTurn:
-    """Single conversation turn (request → response)."""
-
-    role: str = "user"  # "user" or "assistant"
-    prompt: str = ""
-    response: str = ""
-    prompt_hash: str = ""
-    request_hash: str = ""
-    system_prompt_hash: str = ""
+    request_hash: str
+    recorded_at: str
+    request_id: str | None
+    finish_reason: str | None
+    native_finish_reason: str | None
+    system_fingerprint: str | None
+    prompt_tokens: int | None
+    completion_tokens: int | None
+    total_tokens: int | None
+    cost: float | None
+    recording_duration_seconds: float
+    cassette_format_version: int = CASSETTE_FORMAT_VERSION
 
 
-@dataclass
+@dataclass(frozen=True, slots=True)
 class Cassette:
-    """Complete cassette with metadata and turns."""
-
     meta: CassetteMeta
-    turns: list[CassetteTurn] = field(default_factory=list)
-
-    # Pre-parsed results (cached for fast test access)
-    parsed_result_yaml: dict | None = None
-    parsed_classifications: dict | None = None
-    parsed_monthly_W: dict | None = None  # noqa: N815
-    parsed_tests: dict | None = None
-    parsed_stops_reviews: dict | None = None
+    response: str
+    parsed_response: dict[str, Any]
 
     def to_yaml(self) -> str:
-        """Serialize cassette to YAML string."""
-        data = {
-            "meta": asdict(self.meta),
-            "turns": [asdict(t) for t in self.turns],
-        }
-
-        # Add parsed data if available
-        if self.parsed_result_yaml:
-            data["parsed"] = {
-                "result_yaml": self.parsed_result_yaml,
-                "classifications": self.parsed_classifications,
-                "monthly_W": self.parsed_monthly_W,
-                "tests": self.parsed_tests,
-                "stops_reviews": self.parsed_stops_reviews,
-            }
-
-        return yaml.dump(
-            data,
-            default_flow_style=False,
+        return yaml.safe_dump(
+            {
+                "meta": asdict(self.meta),
+                "response": self.response,
+                "parsed_response": self.parsed_response,
+            },
             allow_unicode=True,
-            width=120,
             sort_keys=False,
+            width=120,
         )
 
     def save(self, path: Path) -> None:
-        """Save cassette to file."""
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(self.to_yaml(), encoding="utf-8")
+        temporary = path.with_suffix(path.suffix + ".tmp")
+        temporary.write_text(self.to_yaml(), encoding="utf-8")
+        temporary.replace(path)
 
     @classmethod
     def load(cls, path: Path) -> Cassette:
-        """Load cassette from file."""
-        with open(path, encoding="utf-8") as f:
-            data = yaml.safe_load(f)
-
-        meta = CassetteMeta(**data["meta"])
-        turns = [CassetteTurn(**t) for t in data.get("turns", [])]
-
-        parsed = data.get("parsed", {})
-
-        return cls(
-            meta=meta,
-            turns=turns,
-            parsed_result_yaml=parsed.get("result_yaml"),
-            parsed_classifications=parsed.get("classifications"),
-            parsed_monthly_W=parsed.get("monthly_W"),
-            parsed_tests=parsed.get("tests"),
-            parsed_stops_reviews=parsed.get("stops_reviews"),
-        )
-
-    @property
-    def response(self) -> str:
-        """Get response from first (or only) turn."""
-        if self.turns:
-            return self.turns[0].response
-        return ""
-
-    @property
-    def is_valid(self) -> bool:
-        """Check if cassette has a valid response."""
-        return bool(self.response.strip())
+        data = yaml.safe_load(path.read_text(encoding="utf-8"))
+        if not isinstance(data, dict):
+            raise ValueError(f"Cassette {path} must be a mapping")
+        meta_data = data.get("meta")
+        if not isinstance(meta_data, dict):
+            raise ValueError(f"Cassette {path} has no meta mapping")
+        meta = CassetteMeta(**meta_data)
+        if meta.cassette_format_version != CASSETTE_FORMAT_VERSION:
+            raise ValueError(
+                f"Unsupported cassette version {meta.cassette_format_version}; "
+                f"expected {CASSETTE_FORMAT_VERSION}"
+            )
+        response = data.get("response")
+        parsed = data.get("parsed_response")
+        if not isinstance(response, str) or not response.strip():
+            raise ValueError(f"Cassette {path} has an empty response")
+        if not isinstance(parsed, dict):
+            raise ValueError(f"Cassette {path} has no parsed response")
+        return cls(meta=meta, response=response, parsed_response=parsed)
 
 
-# ============================================================================
-# Manifest — index of all cassettes for quick lookup
-# ============================================================================
-
-
-@dataclass
+@dataclass(slots=True)
 class CassetteManifest:
-    """Index of cassettes with fingerprints for quick validation."""
-
-    entries: dict[str, dict[str, str]] = field(default_factory=dict)
-    # {scenario_id: {"fingerprint": "...", "file": "...", "recorded_at": "..."}}
-
-    def save(self, path: Path) -> None:
-        """Save manifest to YAML file."""
-        data = {
-            "manifest_version": 1,
-            "generated_at": datetime.now(UTC).isoformat(),
-            "entries": self.entries,
-        }
-        path.write_text(
-            yaml.dump(data, default_flow_style=False, allow_unicode=True),
-            encoding="utf-8",
-        )
+    model: str
+    entries: dict[str, dict[str, Any]] = field(default_factory=dict)
 
     @classmethod
-    def load(cls, path: Path) -> CassetteManifest:
-        """Load manifest from file."""
+    def load(cls, path: Path, model: str) -> CassetteManifest:
         if not path.exists():
-            return cls()
-        with open(path, encoding="utf-8") as f:
-            data = yaml.safe_load(f) or {}
-        return cls(entries=data.get("entries", {}))
+            return cls(model=model)
+        data = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+        if data.get("manifest_format_version") != MANIFEST_FORMAT_VERSION:
+            raise ValueError(f"Unsupported manifest version in {path}")
+        if data.get("model") != model:
+            raise ValueError(f"Manifest model mismatch in {path}")
+        entries = data.get("entries")
+        if not isinstance(entries, dict):
+            raise ValueError(f"Manifest entries must be a mapping in {path}")
+        return cls(model=model, entries=entries)
 
-    def get_fingerprint(self, scenario_id: str) -> str | None:
-        """Get fingerprint for scenario from manifest."""
-        entry = self.entries.get(scenario_id)
-        return entry["fingerprint"] if entry else None
-
-    def update(
-        self,
-        scenario_id: str,
-        fingerprint: str,
-        filename: str,
-    ) -> None:
-        """Update or add entry to manifest."""
-        self.entries[scenario_id] = {
-            "fingerprint": fingerprint,
+    def update(self, cassette: Cassette, filename: str) -> None:
+        self.entries[cassette.meta.scenario_id] = {
             "file": filename,
-            "recorded_at": datetime.now(UTC).isoformat(),
+            "fingerprint": cassette.meta.fingerprint,
+            "request_hash": cassette.meta.request_hash,
+            "recorded_at": cassette.meta.recorded_at,
+            "returned_model": cassette.meta.returned_model,
+            "cost": cassette.meta.cost,
         }
+
+    def save(self, path: Path) -> None:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        payload = {
+            "manifest_format_version": MANIFEST_FORMAT_VERSION,
+            "model": self.model,
+            "generated_at": datetime.now(UTC).isoformat(),
+            "entries": dict(sorted(self.entries.items())),
+        }
+        temporary = path.with_suffix(path.suffix + ".tmp")
+        temporary.write_text(
+            yaml.safe_dump(payload, allow_unicode=True, sort_keys=False),
+            encoding="utf-8",
+        )
+        temporary.replace(path)

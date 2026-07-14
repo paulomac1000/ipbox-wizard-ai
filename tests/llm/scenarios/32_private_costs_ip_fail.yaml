@@ -1,13 +1,44 @@
 meta:
-  id: "32_private_costs_ip_fail"
-  name: "Weryfikacja: Prywatne w IP (FAIL)"
-  tags: ["verification", "fail"]
+  id: 32_private_costs_ip_fail
+  name: Koszt prywatny zadeklarowany jako firmowy
+  description: Koszt prywatny zadeklarowany jako firmowy
+  tags:
+  - regression
+  priority: P1
 input:
+  rok: 2025
+  forma_opodatkowania: liniowy_19%
+  polityka_alokacji:
+    policy_id: scenario-policy
+    przychody:
+      metoda: czasowa_W
+    koszty_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      uzasadnienie: Jawna polityka testowa; przychody, MIX i NEXUS są rozdzielone.
+  zus:
+    sposob: brak
+  kontrahenci:
+  - nazwa: ClientA
+    klauzula_IP: true
   miesiace:
-    - miesiac: "2025-01"
-      koszty:
-        - opis: "Kawa do domu"
-          kwota: 100
-          koszyk: "IP" # BŁĄD! Powinno być NIE.
+  - miesiac: 2025-01
+    faktury:
+    - kwota_PLN: 10000
+      kontrahent: ClientA
+      kwalifikuje_IP: true
+    ewidencja:
+      godziny_pracy: 160
+      godziny_nie_IP: 0
+      procent_faktury_IP: 100
+    koszty:
+    - opis: Kawa do domu
+      kwota: 100
+      nexus_source: outside_nexus
+      deklarowany_koszyk: IP
+    opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.
 assertions:
-  testy_fail: ["TEST_2"]
+  testy_fail:
+  - TEST_2
+  koszty_koszyk:
+    Kawa do domu: WYKLUCZONE

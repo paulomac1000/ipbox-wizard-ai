@@ -1,32 +1,46 @@
 meta:
-  id: "03_fx_usd_single_client"
-  name: "Walutowy: liniowy 19%, USD"
-  description: "Weryfikacja kursów NBP i różnic kursowych"
-  tags: ["smoke", "liniowy", "FX", "USD"]
-  priority: "P0"
-
+  id: 03_fx_usd_single_client
+  name: Faktura walutowa z dodatnią różnicą kursową
+  description: Faktura walutowa z dodatnią różnicą kursową
+  tags:
+  - fx
+  priority: P0
 input:
   rok: 2025
-  forma_opodatkowania: "liniowy_19%"
+  forma_opodatkowania: liniowy_19%
+  polityka_alokacji:
+    policy_id: scenario-policy
+    przychody:
+      metoda: czasowa_W
+    koszty_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      uzasadnienie: Jawna polityka testowa; przychody, MIX i NEXUS są rozdzielone.
   zus:
-    sposob: "w_KPiR"
+    sposob: brak
   kontrahenci:
-    - nazwa: "US_Client"
-      waluta: "USD"
-      klauzula_IP: true
+  - nazwa: ClientA
+    klauzula_IP: true
   miesiace:
-    - miesiac: "2025-01"
-      przychody: 5000 # 5000 USD
-      faktury:
-        - numer: "FV/2025/01"
-          kwota_waluta: 5000
-          waluta: "USD"
-          data_wystawienia: "2025-01-14"
-          data_wplywu: "2025-01-20"
+  - miesiac: 2025-01
+    faktury:
+    - kwota_PLN: 20150
+      kontrahent: ClientA
+      kwalifikuje_IP: true
+    ewidencja:
       godziny_pracy: 160
       godziny_nie_IP: 0
-  ulgi: {}
-
+      procent_faktury_IP: 100
+    koszty:
+    - opis: Licencja IDE
+      kwota: 500
+      nexus_source: own_br
+      kategoria: IP
+    opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.
+    różnica_kursowa: 150
 assertions:
   roznice_kursowe_w_IP: false
-  testy_pass: ["TEST_1", "TEST_2", "TEST_3", "TEST_4", "TEST_5", "TEST_6"]
+  testy_pass:
+  - TEST_5
+  - TEST_8
+  - TEST_9

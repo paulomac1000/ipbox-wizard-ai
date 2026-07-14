@@ -1,22 +1,27 @@
 meta:
   id: 14_lump_sum_ineligible_check
-  name: 'Logika: Ryczałt (STOP)'
-  description: Weryfikacja czy algorytm zatrzyma się przy formie podst. Ryczałt
+  name: Ryczałt zatrzymuje przebieg
+  description: Ryczałt zatrzymuje przebieg
   tags:
-  - core
-  - ryczalt
-  - stop
+  - regression
   priority: P1
 input:
   rok: 2025
   forma_opodatkowania: ryczalt
+  polityka_alokacji:
+    policy_id: scenario-policy
+    przychody:
+      metoda: czasowa_W
+    koszty_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      uzasadnienie: Jawna polityka testowa; przychody, MIX i NEXUS są rozdzielone.
   zus:
-    sposob: PIT
+    sposob: brak
+  kontrahenci:
+  - nazwa: ClientA
+    klauzula_IP: true
   miesiace: []
 assertions:
   stops:
-  - STOP_12
-  testy_fail:
-  - TEST_1
-  - TEST_7
-  - TEST_8
+  - STOP_01

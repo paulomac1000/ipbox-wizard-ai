@@ -1,31 +1,73 @@
-"""
-ipbox_calculator.py — Helper module for the IP Box algorithm (v1.0)
+"""Deterministic calculations used by the IP Box wizard.
 
-Usage: Load this file into an AI agent with Code Interpreter (Claude, ChatGPT Custom GPT).
-The agent should use these functions instead of "mental math" for all calculations.
+The module intentionally keeps three decisions separate:
 
-Zero-tolerance math policy: every calculation -> function -> transparent substitution -> result.
+* attribution of revenue to qualifying IP and non-IP activity,
+* allocation of indirect ``MIX`` costs,
+* classification of costs into NEXUS A/B/C/D/outside NEXUS.
 
-License: MIT
+It is calculation support, not tax or legal advice.
 """
 
 from __future__ import annotations
 
 import math
 import re
-from dataclasses import dataclass
+from collections.abc import Iterable, Mapping
+from dataclasses import dataclass, replace
 from datetime import datetime, timedelta
-from decimal import ROUND_HALF_UP, Decimal
+from decimal import ROUND_DOWN, ROUND_HALF_UP, Decimal
 from typing import Any
 
+MONEY_QUANT = Decimal("0.01")
+INTEGER_QUANT = Decimal("1")
+CANONICAL_BASKETS = {"IP", "MIX", "NON", "WYKLUCZONE"}
+BASKET_ALIASES = {"EXCLUDED": "WYKLUCZONE", "NIE": "NON"}
+NEXUS_SOURCE_MAP = {
+    "own_br": "A",
+    "unrelated_br_contractor": "B",
+    "related_br_contractor": "C",
+    "acquired_ip": "D",
+    "outside_nexus": "poza_nexus",
+    "indirect_or_general": "poza_nexus",
+    "unknown": "poza_nexus",
+}
 
-def tax_round(value: float) -> float:
-    return float(Decimal(str(value)).quantize(Decimal("1"), rounding=ROUND_HALF_UP))
+
+def _finite(name: str, value: float | int | Decimal) -> float:
+    try:
+        number = float(value)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"{name} must be numeric") from exc
+    if not math.isfinite(number):
+        raise ValueError(f"{name} must be finite, got {value!r}")
+    return number
 
 
-# ============================================================================
-# W Coefficient (Phase 2)
-# ============================================================================
+def _nonnegative(name: str, value: float | int | Decimal) -> float:
+    number = _finite(name, value)
+    if number < 0:
+        raise ValueError(f"{name} must be >= 0, got {value!r}")
+    return number
+
+
+def _fraction(name: str, value: float | int | Decimal) -> float:
+    number = _finite(name, value)
+    if not 0 <= number <= 1:
+        raise ValueError(f"{name} must be between 0 and 1, got {value!r}")
+    return number
+
+
+def money(value: float | int | Decimal) -> Decimal:
+    """Convert a finite value to PLN cents using half-up rounding."""
+    _finite("money", value)
+    return Decimal(str(value)).quantize(MONEY_QUANT, rounding=ROUND_HALF_UP)
+
+
+def tax_round(value: float | int | Decimal) -> int:
+    """Round a tax base or tax amount to whole PLN, half up."""
+    _finite("value", value)
+    return int(Decimal(str(value)).quantize(INTEGER_QUANT, rounding=ROUND_HALF_UP))
 
 
 def calculate_w_coefficient(
@@ -33,125 +75,105 @@ def calculate_w_coefficient(
     non_ip_hours: float,
     invoice_percentage: float = 100.0,
 ) -> dict[str, float | str]:
-    """
-    Calculate the W coefficient for one month.
-
-    KEY: divisor = actual work hours (excluding vacation and sick leave),
-    NOT 160h calendar hours.
-
-    W = ((work_hours - non_ip_hours) * invoice_percentage/100) / work_hours * 100
-    """
-    if not math.isfinite(work_hours) or work_hours < 0:
-        raise ValueError(f"work_hours must be a finite number >= 0, got {work_hours}")
-    if not math.isfinite(non_ip_hours) or non_ip_hours < 0:
-        raise ValueError(f"non_ip_hours must be a finite number >= 0, got {non_ip_hours}")
-    if not (0 <= invoice_percentage <= 100):
-        raise ValueError(f"invoice_percentage must be between 0 and 100, got {invoice_percentage}")
-
-    if work_hours <= 0:
+    """Calculate monthly W from actual worked hours."""
+    work_hours = _nonnegative("work_hours", work_hours)
+    non_ip_hours = _nonnegative("non_ip_hours", non_ip_hours)
+    invoice_percentage = _finite("invoice_percentage", invoice_percentage)
+    if not 0 <= invoice_percentage <= 100:
+        raise ValueError("invoice_percentage must be between 0 and 100")
+    if work_hours == 0:
         return {
             "status": "ERROR",
-            "message": "Work hours = 0 (vacation/sick leave all month) — skip month in IP Box",
+            "message": "Work hours = 0 — STOP_04 or STOP_08 must be resolved from evidence",
             "W": 0.0,
         }
-
     if non_ip_hours > work_hours:
         return {
             "status": "ERROR",
-            "message": f"Non-IP hours ({non_ip_hours}h) > Work hours ({work_hours}h) — check data",
-            "W": -1,
+            "message": "non_ip_hours exceed work_hours",
+            "W": 0.0,
         }
 
-    effective_ip_hours = (work_hours - non_ip_hours) * (invoice_percentage / 100)
-    w_coef = (effective_ip_hours / work_hours) * 100
-
-    # Validation
-    if w_coef < 0 or w_coef > 100:
-        status = "ERROR"
-    elif w_coef == 0:
-        status = "SKIP MONTH (W=0)"
-    elif w_coef < 50:
-        status = "REVIEW_02 (W < 50% — is it too restrictive?)"
-    elif w_coef > 95:
-        status = "REVIEW_01 (W > 95% — requires strong documentation)"
+    effective_ip_hours = (work_hours - non_ip_hours) * invoice_percentage / 100
+    value = effective_ip_hours / work_hours * 100
+    if value == 0:
+        status = "SKIP_MONTH"
+    elif value < 50:
+        status = "REVIEW_02"
+    elif value > 95:
+        status = "REVIEW_01"
     else:
         status = "OK"
-
-    formula_str = "W = ((work_hours - non_ip_hours) * invoice_percentage/100) / work_hours * 100"
-    sub_str = (
-        f"W = (({work_hours} - {non_ip_hours}) * {invoice_percentage}/100) / {work_hours} * 100"
-    )
     return {
-        "formula": formula_str,
-        "substitution": sub_str,
+        "formula": (
+            "W = ((work_hours - non_ip_hours) * invoice_percentage / 100) / work_hours * 100"
+        ),
+        "substitution": (
+            f"W = (({work_hours} - {non_ip_hours}) * {invoice_percentage} / 100) "
+            f"/ {work_hours} * 100"
+        ),
         "effective_ip_hours": round(effective_ip_hours, 2),
-        "W": round(w_coef, 2),
+        "W": round(value, 2),
         "status": status,
     }
 
 
-def aggregate_w_multiproject(projects: list[dict]) -> float:
-    """
-    Aggregate W for multiple projects in one month — revenue-weighted average.
-
-    projects = [{"revenue": 10000, "W": 75}, {"revenue": 5000, "W": 90}, ...]
-    """
+def aggregate_w_multiproject(projects: list[dict[str, float]]) -> float:
+    """Return a revenue-weighted W for multiple projects."""
     if not projects:
-        raise ValueError("projects list cannot be empty")
-
-    for i, p in enumerate(projects):
-        revenue = p.get("revenue", 0)
-        w_val = p.get("W", 0)
-        if not math.isfinite(revenue) or revenue < 0:
-            raise ValueError(f"project[{i}] revenue must be a finite number >= 0, got {revenue}")
-        if not math.isfinite(w_val) or not (0 <= w_val <= 100):
-            raise ValueError(
-                f"project[{i}] W must be a finite number between 0 and 100, got {w_val}"
-            )
-
-    total_revenue = sum(p["revenue"] for p in projects)
-    if total_revenue == 0:
+        raise ValueError("projects cannot be empty")
+    weighted = Decimal("0")
+    revenue_total = Decimal("0")
+    for index, project in enumerate(projects):
+        if "revenue" not in project or "W" not in project:
+            raise ValueError(f"project[{index}] requires revenue and W")
+        revenue = Decimal(str(_nonnegative(f"project[{index}].revenue", project["revenue"])))
+        w_value = _finite(f"project[{index}].W", project["W"])
+        if not 0 <= w_value <= 100:
+            raise ValueError(f"project[{index}].W must be between 0 and 100")
+        revenue_total += revenue
+        weighted += revenue * Decimal(str(w_value))
+    if revenue_total == 0:
         return 0.0
-    weighted = sum(p["revenue"] * p["W"] for p in projects) / total_revenue
-    return round(weighted, 2)
+    return round(float(weighted / revenue_total), 2)
 
 
-# ============================================================================
-# Currencies and exchange rate differences (Phase 4.2, 4.3)
-# ============================================================================
+def get_nbp_rate(currency: str, date_str: str, max_lookback_days: int = 10) -> float | None:
+    """Fetch an NBP table-A rate, walking backwards through non-business days."""
+    if not re.fullmatch(r"[A-Za-z]{3}", currency):
+        raise ValueError("currency must be a three-letter ISO code")
+    if max_lookback_days < 0:
+        raise ValueError("max_lookback_days must be >= 0")
+    try:
+        current = datetime.strptime(date_str, "%Y-%m-%d")
+    except ValueError as exc:
+        raise ValueError("date_str must use YYYY-MM-DD") from exc
 
-
-def get_nbp_rate(currency: str, date_str: str, _depth: int = 0) -> float | None:
-    """
-    Get the average NBP rate from table A for a given currency and date (YYYY-MM-DD).
-    If date = weekend/holiday -> goes back to the previous business day (max 10 days).
-    """
     try:
         import requests
     except ImportError:
-        print("⚠️  'requests' library unavailable. Download rate manually from nbp.pl")
         return None
 
-    url = f"https://api.nbp.pl/api/exchangerates/rates/a/{currency.lower()}/{date_str}/?format=json"
-    try:
-        response = requests.get(url, timeout=5)
-        if response.status_code == 200:
-            return response.json()["rates"][0]["mid"]
-        elif response.status_code == 404:
-            if _depth >= 10:
-                return None
-            # Weekend/holiday — go back one day
-            prev_date = datetime.strptime(date_str, "%Y-%m-%d") - timedelta(days=1)
-            prev = prev_date.strftime("%Y-%m-%d")
-            return get_nbp_rate(currency, prev, _depth=_depth + 1)
-        else:
+    for _ in range(max_lookback_days + 1):
+        date_value = current.strftime("%Y-%m-%d")
+        url = (
+            "https://api.nbp.pl/api/exchangerates/rates/a/"
+            f"{currency.lower()}/{date_value}/?format=json"
+        )
+        try:
+            response = requests.get(url, timeout=5)
+        except requests.RequestException:
             return None
-    except requests.exceptions.RequestException as e:
-        print(f"⚠️  NBP API Network Error: {e}")
-        return None
-    except (KeyError, IndexError, ValueError) as e:
-        print(f"⚠️  NBP API Data Error: {e}")
-        return None
+        if response.status_code == 200:
+            try:
+                rate = float(response.json()["rates"][0]["mid"])
+            except (KeyError, IndexError, TypeError, ValueError):
+                return None
+            return rate if math.isfinite(rate) and rate > 0 else None
+        if response.status_code != 404:
+            return None
+        current -= timedelta(days=1)
+    return None
 
 
 def convert_fx_invoice(
@@ -159,224 +181,187 @@ def convert_fx_invoice(
     currency: str,
     issue_date: str,
     payment_date: str | None = None,
-    method: str = "accrual",  # "accrual" or "cash"
+    method: str = "accrual",
 ) -> dict[str, Any]:
-    """
-    Convert FX invoice to PLN + calculate exchange rate difference.
+    """Convert an FX invoice and keep exchange differences outside IP revenue."""
+    amount_currency = _nonnegative("amount_currency", amount_currency)
+    if method not in {"accrual", "cash"}:
+        raise ValueError("method must be 'accrual' or 'cash'")
+    try:
+        issue = datetime.strptime(issue_date, "%Y-%m-%d")
+        payment = datetime.strptime(payment_date, "%Y-%m-%d") if payment_date else None
+    except ValueError as exc:
+        raise ValueError("dates must use YYYY-MM-DD") from exc
+    if payment is not None and payment < issue:
+        raise ValueError("payment_date cannot be earlier than issue_date")
+    if method == "cash" and payment is None:
+        raise ValueError("cash method requires payment_date")
 
-    IMPORTANT: exchange rate difference ALWAYS goes to NON-IP revenue/costs.
-    """
-    # Validate method
-    valid_methods = {"accrual", "cash"}
-    if method not in valid_methods:
-        raise ValueError(
-            f"Invalid FX method '{method}'. Must be one of: {', '.join(sorted(valid_methods))}"
-        )
-
-    # Base date for exchange rate
-    if method == "accrual":
-        base_date = issue_date
-    else:  # cash
-        if not payment_date:
-            return {"error": "Cash method requires payment date"}
-        base_date = payment_date
-
-    # Previous business day
-    prev_business_date = datetime.strptime(base_date, "%Y-%m-%d") - timedelta(days=1)
-    rate_date = prev_business_date.strftime("%Y-%m-%d")
-
+    base_date = issue if method == "accrual" else payment
+    assert base_date is not None
+    rate_date = (base_date - timedelta(days=1)).strftime("%Y-%m-%d")
     base_rate = get_nbp_rate(currency, rate_date)
     if base_rate is None:
-        return {"error": f"Cannot get NBP rate for {currency} {rate_date} — provide manually"}
+        return {"error": f"NBP rate unavailable for {currency} near {rate_date}"}
 
-    revenue_pln = round(amount_currency * base_rate, 2)
-
-    # Exchange rate difference (if accrual method and we know payment date)
-    difference = 0.0
-    payment_rate = None
-    if method == "accrual" and payment_date and payment_date != base_date:
-        payment_prev_date = datetime.strptime(payment_date, "%Y-%m-%d") - timedelta(days=1)
-        payment_rate_date = payment_prev_date.strftime("%Y-%m-%d")
+    payment_rate: float | None = None
+    difference = Decimal("0")
+    if method == "accrual" and payment is not None and payment != issue:
+        payment_rate_date = (payment - timedelta(days=1)).strftime("%Y-%m-%d")
         payment_rate = get_nbp_rate(currency, payment_rate_date)
-        if payment_rate is not None:
-            difference = round((payment_rate - base_rate) * amount_currency, 2)
+        if payment_rate is None:
+            return {
+                "error": (
+                    f"NBP payment-date rate unavailable for {currency} near {payment_rate_date}"
+                )
+            }
+        difference = money((payment_rate - base_rate) * amount_currency)
 
     return {
-        "base_revenue_pln": revenue_pln,
+        "base_revenue_pln": float(money(amount_currency * base_rate)),
         "base_rate": base_rate,
         "base_rate_date": rate_date,
         "payment_rate": payment_rate,
-        "exchange_rate_difference": difference,  # + = non-IP revenue, - = non-IP cost
-        "revenue_month": base_date[:7],
-        "difference_month": payment_date[:7] if payment_date else None,
-        "info": "Exchange rate difference → ALWAYS to NON-IP (never to IP Box!)",
+        "exchange_rate_difference": float(difference),
+        "revenue_month": base_date.strftime("%Y-%m"),
+        "difference_month": payment.strftime("%Y-%m") if payment else None,
+        "difference_basket": "NON",
     }
 
 
-# ============================================================================
-# Cost Classification (Phase 3)
-# ============================================================================
+def canonical_basket(value: str) -> str:
+    """Normalize domain basket aliases to one canonical vocabulary."""
+    normalized = BASKET_ALIASES.get(value.upper(), value.upper())
+    if normalized not in CANONICAL_BASKETS:
+        raise ValueError(f"unsupported basket {value!r}")
+    return normalized
 
 
-@dataclass
+@dataclass(frozen=True, slots=True)
 class CostItem:
     description: str
     amount: float
-    basket: str = ""  # IP | MIX | NON | EXCLUDED
+    basket: str = ""
     note: str = ""
-    allocation_method: str = ""  # dokumentowa | czasowa_W | produktowa | z_interpretacji | custom
-    allocation_key: float | None = None  # explicit key 0-1 (None = deferred for annual policy)
-    allocation_source: str = ""  # where the allocation policy came from
-    nexus_source: str = ""  # own_br | unrelated_br_contractor ... (see nexus_classify)
-    nexus_basket: str = ""  # A | B | C | D | poza_nexus
-    nexus_amount: float | None = None  # explicit amount for NEXUS (None = use item.amount)
+    allocation_method: str = ""
+    allocation_key: float | None = None
+    allocation_source: str = ""
+    nexus_source: str = "outside_nexus"
+    nexus_basket: str = "poza_nexus"
+    nexus_amount: float | None = None
 
     def __post_init__(self) -> None:
-        if not math.isfinite(self.amount) or self.amount < 0:
-            raise ValueError(f"amount must be a finite number >= 0, got {self.amount}")
-        if self.nexus_amount is not None and not (0 <= self.nexus_amount <= self.amount):
+        if not self.description.strip():
+            raise ValueError("description cannot be empty")
+        amount = _nonnegative("amount", self.amount)
+        if self.basket:
+            object.__setattr__(self, "basket", canonical_basket(self.basket))
+        if self.allocation_key is not None:
+            _fraction("allocation_key", self.allocation_key)
+        if self.nexus_source not in NEXUS_SOURCE_MAP:
+            raise ValueError(f"unsupported nexus_source {self.nexus_source!r}")
+        expected_nexus_basket = NEXUS_SOURCE_MAP[self.nexus_source]
+        if self.nexus_basket != expected_nexus_basket:
             raise ValueError(
-                f"nexus_amount ({self.nexus_amount}) must be between 0 and cost amount ({self.amount}) for {self.description!r}"  # noqa: E501
+                f"nexus_source={self.nexus_source!r} requires "
+                f"nexus_basket={expected_nexus_basket!r}"
             )
+        if self.nexus_amount is not None:
+            nexus_amount = _nonnegative("nexus_amount", self.nexus_amount)
+            if nexus_amount > amount:
+                raise ValueError("nexus_amount cannot exceed cost amount")
 
 
-# ============================================================================
-# Allocation Policy (Phase 4 — MIX allocation policy)
-# ============================================================================
-
-VALID_MIX_METHODS = {"przychodowa_roczna", "czasowa_W", "metraż", "licencje", "projekt", "custom"}
-VALID_REVENUE_METHODS = {"dokumentowa", "czasowa_W", "produktowa", "z_interpretacji", "custom"}
-VALID_SOURCE = {
+VALID_MIX_METHODS = {
+    "przychodowa_roczna",
+    "czasowa_W",
+    "metraż",
+    "licencje",
+    "projekt",
+    "custom",
+}
+VALID_REVENUE_METHODS = {
+    "dokumentowa",
+    "czasowa_W",
+    "produktowa",
+    "z_interpretacji",
+    "custom",
+}
+VALID_POLICY_SOURCES = {
     "interpretacja_KIS",
     "księgowa",
     "poprzednie_rozliczenie",
     "domyślna_wizard",
     "użytkownik",
 }
+MIX_METHOD_ALIASES = {
+    "przychodowy_roczny": "przychodowa_roczna",
+    "przychodowy": "przychodowa_roczna",
+    "czasowy_W": "czasowa_W",
+    "czasowa": "czasowa_W",
+}
 
 
-@dataclass(frozen=True, kw_only=True)
+@dataclass(frozen=True, kw_only=True, slots=True)
 class AllocationPolicy:
-    """
-    Allocation policy for MIX costs — how to split costs between IP and non-IP.
-
-    Fields:
-        policy_id: Unique identifier for this policy
-        revenue_method: How revenue is attributed
-        mix_method: How MIX costs are allocated to IP
-        mix_key: The percentage key (0.0-1.0) used for mix_method=czasowa_W or custom
-        source: Origin of the policy
-        justification: Documentation or reasoning for this policy
-    """
-
     policy_id: str
     revenue_method: str = "dokumentowa"
     mix_method: str = "przychodowa_roczna"
     mix_key: float | None = None
-    source: str = ""
+    source: str = "domyślna_wizard"
     justification: str = ""
 
     def __post_init__(self) -> None:
-        """Validate policy fields."""
-        if not self.policy_id or not self.policy_id.strip():
-            raise ValueError("policy_id must not be empty")
-        aliases = {
-            "przychodowy_roczny": "przychodowa_roczna",
-            "przychodowy": "przychodowa_roczna",
-            "czasowy_W": "czasowa_W",
-            "czasowa": "czasowa_W",
-        }
-        if self.mix_method in aliases:
-            object.__setattr__(self, "mix_method", aliases[self.mix_method])
-
+        normalized = MIX_METHOD_ALIASES.get(self.mix_method, self.mix_method)
+        object.__setattr__(self, "mix_method", normalized)
         errors: list[str] = []
-
-        # source is required
-        if not self.source:
-            errors.append("source is required — must be one of " + str(sorted(VALID_SOURCE)))
-        if self.source and self.source not in VALID_SOURCE:
-            errors.append(f"source={self.source!r} — must be one of {sorted(VALID_SOURCE)}")
-
-        # valid enums
-        if self.mix_method not in VALID_MIX_METHODS:
-            errors.append(
-                f"mix_method={self.mix_method!r} — must be one of {sorted(VALID_MIX_METHODS)}"
-            )
+        if not self.policy_id.strip():
+            errors.append("policy_id is required")
         if self.revenue_method not in VALID_REVENUE_METHODS:
-            errors.append(
-                f"revenue_method={self.revenue_method!r} — must be one of "
-                f"{sorted(VALID_REVENUE_METHODS)}"
-            )
-
-        # mix_key range 0-1 (only if not None)
-        if self.mix_key is not None and not (0 <= self.mix_key <= 1):
-            errors.append(f"mix_key must be between 0 and 1, got {self.mix_key}")
-
-        # czasowa_W requires justification + mix_key
-        if self.mix_method == "czasowa_W":
-            if not self.justification:
-                errors.append("czasowa_W requires justification (e.g., time tracking summary)")
+            errors.append(f"invalid revenue_method={self.revenue_method!r}")
+        if normalized not in VALID_MIX_METHODS:
+            errors.append(f"invalid mix_method={normalized!r}")
+        if self.source not in VALID_POLICY_SOURCES:
+            errors.append(f"invalid source={self.source!r}")
+        if self.mix_key is not None:
+            try:
+                _fraction("mix_key", self.mix_key)
+            except ValueError as exc:
+                errors.append(str(exc))
+        if normalized == "przychodowa_roczna" and self.mix_key is not None:
+            errors.append("przychodowa_roczna is deferred; monthly mix_key must be None")
+        if normalized in {"czasowa_W", "metraż", "licencje", "projekt", "custom"}:
             if self.mix_key is None:
-                errors.append("czasowa_W requires mix_key")
-
-        # przychodowa_roczna deferred — must NOT have mix_key in monthly policy
-        if self.mix_method == "przychodowa_roczna" and self.mix_key is not None:
-            errors.append("przychodowa_roczna is deferred; do not set mix_key in monthly policy")
-
-        # custom, metraż, licencje, projekt require justification
-        is_justified_method = self.mix_method in {
-            "custom",
-            "metraż",
-            "licencje",
-            "projekt",
-        }
-        if is_justified_method and not self.justification:
-            errors.append(f"{self.mix_method} requires justification")
-
+                errors.append(f"{normalized} requires mix_key")
+            if not self.justification.strip():
+                errors.append(f"{normalized} requires justification")
         if errors:
-            raise ValueError(
-                "AllocationPolicy validation failed:\n" + "\n".join(f"  - {e}" for e in errors)
-            )
+            raise ValueError("AllocationPolicy validation failed:\n- " + "\n- ".join(errors))
 
 
-# Keywords for automatic classification (Polish terms as per logic)
-KEYWORDS_NON = [
+PRIVATE_KEYWORDS = (
+    "prywatn",
+    "osobist",
+    "do domu",
     "kawa",
-    "herbata",
-    "cukier",
-    "mleko",
-    "spożyw",
     "obiad",
-    "chemia",
-    "czysto",
-    "płyn",
-    "mydło",
-    "ręcznik",
-    "odzież",
-    "ubranie",
-    "buty",
-    "koszula",
-    "bluza",
-    "dekoracj",
-    "kwiat",
-    "roślin",
-    "obraz",
-    "medicover",
-    "luxmed",
     "fryzjer",
-    "kosmety",
-]
-
-KEYWORDS_EXCLUDED = [
-    "kara",
-    "grzywna",
-    "odset.*karn",
-    "sankcj",
-    "mandat",
-]
-
-KEYWORDS_SOCIAL_SECURITY = r"(zus.*społeczn|składk.*społeczn|ubezpiecz.*społeczn)"
-KEYWORDS_HEALTH_INSURANCE = r"(zdrowotn|nfz)"
+    "odzież",
+    "buty",
+    "luxmed",
+    "medicover",
+)
+EXCLUDED_PATTERNS = (r"kara", r"grzywna", r"odset.*karn", r"sankcj", r"mandat")
+SOCIAL_SECURITY_PATTERN = r"(zus.*społeczn|składk.*społeczn|ubezpiecz.*społeczn)"
+HEALTH_PATTERN = r"(zdrowotn|nfz)"
+DIRECT_IP_KEYWORDS = (
+    "jetbrains",
+    "visual studio",
+    "ide",
+    "repozytor",
+    "narzędzie programistyczne",
+    "testy automatyczne",
+)
 
 
 def classify_cost(
@@ -385,57 +370,88 @@ def classify_cost(
     health_insurance_in_kpir: bool,
     asset_threshold: float = 10_000,
 ) -> CostItem:
-    """
-    Classify a KPiR item into one of the baskets: IP | MIX | NON | EXCLUDED.
-    """
-    desc = item.description.lower()
-
-    # Guard 1: Social Security
-    if re.search(KEYWORDS_SOCIAL_SECURITY, desc):
+    """Classify a KPiR item conservatively and deterministically."""
+    asset_threshold = _nonnegative("asset_threshold", asset_threshold)
+    description = item.description.lower()
+    if re.search(SOCIAL_SECURITY_PATTERN, description):
         if social_security_in_kpir:
-            item.basket = "MIX"
-            item.note = "ZUS społeczne — in KPiR as cost, DO NOT deduct in PIT"
-        else:
-            item.basket = "EXCLUDED"
-            item.note = "ZUS społeczne — deduction in PIT (not business cost)"
-        return item
-
-    # Guard 2: Health Insurance
-    if re.search(KEYWORDS_HEALTH_INSURANCE, desc):
+            return replace(item, basket="MIX", note="ZUS in KPiR; do not deduct again")
+        return replace(item, basket="WYKLUCZONE", note="ZUS handled outside KPiR")
+    if re.search(HEALTH_PATTERN, description):
         if health_insurance_in_kpir:
-            item.basket = "MIX"
-            item.note = "Składka zdrowotna — in KPiR (linear, up to limit)"
-        else:
-            item.basket = "EXCLUDED"
-            item.note = "Składka zdrowotna — not in costs (non-deductible in PIT since 2022)"
-        return item
-
-    # Guard 3: Fines, penalties
-    for pattern in KEYWORDS_EXCLUDED:
-        if re.search(pattern, desc):
-            item.basket = "EXCLUDED"
-            item.note = "Art. 23 ust. 1 pkt 3 PIT — fines/penalties are not costs"
-            return item
-
-    # Guard 4: Fixed assets > 10k
+            return replace(item, basket="MIX", note="Health contribution in KPiR")
+        return replace(item, basket="WYKLUCZONE", note="Health contribution handled outside costs")
+    if any(re.search(pattern, description) for pattern in EXCLUDED_PATTERNS):
+        return replace(item, basket="WYKLUCZONE", note="Statutorily excluded cost")
     if item.amount > asset_threshold:
-        item.basket = "WYKLUCZONE"
-        item.note = (
-            f"Item > {asset_threshold:,.0f} PLN — "
-            f"fixed asset (WYKLUCZONE, depreciation handled separately)"
+        return replace(
+            item, basket="WYKLUCZONE", note="Fixed asset; depreciation handled separately"
         )
-        return item
+    if any(keyword in description for keyword in PRIVATE_KEYWORDS):
+        return replace(
+            item,
+            basket="WYKLUCZONE",
+            note="Private/personal expense; not a deductible business cost",
+        )
+    if any(keyword in description for keyword in DIRECT_IP_KEYWORDS):
+        return replace(item, basket="IP", note="Direct software-development cost")
+    return replace(item, basket="MIX", note="Indirect/common business cost")
 
-    # Guard 5: NON basket (private)
-    for keyword in KEYWORDS_NON:
-        if keyword in desc:
-            item.basket = "NON"
-            item.note = f"Private cost (category: {keyword})"
-            return item
 
-    # Default: MIX (common for entire business)
-    item.basket = "MIX"
-    return item
+def allocate_revenue_monthly(
+    base_revenue: float,
+    revenue_method: str,
+    revenue_key: float | None = None,
+    document_split_ip: float | None = None,
+) -> dict[str, float | str | None]:
+    """Split base revenue according to an explicit revenue policy."""
+    base_revenue = _nonnegative("base_revenue", base_revenue)
+    if revenue_method not in VALID_REVENUE_METHODS:
+        raise ValueError(f"unsupported revenue_method={revenue_method!r}")
+    total = money(base_revenue)
+    if revenue_method == "dokumentowa":
+        if document_split_ip is None:
+            raise ValueError("document_split_ip is required for dokumentowa")
+        split = money(_nonnegative("document_split_ip", document_split_ip))
+        if split > total:
+            raise ValueError("document_split_ip cannot exceed base_revenue")
+        key = float(split / total) if total else 0.0
+    else:
+        if revenue_key is None:
+            raise ValueError(f"revenue_key is required for {revenue_method}")
+        key = _fraction("revenue_key", revenue_key)
+        split = money(total * Decimal(str(key)))
+    non_ip = total - split
+    return {
+        "base_revenue": float(total),
+        "ip_revenue": float(split),
+        "non_ip_revenue": float(non_ip),
+        "revenue_method": revenue_method,
+        "revenue_key_used": key,
+        "document_split_ip_used": document_split_ip,
+    }
+
+
+def _assert_unique_instances(*collections: Iterable[CostItem]) -> None:
+    seen: set[int] = set()
+    for item in (entry for collection in collections for entry in collection):
+        identity = id(item)
+        if identity in seen:
+            raise ValueError("the same CostItem instance cannot be included twice")
+        seen.add(identity)
+
+
+def resolve_mix_key(item: CostItem, policy: AllocationPolicy) -> tuple[float, str, str]:
+    """Resolve an explicit MIX key and its audit metadata."""
+    if item.allocation_key is not None:
+        return (
+            _fraction("item.allocation_key", item.allocation_key),
+            item.allocation_method or policy.mix_method,
+            item.allocation_source or policy.source,
+        )
+    if policy.mix_key is not None:
+        return policy.mix_key, policy.mix_method, policy.source
+    raise ValueError(f"no allocation key for MIX cost {item.description!r}")
 
 
 def allocate_costs_monthly(
@@ -445,126 +461,262 @@ def allocate_costs_monthly(
     w_coefficient: float | None = None,
     ip_direct_costs: list[CostItem] | None = None,
 ) -> dict[str, Any]:
-    """
-    Allocate monthly costs to IP / NON in the correct order using an AllocationPolicy.
+    """Allocate monthly costs and return a per-item audit trace."""
+    if w_coefficient is not None:
+        w_value = _finite("w_coefficient", w_coefficient)
+        if not 0 <= w_value <= 100:
+            raise ValueError("w_coefficient must be between 0 and 100")
+    extra = ip_direct_costs or []
+    _assert_unique_instances(items, extra)
+    for item in extra:
+        if item.basket and item.basket != "IP":
+            raise ValueError("ip_direct_costs may contain only IP or unclassified items")
+    extra_ids = {id(item) for item in extra}
 
-    Per-item MIX loop: each MIX cost uses resolve_mix_key().
-    For przychodowa_roczna: costs with no allocatable key are deferred to mix_deferred.
-    For other methods: resolve_mix_key() must succeed or ValueError is raised.
+    totals = {
+        "IP": Decimal("0"),
+        "NON": Decimal("0"),
+        "MIX": Decimal("0"),
+        "WYKLUCZONE": Decimal("0"),
+        "MIX_DEFERRED": Decimal("0"),
+        "MIX_IP": Decimal("0"),
+        "MIX_ALLOCATED": Decimal("0"),
+    }
+    trace: list[dict[str, Any]] = []
 
-    Returns:
-        costs_ip, costs_non, ip_direct, non_direct, mix, excluded,
-        mix_method, mix_key_used, mix_key_source, result_status, mix_deferred
-    """
-    if w_coefficient is not None and not (0 <= w_coefficient <= 100):
-        raise ValueError(f"w_coefficient ({w_coefficient}) must be between 0 and 100")
+    for item in [*items, *extra]:
+        basket = item.basket or ("IP" if id(item) in extra_ids else "")
+        basket = canonical_basket(basket)
+        amount = money(item.amount)
+        ip_amount = Decimal("0")
+        non_amount = Decimal("0")
+        status = "FINAL"
+        method = "direct"
+        source = item.allocation_source or "dokument"
+        key: float | None = None
 
-    ip_direct_costs = ip_direct_costs or []
+        if basket == "IP":
+            totals["IP"] += amount
+            ip_amount = amount
+            key = 1.0
+        elif basket == "NON":
+            totals["NON"] += amount
+            non_amount = amount
+            key = 0.0
+        elif basket == "WYKLUCZONE":
+            totals["WYKLUCZONE"] += amount
+            method = "excluded"
+            status = "WYKLUCZONE"
+        elif basket == "MIX":
+            totals["MIX"] += amount
+            if allocation_policy.mix_method == "przychodowa_roczna" and item.allocation_key is None:
+                totals["MIX_DEFERRED"] += amount
+                method = allocation_policy.mix_method
+                source = item.allocation_source or allocation_policy.source
+                status = "DEFERRED"
+            else:
+                key, method, source = resolve_mix_key(item, allocation_policy)
+                ip_amount = money(amount * Decimal(str(key)))
+                non_amount = amount - ip_amount
+                totals["IP"] += ip_amount
+                totals["NON"] += non_amount
+                totals["MIX_IP"] += ip_amount
+                totals["MIX_ALLOCATED"] += amount
 
-    sum_ip_direct = sum(i.amount for i in ip_direct_costs)
-    sum_ip_from_classification = sum(i.amount for i in items if i.basket == "IP")
-    total_ip_direct = sum_ip_direct + sum_ip_from_classification
+        trace.append(
+            {
+                "description": item.description,
+                "amount": float(amount),
+                "basket": basket,
+                "allocation_method": method,
+                "allocation_source": source,
+                "allocation_key": key,
+                "ip_amount": float(ip_amount),
+                "non_ip_amount": float(non_amount),
+                "status": status,
+                "nexus_source": item.nexus_source,
+                "nexus_basket": item.nexus_basket,
+                "nexus_amount": item.nexus_amount,
+            }
+        )
 
-    sum_non_direct = sum(i.amount for i in items if i.basket == "NON")
-    mix_items = [i for i in items if i.basket == "MIX"]
-    sum_excluded = sum(i.amount for i in items if i.basket == "EXCLUDED")
-
-    # Per-item MIX allocation loop
-    costs_ip = total_ip_direct
-    costs_non = sum_non_direct
-    mix_deferred: float = 0.0
-    mix_ip: float = 0.0
-    mix_total_allocated: float = 0.0
-
-    for item in mix_items:
-        if allocation_policy.mix_method == "przychodowa_roczna":
-            # Per-item allocation_key can allocate immediately; None → deferred
-            if item.allocation_key is None:
-                mix_deferred += item.amount
-                continue
-            if not (0 <= item.allocation_key <= 1):
-                raise ValueError(
-                    f"allocation_key={item.allocation_key} for {item.description!r} "
-                    "must be between 0 and 1"
-                )
-            key = item.allocation_key
-        else:
-            # Monthly methods require a key — will raise if none found
-            key = resolve_mix_key(item, allocation_policy)
-
-        costs_ip += item.amount * key
-        costs_non += item.amount * (1 - key)
-        mix_ip += item.amount * key
-        mix_total_allocated += item.amount
-
-    result_status = "PROVISIONAL" if mix_deferred > 0 else "FINAL"
-
-    sum_mix = sum(i.amount for i in mix_items)
-
+    effective_key = (
+        float(totals["MIX_IP"] / totals["MIX_ALLOCATED"]) if totals["MIX_ALLOCATED"] else None
+    )
     return {
-        "ip_direct": round(total_ip_direct, 2),
-        "non_direct": round(sum_non_direct, 2),
-        "mix": round(sum_mix, 2),
-        "excluded": round(sum_excluded, 2),
-        "costs_ip": round(costs_ip, 2),
-        "costs_non": round(costs_non, 2),
+        "costs_ip": float(totals["IP"]),
+        "costs_non": float(totals["NON"]),
+        "mix": float(totals["MIX"]),
+        "mix_deferred": float(totals["MIX_DEFERRED"]),
+        "excluded": float(totals["WYKLUCZONE"]),
         "mix_method": allocation_policy.mix_method,
-        "mix_key_used": allocation_policy.mix_key,
-        "mix_effective_key": (
-            round(mix_ip / mix_total_allocated, 6) if mix_total_allocated > 0 else None
-        ),
         "mix_key_source": allocation_policy.source,
-        "result_status": result_status,
-        "mix_deferred": round(mix_deferred, 2),
+        "mix_effective_key": effective_key,
+        "result_status": "PROVISIONAL" if totals["MIX_DEFERRED"] else "FINAL",
         "w_coefficient": w_coefficient,
+        "allocation_trace": trace,
     }
 
 
-# ============================================================================
-# NEXUS (Phase 7.3)
-# ============================================================================
+def annual_mix_allocation_revenue(
+    deferred_mix_total: float,
+    annual_ip_revenue: float,
+    annual_total_revenue: float,
+) -> dict[str, float | str]:
+    """Perform the final annual true-up for deferred MIX."""
+    deferred_mix_total = _nonnegative("deferred_mix_total", deferred_mix_total)
+    annual_ip_revenue = _nonnegative("annual_ip_revenue", annual_ip_revenue)
+    annual_total_revenue = _nonnegative("annual_total_revenue", annual_total_revenue)
+    if annual_total_revenue == 0:
+        raise ValueError("annual_total_revenue must be > 0")
+    if annual_ip_revenue > annual_total_revenue:
+        raise ValueError("annual_ip_revenue cannot exceed annual_total_revenue")
+    key = annual_ip_revenue / annual_total_revenue
+    total = money(deferred_mix_total)
+    ip_amount = money(total * Decimal(str(key)))
+    non_amount = total - ip_amount
+    return {
+        "method": "przychodowa_roczna",
+        "effective_key": key,
+        "mix_total": float(total),
+        "mix_ip": float(ip_amount),
+        "mix_non_ip": float(non_amount),
+        "status": "FINAL",
+    }
 
 
-def calculate_nexus(A: float, B: float = 0, C: float = 0, D: float = 0) -> dict[str, float]:  # noqa: N803
-    """
-    Calculate the annual NEXUS (art. 30ca ust. 7 PIT).
-    """
-    for name, val in [("A", A), ("B", B), ("C", C), ("D", D)]:
-        if not math.isfinite(val) or val < 0:
-            raise ValueError(f"NEXUS component {name} must be a finite number >= 0, got {val}")
+def _split_money_by_weights(total: float, weights: Mapping[str, float]) -> dict[str, float]:
+    """Allocate every cent with the largest-remainder method."""
+    total_dec = money(total)
+    if not weights:
+        raise ValueError("weights cannot be empty")
+    normalized: dict[str, Decimal] = {}
+    for name, value in weights.items():
+        normalized[name] = Decimal(str(_nonnegative(f"weights[{name!r}]", value)))
+    denominator = sum(normalized.values(), Decimal("0"))
+    if denominator == 0:
+        if total_dec == 0:
+            return {name: 0.0 for name in normalized}
+        raise ValueError("sum of weights must be > 0 when total is positive")
 
-    denominator = A + B + C + D
+    raw = {name: total_dec * value / denominator for name, value in normalized.items()}
+    floors = {
+        name: int((value * 100).quantize(Decimal("1"), rounding=ROUND_DOWN))
+        for name, value in raw.items()
+    }
+    remaining = int(total_dec * 100) - sum(floors.values())
+    order = sorted(
+        raw,
+        key=lambda name: ((raw[name] * 100) - floors[name], name),
+        reverse=True,
+    )
+    for name in order[:remaining]:
+        floors[name] += 1
+    return {name: float(Decimal(cents) / 100) for name, cents in floors.items()}
+
+
+def allocate_multi_ip(
+    total_indirect_costs: float,
+    software_ip_revenue: float,
+    total_revenue: float,
+    ip_revenues: Mapping[str, float],
+) -> dict[str, Any]:
+    """Allocate indirect costs in two stages while preserving cents."""
+    total_indirect_costs = _nonnegative("total_indirect_costs", total_indirect_costs)
+    software_ip_revenue = _nonnegative("software_ip_revenue", software_ip_revenue)
+    total_revenue = _nonnegative("total_revenue", total_revenue)
+    if total_revenue == 0:
+        raise ValueError("total_revenue must be > 0")
+    if software_ip_revenue > total_revenue:
+        raise ValueError("software_ip_revenue cannot exceed total_revenue")
+    if not ip_revenues:
+        raise ValueError("ip_revenues cannot be empty")
+    total_ip_revenue = sum(
+        _nonnegative(f"ip_revenues[{name!r}]", value) for name, value in ip_revenues.items()
+    )
+    if not math.isclose(total_ip_revenue, software_ip_revenue, abs_tol=0.005):
+        raise ValueError("sum(ip_revenues) must equal software_ip_revenue")
+
+    stage1 = money(
+        Decimal(str(total_indirect_costs))
+        * Decimal(str(software_ip_revenue))
+        / Decimal(str(total_revenue))
+    )
+    allocations = _split_money_by_weights(float(stage1), ip_revenues)
+    return {
+        "stage1_software_share": float(stage1),
+        "stage1_non_software_share": float(money(total_indirect_costs) - stage1),
+        "projects": allocations,
+    }
+
+
+def nexus_classify(item: CostItem, source: str) -> CostItem:
+    """Attach a validated NEXUS source and basket."""
+    if source not in NEXUS_SOURCE_MAP:
+        raise ValueError(f"unsupported nexus source {source!r}")
+    return replace(item, nexus_source=source, nexus_basket=NEXUS_SOURCE_MAP[source])
+
+
+def aggregate_nexus_costs(items: list[CostItem]) -> dict[str, float]:
+    """Aggregate NEXUS independently from income-allocation baskets."""
+    totals = {name: Decimal("0") for name in ("A", "B", "C", "D", "poza_nexus")}
+    for item in items:
+        basket = item.nexus_basket or NEXUS_SOURCE_MAP.get(item.nexus_source, "poza_nexus")
+        if basket not in totals:
+            raise ValueError(f"invalid nexus_basket={basket!r}")
+        amount = money(item.amount)
+        if basket in {"A", "B", "C", "D"}:
+            if item.basket == "MIX" and item.nexus_amount is None:
+                raise ValueError(f"MIX cost {item.description!r} requires explicit nexus_amount")
+            qualified = money(item.nexus_amount if item.nexus_amount is not None else amount)
+            if qualified > amount:
+                raise ValueError("nexus_amount cannot exceed item amount")
+            totals[basket] += qualified
+            totals["poza_nexus"] += amount - qualified
+        else:
+            totals["poza_nexus"] += amount
+    input_total = sum((money(item.amount) for item in items), Decimal("0"))
+    allocated_total = sum(totals.values(), Decimal("0"))
+    if input_total != allocated_total:
+        raise ValueError("NEXUS allocation does not preserve total cost")
+    return {name: float(value) for name, value in totals.items()}
+
+
+def calculate_nexus(
+    component_a: float,
+    component_b: float = 0,
+    component_c: float = 0,
+    component_d: float = 0,
+) -> dict[str, float | str]:
+    """Calculate NEXUS; zero qualifying costs always produce zero."""
+    values = {
+        "A": _nonnegative("A", component_a),
+        "B": _nonnegative("B", component_b),
+        "C": _nonnegative("C", component_c),
+        "D": _nonnegative("D", component_d),
+    }
+    denominator = sum(values.values())
     if denominator == 0:
         return {
-            "nexus": 0,
-            "message": (
-                "A=B=C=D=0 — no qualified costs. "
-                "REVIEW_03 (A=0 with IP income? consider minimal costs)."
-            ),
+            **values,
+            "denominator": 0.0,
+            "nexus": 0.0,
+            "message": "A=B=C=D=0 — no qualifying NEXUS costs",
         }
-
-    nexus_val = min(1.0, (A * 1.3 + B) / denominator)
+    result = min(1.0, (values["A"] * 1.3 + values["B"]) / denominator)
     return {
-        "A": A,
-        "B": B,
-        "C": C,
-        "D": D,
+        **values,
         "denominator": denominator,
-        "formula": "NEXUS = min(1.0, (A*1.3 + B) / (A+B+C+D))",
-        "nexus": round(nexus_val, 4),
+        "formula": "min(1, (A*1.3+B)/(A+B+C+D))",
+        "nexus": round(result, 6),
     }
-
-
-# ============================================================================
-# Tax Cascade (Phase 7.4)
-# ============================================================================
 
 
 def tax_cascade(
     non_ip_income: float,
     ip_income: float,
     nexus: float,
-    tax_form: str,  # "linear_19%" | "scale"
+    tax_form: str,
     *,
     previous_losses: float = 0,
     social_security_deduction: float = 0,
@@ -577,578 +729,224 @@ def tax_cascade(
     child_tax_credit: float = 0,
     extra_income_scale: float = 0,
 ) -> dict[str, Any]:
-    """
-    Full tax cascade in the binding order.
-    """
-    if not (0.0 <= nexus <= 1.0):
-        raise ValueError(f"nexus must be between 0 and 1, got {nexus}")
+    """Calculate the annual cascade with explicit validation and rounding."""
+    non_ip_income = _finite("non_ip_income", non_ip_income)
+    ip_income = _finite("ip_income", ip_income)
+    nexus = _fraction("nexus", nexus)
+    if tax_form not in {"liniowy_19%", "linear_19%", "skala", "scale"}:
+        raise ValueError("unsupported tax_form")
 
-    if not math.isfinite(child_tax_credit) or child_tax_credit < 0:
-        raise ValueError(f"child_tax_credit must be a finite number >= 0, got {child_tax_credit}")
+    values = {
+        "previous_losses": previous_losses,
+        "social_security_deduction": social_security_deduction,
+        "ikze": ikze,
+        "donations": donations,
+        "internet_tax_relief": internet_tax_relief,
+        "rehabilitative_relief_income": rehabilitative_relief_income,
+        "rd_relief": rd_relief,
+        "thermomodernization_pool": thermomodernization_pool,
+        "child_tax_credit": child_tax_credit,
+        "extra_income_scale": extra_income_scale,
+    }
+    for name, value in values.items():
+        values[name] = _nonnegative(name, value)
 
-    valid_tax_forms = frozenset({"linear_19%", "scale"})
-    if tax_form not in valid_tax_forms:
-        raise ValueError(
-            f"Invalid tax_form: {tax_form!r}. Must be one of {sorted(valid_tax_forms)}"
-        )
+    remaining = max(0.0, non_ip_income)
+    steps: list[dict[str, float | str]] = []
+    for label, key in (
+        ("Previous losses", "previous_losses"),
+        ("Social security", "social_security_deduction"),
+        ("IKZE", "ikze"),
+        ("Donations", "donations"),
+        ("Internet relief", "internet_tax_relief"),
+        ("Rehabilitative relief", "rehabilitative_relief_income"),
+        ("R&D relief", "rd_relief"),
+    ):
+        amount = values[key]
+        used = min(amount, remaining)
+        if used:
+            remaining -= used
+            steps.append({"step": label, "deduction": used, "after": remaining})
 
-    steps = []
-    remaining = max(0, non_ip_income)  # Guard: cannot deduct from negative base
+    thermo_used = min(values["thermomodernization_pool"], remaining)
+    remaining -= thermo_used
+    thermo_carry = values["thermomodernization_pool"] - thermo_used
+    if thermo_used:
+        steps.append({"step": "Thermomodernization", "deduction": thermo_used, "after": remaining})
 
-    # Step 2: Losses
-    if previous_losses > 0:
-        deduction = min(previous_losses, remaining)
-        steps.append(
-            {
-                "step": "Losses from previous years",
-                "deduction": deduction,
-                "after": remaining - deduction,
-            }
-        )
-        remaining -= deduction
-
-    # Step 3: Social Security
-    if social_security_deduction > 0:
-        deduction = min(social_security_deduction, remaining)
-        steps.append(
-            {
-                "step": "Social Security",
-                "deduction": deduction,
-                "after": remaining - deduction,
-            }
-        )
-        remaining -= deduction
-
-    # Step 4: Use-it-or-lose-it
-    for name, amount in [
-        ("IKZE", ikze),
-        ("Donations", donations),
-        ("Internet Relief", internet_tax_relief),
-        ("Rehabilitative Relief", rehabilitative_relief_income),
-        ("R&D Relief", rd_relief),
-    ]:
-        if amount > 0:
-            deduction = min(amount, remaining)
-            steps.append({"step": name, "deduction": deduction, "after": remaining - deduction})
-            remaining -= deduction
-
-    # Step 5: Thermomodernization (LAST)
-    thermo_used = 0
-    if thermomodernization_pool > 0:
-        thermo_used = min(thermomodernization_pool, remaining)
-        steps.append(
-            {
-                "step": "Thermomodernization",
-                "deduction": thermo_used,
-                "after": remaining - thermo_used,
-            }
-        )
-        remaining -= thermo_used
-
-    thermo_carry_over = thermomodernization_pool - thermo_used
-
-    # Step 6: Non-IP Tax
-    non_ip_base_rounded = tax_round(max(0, remaining))
-
-    if tax_form == "linear_19%":
-        non_ip_tax_before_relief = tax_round(non_ip_base_rounded * 0.19)
-    else:  # scale
-        total_scale_base = non_ip_base_rounded + tax_round(extra_income_scale)
+    non_ip_base = tax_round(remaining)
+    linear = tax_form in {"liniowy_19%", "linear_19%"}
+    if linear:
+        non_ip_tax_before_credit = tax_round(non_ip_base * 0.19)
+    else:
+        total_scale_base = non_ip_base + tax_round(values["extra_income_scale"])
         if total_scale_base <= 120_000:
-            scale_tax = max(0, tax_round(total_scale_base * 0.12 - 3_600))
+            total_scale_tax = max(0, tax_round(total_scale_base * 0.12 - 3_600))
         else:
-            scale_tax = tax_round(10_800 + (total_scale_base - 120_000) * 0.32)
-
-        if total_scale_base > 0:
-            non_ip_tax_before_relief = tax_round(
-                scale_tax * (non_ip_base_rounded / total_scale_base)
-            )
+            total_scale_tax = tax_round(10_800 + (total_scale_base - 120_000) * 0.32)
+        other_base = tax_round(values["extra_income_scale"])
+        if other_base <= 120_000:
+            other_tax = max(0, tax_round(other_base * 0.12 - 3_600))
         else:
-            non_ip_tax_before_relief = 0
+            other_tax = tax_round(10_800 + (other_base - 120_000) * 0.32)
+        non_ip_tax_before_credit = max(0, total_scale_tax - other_tax)
 
-    # Step 7: IP Tax
-    ip_base_rounded = tax_round(max(0, ip_income * nexus))
-    ip_tax = tax_round(ip_base_rounded * 0.05)
-
-    # Step 8: Child Credit
-    non_ip_tax_after_relief = max(0, non_ip_tax_before_relief - child_tax_credit)
-    used_child_credit = min(child_tax_credit, non_ip_tax_before_relief)
-
-    total_tax = non_ip_tax_after_relief + ip_tax
-
+    child_used = min(values["child_tax_credit"], non_ip_tax_before_credit)
+    non_ip_tax = max(0, non_ip_tax_before_credit - tax_round(child_used))
+    ip_base = tax_round(max(0.0, ip_income * nexus))
+    ip_tax = tax_round(ip_base * 0.05)
     return {
-        "steps": steps,
-        "remaining_non_ip_income": round(remaining, 2),
-        "non_ip_base_rounded": non_ip_base_rounded,
-        "non_ip_tax_before_relief": non_ip_tax_before_relief,
-        "used_child_credit": used_child_credit,
-        "non_ip_tax_after_relief": non_ip_tax_after_relief,
-        "ip_base_rounded": ip_base_rounded,
+        "deduction_steps": steps,
+        "thermomodernization_used": thermo_used,
+        "thermomodernization_carry_over": thermo_carry,
+        "non_ip_base_rounded": non_ip_base,
+        "non_ip_tax_before_child_relief": non_ip_tax_before_credit,
+        "child_tax_credit_used": child_used,
+        "non_ip_tax_final": non_ip_tax,
+        "ip_base_rounded": ip_base,
         "ip_tax": ip_tax,
-        "total_tax": total_tax,
-        "thermo_used": round(thermo_used, 2),
-        "thermo_carry_over": round(thermo_carry_over, 2),
+        "total_tax": non_ip_tax + ip_tax,
     }
 
 
-def calculate_overpayment_or_underpayment(
-    total_advances: float,
-    total_tax: float,
-) -> dict[str, float]:
-    """Calculate overpayment (+) or underpayment (-)."""
-    result = round(total_advances - total_tax, 2)
-    return {
-        "total_advances": round(total_advances, 2),
-        "total_tax": total_tax,
-        "result": result,
-        "type": "overpayment" if result >= 0 else "underpayment",
-    }
-
-
-# ============================================================================
-# Verification Tests (Phase 8)
-# ============================================================================
+def calculate_overpayment(
+    tax_due: float,
+    advances_paid: float,
+    previous_year_refund_adjustment: float = 0,
+) -> dict[str, float | str]:
+    """Return a positive overpayment or positive amount due."""
+    tax_due = _nonnegative("tax_due", tax_due)
+    advances_paid = _nonnegative("advances_paid", advances_paid)
+    adjustment = _nonnegative("previous_year_refund_adjustment", previous_year_refund_adjustment)
+    difference = tax_round(advances_paid - adjustment - tax_due)
+    if difference > 0:
+        return {"type": "overpayment", "amount": difference}
+    if difference < 0:
+        return {"type": "amount_due", "amount": abs(difference)}
+    return {"type": "settled", "amount": 0}
 
 
 def verify_kpir_balance(
-    ip_revenue_sum: float,
-    non_ip_revenue_sum: float,
-    net_fx_diff: float,
     kpir_revenue: float,
-    ip_costs_sum: float,
-    non_ip_costs_sum: float,
-    kpir_costs_net: float,
-    tolerance: float = 0.10,
+    kpir_costs: float,
+    computed_revenue: float,
+    computed_costs: float,
+    tolerance: float = 1.0,
 ) -> dict[str, Any]:
-    """
-    VERIFY 1: KPiR Balance.
-    """
-    revenue_diff = abs((ip_revenue_sum + non_ip_revenue_sum - net_fx_diff) - kpir_revenue)
-    costs_diff = abs((ip_costs_sum + non_ip_costs_sum) - kpir_costs_net)
-
+    """Verify monthly totals against an external KPiR summary."""
+    for name, value in (
+        ("kpir_revenue", kpir_revenue),
+        ("kpir_costs", kpir_costs),
+        ("computed_revenue", computed_revenue),
+        ("computed_costs", computed_costs),
+        ("tolerance", tolerance),
+    ):
+        _nonnegative(name, value)
+    revenue_diff = abs(money(kpir_revenue) - money(computed_revenue))
+    costs_diff = abs(money(kpir_costs) - money(computed_costs))
+    passed = revenue_diff <= Decimal(str(tolerance)) and costs_diff <= Decimal(str(tolerance))
     return {
-        "test": "VERIFY 1 — KPiR Balance",
-        "revenue_diff": round(revenue_diff, 2),
-        "costs_diff": round(costs_diff, 2),
-        "status": "PASS" if (revenue_diff < tolerance and costs_diff < tolerance) else "FAIL",
+        "test": "TEST_1",
+        "status": "PASS" if passed else "FAIL",
+        "revenue_difference": float(revenue_diff),
+        "cost_difference": float(costs_diff),
     }
 
 
-def verify_private_costs(
-    private_costs_allocated_to_ip: float,
-    *,
-    tolerance: float = 0.02,
-) -> dict[str, Any]:
-    if not math.isfinite(private_costs_allocated_to_ip) or private_costs_allocated_to_ip < 0:
-        raise ValueError(
-            f"private_costs_allocated_to_ip must be a finite non-negative number, "
-            f"got {private_costs_allocated_to_ip!r}"
-        )
-    if private_costs_allocated_to_ip > tolerance:
-        return {
-            "test": "VERIFY 2 — Private Costs",
-            "status": "FAIL",
-            "private_costs_allocated_to_ip": private_costs_allocated_to_ip,
-        }
+def verify_private_costs(private_costs_allocated_to_business: float) -> dict[str, Any]:
+    """Fail if a known private amount remains in IP or MIX."""
+    amount = _nonnegative(
+        "private_costs_allocated_to_business", private_costs_allocated_to_business
+    )
     return {
-        "test": "VERIFY 2 — Private Costs",
-        "status": "PASS",
-        "private_costs_allocated_to_ip": private_costs_allocated_to_ip,
+        "test": "TEST_2",
+        "status": "PASS" if money(amount) == 0 else "FAIL",
+        "private_amount_allocated_to_business": float(money(amount)),
     }
 
 
-def verify_no_double_social_security(
-    in_kpir: bool,
-    pit_deduction: float,
-    monthly_costs_sum: float,
+def verify_zus_no_double_dip(
+    social_security_in_kpir: bool,
+    social_security_deduction: float,
+    health_in_kpir: bool,
+    health_deduction: float,
 ) -> dict[str, Any]:
-    """
-    VERIFY 3: No Double Social Security.
-    """
-    if in_kpir:
-        if pit_deduction != 0:
-            return {
-                "test": "VERIFY 3",
-                "status": "FAIL",
-                "error": f"In KPiR, but PIT deduction = {pit_deduction}",
-            }
-    else:
-        if monthly_costs_sum != 0:
-            return {
-                "test": "VERIFY 3",
-                "status": "FAIL",
-                "error": f"Deducted in PIT, but in costs = {monthly_costs_sum}",
-            }
-
-    return {"test": "VERIFY 3 — No Double Social Security", "status": "PASS"}
-
-
-def verify_tax_cascade(
-    non_ip_base_rounded: float,
-    thermo_carry_over: float,
-) -> dict[str, Any]:
-    """
-    VERIFY 4: Base >= 0, carry-over >= 0.
-    """
-    if non_ip_base_rounded < 0:
-        return {
-            "test": "VERIFY 4",
-            "status": "FAIL",
-            "error": f"Non-IP base = {non_ip_base_rounded} < 0",
-        }
-    if thermo_carry_over < 0:
-        return {
-            "test": "VERIFY 4",
-            "status": "FAIL",
-            "error": f"Thermo carry-over = {thermo_carry_over} < 0",
-        }
-    return {"test": "VERIFY 4 — Tax Cascade", "status": "PASS"}
+    """Detect social-security or health-contribution double-dipping."""
+    social = _nonnegative("social_security_deduction", social_security_deduction)
+    health = _nonnegative("health_deduction", health_deduction)
+    problems: list[str] = []
+    if social_security_in_kpir and social:
+        problems.append("social security appears in KPiR and PIT deduction")
+    if health_in_kpir and health:
+        problems.append("health contribution appears in KPiR and PIT deduction")
+    return {
+        "test": "TEST_3",
+        "status": "FAIL" if problems else "PASS",
+        "problems": problems,
+    }
 
 
 def verify_ip_tax(
     ip_income: float,
     nexus: float,
-    declared_base: int,
-    declared_tax: int,
+    declared_base: float,
+    declared_tax: float,
 ) -> dict[str, Any]:
-    """
-    VERIFY 5: IP Tax calculation.
-    """
-    expected_base = tax_round(max(0, ip_income * nexus))
+    """Verify IP tax with the same rounding policy as the calculator."""
+    ip_income = _finite("ip_income", ip_income)
+    nexus = _fraction("nexus", nexus)
+    declared_base = _nonnegative("declared_base", declared_base)
+    declared_tax = _nonnegative("declared_tax", declared_tax)
+    expected_base = tax_round(max(0.0, ip_income * nexus))
     expected_tax = tax_round(expected_base * 0.05)
-
-    if expected_base != declared_base:
-        return {
-            "test": "VERIFY 5",
-            "status": "FAIL",
-            "error": f"Expected base {expected_base}, declared {declared_base}",
-        }
-    if expected_tax != declared_tax:
-        return {
-            "test": "VERIFY 5",
-            "status": "FAIL",
-            "error": f"Expected tax {expected_tax}, declared {declared_tax}",
-        }
-
-    return {"test": "VERIFY 5 — IP Tax", "status": "PASS"}
-
-
-def verify_overpayment(
-    total_advances: float,
-    total_tax: float,
-    declared_result: float,
-    tolerance: float = 1.0,
-) -> dict[str, Any]:
-    """
-    VERIFY 6: Overpayment verification.
-    """
-    expected = round(total_advances - total_tax, 2)
-    diff = abs(expected - declared_result)
-
-    if diff > tolerance:
-        return {
-            "test": "VERIFY 6",
-            "status": "FAIL",
-            "error": f"Expected {expected}, declared {declared_result}",
-        }
-    return {"test": "VERIFY 6 — Overpayment", "status": "PASS"}
-
-
-# ============================================================================
-# NEXUS Classification & MIX Key Resolution (Phase 4 — Allocation)
-# ============================================================================
-
-NEXUS_SOURCE_MAP: dict[str, str] = {
-    "own_br": "A",
-    "unrelated_br_contractor": "B",
-    "related_br_contractor": "C",
-    "ip_acquisition": "D",
-    "indirect_or_general": "poza_nexus",
-    "unknown": "poza_nexus",
-}
-
-
-def nexus_classify(item: CostItem, nexus_source: str = "unknown") -> CostItem:
-    """
-    Classify a cost item into a NEXUS basket based on its nexus_source.
-    Validates source against NEXUS_SOURCE_MAP; invalid sources raise ValueError.
-    """
-    source = nexus_source or "unknown"
-
-    if source not in NEXUS_SOURCE_MAP:
-        raise ValueError(
-            f"Invalid nexus_source={source!r}. Valid values: {sorted(NEXUS_SOURCE_MAP)}"
-        )
-
-    item.nexus_source = source
-    item.nexus_basket = NEXUS_SOURCE_MAP[source]
-
-    if source == "unknown":
-        item.note += (
-            "REVIEW_NEXUS_UNKNOWN: nexus_source unknown; treated as poza_nexus conservatively"
-        )
-
-    return item
-
-
-def resolve_mix_key(
-    item: CostItem,
-    default_policy: AllocationPolicy,
-) -> float:
-    """
-    Resolve the effective mix key for a cost item.
-    Uses `is not None` so that 0.0 is accepted as a valid key (0% to IP).
-    """
-    if item.basket != "MIX":
-        return 0.0
-
-    if item.allocation_key is not None:
-        if not (0 <= item.allocation_key <= 1):
-            raise ValueError(
-                f"allocation_key={item.allocation_key} for {item.description!r} "
-                "must be between 0 and 1"
-            )
-        return item.allocation_key
-
-    if default_policy.mix_key is not None:
-        if not (0 <= default_policy.mix_key <= 1):
-            raise ValueError(f"policy.mix_key={default_policy.mix_key} must be between 0 and 1")
-        return default_policy.mix_key
-
-    raise ValueError(
-        f"Cannot resolve mix_key for {item.description!r}: "
-        f"item.allocation_key=None, policy.mix_key=None. "
-        "Set per-item allocation_key or provide mix_key in AllocationPolicy."
-    )
-
-
-def aggregate_nexus_costs(items: list[CostItem]) -> dict[str, float]:
-    """
-    Aggregate cost item amounts by nexus_basket.
-    MIX costs can only enter A/B/C/D if they have explicit nexus_amount.
-    """
-    result: dict[str, float] = {"A": 0.0, "B": 0.0, "C": 0.0, "D": 0.0, "poza_nexus": 0.0}
-    for item in items:
-        basket = item.nexus_basket or "poza_nexus"
-        if basket not in result:
-            raise ValueError(f"Invalid nexus_basket={basket!r}")
-
-        if item.basket == "MIX" and basket in {"A", "B", "C", "D"}:
-            if item.nexus_amount is None:
-                raise ValueError(
-                    f"MIX cost {item.description!r} cannot enter NEXUS {basket} "
-                    "with full amount. Set explicit nexus_amount."
-                )
-            amount = item.nexus_amount
-            result["poza_nexus"] += item.amount - item.nexus_amount
-        else:
-            amount = item.nexus_amount if item.nexus_amount is not None else item.amount
-            if item.nexus_amount is not None:
-                result["poza_nexus"] += item.amount - item.nexus_amount
-
-        if amount < 0:
-            raise ValueError(f"nexus amount cannot be negative for {item.description!r}")
-
-        result[basket] += amount
-
-    total_allocated = sum(result.values())
-    total_input = sum(item.amount for item in items)
-    if abs(total_allocated - total_input) > 0.02:
-        raise ValueError(
-            f"Cost sum mismatch: allocated {total_allocated:.2f} != input {total_input:.2f}"
-        )
-
-    return result
-
-
-# ============================================================================
-# Revenue Allocation (Phase 4.1)
-# ============================================================================
-
-
-def allocate_revenue_monthly(
-    base_revenue: float,
-    revenue_method: str,
-    revenue_key: float | None = None,
-    document_split_ip: float | None = None,
-) -> dict[str, Any]:
-    """
-    Split monthly base revenue into IP and non-IP portions.
-
-    Priority by method:
-        dokumentowa   — uses document_split_ip (absolute PLN amount)
-        czasowa_W     — uses revenue_key as W-derived fraction (0-1)
-        produktowa    — uses revenue_key as product fraction (0-1)
-        z_interpretacji — uses revenue_key as KIS-stipulated fraction (0-1)
-        custom        — uses revenue_key as custom fraction (0-1)
-    """
-    # --- Validations ---
-    errors: list[str] = []
-
-    if base_revenue < 0:
-        errors.append(f"base_revenue ({base_revenue}) must be >= 0")
-
-    if revenue_method not in VALID_REVENUE_METHODS:
-        errors.append(
-            f"revenue_method={revenue_method!r} — must be one of {sorted(VALID_REVENUE_METHODS)}"
-        )
-
-    if revenue_method == "dokumentowa":
-        if document_split_ip is None:
-            errors.append("document_split_ip is required for dokumentowa method")
-        elif not (0 <= document_split_ip <= base_revenue):
-            errors.append(
-                f"document_split_ip ({document_split_ip}) must be between 0 "
-                f"and base_revenue ({base_revenue})"
-            )
-    else:
-        if revenue_key is None:
-            errors.append(f"revenue_key is required for {revenue_method} method")
-        elif not (0 <= revenue_key <= 1):
-            errors.append(f"revenue_key ({revenue_key}) must be between 0 and 1")
-
-    if errors:
-        raise ValueError(
-            "allocate_revenue_monthly validation failed:\n" + "\n".join(f"  - {e}" for e in errors)
-        )
-
-    # --- Allocation ---
-    if revenue_method == "dokumentowa":
-        ip_revenue = document_split_ip  # type: ignore[assignment]
-        non_ip_revenue = base_revenue - ip_revenue
-    else:
-        ip_revenue = base_revenue * revenue_key  # type: ignore[operator]
-        non_ip_revenue = base_revenue * (1 - revenue_key)  # type: ignore[operator]
-
+    passed = tax_round(declared_base) == expected_base and tax_round(declared_tax) == expected_tax
     return {
-        "base_revenue": round(base_revenue, 2),
-        "ip_revenue": round(ip_revenue, 2),
-        "non_ip_revenue": round(non_ip_revenue, 2),
-        "revenue_method": revenue_method,
-        "revenue_key_used": revenue_key,
-        "document_split_ip_used": document_split_ip,
+        "test": "TEST_5",
+        "status": "PASS" if passed else "FAIL",
+        "expected_base": expected_base,
+        "expected_tax": expected_tax,
     }
 
 
-# ============================================================================
-# Annual MIX Allocation by Revenue (Phase 4 — deferred mix settlement)
-# ============================================================================
-
-
-def annual_mix_allocation_revenue(
-    deferred_mix_total: float,
+def compare_allocation_methods(
+    *,
+    mix_total: float,
     annual_ip_revenue: float,
     annual_total_revenue: float,
+    annual_w_percent: float,
+    ip_income_before_mix: float,
+    nexus: float,
 ) -> dict[str, Any]:
-    """
-    Allocate deferred MIX costs using annual IP revenue proportion
-    (roczna metoda przychodowa).
-
-    When monthly MIX costs cannot be resolved under przychodowa_roczna
-    method (no per-item allocation key), they are deferred to year-end.
-    This function allocates them at annual settlement:
-
-        mix_key = annual_ip_revenue / annual_total_revenue
-        costs_ip_mix = deferred_mix_total * mix_key
-        costs_non_mix = deferred_mix_total * (1 - mix_key)
-    """
-    if annual_total_revenue <= 0:
-        raise ValueError(f"annual_total_revenue must be > 0, got {annual_total_revenue}")
-    if annual_ip_revenue < 0:
-        raise ValueError(f"annual_ip_revenue must be >= 0, got {annual_ip_revenue}")
-    if annual_ip_revenue > annual_total_revenue:
-        raise ValueError(
-            f"annual_ip_revenue ({annual_ip_revenue}) cannot exceed "
-            f"annual_total_revenue ({annual_total_revenue})"
+    """Compare methods transparently without choosing by tax outcome."""
+    mix_total = _nonnegative("mix_total", mix_total)
+    ip_income_before_mix = _nonnegative("ip_income_before_mix", ip_income_before_mix)
+    nexus = _fraction("nexus", nexus)
+    annual_w_percent = _finite("annual_w_percent", annual_w_percent)
+    if not 0 <= annual_w_percent <= 100:
+        raise ValueError("annual_w_percent must be between 0 and 100")
+    revenue = annual_mix_allocation_revenue(
+        mix_total,
+        annual_ip_revenue,
+        annual_total_revenue,
+    )
+    rows: list[dict[str, Any]] = []
+    for method, key, mix_ip in (
+        ("przychodowa_roczna", revenue["effective_key"], revenue["mix_ip"]),
+        ("czasowa_W", annual_w_percent / 100, float(money(mix_total * annual_w_percent / 100))),
+    ):
+        income = max(0.0, ip_income_before_mix - float(mix_ip))
+        base = tax_round(income * nexus)
+        rows.append(
+            {
+                "method": method,
+                "key": key,
+                "mix_ip": mix_ip,
+                "ip_income_after_mix": income,
+                "ip_tax": tax_round(base * 0.05),
+            }
         )
-    if deferred_mix_total < 0:
-        raise ValueError(f"deferred_mix_total must be >= 0, got {deferred_mix_total}")
-
-    if deferred_mix_total == 0:
-        return {
-            "mix_key_used": 0.0,
-            "costs_ip_mix": 0.0,
-            "costs_non_mix": 0.0,
-            "deferred_mix_total": 0.0,
-        }
-
-    mix_key = annual_ip_revenue / annual_total_revenue
-    costs_ip_mix = deferred_mix_total * mix_key
-    costs_non_mix = deferred_mix_total * (1 - mix_key)
-
     return {
-        "mix_key_used": round(mix_key, 4),
-        "costs_ip_mix": round(costs_ip_mix, 2),
-        "costs_non_mix": round(costs_non_mix, 2),
-        "deferred_mix_total": round(deferred_mix_total, 2),
+        "methods": rows,
+        "tax_difference": abs(rows[0]["ip_tax"] - rows[1]["ip_tax"]),
+        "decision_rule": "follow documented policy/KIS, never the lower-tax result",
     }
-
-
-def allocate_multi_ip(
-    total_indirect_costs: float,
-    software_ip_revenue: float,
-    total_revenue: float,
-    ip_revenues: dict[str, float],
-) -> dict[str, Any]:
-    """
-    Two-stage allocation of shared indirect costs across multiple IPs.
-
-    Stage 1 — Software IP share of total indirect costs:
-        software_share = total_indirect_costs * software_ip_revenue / total_revenue
-
-    Stage 2 — Split software_share among individual IPs by revenue:
-        cost_for_ip = software_share * ip_revenue / sum(ip_revenues)
-
-    Note: Direct costs per IP are NOT processed here — this function
-    handles only shared/indirect costs.
-    """
-    if total_indirect_costs < 0:
-        raise ValueError(f"total_indirect_costs must be >= 0, got {total_indirect_costs}")
-    if total_revenue <= 0:
-        raise ValueError(f"total_revenue must be > 0, got {total_revenue}")
-    if software_ip_revenue < 0:
-        raise ValueError(f"software_ip_revenue must be >= 0, got {software_ip_revenue}")
-    if software_ip_revenue > total_revenue:
-        raise ValueError(
-            f"software_ip_revenue ({software_ip_revenue}) cannot exceed "
-            f"total_revenue ({total_revenue})"
-        )
-    if not ip_revenues:
-        raise ValueError("ip_revenues dict must be non-empty")
-    for ip_name, ip_rev in ip_revenues.items():
-        if ip_rev < 0:
-            raise ValueError(f"ip_revenues[{ip_name!r}] must be >= 0, got {ip_rev}")
-    total_ip_revenue = sum(ip_revenues.values())
-    if total_ip_revenue <= 0:
-        raise ValueError(f"Sum of ip_revenues values must be > 0, got {total_ip_revenue}")
-    if abs(total_ip_revenue - software_ip_revenue) > 0.02:
-        raise ValueError(
-            f"Sum of ip_revenues ({total_ip_revenue}) does not match "
-            f"software_ip_revenue ({software_ip_revenue}) — "
-            f"difference exceeds 0.02"
-        )
-
-    # Stage 1
-    software_share = total_indirect_costs * software_ip_revenue / total_revenue
-
-    # Stage 2
-    stage2: dict[str, dict[str, float]] = {}
-    for ip_name, ip_rev in ip_revenues.items():
-        ip_share = ip_rev / total_ip_revenue
-        stage2[ip_name] = {
-            "costs": round(software_share * ip_share, 2),
-            "share": round(ip_share, 4),
-        }
-
-    return {
-        "stage1": {
-            "software_share": round(software_share, 2),
-            "software_ip_revenue": round(software_ip_revenue, 2),
-            "total_revenue": round(total_revenue, 2),
-        },
-        "stage2": stage2,
-    }
-
-
-if __name__ == "__main__":
-    print("DEMO OK")

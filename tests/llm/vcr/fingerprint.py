@@ -1,110 +1,29 @@
-"""
-Fingerprint computation for VCR cassettes.
-
-Fingerprint = deterministic hash of:
-  - ipbox_algorytm.md content
-  - scenario YAML content
-  - LLM provider name
-  - LLM model name
-  - system prompt (optional)
-
-Change to any component → cassette invalidated → re-record triggered.
-"""
+"""Exact identity of the algorithm, scenario and API request."""
 
 from __future__ import annotations
 
 import hashlib
 from pathlib import Path
 
-# Prompt template version — bump when prompt format changes
-PROMPT_TEMPLATE_VERSION = "2"
-
-# Path to algorithm source
-ALGORITHM_PATH = Path(__file__).parent.parent.parent.parent / "ipbox_algorytm.md"
+FINGERPRINT_VERSION = "v3"
+ALGORITHM_PATH = Path(__file__).resolve().parents[3] / "ipbox_algorytm.md"
 
 
-def _file_hash(path: Path) -> str:
-    """Compute SHA-256 hash of file content, return first 16 hex chars."""
-    if not path.exists():
-        return "0000000000000000"
-    content = path.read_bytes()
-    return hashlib.sha256(content).hexdigest()[:16]
+def file_hash(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def _content_hash(content: str) -> str:
-    """Compute SHA-256 hash of string content."""
-    return hashlib.sha256(content.encode("utf-8")).hexdigest()[:16]
+def content_hash(content: str) -> str:
+    return hashlib.sha256(content.encode("utf-8")).hexdigest()
 
 
-def compute_fingerprint(
-    scenario_path: Path,
-    provider: str,
-    model: str,
-    system_prompt: str = "",
-) -> str:
-    """
-    Compute fingerprint for (algorithm + scenario + provider + model + system_prompt).
-
-    Format: "v{version}_{algo_hash}_{scenario_hash}_{provider}_{model_hash}_sp{sp_hash}"
-
-    Example: "v1_a3f8b2c1d4e5f6a7_b1c2d3e4f5a6b7c8_google_gemini-2.0-flash_spa1b2c3d4"
-    """
-    algo_hash = _file_hash(ALGORITHM_PATH)
-    scenario_hash = _file_hash(scenario_path)
-    model_hash = _content_hash(model)[:8]
-    sp_hash = _content_hash(system_prompt)[:8]
-
-    return (
-        f"v{PROMPT_TEMPLATE_VERSION}"
-        f"_{algo_hash}"
-        f"_{scenario_hash}"
-        f"_{provider}"
-        f"_{model_hash}"
-        f"_sp{sp_hash}"
+def compute_fingerprint(scenario_path: Path, request_hash: str) -> str:
+    material = "\0".join(
+        (
+            FINGERPRINT_VERSION,
+            file_hash(ALGORITHM_PATH),
+            file_hash(scenario_path),
+            request_hash,
+        )
     )
-
-
-def fingerprint_changed(
-    stored_fingerprint: str,
-    current_fingerprint: str,
-) -> bool:
-    """Check if fingerprint has changed."""
-    return stored_fingerprint != current_fingerprint
-
-
-def explain_fingerprint_change(
-    stored: str,
-    current: str,
-) -> list[str]:
-    """
-    Explain what changed between fingerprints.
-
-    Returns list of human-readable change descriptions.
-    """
-    changes = []
-
-    stored_parts = stored.split("_")
-    current_parts = current.split("_")
-
-    if len(stored_parts) < 6 or len(current_parts) < 6:
-        return ["Unrecognized fingerprint format"]
-
-    labels = [
-        "prompt_template_version",
-        "algorithm_hash",
-        "scenario_hash",
-        "provider",
-        "model_hash",
-        "system_prompt_hash",
-    ]
-
-    for i, label in enumerate(labels):
-        if i < len(stored_parts) and i < len(current_parts) and stored_parts[i] != current_parts[i]:
-            changes.append(f"{label}: {stored_parts[i]} → {current_parts[i]}")
-
-    return changes if changes else ["No changes (fingerprints identical)"]
-
-
-def get_algorithm_hash() -> str:
-    """Get just the algorithm file hash (for manifest)."""
-    return _file_hash(ALGORITHM_PATH)
+    return f"{FINGERPRINT_VERSION}_{content_hash(material)}"

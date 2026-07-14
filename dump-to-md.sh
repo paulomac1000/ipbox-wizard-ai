@@ -1,82 +1,41 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -euo pipefail
+ROOT="$(realpath "${1:-.}")"
+OUTPUT="$(realpath -m "${2:-/tmp/ipbox-wizard-ai.md}")"
+TMP="$(mktemp)"
+trap 'rm -f "$TMP"' EXIT
 
-INPUT_PATH="${1:?Usage: $0 <path>}"
-OUTPUT_DIR="${2:-.}"
-SCRIPT_NAME="dump-to-md.sh"
-TEXT_EXTS="\.(py|json|md|txt|tsv|sh|log|yaml|yml|cfg|conf|toml|ini|xml|html|css|js|svg|tex|r|R|c|cpp|h|rb|go|rs|java|php|pl|pm|lua|vim|ps1|bat|env|sample|example|jinja|jinja2|properties|gradle|makefile|dockerfile|Dockerfile|gitignore|gitkeep|editorconfig)"
+printf '# Repository dump: ipbox-wizard-ai\n\n' > "$TMP"
+while IFS= read -r -d '' file; do
+  rel="${file#$ROOT/}"
+  [[ "$file" == "$OUTPUT" ]] && continue
+  case "$rel" in
+    .git/*|.venv/*|venv/*|input/*|reports/*|tmp/*|.omo/*|__pycache__/*|*/__pycache__/*|\
+    .pytest_cache/*|.ruff_cache/*|tests/llm/vcr/cassettes/*|.env|.env.*|*.pyc|*.pem|*.key)
+      continue ;;
+  esac
+  case "$rel" in
+    *.py|*.md|*.txt|*.toml|*.yaml|*.yml|*.json|*.sh|*.example|Makefile|LICENSE) ;;
+    *) continue ;;
+  esac
+  grep -Iq . "$file" || continue
+  max=2
+  while IFS= read -r line; do
+    if [[ "$line" =~ ^(\`+) ]]; then
+      n=${#BASH_REMATCH[1]}; (( n > max )) && max=$n
+    fi
+  done < "$file"
+  fence="$(printf '%*s' "$((max + 1))" '' | tr ' ' '`')"
+  printf '## `%s`\n\n%s\n' "$rel" "$fence" >> "$TMP"
+  cat "$file" >> "$TMP"
+  printf '\n%s\n\n' "$fence" >> "$TMP"
+done < <(find "$ROOT" -type f -print0 | sort -z)
 
-if [ ! -d "$INPUT_PATH" ]; then
-    echo "Error: not a directory" >&2
-    exit 1
+if grep -Ein '(BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY|Bearer [A-Za-z0-9._-]{20,}|sk-[A-Za-z0-9_-]{20,}|OPENROUTER_API_KEY=[^[:space:]]+)' "$TMP"; then
+  echo 'Potential secret detected; refusing to write dump' >&2
+  exit 1
 fi
-
-ABS_PATH=$(realpath "$INPUT_PATH")
-
-# Create output dir if missing
-mkdir -p "$OUTPUT_DIR"
-FOLDER_NAME=$(basename "$ABS_PATH")
-OUTPUT_FILE="${OUTPUT_DIR}/${FOLDER_NAME}.md"
-OUTPUT_NAME=$(basename "$OUTPUT_FILE")
-
-echo "# $FOLDER_NAME" > "$OUTPUT_FILE"
-echo "" >> "$OUTPUT_FILE"
-
-total=0
-skipped_nontext=0
-skipped_excluded=0
-
-# Find all files, pruning forbidden directories, then filter by extension and exclusion paths
-while IFS= read -r -d '' f; do
-    rel="${f#$ABS_PATH/}"
-    [ -z "$rel" ] && continue
-
-    # Skip script itself and output file
-    if [ "$rel" = "$SCRIPT_NAME" ] || [ "$rel" = "$OUTPUT_NAME" ]; then
-        continue
-    fi
-
-    # Skip dotenv files (including .env.example, .env.test, etc.)
-    case "$rel" in
-        .env*|*/.env*)
-            skipped_excluded=$((skipped_excluded+1))
-            continue
-            ;;
-    esac
-
-    # Only include text file extensions
-    # Also match known files without extension: Makefile, Dockerfile, docker-compose.yml
-    basename_only=$(basename "$rel")
-    if ! echo "$rel" | grep -qiE "${TEXT_EXTS}$" 2>/dev/null; then
-        case "$basename_only" in
-            Makefile|Dockerfile|docker-compose.yml|docker-compose.yaml|Gemfile|Rakefile|Procfile)
-                ;;
-            *)
-                skipped_nontext=$((skipped_nontext+1))
-                continue
-                ;;
-        esac
-    fi
-
-    total=$((total+1))
-    sanitized_rel="$rel"
-    echo "## $sanitized_rel" >> "$OUTPUT_FILE"
-    # Use filetype fence with extra delimiter to avoid breaking markdown
-    ext="${f##*.}"
-    echo '````' >> "$OUTPUT_FILE"
-    if [ ${#ext} -le 10 ] && [ "$ext" != "$f" ]; then
-        echo -n "$ext" >> "$OUTPUT_FILE"
-    fi
-    echo >> "$OUTPUT_FILE"
-    cat "$f" >> "$OUTPUT_FILE"
-    echo >> "$OUTPUT_FILE"
-    echo '````' >> "$OUTPUT_FILE"
-    echo "" >> "$OUTPUT_FILE"
-done < <(find "$ABS_PATH" -mindepth 1 \( -name .git -o -name input -o -name .pytest_cache -o -name .vscode -o -name .omo -o -name reports -o -name tmp -o -name .venv -o -name .ruff_cache -o -name htmlcov -o -name node_modules -o -name cassettes.old -o -name cassettes.new \) -prune -o -type f -print0 2>/dev/null)
-
-echo "--- Statistics ---" >> "$OUTPUT_FILE"
-echo "- Total text files dumped: $total" >> "$OUTPUT_FILE"
-echo "- Skipped (non-text): $skipped_nontext" >> "$OUTPUT_FILE"
-echo "- Skipped (excluded dirs): $skipped_excluded" >> "$OUTPUT_FILE"
-
-echo "Done: $OUTPUT_FILE ($total text files, $skipped_nontext non-text skipped, $skipped_excluded excluded dirs skipped)"
+mkdir -p "$(dirname "$OUTPUT")"
+mv "$TMP" "$OUTPUT"
+trap - EXIT
+printf 'Wrote %s\n' "$OUTPUT"

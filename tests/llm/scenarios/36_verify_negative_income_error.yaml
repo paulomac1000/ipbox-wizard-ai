@@ -1,67 +1,71 @@
 meta:
-  id: "36_verify_negative_income_error"
-  name: "Weryfikacja: Ujemny dochód IP roczny → podatek = 0"
-  description: >
-    Oba miesiące przynoszą stratę — koszty bezpośrednie IP > przychód IP.
-    Roczny Dochód_IP < 0 — podatek IP Box musi wynosić 0 (nie ujemny).
-    Test algorytmu: max(0, Dochód_IP_roczny × 5%).
-    Celowo brak ZUS/MIX żeby uniknąć ambiguity w alokacji — tylko koszty IP-bezpośrednie.
-  tags: ["verification", "edge", "negative-income"]
+  id: 36_verify_negative_income_error
+  name: Ujemny dochód IP daje podatek zero
+  description: Ujemny dochód IP daje podatek zero
+  tags:
+  - regression
   priority: P1
-  expected_stops: []
-  expected_reviews: []
-
 input:
   rok: 2025
-  forma_opodatkowania: "liniowy_19%"
+  forma_opodatkowania: liniowy_19%
+  polityka_alokacji:
+    policy_id: scenario-policy
+    przychody:
+      metoda: czasowa_W
+    koszty_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      uzasadnienie: Jawna polityka testowa; przychody, MIX i NEXUS są rozdzielone.
   zus:
-    sposob: "nie_odlicza"
+    sposob: brak
   kontrahenci:
-    - nazwa: "StartupXYZ Sp. z o.o."
-      waluta: "PLN"
-      klauzula_IP: true
-      model_komercjalizacji: "przeniesienie_praw"
-
+  - nazwa: ClientA
+    klauzula_IP: true
   miesiace:
-    - miesiac: "2025-01"
-      faktury:
-        - kwota_netto: 3000
-          kontrahent: "StartupXYZ Sp. z o.o."
-      ewidencja:
-        godziny_pracy: 160
-        godziny_nie_IP: 0
-        procent_faktury_IP: 100
-      koszty:
-        - opis: "Dzierżawa serwera GPU (infrastruktura B+R)"
-          kwota: 2500.00
-        - opis: "Licencja oprogramowania ML (PyTorch Enterprise)"
-          kwota: 1800.00
-      opis_projektu: >
-        Zaprojektowałem architekturę systemu kolejkowania zadań ML
-        z dedykowaną infrastrukturą GPU.
-    - miesiac: "2025-02"
-      faktury:
-        - kwota_netto: 3000
-          kontrahent: "StartupXYZ Sp. z o.o."
-      ewidencja:
-        godziny_pracy: 160
-        godziny_nie_IP: 0
-        procent_faktury_IP: 100
-      koszty:
-        - opis: "Dzierżawa serwera GPU (infrastruktura B+R)"
-          kwota: 2500.00
-        - opis: "Usługi cloud AWS (przetwarzanie danych)"
-          kwota: 2000.00
-      opis_projektu: >
-        Wdrożyłem moduł przetwarzania zdarzeń w czasie rzeczywistym
-        z wykorzystaniem infrastruktury serverless.
-
-  ulgi: {}
-
+  - miesiac: 2025-01
+    faktury:
+    - kwota_PLN: 3000
+      kontrahent: ClientA
+      kwalifikuje_IP: true
+    ewidencja:
+      godziny_pracy: 160
+      godziny_nie_IP: 0
+      procent_faktury_IP: 100
+    koszty:
+    - opis: Serwer GPU B+R
+      kwota: 2500
+      nexus_source: own_br
+      kategoria: IP
+    - opis: Licencja ML
+      kwota: 1800
+      nexus_source: own_br
+      kategoria: IP
+    opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.
+  - miesiac: 2025-02
+    faktury:
+    - kwota_PLN: 3000
+      kontrahent: ClientA
+      kwalifikuje_IP: true
+    ewidencja:
+      godziny_pracy: 160
+      godziny_nie_IP: 0
+      procent_faktury_IP: 100
+    koszty:
+    - opis: Serwer GPU B+R 2
+      kwota: 2500
+      nexus_source: own_br
+      kategoria: IP
+    - opis: Usługi cloud B+R
+      kwota: 2000
+      nexus_source: own_br
+      kategoria: IP
+    opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.
 assertions:
-  # W=100% dla obu miesięcy → wszystkie koszty IP-bezpośrednie
-  # Dochód_IP M1 = 3000 - (2500+1800) = 3000 - 4300 = -1300
-  # Dochód_IP M2 = 3000 - (2500+2000) = 3000 - 4500 = -1500
-  # Dochód_IP_roczny = -1300 + (-1500) = -2800 < 0
-  # Podatek_IP = max(0, -2800 × 5%) = 0
-  podatek_IP_range: [0, 0]
+  podatek_IP_range:
+  - 0
+  - 0
+  testy_pass:
+  - TEST_4
+  - TEST_5
+  - TEST_8
+  - TEST_9

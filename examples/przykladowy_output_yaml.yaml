@@ -1,180 +1,30 @@
-# Przykładowy output YAML — rok 2025, programista B2B liniowy 19%
-# (dane anonimizowane; wartości do przykładu)
-
+status: PROVISIONAL
 rok: 2025
-forma_opodatkowania: "liniowy_19%"
-metoda_rachunkowości: "memoriał"
-
-zus:
-  sposób_ujęcia: "w_KPiR"           # <— deklaracja użytkownika, krytyczne dla TEST 3
-  kwota_społeczne: 15000.00
-  kwota_zdrowotne: 11600.00          # limit 2024; sprawdź aktualny
-
-kontrahenci:
-  - nazwa: "Klient Software House Sp. z o.o."
-    NIP: "0000000000"
-    umowa_klauzula_IP: true
-    model_komercjalizacji: "przeniesienie_praw"
-
-interpretacja_KIS:
-  posiada: true
-  sygnatura: "0115-KDIT3.4011.XXX.2024.2.MK"
-  potwierdza_IP_Box: true
-
-przychody_roczne:
-  IP: 181687.42
-  NIE: 5832.10
-  KPiR_total: 187519.52
-  roznice_kursowe_netto: 0
-
-koszty_roczne:
-  IP: 13096.34
-  NIE: 3210.85
-  WYKLUCZONE: 0.00                   # kary, ST >10k, etc.
-
 polityka_alokacji:
-  źródło: "interpretacja_KIS"
-  opis: "Stosowanie przychodowego rocznego klucza alokacji dla kosztów pośrednich MIX zgodnie z interpretacją KIS"
-  spójna_z_interpretacją_KIS: true
-
-klucze_alokacji_roczne:
-  przychód_IP:
-    metoda: "dokumentowa"
-    klucz_efektywny: 0.9689
+  policy_id: kis-annual-revenue
+  przychody:
+    metoda: dokumentowa
   koszty_MIX:
-    metoda: "przychodowa_roczna"
-    klucz_efektywny: 0.9689
-    przychód_IP_roczny: 181687.42
-    przychód_całkowity_roczny: 187519.52
-
-porównanie_metod:
-  metoda_użyta:
-    nazwa: "przychodowa_roczna"
-    podatek_łączny: 8430
-  metoda_alternatywna:
-    nazwa: "czasowa_W"
-    podatek_łączny: 8441
-  różnica_podatku: 11
-
+    metoda: przychodowa_roczna
+    źródło: interpretacja_KIS
+    uzasadnienie: "Treść interpretacji wymaga rocznego klucza przychodowego"
+klucz_MIX:
+  wartość: null
+  status: DEFERRED
 nexus:
-  A: 13096.34                        # własna działalność (bez pytania o B/C/D, bo brak)
-  B: 0
-  C: 0
-  D: 0
-  wartość: 1.0000
-
-dochody_roczne:
-  IP_przed_nexus: 168591.08
-  IP_po_nexus: 168591.08
-  NIE: 2621.25
-
-kaskada_odliczeń:
-  straty_poprzednie: 0.00
-  ZUS_odliczenie: 0.00               # 0 bo ZUS w KPiR
-  IKZE: 9388.80
-  darowizny: 0.00
-  ulga_internet: 760.00
-  ulga_rehabilitacyjna: 0.00
-  ulga_BR: 0.00
-  termomodernizacja_wykorzystano: 2621.25   # <- tylko tyle, ile się zmieściło
-  termomodernizacja_pula_poczatkowa: 23481.53
-  termomodernizacja_carry_over_na_2026: 20860.28   # <- reszta przechodzi
-  
-  # Uwaga: tutaj IKZE + internet + pierwsze kroki zdominowały dochód NIE;
-  # gdyby użytkownik odliczył termo najpierw, straciłby IKZE bezpowrotnie.
-
-podatek:
-  podstawa_NIE_zaokr: 0              # po kaskadzie = 0 (wyzerowane)
-  podatek_NIE_przed_ulgami: 0
-  ulga_prorodzinna_uzyta: 0
-  podatek_NIE_finalny: 0
-  podstawa_IP_zaokr: 168591
-  podatek_IP_5_procent: 8430
-  podatek_łączny: 8430
-
-zaliczki:
-  typ: "miesięczne"
-  suma: 35964
-  rozbicie:
-    - {miesiąc: "2025-01", kwota: 2997}
-    - {miesiąc: "2025-02", kwota: 2997}
-    - {miesiąc: "2025-03", kwota: 2997}
-    - {miesiąc: "2025-04", kwota: 2997}
-    - {miesiąc: "2025-05", kwota: 2997}
-    - {miesiąc: "2025-06", kwota: 2997}
-    - {miesiąc: "2025-07", kwota: 2997}
-    - {miesiąc: "2025-08", kwota: 2997}
-    - {miesiąc: "2025-09", kwota: 2997}
-    - {miesiąc: "2025-10", kwota: 2997}
-    - {miesiąc: "2025-11", kwota: 2997}
-    - {miesiąc: "2025-12", kwota: 2997}
-
-wynik:
-  nadpłata_lub_dopłata: 27534         # + = nadpłata (do zwrotu)
-  typ: "nadpłata"
-
+  A: 1000.00
+  B: 0.00
+  C: 0.00
+  D: 0.00
+  poza_nexus: 500.00
+  wartość: 1.0
 testy:
-  test_1_bilans: "PASS"
-  test_2_koszty_prywatne: "PASS"     # żadnych kosztów prywatnych w IP Box
-  test_3_anty_dubel_ZUS: "PASS"      # ZUS w KPiR i odliczenie = 0
-  test_4_kaskada: "PASS"             # kolejność + max(0, ...) + carry-over >= 0
-  test_5_podatek_IP: "PASS"          # round(168591 * 0.05) = 8430
-  test_6_nadpłata: "PASS"            # 35964 - 8430 = 27534
-  test_7_spójność_polityki_alokacji: "PASS"
-  test_8_dochód_IP_vs_NEXUS: "PASS"
-  test_9_porównanie_metod: "PASS"
-
-review_do_weryfikacji:
-  - REVIEW_09: "Jeden kontrahent = 100% przychodów IP. Udokumentuj autonomię."
-
-miesiące:
-  - miesiąc: "2025-01"
-    kontrahent:
-      nazwa: "Klient Software House Sp. z o.o."
-      NIP: "0000000000"
-    kwalifikowane_IP:
-      typ: "autorskie prawo do programu komputerowego"
-      opis: "Moduł raportowania i analityki danych w systemie CRM"
-    ewidencja_czasu:
-      godziny_pracy: 160
-      godziny_nie_IP: 8
-      procent_faktury_IP: 100
-      W: 95.00
-    przychody:
-      podstawowy_PLN: 15000.00
-      z_faktur_FX_przeliczony: 0.00
-      rozne_kursowe_do_NIE: 0.00
-      alokacja_IP: 14535.00
-      alokacja_NIE: 465.00
-    alokacja:
-      przychód:
-        metoda: "dokumentowa"
-        źródło: "domyślna_wizard"
-        klucz: 0.9690
-        uzasadnienie: "Wydzielono przychód na podstawie dokumentacji projektowej"
-      koszty_MIX:
-        metoda: "przychodowa_roczna"
-        źródło: "interpretacja_KIS"
-        klucz: null
-        uzasadnienie: "Alokacja rocznym kluczem przychodowym; odroczona do końca roku"
-    koszty:
-      IP_bezpośrednie: 1000.00
-      NIE_bezpośrednie: 200.00
-      MIX: 500.00
-      MIX_do_IP: 0.00
-      MIX_do_NIE: 0.00
-      MIX_deferred: 500.00
-      MIX_status: "DEFERRED"
-      IP_obliczone: 1000.00
-      NIE_obliczone: 200.00
-      WYKLUCZONE: 0.00
-    nexus_koszty:
-      A: 1000.00
-      B: 0.00
-      C: 0.00
-      D: 0.00
-      poza_nexus: 700.00
-    dochody:
-      IP_Box: 13535.00
-      NIE_IP: 265.00
-      status: "PROVISIONAL"
+  TEST_1: PASS
+  TEST_2: PASS
+  TEST_3: PASS
+  TEST_4: PASS
+  TEST_5: PASS
+  TEST_6: PASS
+  TEST_7: PASS
+  TEST_8: PASS
+  TEST_9: PASS

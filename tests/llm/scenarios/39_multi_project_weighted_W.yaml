@@ -1,61 +1,60 @@
 meta:
-  id: "39_multi_project_weighted_W"
-  name: "Wieloprojektowy miesiąc — REVIEW_04 + ważona średnia W"
-  description: >
-    Jeden miesiąc z dwoma projektami od różnych klientów. Algorytm §2.3: oblicz
-    W dla każdego projektu osobno, potem ważona średnia przez przychód.
-  tags: [ "core", "multi-project", "W", "weighted-average" ]
-  priority: "P0"
-  expected_reviews: [ "REVIEW_04" ]
-
+  id: 39_multi_project_weighted_W
+  name: Ważona średnia W dla wielu projektów
+  description: Ważona średnia W dla wielu projektów
+  tags:
+  - regression
+  priority: P0
+  expected_reviews:
+  - REVIEW_04
 input:
   rok: 2025
-  forma_opodatkowania: "liniowy_19%"
+  forma_opodatkowania: liniowy_19%
+  polityka_alokacji:
+    policy_id: scenario-policy
+    przychody:
+      metoda: czasowa_W
+    koszty_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      uzasadnienie: Jawna polityka testowa; przychody, MIX i NEXUS są rozdzielone.
   zus:
-    sposob: "w_KPiR"
-    spoleczne_miesiecznie: 1418.48
+    sposob: brak
   kontrahenci:
-    - nazwa: "TechCorp A"
-      NIP: "1234567890"
-      waluta: "PLN"
-      klauzula_IP: true
-      model_komercjalizacji: "przeniesienie_praw"
-    - nazwa: "TechCorp B"
-      NIP: "0987654321"
-      waluta: "PLN"
-      klauzula_IP: true
-      model_komercjalizacji: "przeniesienie_praw"
-
+  - nazwa: A
+    klauzula_IP: true
+  - nazwa: B
+    klauzula_IP: true
   miesiace:
-    - miesiac: "2025-01"
-      faktury:
-        - kwota_netto: 15000
-          kontrahent: "TechCorp A"
-        - kwota_netto: 10000
-          kontrahent: "TechCorp B"
-      ewidencja:
-        godziny_pracy: 160
-        godziny_nie_IP: 40
-        procent_faktury_IP: 100
-        projekty:
-          - nazwa: "TechCorp A"
-            godziny: 100
-            godziny_nie_IP: 10
-          - nazwa: "TechCorp B"
-            godziny: 60
-            godziny_nie_IP: 30
-      koszty:
-        - opis: "Składki ZUS społeczne"
-          kwota: 1418.48
-      opis_projektu: >
-        Projekt A: moduł autoryzacji OAuth2. Projekt B: integracja z API REST.
-
-  ulgi: {}
-
+  - miesiac: 2025-01
+    faktury:
+    - kwota_PLN: 15000
+      kontrahent: A
+      kwalifikuje_IP: true
+    - kwota_PLN: 10000
+      kontrahent: B
+      kwalifikuje_IP: true
+    ewidencja:
+      godziny_pracy: 160
+      godziny_nie_IP: 40
+      procent_faktury_IP: 100
+      projekty:
+      - nazwa: A
+        godziny: 100
+        godziny_nie_IP: 10
+        przychod: 15000
+      - nazwa: B
+        godziny: 60
+        godziny_nie_IP: 30
+        przychod: 10000
+    koszty:
+    - opis: IDE
+      kwota: 100
+      nexus_source: own_br
+      kategoria: IP
+    opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.
 assertions:
-  # REVIEW_04: wiele projektów w miesiącu → wymaga średniej ważonej
   W_miesieczne:
-    "2025-01": 74.0
-  # Sprawdź czy LLM poprawnie oblicza ważoną średnią:
-  # W_ważona = (90% × 15000 + 50% × 10000) / (15000 + 10000)
-  # = (13500 + 5000) / 25000 = 18500 / 25000 = 74%
+    2025-01: 74.0
+  review_obecne:
+  - REVIEW_04

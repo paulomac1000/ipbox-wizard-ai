@@ -1,85 +1,70 @@
 meta:
   id: 30_edge_related_parties_nexus_mixed
-  name: 'Edge: NEXUS mieszany — własne koszty A (sprzęt/licencje) + powiązany podwykonawca
-    C'
-  description: 'Programista ma zarówno własne koszty B+R (laptop, licencje IDE) →
-    NEXUS A, jak i powiązanego podwykonawcę (siostra prowadzi CodeSis Sp. z o.o.)
-    → NEXUS C. NEXUS < 1.0 — test prawidłowego obliczenia przy mieszanym NEXUS. A
-    = 3500 (laptop 3000 + JetBrains 500), C = 10000. NEXUS = min(1.0, 3500×1.3 / (3500+10000))
-    = min(1.0, 4550/13500) ≈ 0.337
-
-    '
+  name: Mieszane koszty A i C
+  description: Mieszane koszty A i C
   tags:
-  - edge
-  - nexus
-  - related-parties
+  - regression
   priority: P1
-  expected_stops: []
-  expected_reviews: []
 input:
   rok: 2025
   forma_opodatkowania: liniowy_19%
+  polityka_alokacji:
+    policy_id: scenario-policy
+    przychody:
+      metoda: czasowa_W
+    koszty_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      uzasadnienie: Jawna polityka testowa; przychody, MIX i NEXUS są rozdzielone.
   zus:
-    sposob: w_KPiR
-    spoleczne_miesiecznie: 1418.48
+    sposob: brak
   kontrahenci:
-  - nazwa: MegaCorp Sp. z o.o.
-    waluta: PLN
+  - nazwa: ClientA
     klauzula_IP: true
-    model_komercjalizacji: przeniesienie_praw
   miesiace:
   - miesiac: 2025-01
     faktury:
-    - kwota_netto: 20000
-      kontrahent: MegaCorp Sp. z o.o.
+    - kwota_PLN: 20000
+      kontrahent: ClientA
+      kwalifikuje_IP: true
     ewidencja:
       godziny_pracy: 160
       godziny_nie_IP: 0
       procent_faktury_IP: 100
     koszty:
-    - opis: Składki ZUS społeczne
-      kwota: 1418.48
-    - opis: Laptop Dell Precision (narzędzie B+R)
-      kwota: 3000.0
-    - opis: Usługi programistyczne — CodeSis Sp. z o.o. (siostra)
+    - opis: Laptop do B+R
+      kwota: 3000
+      nexus_source: own_br
+      kategoria: IP
+    - opis: Usługi CodeSis
       kwota: 5000
-      typ_nexus: C
-    opis_projektu: 'Zaprojektowałem architekturę mikroserwisów; część modułów back-end
-      zrealizowała spółka powiązana CodeSis.
-
-      '
+      nexus_source: related_br_contractor
+      kategoria: IP
+    opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.
   - miesiac: 2025-02
     faktury:
-    - kwota_netto: 20000
-      kontrahent: MegaCorp Sp. z o.o.
+    - kwota_PLN: 20000
+      kontrahent: ClientA
+      kwalifikuje_IP: true
     ewidencja:
       godziny_pracy: 160
       godziny_nie_IP: 0
       procent_faktury_IP: 100
     koszty:
-    - opis: Składki ZUS społeczne
-      kwota: 1418.48
-    - opis: Licencja JetBrains All Products Pack
-      kwota: 500.0
-    - opis: Usługi programistyczne — CodeSis Sp. z o.o. (siostra)
+    - opis: Licencja JetBrains
+      kwota: 500
+      nexus_source: own_br
+      kategoria: IP
+    - opis: Usługi CodeSis 2
       kwota: 5000
-      typ_nexus: C
-    opis_projektu: 'Wdrożyłem system CI/CD i przeprowadziłem integrację z API zewnętrznego
-      dostawcy.
-
-      '
-  ulgi: {}
+      nexus_source: related_br_contractor
+      kategoria: IP
+    opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.
 assertions:
-  nexus: 0.337
-  podatek_IP_range:
-  - 400
-  - 400
-  przychod_IP_roczny_range:
-  - 40000
-  - 40000
-  podatek_NIE_range:
-  - 2211
-  - 2211
-  przychod_NIE_roczny_range:
-  - 0
-  - 0
+  nexus_range:
+  - 0.337
+  - 0.3371
+  testy_pass:
+  - TEST_5
+  - TEST_8
+  - TEST_9

@@ -1,19 +1,46 @@
 meta:
   id: 15_vacation_sick_mix
-  name: 'Logika: Urlop + L4'
-  description: Weryfikacja dzielnika czasu pracy
+  name: Urlop i L4 nie zwiększają mianownika W
+  description: Urlop i L4 nie zwiększają mianownika W
   tags:
-  - core
-  - time
+  - regression
   priority: P1
 input:
   rok: 2025
+  forma_opodatkowania: liniowy_19%
+  polityka_alokacji:
+    policy_id: scenario-policy
+    przychody:
+      metoda: czasowa_W
+    koszty_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      uzasadnienie: Jawna polityka testowa; przychody, MIX i NEXUS są rozdzielone.
+  zus:
+    sposob: brak
+  kontrahenci:
+  - nazwa: ClientA
+    klauzula_IP: true
   miesiace:
   - miesiac: 2025-01
-    godziny_pracy: 40
-    godziny_nie_IP: 4
+    faktury:
+    - kwota_PLN: 10000
+      kontrahent: ClientA
+      kwalifikuje_IP: true
+    ewidencja:
+      godziny_pracy: 40
+      godziny_nie_IP: 4
+      procent_faktury_IP: 100
+    koszty:
+    - opis: Hosting
+      kwota: 300
+      nexus_source: outside_nexus
+      kategoria: MIX
+    opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.
 assertions:
   W_miesieczne:
     2025-01: 90.0
-  testy_fail:
+  testy_pass:
   - TEST_7
+  - TEST_8
+  - TEST_9

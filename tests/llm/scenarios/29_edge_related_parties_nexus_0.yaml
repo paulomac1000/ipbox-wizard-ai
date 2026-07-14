@@ -1,49 +1,44 @@
 meta:
   id: 29_edge_related_parties_nexus_0
-  name: 'Edge: NEXUS = 0 — tylko powiązany podwykonawca (typ C)'
-  description: 'Programista zleca 100% prac programistycznych spółce powiązanej (brat).
-    Brak własnych kosztów kwalifikowanych (A=0, B=0, C>0). NEXUS = 0, podatek IP Box
-    = 0 mimo dodatniego dochodu.
-
-    '
+  name: NEXUS zero przy wyłącznie kosztach C
+  description: NEXUS zero przy wyłącznie kosztach C
   tags:
-  - edge
-  - nexus
-  - related-parties
+  - regression
   priority: P1
-  expected_stops: []
-  expected_reviews: []
 input:
   rok: 2025
   forma_opodatkowania: liniowy_19%
+  polityka_alokacji:
+    policy_id: scenario-policy
+    przychody:
+      metoda: czasowa_W
+    koszty_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      uzasadnienie: Jawna polityka testowa; przychody, MIX i NEXUS są rozdzielone.
   zus:
     sposob: brak
   kontrahenci:
-  - nazwa: GlobalSoft S.A.
-    waluta: PLN
+  - nazwa: ClientA
     klauzula_IP: true
-    model_komercjalizacji: przeniesienie_praw
   miesiace:
   - miesiac: 2025-01
     faktury:
-    - kwota_netto: 20000
-      kontrahent: GlobalSoft S.A.
+    - kwota_PLN: 20000
+      kontrahent: ClientA
+      kwalifikuje_IP: true
     ewidencja:
       godziny_pracy: 160
       godziny_nie_IP: 0
       procent_faktury_IP: 100
     koszty:
-    - opis: Usługi programistyczne — DevBro Sp. z o.o. (spółka brata)
+    - opis: Usługi spółki powiązanej
       kwota: 15000
-      typ_nexus: C
-    opis_projektu: 'Zarządzałem projektem implementacji systemu CRM; prace programistyczne
-      zlecone spółce powiązanej DevBro Sp. z o.o.
-
-      '
-  ulgi: {}
+      nexus_source: related_br_contractor
+      kategoria: IP
+    opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.
 assertions:
   nexus: 0.0
-  # NEXUS = 0 → Dochód_IP * NEXUS = 0 → podatek_IP = 0
   podatek_IP_range:
   - 0
-  - 10
+  - 0

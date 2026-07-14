@@ -1,27 +1,48 @@
 meta:
-  id: "22_related_parties_nexus_reduction"
-  name: "Brzegowy: Powiązania (Nexus < 1.0)"
-  description: "Weryfikacja obniżenia Nexusa przez koszty typu C"
-  tags: ["edge", "nexus"]
-  priority: "P1"
-
+  id: 22_related_parties_nexus_reduction
+  name: Wyłącznie koszt C obniża NEXUS do zera
+  description: Wyłącznie koszt C obniża NEXUS do zera
+  tags:
+  - regression
+  priority: P1
 input:
   rok: 2025
-  forma_opodatkowania: "liniowy_19%"
+  forma_opodatkowania: liniowy_19%
+  polityka_alokacji:
+    policy_id: scenario-policy
+    przychody:
+      metoda: czasowa_W
+    koszty_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      uzasadnienie: Jawna polityka testowa; przychody, MIX i NEXUS są rozdzielone.
   zus:
-    sposob: "w_KPiR"
+    sposob: brak
+  kontrahenci:
+  - nazwa: ClientA
+    klauzula_IP: true
   miesiace:
-    - miesiac: "2025-01"
-      przychody: 20000
+  - miesiac: 2025-01
+    faktury:
+    - kwota_PLN: 20000
+      kontrahent: ClientA
+      kwalifikuje_IP: true
+    ewidencja:
       godziny_pracy: 160
       godziny_nie_IP: 0
-      koszty:
-        - opis: "Podwykonawca (brat)"
-          kwota: 10000
-          typ_nexus: "C" # Powiązany
-  ulgi: {}
-
+      procent_faktury_IP: 100
+    koszty:
+    - opis: Powiązany podwykonawca
+      kwota: 10000
+      nexus_source: related_br_contractor
+      kategoria: IP
+    opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.
 assertions:
-  nexus_range: [0.0, 0.9] # Szacunkowo: (0*1.3 + 0) / 10000 = 0
-  # Wait, if A=0, Nexus = 0.
-  testy_pass: ["TEST_5"]
+  nexus: 0.0
+  podatek_IP_range:
+  - 0
+  - 0
+  testy_pass:
+  - TEST_5
+  - TEST_8
+  - TEST_9

@@ -1,33 +1,56 @@
 meta:
   id: 26_rd_relief_nexus
-  name: 'Brzegowy: Ulga B+R a IP Box'
-  description: 'Weryfikacja blokady double-dipping: ulga B+R nie może łączyć się z
-    IP Box dla tych samych kosztów'
+  name: Jawne rozdzielenie ulgi B+R i kosztów NEXUS
+  description: Jawne rozdzielenie ulgi B+R i kosztów NEXUS
   tags:
-  - edge
   - relief
-  - BR
   priority: P1
 input:
   rok: 2025
   forma_opodatkowania: liniowy_19%
+  polityka_alokacji:
+    policy_id: scenario-policy
+    przychody:
+      metoda: czasowa_W
+    koszty_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      uzasadnienie: Jawna polityka testowa; przychody, MIX i NEXUS są rozdzielone.
   zus:
-    sposob: w_KPiR
+    sposob: brak
+  kontrahenci:
+  - nazwa: ClientA
+    klauzula_IP: true
+  ulgi:
+    ulga_BR: 1000
   miesiace:
   - miesiac: 2025-01
     faktury:
-    - kwota_netto: 20000
-      kontrahent: TestCorp
+    - kwota_PLN: 20000
+      kontrahent: ClientA
+      kwalifikuje_IP: true
     ewidencja:
       godziny_pracy: 160
       godziny_nie_IP: 16
       procent_faktury_IP: 100
     koszty:
-    - opis: Abonament internet
+    - opis: Licencja IDE
       kwota: 89
-  ulgi:
-    ulga_BR: 10000
+      nexus_source: own_br
+      kategoria: IP
+    - opis: Koszt objęty odrębną ulgą B+R
+      kwota: 500
+      nexus_source: outside_nexus
+      kategoria: NON
+    opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.
 assertions:
-  nexus: 0.0
-  podatek_IP_range: [0, 0]
-  przychod_IP_roczny_range: [20000, 20000]
+  nexus: 1.0
+  przychod_IP_roczny_range:
+  - 18000
+  - 18000
+  W_miesieczne:
+    2025-01: 90.0
+  testy_pass:
+  - TEST_5
+  - TEST_8
+  - TEST_9

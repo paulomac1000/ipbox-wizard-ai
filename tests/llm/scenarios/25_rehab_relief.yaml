@@ -1,41 +1,52 @@
 meta:
   id: 25_rehab_relief
-  name: 'Brzegowy: Ulga rehabilitacyjna'
-  description: Weryfikacja odliczenia ulgi rehabilitacyjnej od dochodu
+  name: Ulga rehabilitacyjna
+  description: Ulga rehabilitacyjna
   tags:
-  - edge
   - relief
   priority: P1
 input:
   rok: 2025
   forma_opodatkowania: liniowy_19%
+  polityka_alokacji:
+    policy_id: scenario-policy
+    przychody:
+      metoda: czasowa_W
+    koszty_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      uzasadnienie: Jawna polityka testowa; przychody, MIX i NEXUS są rozdzielone.
   zus:
-    sposob: w_KPiR
+    sposob: brak
+  kontrahenci:
+  - nazwa: ClientA
+    klauzula_IP: true
+  ulgi:
+    ulga_rehabilitacyjna: 1000
   miesiace:
   - miesiac: 2025-01
     faktury:
-    - kwota_netto: 20000
-      kontrahent: TestCorp
+    - kwota_PLN: 20000
+      kontrahent: ClientA
+      kwalifikuje_IP: true
     ewidencja:
       godziny_pracy: 160
       godziny_nie_IP: 16
       procent_faktury_IP: 100
     koszty:
-    - opis: Abonament internet
+    - opis: Licencja IDE
       kwota: 89
-  ulgi:
-    ulga_rehabilitacyjna_dochod: 3000
+      nexus_source: own_br
+      kategoria: IP
+    opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.
 assertions:
-  nexus: 0.0
-  podatek_IP_range:
-  - 0
-  - 0
-  podatek_NIE_range:
-  - 363
-  - 363
+  nexus: 1.0
   przychod_IP_roczny_range:
   - 18000
   - 18000
-  przychod_NIE_roczny_range:
-  - 2000
-  - 2000
+  W_miesieczne:
+    2025-01: 90.0
+  testy_pass:
+  - TEST_5
+  - TEST_8
+  - TEST_9

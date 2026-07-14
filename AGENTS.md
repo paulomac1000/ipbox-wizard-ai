@@ -1,101 +1,56 @@
-# AGENTS.md — Przewodnik dla agentów AI
+# AGENTS.md
 
-## Cel projektu
+## Misja
 
-`ipbox-wizard-ai` to system wspomagający rozliczenie ulgi **IP Box** (art. 30ca PIT) dla programistów B2B w Polsce. Składa się z:
+Utrzymuj wiarygodne narzędzie decision-support dla IP Box. Nie przedstawiaj wyniku jako porady podatkowej.
 
-1. **`ipbox_algorytm.md`** — główna instrukcja dla agentów AI (system prompt), prowadzi przez 11 faz rozliczenia (0-10)
-2. **`python_helper/ipbox_calculator.py`** — moduł Pythona z funkcjami matematycznymi (W, NEXUS, kaskada podatkowa, FX)
-3. **`tests/`** — testy jednostkowe Pythona i testy LLM weryfikujące działanie algorytmu
+## Źródła prawdy
 
-## Kluczowe pliki
+1. `ipbox_algorytm.md` — reguły procesu.
+2. `python_helper/ipbox_calculator.py` — deterministyczna matematyka.
+3. `tests/llm/output_schema.py` — kontrakt odpowiedzi.
+4. `tests/llm/oracle.py` — niezależna oczekiwana semantyka.
+5. `tests/llm/scenarios/` — przypadki biznesowe.
+6. `tests/unit/` — wykonywalna specyfikacja.
 
-| Plik | Rola |
-|---|---|
-| `ipbox_algorytm.md` | Algorytm — system prompt dla AI |
-| `python_helper/ipbox_calculator.py` | Kalkulator — funkcje matematyczne |
-| `tests/unit/` | Testy deterministyczne kalkulatora |
-| `tests/llm/scenarios/` | Scenariusze end-to-end dla LLM |
-| `tests/llm/evaluator.py` | Walidator wyników LLM |
-| `docs/testing.md` | Dokumentacja systemu testów |
-| `.env.example` | Wymagane zmienne środowiskowe |
+Sprzeczność między źródłami jest błędem do naprawy, nie wyborem modelu.
 
-## Jak uruchamiać testy
+## Invarianty
+
+- przychód, MIX i NEXUS są rozdzielone;
+- W nie jest uniwersalnym kluczem MIX;
+- KIS/jawna polityka ma pierwszeństwo przed heurystyką;
+- MIX nie trafia do A bez `nexus_source` i `nexus_amount`;
+- A=B=C=D=0 oznacza NEXUS=0;
+- alokacje zachowują kwotę co do grosza;
+- STOP zeruje finalne liczby;
+- TEST 1–9 ustala Python;
+- playback nigdy nie wykonuje live requestu;
+- kaseta powstaje dopiero po schema + semantic PASS.
+
+## Nie wolno
+
+- osłabiać asercji pod odpowiedź modelu;
+- dodawać `skip: true`;
+- ręcznie edytować response/hash/timestamp kasety;
+- tworzyć fikcyjnego NEXUS A;
+- włączać płatnych requestów do zwykłego CI;
+- wznawiać pełnego nagrywania, gdy brakuje tylko kilku kaset;
+- dodawać globalnych ignore Ruff.
+
+## Polecenia jakości
 
 ```bash
-# Testy jednostkowe (nie wymagają klucza API)
-pytest tests/unit/ -v
-
-# Testy LLM z VCR (domyślnie auto - użyj kaset jeśli aktualne)
-pytest tests/llm/ --run-llm -v
-
-# Testy LLM w trybie playback (użyj wyłącznie kaset, brak API calls)
-pytest tests/llm/ --run-llm -v --vcr-mode=playback
-
-# Testy LLM w trybie record (nagraj na nowo wszystkie kasety)
-pytest tests/llm/ --run-llm -v --vcr-mode=record
-
-# Makefile shortcuts (alternatywnie)
-make test-llm-playback  # Playback (brak kosztów API)
-make test-llm-record # Nagraj wszystkie kasety
-make vcr-smoke    # Smoke test z VCR
-make vcr-check   # Sprawdź świeżość kaset
+ruff format --check .
+ruff check .
+python -m compileall -q python_helper tests scripts
+pytest tests/unit --cov=python_helper --cov-report=term-missing --cov-fail-under=90
+pytest -q
+python scripts/check_cassette_policy.py
 ```
 
-### VCR (Virtual Cassette Recorder)
+## Nagrywanie
 
-System VCR pozwala na redukcję kosztów API o >95% poprzez nagrywanie i odtwarzanie odpowiedzi LLM.
+Nagrywaj przez `scripts/record_model.py`, który pomija już istniejące, poprawne pliki. Po każdej zmianie algorytmu, scenariusza, schematu lub requestu usuń kasety konkretnego modelu i nagraj od nowa.
 
-| Tryb | Env `VCR_MODE` | Zachowanie |
-| ------ | -------------- | ---------- |
-| `playback` | `playback` | Użyj wyłącznie kaset. Fail jeśli brak. Zero API calls. |
-| `auto` | `auto` (domyślny) | Użyj kasety jeśli aktualna, inaczej nagraj |
-| `record` | `record` | Zawsze nagraj (nadpisz istniejące) |
-| `none` | `none` | Wyłącz VCR — zawsze wywołuj API |
-
-Kasety są przechowywane w `tests/llm/vcr/cassettes/` i commitowane do repo. Fingerprint kasety = hash(ipbox_algorytm.md + scenariusz.yaml + provider + model). Zmiana któregokolwiek komponentu inwaliduje kasetę.
-
-Pełna dokumentacja: [docs/testing.md](docs/testing.md)
-
-## Wytyczne dla agentów modyfikujących kod
-
-### Język
-
-- Kod źródłowy, nazwy plików, nazwy funkcji: **angielski**
-- Treść przekazywana do LLM w testach (prompty, dane YAML): **polski**
-- Komentarze w kodzie: angielski lub brak
-
-### Modele AI
-
-- Obsługiwani providerzy: **Google Gemini** (direct) oraz **OpenRouter** (proxy)
-- Klucz: `OPENROUTER_API_KEY` (secret)
-- Model: `LLM_MODEL` (zmienna środowiskowa, domyślnie `google/gemini-3.5-flash`)
-- Nie dodawać zależności do innych SDK/providerów — OpenRouter jest jedynym proxy, żadnych bezpośrednich SDK
-
-### Testy jednostkowe
-
-- Każda funkcja publiczna `ipbox_calculator.py` musi mieć testy
-- Każdy test musi mieć markery: `@pytest.mark.unit` + `@pytest.mark.P0/P1/P2`
-- Coverage minimum: 90% (`python_helper/`)
-
-### Scenariusze LLM
-
-- Format pliku: `NN_krotka_angielska_nazwa.yaml`
-- Zawartość (input, nazwa po polsku): **po polsku**
-- Scenariusz musi mieć `input.rok` i `input.forma_opodatkowania` — w przeciwnym razie jest niekompletny i należy go poprawić, nie pomijać
-- **Nie dodawać `skip: true` jako sposobu naprawy testu.** Jeśli test nie przechodzi, należy naprawić kod lub zaktualizować asercje do poprawnych matematycznie wartości
-- **Nie edytować ręcznie kaset, hashy ani manifestu** — zmiana któregokolwiek komponentu (algorytm, scenariusz, prompt) wymaga ponownego nagrania kaset przez `VCR_MODE=record`
-- **Nie osłabiać asercji** aby dopasować je do outputu modelu. Asercje muszą odzwierciedlać poprawność matematyczną, nie to co model zwraca
-
-### CI/CD
-
-- `LLM_MODEL`: zmienna GitHub Actions (`vars.LLM_MODEL`), **nie secret**
-- `OPENROUTER_API_KEY`: secret GitHub Actions (`secrets.OPENROUTER_API_KEY`)
-- Limit scenariuszy LLM w CI: `LLM_MAX_CALLS_PER_RUN` (domyślnie 0 — wszystkie)
-
-## Czego NIE robić
-
-- Nie dodawać zależności do `anthropic`, `openai` ani innych LLM providerów
-- Nie commitować kluczy API do plików (`.env` jest w `.gitignore`)
-- Nie tworzyć pliku `pytest.ini` — konfiguracja jest w `pyproject.toml`
-- Nie dodawać `README_TESTING.md` do katalogu głównego — dokumentacja jest w `docs/`
+Nigdy nie commituj częściowego zestawu jako bramki. Najpierw 36/36, offline playback, `vcr_precommit.py`, przegląd diffu.

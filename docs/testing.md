@@ -1,340 +1,197 @@
-# System testów IP Box Wizard AI
+# Testowanie i nagrywanie kaset
 
-## Architektura
+## 1. Bezpłatna bramka przed API
 
-Dwie niezależne warstwy testów:
-
-| Warstwa | Katalog | Cel | Uruchamia się |
-|---|---|---|---|
-| **Unit (Python)** | `tests/unit/` | Deterministyczna weryfikacja matematyki (`ipbox_calculator.py`) | Zawsze — bez klucza API |
-| **LLM (scenariuszowe)** | `tests/llm/` | Weryfikacja end-to-end `ipbox_algorytm.md` przez OpenRouter | Tylko z `--run-llm` + `LLM_API_KEY` |
-
-## Szybki start
-
-### 1. Instalacja
+Uruchom dokładnie:
 
 ```bash
-pip install -r requirements.txt
-pip install -r requirements-test.txt
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt -r requirements-test.txt
+
+ruff format --check .
+ruff check .
+python -m compileall -q python_helper tests scripts
+pytest tests/unit \
+  --cov=python_helper \
+  --cov-report=term-missing \
+  --cov-fail-under=90
+pytest -q
 ```
 
-### 2. Konfiguracja `.env`
+Oczekiwany wynik: testy jednostkowe PASS, coverage >=90%, testy LLM oznaczone jako skipped bez `--run-llm`.
 
-```env
-# Preferred: OpenRouter
-LLM_PROVIDER=openrouter
-LLM_MODEL=google/gemini-3.5-flash
-OPENROUTER_API_KEY=twoj_klucz_api
+## 2. Dlaczego stare kasety muszą być usunięte
 
-# Deprecated — removed in favor of LLM_MODEL/OPENROUTER_API_KEY
+Tożsamość requestu obejmuje:
+
+- cały `ipbox_algorytm.md`;
+- scenariusz YAML;
+- system prompt i user prompt;
+- wynik narzędzia deterministycznego dołączony do promptu;
+- model, limit tokenów, reasoning/temperature;
+- pełny strict JSON Schema.
+
+Zmiana któregokolwiek elementu unieważnia kasetę. Nie przenoś starych response, hashy ani manifestów.
+
+## 3. Modele bramkowe
+
+```text
+google/gemini-3.5-flash
+openai/gpt-5-mini
+anthropic/claude-haiku-4.5
 ```
 
-### 3. Uruchamianie
+GPT-5 Mini jest świadomym wyborem zamiast Nano: zadanie wymaga ścisłego odwzorowania dużego JSON i wielu warunków. Różnica kosztu pełnego runu jest mała wobec czasu potrzebnego na analizę niestabilnych odpowiedzi.
+
+## 4. Konkretna instrukcja dla agenta nagrywającego
+
+### Przygotowanie
 
 ```bash
-# Testy jednostkowe (szybkie, bez API)
-make test-unit
-# lub: pytest tests/unit/ -v
-
-# Testy LLM z VCR (domyślnie auto - użyj kaset jeśli aktualne)
-make test-llm
-# lub: pytest tests/llm/ --run-llm -v
-
-# Testy LLM w trybie playback (użyj wyłącznie kaset, brak API calls)
-make test-llm-playback
-
-# Testy LLM w trybie record (nagraj na nowo wszystkie kasety)
-make test-llm-record
-
-# Tylko smoke testy LLM (priorytet P0)
-make test-llm-smoke
-
-# VCR smoke check (bez API calls)
-make vcr-smoke
-
-# Sprawdź świeżość kaset VCR
-make vcr-check
-
-# Coverage report
-make coverage
+git switch fix/decouple-mix-allocation-from-w
+git pull --ff-only
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt -r requirements-test.txt
+export OPENROUTER_API_KEY='WKLEJ_KLUCZ'
 ```
 
-## VCR (Virtual Cassette Recorder)
+Sprawdź saldo OpenRouter przed startem. Nie uruchamiaj trzech modeli równolegle; ogranicza to ryzyko rate-limitów i ułatwia kontrolę kosztu.
 
-System VCR nagrywa i odtwarza odpowiedzi LLM, redukując koszty API o >95%.
-
-### Struktura
-
-```
-tests/llm/vcr/
-├── __init__.py
-├── config.py        # Konfiguracja trybów (VCR_CASSETTES_ROOT)
-├── fingerprint.py  # Obliczanie hash kaset
-├── cassette.py     # Model kasety + manifest (format v3)
-├── recorder.py     # Logika nagrywania/odtwarzania
-├── request_spec.py # LLMRequestSpec — kompletna specyfikacja żądania
-└── cassettes/      # Nagrane kasety, per-model (commitowane do repo)
-    ├── _manifest.yaml
-    ├── openrouter/
-    │   └── google_gemini_3_5_flash/
-    │       ├── 01_basic_linear.yaml
-    │       └── ...
-    └── google/
-        ├── google_gemini_3_5_flash/
-        │   └── ...
-        └── google_gemma_4_31b_it/
-            └── ...
-```
-
-Kasety są teraz przechowywane per-model w `cassettes/{provider}/{model_slug}/`, gdzie `model_slug` to nazwa modelu z `/` → `_` i bezpieczna dla systemu plików. Domyślny katalog kaset to `tests/llm/vcr/cassettes/`, ale można go zmienić przez zmienną środowiskową `VCR_CASSETTES_ROOT`.
-
-### Cassette format version 3
-
-Kasety używają formatu w wersji **3** (zamiast 2). Kluczowe zmiany:
-
-- `cassette_format_version: 3` w meta
-- Każdy turn zawiera `request_hash` — SHA-256 całej specyfikacji żądania (provider, model, prompt, system_prompt, temperature, max_tokens itd.)
-- `request_hash = SHA-256(JSON(LLMRequestSpec))` — pozwala wykryć zmiany w dowolnym parametrze wywołania LLM
-- Dodatkowe pola: `system_prompt_hash` w turn, `algorithm_hash` w meta
-
-### Tryby pracy
-
-| Tryb | Env | Opis |
-|------|-----|------|
-| `playback` | `VCR_MODE=playback` | Użyj wyłącznie kaset. Fail jeśli brak. Zero API calls. |
-| `auto` | `VCR_MODE=auto` (domyślny) | Użyj kasety jeśli aktualna, inaczej nagraj |
-| `record` | `VCR_MODE=record` | Zawsze nagraj (nadpisz istniejące) |
-| `none` | `VCR_MODE=none` | Wyłącz VCR — zawsze wywołuj API |
-
-### Fingerprint
-
-Kaseta jest unieważniona gdy zmieni się:
-
-- Zawartość `ipbox_algorytm.md` (hash SHA-256)
-- Plik scenariusza YAML (hash SHA-256)
-- Provider LLM
-- Model LLM
-- System prompt (hash SHA-256)
-
-Fingerprint = `hash(algorithm + scenario + provider + model + system_prompt)` z prefiksem wersji.
-
-Format: `v{PROMPT_TEMPLATE_VERSION}_{algo_hash}_{scenario_hash}_{provider}_{model_hash}_sp{sp_hash}`
-
-`PROMPT_TEMPLATE_VERSION` (obecnie `"2"`) jest inkrementowany gdy zmienia się format prompta wysyłanego do LLM, co unieważnia wszystkie istniejące kasety.
-
-### request_hash — pełna specyfikacja żądania
-
-Od formatu v3 każdy `CassetteTurn` zawiera `request_hash` obliczany jako SHA-256 z kanonicznego JSON-a całej struktury `LLMRequestSpec`:
-
-```
-LLMRequestSpec {
-    provider: str           # np. "openrouter"
-    model: str              # np. "google/gemini-3.5-flash"
-    system_prompt: str      # pełny prompt systemowy
-    user_prompt: str        # prompt użytkownika
-    temperature: float      # 0.0
-    max_tokens: int         # 16000
-    response_format: dict   # opcjonalny
-    schema: dict            # opcjonalny
-    schema_version: str     # opcjonalny
-    provider_preferences: dict  # opcjonalny
-    seed: int               # opcjonalny
-    reasoning_settings: dict    # opcjonalny
-}
-```
-
-Dzięki temu zmiana dowolnego parametru (np. temperatury, schematu, providera) unieważnia kasetę — nie tylko zmiana prompta.
-
-### Dodatkowa walidacja w playbacku
-
-- **Prompt hash**: Podczas odtwarzania kasety VCR weryfikuje SHA-256 prompta. Jeśli hash nie zgadza się z zapisanym w kasecie, rzuca `ValueError` — to sygnalizuje zmianę w generacji prompta (np. zmiana algorytmu lub scenariusza).
-- **request_hash**: Od formatu v3 `request_hash` obejmuje pełną specyfikację LLM (provider, model, prompt, temperature, max_tokens, schema itd.). Zmiana dowolnego parametru → mismatch → re-record.
-- **system_prompt_hash**: Dodatkowa walidacja SHA-256 prompta systemowego (oddzielnie od prompt_hash użytkownika).
-- **Fail-closed**: W trybie `playback` VCR nie ma fallbacku do live API. Jeśli kasety brakuje lub jest nieaktualna, test kończy się błędem z komunikatem o konieczności przejścia w tryb `record`.
-
-### Użycie lokalne
+### Nagrywanie wszystkich modeli
 
 ```bash
-# Nagraj pierwsze kasety (wymaga OPENROUTER_API_KEY)
-VCR_MODE=record pytest tests/llm/ --run-llm -v
-
-# Kolejne uruchomienia (użyj kaset, brak kosztów)
-pytest tests/llm/ --run-llm -v
-
-# Użyj alternatywnego katalogu kaset
-VCR_CASSETTES_ROOT=/path/to/cassettes pytest tests/llm/ --run-llm -v
-
-# Sprawdź czy kasety są świeże
-make vcr-check
-# lub: python scripts/vcr_precommit.py
-
-# Smoke test (zero API calls)
-make vcr-smoke
-# lub: ./scripts/vcr_smoke.sh
+./scripts/record_all_models.sh --max-cost-usd 5
 ```
 
-### CI/CD
+Skrypt:
 
-W GitHub Actions domyślnie używany jest tryb `playback` (zero kosztów API). Gdy kasety są nieaktualne, workflow tworzy PR z nowymi kasetami.
+1. uruchamia bezpłatne testy;
+2. nagrywa każdy scenariusz osobno;
+3. pomija kasetę już obecną po rzeczywistym offline playbacku, więc wznowienie nie płaci ponownie;
+4. kontynuuje kolejne modele nawet wtedy, gdy jeden model ma chwilowy błąd;
+5. zapisuje odrzucone odpowiedzi do `/tmp/ipbox_llm_rejected/`;
+6. stosuje miękki limit kosztu przed każdym następnym requestem;
+7. wykonuje offline playback i walidację manifestu;
+8. generuje `reports/benchmark-summary.json`.
 
-### Playback bez klucza API
+### Nagrywanie jednego modelu
 
-W trybie `playback` klucz API nie jest wymagany. `LLMClient` akceptuje `require_api_key=False`, a fixture `llm_client` w `test_scenarios.py` automatycznie przekazuje tę flagę gdy `VCR_MODE=playback`. Nie potrzebujesz `OPENROUTER_API_KEY` — kasety są odtwarzane lokalnie.
-
-### Rozwiązywanie problemów
-
-| Problem | Rozwiązanie |
-|---------|------------|
-| `CassetteNotFoundError` w trybie playback | Uruchom z `VCR_MODE=record` aby nagrać nowe kasety |
-| Kasety nieaktualne | `make vcr-check` sprawdzi świeżość, `VCR_MODE=record` odświeży |
-| `ValueError: Prompt hash mismatch` | Zmienił się prompt (algorytm/scenariusz). Przejdź w tryb `record` aby nagrać nowe kasety |
-| `ValueError: Request hash mismatch` | Zmieniła się specyfikacja żądania LLM (provider, model, temperatura itd.). Przejdź w tryb `record` |
-| `request_hash not found` (format < v3) | Kaseta w starym formacie. Przejdź w tryb `record` aby nagrać z `cassette_format_version=3` |
-| Chcesz live API | Uruchom z `VCR_MODE=none` |
-
-## VSCode
-
-Po otwarciu projektu w VSCode panel **Testing** (ikona probówki) pokaże zarówno testy `unit/` jak i `llm/`. Testy LLM mają status "skip" dopóki nie ustawisz `OPENROUTER_API_KEY` w `.env` i nie uruchomisz ich ręcznie przez terminal z flagą `--run-llm`.
-
-## Markery pytest
-
-| Marker | Opis |
-|---|---|
-| `unit` | Testy Python (deterministyczne) |
-| `llm` | Testy LLM (wymagają API) |
-| `smoke` | Minimalne testy do szybkiej walidacji |
-| `P0` | Krytyczne — muszą przejść |
-| `P1` | Ważne |
-| `P2` | Dodatkowe edge cases |
-
-## GitHub CI/CD
-
-### Wymagana konfiguracja repozytorium
-
-| Typ | Nazwa | Wartość |
-|---|---|---|
-| **Secret** | `OPENROUTER_API_KEY` | Klucz API OpenRouter |
-| **Variable** | `LLM_MODEL` | np. `google/gemini-3.5-flash` |
-
-### Przepływ
-
-- `full-suite.yml` — orchestrator (lint → unit → llm → summary), uruchamiany na `main` i co poniedziałek
-  - `lint` — Ruff (`ruff check .`) — walidacja składni i stylu Pythona
-  - `unit` — testy jednostkowe (wywołuje `unit-tests.yml`)
-  - `llm` — testy scenariuszowe (wywołuje `llm-scenario-tests.yml`)
-- `unit-tests.yml` — uruchamiany przy zmianach w `python_helper/` lub `tests/unit/`
-- `llm-scenario-tests.yml` — uruchamiany przy zmianach w `ipbox_algorytm.md` lub `tests/llm/`
-  - PR: tryb `playback` (zero kosztów API)
-  - push/dispatch: tryb `auto` (używa kaset lub nagrywa)
-
-Domyślny limit LLM: `LLM_MAX_CALLS_PER_RUN=0` (wszystkie scenariusze).
-
-## Dodawanie scenariuszy LLM
-
-Nowy plik `NN_nazwa.yaml` w `tests/llm/scenarios/`:
-
-```yaml
-meta:
-  id: "NN_krotka_nazwa"
-  name: "Opis po polsku"
-  description: "Szczegółowy opis co testuje scenariusz"
-  tags: ["core", "edge", ...]
-  priority: "P0"  # P0 / P1 / P2
-  expected_stops: []   # opcjonalne
-  expected_reviews: [] # opcjonalne
-  # skip: true         # opcjonalne — pomija test (WIP)
-
-input:
-  rok: 2025
-  forma_opodatkowania: "liniowy_19%"
-  zus:
-    sposob: "w_KPiR"
-  miesiace: [...]
-  ulgi: {}
-
-assertions:
-  nexus: 1.0
-  W_miesieczne:
-    "2025-01": 90.0
-  podatek_IP_range: [1000, 5000]
-  testy_pass: ["TEST_1", "TEST_3"]
-  zus_dubel: false
-  roznice_kursowe_w_IP: false
-  koszty_koszyk:
-    kawa: "NON"
-    jetbrains: "IP"
+```bash
+python scripts/record_model.py \
+  --model google/gemini-3.5-flash \
+  --max-cost-usd 5
 ```
 
-### Typy asercji
+Potem:
 
-#### HARD — blokujące (fail-closed)
+```bash
+python scripts/record_model.py --model openai/gpt-5-mini
+python scripts/record_model.py --model anthropic/claude-haiku-4.5
+```
 
-Wszystkie HARD assertions są fail-closed: wartość musi być jawnie obecna i poprawna. Brak sekcji w odpowiedzi LLM lub brak wartości to błąd.
+### Wznowienie po błędzie 402/429/5xx
 
-| Klucz | Opis |
-|---|---|
-| `nexus` | Dokładność ±0.001. `None` → failure. |
-| `nexus_range` | Zakres `[min, max]` z tolerancją ±0.001. |
-| `testy_pass` | Lista `TEST_1..TEST_9` które muszą być jawnie PASS. Brak testu w bloku `<tests>` → failure. |
-| `testy_fail` | Lista testów które muszą być jawnie FAIL. PASS → failure, brak → failure. |
-| `zus_dubel` | `false` = TEST_3 musi być PASS (brak podwójnego odliczenia ZUS). |
-| `roznice_kursowe_w_IP` | `false` = różnice kursowe nie mogą trafić do koszyka IP. |
-| `expected_stops` | Lista kodów STOP (z `meta`) które muszą wystąpić w `<stops_reviews>`. |
-| `assertions.stops` | Lista kodów STOP (z `assertions.stops`) które muszą wystąpić. |
-| `expected_reviews` | Lista kodów REVIEW (z `meta`) które muszą wystąpić. |
-| `review_obecne` | Lista kodów REVIEW które muszą być obecne (alternatywna nazwa). |
-| `klucz_MIX_metoda` | Oczekiwana metoda klucza MIX (np. `przychodowa_roczna`, `czasowa_W`). |
-| `klucz_MIX_źródło` | Źródło klucza MIX (np. `interpretacja_KIS`, `polityka_wizard`). |
-| `nie_używaj_W_do_MIX` | `true` = W nie może być użyty do alokacji MIX. |
-| `alokacja_multi_ip` | Mapa wartości alokacji dwustopniowej (dla wielu projektów IP), tolerancja ±0.5. |
-| `koszty_koszyk` | Mapa koszt→koszyk (IP / MIX / NIE / WYKLUCZONE). |
-| `warnings` | Kody ostrzeżeń które muszą być wygenerowane. **HARD** (blokujące). |
+Nie usuwaj poprawnych kaset. Po doładowaniu lub odczekaniu uruchom to samo polecenie. Skrypt pominie istniejące pliki i nagra wyłącznie brakujące.
 
-#### RANGE — zakresy
+### Nagranie pojedynczego scenariusza
 
-| Klucz | Opis |
-|---|---|
-| `podatek_IP_range` | `[min, max]` — podatek IP. `None` → failure. |
-| `podatek_NIE_range` | `[min, max]` — podatek NIE. `None` → failure. |
-| `przychod_IP_roczny_range` | `[min, max]` — roczny przychód IP. `None` → failure. |
-| `przychod_NIE_roczny_range` | `[min, max]` — roczny przychód NIE. `None` → failure. |
-| `W_miesieczne` | Mapa miesiąc→W%, tolerancja ±2pp. Brak miesiąca → failure. |
+```bash
+python scripts/record_model.py \
+  --model openai/gpt-5-mini \
+  --scenario 44_mix_revenue_key_kis
+```
 
-#### SOFT — nieblokujące
+### Pełne nagranie po zmianie requestu
 
-| Klucz | Opis |
-|---|---|
-| `soft_warnings` | Kody ostrzeżeń do sprawdzenia (nieblokujące, tylko print). |
+Tylko po zmianie algorytmu, schematu, promptu, profilu modelu lub scenariuszy:
 
-### Per-section validation
+```bash
+rm -rf tests/llm/vcr/cassettes/google_gemini_3_5_flash
+python scripts/record_model.py --model google/gemini-3.5-flash
+```
 
-Evaluator automatycznie sprawdza, czy odpowiedź LLM zawiera wymagane sekcje (tagi XML) na podstawie użytych asercji:
+Analogicznie dla pozostałych modeli. Opcja `--force` również nagrywa wszystko ponownie, ale jest droższa i powinna być używana wyłącznie świadomie.
 
-| Gdy asercja zawiera... | Wymagana sekcja |
-|---|---|
-| `nexus`, `nexus_range`, `podatek_IP_range`, `podatek_NIE_range`, `przychod_IP_roczny_range`, `przychod_NIE_roczny_range`, `alokacja_multi_ip`, `klucz_MIX_metoda`, `klucz_MIX_źródło` | `<result>` |
-| `W_miesieczne` | `<monthly_W>` |
-| `testy_pass`, `testy_fail` | `<tests>` |
-| `stops`, `review_obecne`, `warnings`, `soft_warnings` lub `meta.expected_stops`/`meta.expected_reviews` | `<stops_reviews>` |
-| `koszty_koszyk`, `nie_używaj_W_do_MIX`, `roznice_kursowe_w_IP` | `<classifications>` |
+## 5. Weryfikacja offline
 
-Brak wymaganej sekcji → failure.
+Dla jednego modelu:
 
-### Normalizacja ID testów
+```bash
+unset OPENROUTER_API_KEY
+export LLM_PROVIDER=openrouter
+export LLM_MODEL=google/gemini-3.5-flash
+export VCR_MODE=playback
 
-Evaluator normalizuje ID testów przez regex: `TEST[\s_-]*(\d+)` → `TEST_N`.
+pytest tests/llm/test_scenarios.py --run-llm --vcr-mode=playback -v
+python scripts/vcr_precommit.py --model google/gemini-3.5-flash
+```
 
-- `TEST 1` → `TEST_1`
-- `test_1_bilans` → `TEST_1`
-- `TEST-3` → `TEST_3`
+Dla całej macierzy:
 
-Dzięki temu asercje `testy_pass: ["TEST_1"]` dopasują się niezależnie od formatu użytego przez LLM.
+```bash
+./scripts/verify_all_models.sh
+```
 
-### Koncepty alokacji MIX
+## 6. Kryterium zaliczenia
 
-Przy kluczu `przychodowa_roczna` koszty MIX są **deferred** — odkładane do rozliczenia rocznego (Faza 7.2.A):
+Model zalicza benchmark tylko przy **36/36**. Odpowiedź musi jednocześnie:
 
-- Koszty z `klucz: null` (lub brak klucza per-item) trafiają do puli `MIX_deferred` w danym miesiącu
-- Miesięczne dochody przed alokacją MIX mają status **PROVISIONAL**
-- Po Fazie 7.2.A (roczne rozliczenie MIX) dochody stają się **FINAL**
-- W wynikach YAML: `mix_deferred: 0.00` (kwota odroczona) i `result_status: "PROVISIONAL"` / `"FINAL"`
+- zakończyć się `finish_reason=stop`;
+- być czystym JSON;
+- przejść strict JSON Schema;
+- zgadzać się z niezależnym oracle;
+- mieć poprawny request hash i fingerprint;
+- przejść późniejszy playback bez klucza API.
+
+13/36 albo 30/36 to wynik diagnostyczny, nie gotowa bramka produkcyjna.
+
+## 7. Analiza odrzuconych odpowiedzi
+
+```bash
+find /tmp/ipbox_llm_rejected -type f -maxdepth 3 -print
+```
+
+Dla każdej porażki ustal jedną kategorię:
+
+1. błąd scenariusza/asercji;
+2. błąd kalkulatora/oracle;
+3. niejasna instrukcja;
+4. błąd schematu lub integracji OpenRouter;
+5. ograniczenie modelu.
+
+Nie poprawiaj asercji tylko dlatego, że model zwrócił inną liczbę. Najpierw przelicz prawdę deterministycznie i dodaj test regresyjny.
+
+## 8. Przegląd przed commitem kaset
+
+```bash
+python scripts/benchmark_report.py
+python scripts/vcr_precommit.py --all-models
+git status --short
+git diff --stat
+```
+
+Sprawdź ręcznie szczególnie:
+
+- 11 — FX;
+- 23–27 — W=90% i ulgi;
+- 29–30 — NEXUS C i A+C;
+- 31–33 — TEST 1–3 FAIL;
+- 39 — ważona średnia W;
+- 44 — KIS/MIX bez automatycznego NEXUS A;
+- 45 — alokacja 8000 = 3000 + 5000.
+
+Repozytorium przyjmuje tylko dwa stany: brak kaset albo kompletna, poprawna macierz 3 × 36. `python scripts/check_cassette_policy.py` blokuje częściowy commit. Nie commituj `/tmp/ipbox_llm_rejected` ani raportów.
+
+## 9. Manualny workflow GitHub
+
+Workflow `Paid multi-model LLM benchmark` wymaga jawnego tekstu potwierdzającego koszt i ma miękki limit kosztu per model. Każdy model działa w osobnym, sekwencyjnym jobie. Pobierz trzy artefakty, skopiuj katalogi modeli do `tests/llm/vcr/cassettes/`, a następnie uruchom:
+
+```bash
+./scripts/verify_all_models.sh
+python scripts/benchmark_report.py
+python scripts/check_cassette_policy.py
+```
+
+Workflow nie commituję kaset automatycznie. Dzięki temu odrzucona odpowiedź ani częściowy zestaw nie może trafić na branch bez przeglądu.

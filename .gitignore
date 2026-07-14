@@ -1,47 +1,28 @@
-# ==============================================================================
-# IP Box Wizard AI - Git Ignore Configuration
-# ==============================================================================
-
-# --- Secrets and Environment ---
+# Secrets and taxpayer data
 .env
 .env.*
 !.env.example
-
-# --- Project Specific Data ---
 input/
-reports/
-tmp/
 
-# --- Python ---
+# Python
+.venv/
+venv/
 __pycache__/
 *.py[cod]
-*$py.class
-.ipynb_checkpoints
-*.so
-
-# --- Testing & Coverage ---
 .pytest_cache/
 .ruff_cache/
 .coverage
 coverage.xml
 htmlcov/
-tests/llm/expected/
-.cache/
 
-# --- IDEs & Editors ---
+# Generated results
+reports/
+tmp/
+.omo/
+*.log
+
+# IDE and OS
 .vscode/
 .idea/
-*.swp
-*.swo
-*~
-
-# --- Agent runtime state ---
-.omo/
-
-# --- Generated / auto-saved files ---
-ipbox-wizard-ai.md
-
-# --- System ---
 .DS_Store
 Thumbs.db
-desktop.ini

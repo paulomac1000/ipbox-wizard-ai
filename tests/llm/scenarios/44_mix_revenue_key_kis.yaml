@@ -1,16 +1,9 @@
 meta:
   id: 44_mix_revenue_key_kis
-  name: 'MIX: klucz przychodowy z interpretacji KIS vs W czasowy'
-  description: 'Weryfikuje, czy wizard wykrywa przychodowy klucz alokacji MIX z interpretacji
-    KIS i nie używa domyślnego W (czasowego). Klucz przychodowy roczny = 100% (jeden
-    klient), więc całość kosztu MIX (500 PLN) trafia do IP, a nie proporcjonalnie
-    do W.
-
-    '
+  name: Klucz przychodowy MIX z interpretacji KIS
+  description: Klucz przychodowy MIX z interpretacji KIS
   tags:
-  - mix
-  - KIS
-  - allocation
+  - regression
   priority: P1
   expected_reviews:
   - REVIEW_16
@@ -18,36 +11,48 @@ meta:
 input:
   rok: 2025
   forma_opodatkowania: liniowy_19%
+  polityka_alokacji:
+    policy_id: scenario-policy
+    przychody:
+      metoda: czasowa_W
+    koszty_MIX:
+      metoda: przychodowa_roczna
+      źródło: interpretacja_KIS
+      uzasadnienie: Jawna polityka testowa; przychody, MIX i NEXUS są rozdzielone.
   zus:
-    sposob: w_KPiR
-  interpretacja_KIS:
-    posiada: true
-    klucz_kosztów_pośrednich: przychodowy_roczny
+    sposob: brak
   kontrahenci:
-  - nazwa: SoftwareCorp
-    waluta: PLN
+  - nazwa: ClientA
     klauzula_IP: true
   miesiace:
   - miesiac: 2025-01
-    przychody: 10000
-    godziny_pracy: 160
-    godziny_nie_IP: 20
+    faktury:
+    - kwota_PLN: 10000
+      kontrahent: ClientA
+      kwalifikuje_IP: true
+    ewidencja:
+      godziny_pracy: 160
+      godziny_nie_IP: 20
+      procent_faktury_IP: 100
     koszty:
     - opis: Serwer AWS
       kwota: 500
+      nexus_source: outside_nexus
       kategoria: MIX
     - opis: Licencja JetBrains
       kwota: 100
+      nexus_source: own_br
       kategoria: IP
+    opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.
 assertions:
-  klucz_MIX_metoda: "przychodowa_roczna"
-  klucz_MIX_źródło: "interpretacja_KIS"
+  klucz_MIX_metoda: przychodowa_roczna
+  klucz_MIX_źródło: interpretacja_KIS
   nie_używaj_W_do_MIX: true
+  mix_w_nexus_A: false
+  testy_pass:
+  - TEST_7
+  - TEST_8
+  - TEST_9
   review_obecne:
   - REVIEW_16
   - REVIEW_17
-  testy_pass:
-  - TEST_1
-  - TEST_2
-  - TEST_7
-  - TEST_8
