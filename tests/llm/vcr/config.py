@@ -78,7 +78,7 @@ class VCRConfig:
     def cassette_path(self, scenario_id: str) -> Path:
         """Get path to cassette for a given scenario."""
         model_slug = self._model_slug()
-        model_dir = self.cassettes_root / self.provider / model_slug
+        model_dir = self.cassettes_root / model_slug
         model_dir.mkdir(parents=True, exist_ok=True)
         filename = f"{scenario_id}.yaml"
         return model_dir / filename
