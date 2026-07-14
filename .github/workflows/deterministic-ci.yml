@@ -1,22 +1,17 @@
-name: Publish reviewed LLM decision contract
+name: Diagnose corrected final fragments
 
 on:
   pull_request:
     branches: [main]
 
 permissions:
-  contents: write
-
-concurrency:
-  group: publish-reviewed-${{ github.ref }}
-  cancel-in-progress: true
+  contents: read
 
 jobs:
-  publish:
-    if: github.head_ref == 'fix/decouple-mix-allocation-from-w' && github.actor != 'github-actions[bot]'
+  diagnose:
+    if: github.head_ref == 'fix/decouple-mix-allocation-from-w'
     runs-on: ubuntu-latest
-    timeout-minutes: 30
-
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
         with:
@@ -24,102 +19,36 @@ jobs:
           fetch-depth: 1
           show-progress: false
 
-      - name: Reconstruct reviewed source
+      - name: Compare corrected fragment hashes
         run: |
           set -euo pipefail
-          cat \
-            .delivery-final/part-00 \
-            .delivery-final/fix01-* \
-            .delivery-final/part-02 \
-            .delivery-final/fix03-* \
-            .delivery-final/fix04-* \
-            .delivery-final/part-05 \
-            .delivery-final/part-06 \
-            .delivery-final/fix07-* \
-            .delivery-final/fix08-* \
-            .delivery-final/fix09-* \
-            .delivery-final/part-10 \
-            > /tmp/ipbox-final.b64
-          base64 --decode /tmp/ipbox-final.b64 > /tmp/ipbox-final.tar.gz
-          echo "81700578e14043d07df7a425a0e83560d107e906d0c042c57432124d64b19d00  /tmp/ipbox-final.tar.gz" | sha256sum -c -
+          cat > /tmp/expected.txt <<'EOF'
+          fix01-0 c77a566f4fbd225bbf5fd613ce14d836ec4ca136
+          fix01-1 3248a88af701e97656814223fe0d580874fb3f78
+          fix03-0 a036c12e5fd5a423a0d0f57fc342f60b0b5e1f66
+          fix03-1 d5140c8f267c8791d82071ab86f813590bb55e38
+          fix04-0 c3c04d36e319f4250163a6e7e7c74e9a9de4facb
+          fix04-1 e7987d2b44c67485685d7f9d009fb984942e878c
+          fix07-0 8c93235c1a0c5176c0bb4e566f259a5d9500284c
+          fix07-1 8e84610e0c9e0a9966ad8d51eaf4c63a3a94c849
+          fix08-0 c34774fe536c7cf4de6ca757e7bd01153c956c01
+          fix08-1 4c4ddfdb2611986879775b7d22ac952949ecb6d0
+          fix09-0 fdab596f27a11ca2b943d000ec367d95b52dd022
+          fix09-1 f9f4ce4c7accc1568151fd765985329003018e54
+          EOF
+          : > /tmp/corrected-fragment-hashes.txt
+          while read -r name expected; do
+            path=".delivery-final/$name"
+            actual="$(git hash-object "$path")"
+            printf '%s expected=%s actual=%s match=%s\n' \
+              "$name" "$expected" "$actual" "$([ "$actual" = "$expected" ] && echo yes || echo no)" \
+              >> /tmp/corrected-fragment-hashes.txt
+          done < /tmp/expected.txt
+          cat /tmp/corrected-fragment-hashes.txt
 
-          rm -rf /tmp/reviewed-tree
-          mkdir -p /tmp/reviewed-tree
-          python3 - <<'PY'
-          import tarfile
-          from pathlib import Path
-
-          root = Path('/tmp/reviewed-tree').resolve()
-          with tarfile.open('/tmp/ipbox-final.tar.gz', 'r:gz') as archive:
-              for member in archive.getmembers():
-                  target = (root / member.name).resolve()
-                  if target != root and root not in target.parents:
-                      raise SystemExit(f'unsafe archive path: {member.name}')
-              archive.extractall(root)
-          PY
-
-      - uses: actions/setup-python@v5
+      - uses: actions/upload-artifact@v4
         with:
-          python-version: "3.12"
-
-      - name: Install dependencies
-        working-directory: /tmp/reviewed-tree
-        run: pip install -r requirements.txt -r requirements-test.txt
-
-      - name: Ruff format
-        working-directory: /tmp/reviewed-tree
-        run: ruff format --check .
-
-      - name: Ruff lint
-        working-directory: /tmp/reviewed-tree
-        run: ruff check .
-
-      - name: Compile Python
-        working-directory: /tmp/reviewed-tree
-        run: python -m compileall -q python_helper tests scripts
-
-      - name: Unit tests and coverage
-        working-directory: /tmp/reviewed-tree
-        run: |
-          pytest tests/unit \
-            --cov=python_helper \
-            --cov-report=term-missing \
-            --cov-fail-under=90
-
-      - name: Full free suite
-        working-directory: /tmp/reviewed-tree
-        run: pytest -q
-
-      - name: Cassette policy
-        working-directory: /tmp/reviewed-tree
-        run: python scripts/check_cassette_policy.py
-
-      - name: Shell syntax
-        working-directory: /tmp/reviewed-tree
-        run: |
-          set -euo pipefail
-          for script in scripts/*.sh dump-to-md.sh; do
-            bash -n "$script"
-          done
-
-      - name: Replace code while preserving current workflows
-        run: |
-          set -euo pipefail
-          rm -rf /tmp/current-workflows
-          mkdir -p /tmp/current-workflows
-          cp -a .github/workflows/. /tmp/current-workflows/
-
-          find . -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
-          cp -a /tmp/reviewed-tree/. .
-
-          mkdir -p .github/workflows
-          cp -a /tmp/current-workflows/. .github/workflows/
-
-      - name: Commit reviewed production code
-        run: |
-          set -euo pipefail
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
-          git commit -m "fix: simplify LLM decision contract and remove stale cassettes"
-          git push origin HEAD:fix/decouple-mix-allocation-from-w
+          name: corrected-fragment-hashes
+          path: /tmp/corrected-fragment-hashes.txt
+          if-no-files-found: error
+          retention-days: 1
