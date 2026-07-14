@@ -105,21 +105,40 @@ jobs:
         run: |
           set -euo pipefail
           unset OPENROUTER_API_KEY || true
-          ./scripts/verify_all_models.sh
+          if [ "${{ inputs.model }}" = "all" ]; then
+            ./scripts/verify_all_models.sh
+            python scripts/vcr_precommit.py --all-models
+            python scripts/check_cassette_policy.py
+          else
+            LLM_PROVIDER=openrouter \
+            LLM_MODEL="${{ inputs.model }}" \
+            VCR_MODE=playback \
+            pytest tests/llm/test_scenarios.py --run-llm --vcr-mode=playback -q
+            python scripts/vcr_precommit.py --model "${{ inputs.model }}"
+          fi
           python scripts/benchmark_report.py
-          python scripts/vcr_precommit.py --all-models
-          python scripts/check_cassette_policy.py
 
-      - name: Upload benchmark report
+      - name: Collect diagnostics
+        if: always()
+        run: |
+          set -euo pipefail
+          mkdir -p reports/rejected reports/responses
+          cp -a /tmp/ipbox_llm_rejected/. reports/rejected/ 2>/dev/null || true
+          cp -a /tmp/ipbox_llm_responses/. reports/responses/ 2>/dev/null || true
+
+      - name: Upload cassette candidates and reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: llm-benchmark-report-${{ github.run_id }}
-          path: reports/
+          name: llm-benchmark-${{ github.run_id }}
+          path: |
+            tests/llm/vcr/cassettes/
+            reports/
           if-no-files-found: warn
           retention-days: 30
 
-      - name: Block merge on incomplete matrix
+      - name: Require a complete matrix for all-model runs
+        if: inputs.model == 'all'
         run: |
           set -euo pipefail
           python scripts/check_cassette_policy.py
