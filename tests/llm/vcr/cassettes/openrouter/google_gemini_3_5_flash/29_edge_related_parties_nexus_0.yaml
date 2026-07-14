@@ -4,8 +4,8 @@ meta:
   provider: openrouter
   model: google/gemini-3.5-flash
   fingerprint: v2_be9aedbd727271f4_b2448f655aae10b8_openrouter_8d99798a_spc2c5afcf
-  recorded_at: '2026-07-13T22:24:55.000130+00:00'
-  recording_duration_seconds: 3.38
+  recorded_at: '2026-07-14T17:44:52.997269+00:00'
+  recording_duration_seconds: 3.72
   prompt_tokens_estimate: 14592
   response_tokens_estimate: 296
   algorithm_hash: be9aedbd727271f4

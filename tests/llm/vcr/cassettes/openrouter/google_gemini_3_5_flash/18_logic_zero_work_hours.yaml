@@ -4,10 +4,10 @@ meta:
   provider: openrouter
   model: google/gemini-3.5-flash
   fingerprint: v2_be9aedbd727271f4_ffd3a5dbff0ca978_openrouter_8d99798a_spc2c5afcf
-  recorded_at: '2026-07-13T22:24:17.013049+00:00'
-  recording_duration_seconds: 4.22
+  recorded_at: '2026-07-14T17:44:15.018212+00:00'
+  recording_duration_seconds: 4.98
   prompt_tokens_estimate: 14508
-  response_tokens_estimate: 278
+  response_tokens_estimate: 276
   algorithm_hash: be9aedbd727271f4
   cassette_format_version: 3
 turns:
@@ -21,9 +21,9 @@ turns:
     \  },\n  \"tests\": {\n    \"test_1_bilans\": \"PASS\",\n    \"test_2_koszty_prywatne\": \"PASS\",\n    \"test_3_anty_dubel_ZUS\"\
     : \"PASS\",\n    \"test_4_kaskada\": \"PASS\",\n    \"test_5_podatek_IP\": \"PASS\",\n    \"test_6_nadpłata\": \"PASS\"\
     ,\n    \"test_7_spójność_polityki_alokacji\": \"PASS\",\n    \"test_8_dochód_IP_vs_NEXUS\": \"PASS\",\n    \"test_9_porównanie_metod\"\
-    : \"PASS\"\n  },\n  \"stops_reviews\": {\n    \"reviews\": [\n      \"REVIEW_20\",\n      \"REVIEW_09\"\n    ],\n    \"\
+    : \"PASS\"\n  },\n  \"stops_reviews\": {\n    \"reviews\": [\n      \"REVIEW_09\",\n      \"REVIEW_20\"\n    ],\n    \"\
     stops\": [\n      \"STOP_04\"\n    ],\n    \"warnings\": [\n      \"Miesiąc 2025-01 został wykluczony z IP Box z powodu\
-    \ zerowych godzin pracy/B+R (STOP_04).\"\n    ]\n  }\n}"
+    \ braku godzin B+R (W = 0).\"\n    ]\n  }\n}"
   prompt_hash: d61ba8d8de5520b7
   request_hash: 3841255d00dd595a
   system_prompt_hash: c2c5afcf900231f7
@@ -59,9 +59,9 @@ parsed:
     test_9_porównanie_metod: PASS
   stops_reviews:
     reviews:
-    - REVIEW_20
     - REVIEW_09
+    - REVIEW_20
     stops:
     - STOP_04
     warnings:
-    - Miesiąc 2025-01 został wykluczony z IP Box z powodu zerowych godzin pracy/B+R (STOP_04).
+    - Miesiąc 2025-01 został wykluczony z IP Box z powodu braku godzin B+R (W = 0).

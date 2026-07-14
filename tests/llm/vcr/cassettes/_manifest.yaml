@@ -2,123 +2,123 @@ entries:
   01_basic_linear:
     file: 01_basic_linear.yaml
     fingerprint: v2_be9aedbd727271f4_87a24bb22c10fcb2_openrouter_8d99798a_spc2c5afcf
-    recorded_at: '2026-07-13T22:23:39.548641+00:00'
+    recorded_at: '2026-07-14T17:43:33.555204+00:00'
   02_basic_scale_single_client:
     file: 02_basic_scale_single_client.yaml
     fingerprint: v2_be9aedbd727271f4_3502d96e8e92abde_openrouter_8d99798a_spc2c5afcf
-    recorded_at: '2026-07-13T22:23:44.098990+00:00'
+    recorded_at: '2026-07-14T17:43:37.974783+00:00'
   03_fx_usd_single_client:
     file: 03_fx_usd_single_client.yaml
     fingerprint: v2_be9aedbd727271f4_f079ae7362765116_openrouter_8d99798a_spc2c5afcf
-    recorded_at: '2026-07-13T22:23:47.415587+00:00'
+    recorded_at: '2026-07-14T17:43:42.966844+00:00'
   11_multi_client_mixed_currencies:
     file: 11_multi_client_mixed_currencies.yaml
     fingerprint: v2_be9aedbd727271f4_df97b983d541cfc2_openrouter_8d99798a_spc2c5afcf
-    recorded_at: '2026-07-13T22:23:51.452260+00:00'
+    recorded_at: '2026-07-14T17:43:46.546555+00:00'
   12_zus_in_pit_path:
     file: 12_zus_in_pit_path.yaml
     fingerprint: v2_be9aedbd727271f4_8d91ae79dc84d1a4_openrouter_8d99798a_spc2c5afcf
-    recorded_at: '2026-07-13T22:23:54.852605+00:00'
+    recorded_at: '2026-07-14T17:43:49.777848+00:00'
   13_income_from_employment_impact:
     file: 13_income_from_employment_impact.yaml
     fingerprint: v2_be9aedbd727271f4_60539fdafcf7e025_openrouter_8d99798a_spc2c5afcf
-    recorded_at: '2026-07-13T22:23:57.833684+00:00'
+    recorded_at: '2026-07-14T17:43:53.300562+00:00'
   14_lump_sum_ineligible_check:
     file: 14_lump_sum_ineligible_check.yaml
     fingerprint: v2_be9aedbd727271f4_00539dcd852041de_openrouter_8d99798a_spc2c5afcf
-    recorded_at: '2026-07-13T22:24:01.338555+00:00'
+    recorded_at: '2026-07-14T17:43:58.584471+00:00'
   15_vacation_sick_mix:
     file: 15_vacation_sick_mix.yaml
     fingerprint: v2_be9aedbd727271f4_78bee12c031be194_openrouter_8d99798a_spc2c5afcf
-    recorded_at: '2026-07-13T22:24:05.508943+00:00'
+    recorded_at: '2026-07-14T17:44:01.843930+00:00'
   16_high_w_review:
     file: 16_high_w_review.yaml
     fingerprint: v2_be9aedbd727271f4_7353be4c650cc3e3_openrouter_8d99798a_spc2c5afcf
-    recorded_at: '2026-07-13T22:24:08.961374+00:00'
+    recorded_at: '2026-07-14T17:44:06.358069+00:00'
   17_low_w_review:
     file: 17_low_w_review.yaml
     fingerprint: v2_be9aedbd727271f4_0fa3ab369fb863a3_openrouter_8d99798a_spc2c5afcf
-    recorded_at: '2026-07-13T22:24:12.770557+00:00'
+    recorded_at: '2026-07-14T17:44:10.013189+00:00'
   18_logic_zero_work_hours:
     file: 18_logic_zero_work_hours.yaml
     fingerprint: v2_be9aedbd727271f4_ffd3a5dbff0ca978_openrouter_8d99798a_spc2c5afcf
-    recorded_at: '2026-07-13T22:24:17.017110+00:00'
+    recorded_at: '2026-07-14T17:44:15.023358+00:00'
   21_monthly_loss_impact:
     file: 21_monthly_loss_impact.yaml
     fingerprint: v2_be9aedbd727271f4_ab5cef6aa837026e_openrouter_8d99798a_spc2c5afcf
-    recorded_at: '2026-07-13T22:24:22.102128+00:00'
+    recorded_at: '2026-07-14T17:44:19.012468+00:00'
   22_related_parties_nexus_reduction:
     file: 22_related_parties_nexus_reduction.yaml
     fingerprint: v2_be9aedbd727271f4_1a4c9b20d39f3707_openrouter_8d99798a_spc2c5afcf
-    recorded_at: '2026-07-13T22:24:27.498598+00:00'
+    recorded_at: '2026-07-14T17:44:22.668986+00:00'
   23_loss_carry_forward:
     file: 23_loss_carry_forward.yaml
     fingerprint: v2_be9aedbd727271f4_b78674b2686aa11a_openrouter_8d99798a_spc2c5afcf
-    recorded_at: '2026-07-13T22:24:31.123793+00:00'
+    recorded_at: '2026-07-14T17:44:27.002836+00:00'
   24_donations_relief:
     file: 24_donations_relief.yaml
     fingerprint: v2_be9aedbd727271f4_5e6b4061284b99d5_openrouter_8d99798a_spc2c5afcf
-    recorded_at: '2026-07-13T22:24:35.336883+00:00'
+    recorded_at: '2026-07-14T17:44:30.030243+00:00'
   25_rehab_relief:
     file: 25_rehab_relief.yaml
     fingerprint: v2_be9aedbd727271f4_d6806e47f244d02f_openrouter_8d99798a_spc2c5afcf
-    recorded_at: '2026-07-13T22:24:39.063341+00:00'
+    recorded_at: '2026-07-14T17:44:34.206575+00:00'
   26_rd_relief_nexus:
     file: 26_rd_relief_nexus.yaml
     fingerprint: v2_be9aedbd727271f4_76eaa49236399620_openrouter_8d99798a_spc2c5afcf
-    recorded_at: '2026-07-13T22:24:43.387895+00:00'
+    recorded_at: '2026-07-14T17:44:39.868529+00:00'
   27_termomodernizacja_full:
     file: 27_termomodernizacja_full.yaml
     fingerprint: v2_be9aedbd727271f4_e258ce4782ccc393_openrouter_8d99798a_spc2c5afcf
-    recorded_at: '2026-07-13T22:24:47.070394+00:00'
+    recorded_at: '2026-07-14T17:44:44.715878+00:00'
   28_edge_multiple_carry-overs:
     file: 28_edge_multiple_carry-overs.yaml
     fingerprint: v2_be9aedbd727271f4_f297ed0373121baa_openrouter_8d99798a_spc2c5afcf
-    recorded_at: '2026-07-13T22:24:51.593483+00:00'
+    recorded_at: '2026-07-14T17:44:49.250961+00:00'
   29_edge_related_parties_nexus_0:
     file: 29_edge_related_parties_nexus_0.yaml
     fingerprint: v2_be9aedbd727271f4_b2448f655aae10b8_openrouter_8d99798a_spc2c5afcf
-    recorded_at: '2026-07-13T22:24:55.004531+00:00'
+    recorded_at: '2026-07-14T17:44:53.001766+00:00'
   30_edge_related_parties_nexus_mixed:
     file: 30_edge_related_parties_nexus_mixed.yaml
     fingerprint: v2_be9aedbd727271f4_7977f315b26645dd_openrouter_8d99798a_spc2c5afcf
-    recorded_at: '2026-07-13T22:24:59.918713+00:00'
+    recorded_at: '2026-07-14T17:45:03.258570+00:00'
   31_zus_double_dip_fail:
     file: 31_zus_double_dip_fail.yaml
     fingerprint: v2_be9aedbd727271f4_89c66e782e3f690f_openrouter_8d99798a_spc2c5afcf
-    recorded_at: '2026-07-13T22:25:03.848532+00:00'
+    recorded_at: '2026-07-14T17:45:06.681190+00:00'
   32_private_costs_ip_fail:
     file: 32_private_costs_ip_fail.yaml
     fingerprint: v2_be9aedbd727271f4_c6f8688155417c7e_openrouter_8d99798a_spc2c5afcf
-    recorded_at: '2026-07-13T22:25:08.059401+00:00'
+    recorded_at: '2026-07-14T17:45:10.990706+00:00'
   33_kpir_balance_fail:
     file: 33_kpir_balance_fail.yaml
     fingerprint: v2_be9aedbd727271f4_23f50c2b4a44055d_openrouter_8d99798a_spc2c5afcf
-    recorded_at: '2026-07-13T22:25:12.185850+00:00'
+    recorded_at: '2026-07-14T17:45:15.680051+00:00'
   34_verify_fixed_asset_threshold_fail:
     file: 34_verify_fixed_asset_threshold_fail.yaml
     fingerprint: v2_be9aedbd727271f4_a315136ccf3e8a5f_openrouter_8d99798a_spc2c5afcf
-    recorded_at: '2026-07-13T22:25:16.571170+00:00'
+    recorded_at: '2026-07-14T17:45:19.866543+00:00'
   35_verify_monthly_w_jump_inconsistency:
     file: 35_verify_monthly_w_jump_inconsistency.yaml
     fingerprint: v2_be9aedbd727271f4_9862390246558a24_openrouter_8d99798a_spc2c5afcf
-    recorded_at: '2026-07-13T22:25:20.328404+00:00'
+    recorded_at: '2026-07-14T17:45:27.975876+00:00'
   36_verify_negative_income_error:
     file: 36_verify_negative_income_error.yaml
     fingerprint: v2_be9aedbd727271f4_b64a2d1f780eb1ef_openrouter_8d99798a_spc2c5afcf
-    recorded_at: '2026-07-13T22:25:25.042807+00:00'
+    recorded_at: '2026-07-14T17:45:34.702115+00:00'
   37_verify_invalid_tax_form_stop:
     file: 37_verify_invalid_tax_form_stop.yaml
     fingerprint: v2_be9aedbd727271f4_6ac4d61af1d0d462_openrouter_8d99798a_spc2c5afcf
-    recorded_at: '2026-07-13T22:25:28.076918+00:00'
+    recorded_at: '2026-07-14T17:45:43.701091+00:00'
   38_verify_missing_kpir_data:
     file: 38_verify_missing_kpir_data.yaml
     fingerprint: v2_be9aedbd727271f4_fe6c26e8dd5aea59_openrouter_8d99798a_spc2c5afcf
-    recorded_at: '2026-07-13T22:25:32.330670+00:00'
+    recorded_at: '2026-07-14T17:45:46.913747+00:00'
   39_multi_project_weighted_W:
     file: 39_multi_project_weighted_W.yaml
     fingerprint: v2_be9aedbd727271f4_73c21ec4ce094cd8_openrouter_8d99798a_spc2c5afcf
-    recorded_at: '2026-07-13T22:25:35.283466+00:00'
+    recorded_at: '2026-07-14T17:45:52.325881+00:00'
   40_mixed_ip_clause:
     file: 40_mixed_ip_clause.yaml
     fingerprint: v2_be9aedbd727271f4_0fe5c9314cdf26b4_openrouter_8d99798a_spc2c5afcf
@@ -143,5 +143,5 @@ entries:
     file: 45_multi_ip_two_stage.yaml
     fingerprint: v2_be9aedbd727271f4_95cbe85977c555a3_openrouter_8d99798a_spc2c5afcf
     recorded_at: '2026-07-13T22:26:02.201652+00:00'
-generated_at: '2026-07-13T22:26:02.201769+00:00'
+generated_at: '2026-07-14T17:45:52.326017+00:00'
 manifest_version: 1

@@ -4,10 +4,10 @@ meta:
   provider: openrouter
   model: google/gemini-3.5-flash
   fingerprint: v2_be9aedbd727271f4_76eaa49236399620_openrouter_8d99798a_spc2c5afcf
-  recorded_at: '2026-07-13T22:24:43.383651+00:00'
-  recording_duration_seconds: 4.3
+  recorded_at: '2026-07-14T17:44:39.863942+00:00'
+  recording_duration_seconds: 5.63
   prompt_tokens_estimate: 14515
-  response_tokens_estimate: 248
+  response_tokens_estimate: 252
   algorithm_hash: be9aedbd727271f4
   cassette_format_version: 3
 turns:
@@ -15,14 +15,14 @@ turns:
   prompt: ''
   response: "{\n  \"result\": {\n    \"rok\": 2025,\n    \"przychody_roczne\": {\n      \"IP\": 18000.0,\n      \"NIE\": 2000.0\n\
     \    },\n    \"nexus\": 1.0,\n    \"podatek\": {\n      \"podatek_IP\": 896,\n      \"podatek_NIE_finalny\": 363,\n  \
-    \    \"podatek_całościowy\": 1259\n    },\n    \"dochód_IP\": 17919.9,\n    \"dochód_NIE\": 1910.1,\n    \"klucz_MIX\"\
+    \    \"podatek_całościowy\": 1259\n    },\n    \"dochód_IP\": 17919.9,\n    \"dochód_NIE\": 1991.1,\n    \"klucz_MIX\"\
     : {\n      \"metoda\": \"przychodowa_roczna\",\n      \"źródło\": \"domyślna_wizard\"\n    }\n  },\n  \"classifications\"\
     : [\n    \"Abonament internet: basket=MIX, nexus_basket=poza_nexus\"\n  ],\n  \"monthly_W\": {\n    \"2025-01\": 90.0\n\
-    \  },\n  \"tests\": {\n    \"TEST_1_BILANS\": \"PASS\",\n    \"TEST_2_KOSZTY_PRYWATNE\": \"PASS\",\n    \"TEST_3_ANTY_DUBEL_ZUS\"\
-    : \"PASS\",\n    \"TEST_4_KASKADA\": \"PASS\",\n    \"TEST_5_PODATEK_IP\": \"PASS\",\n    \"TEST_6_NADPŁATA\": \"PASS\"\
-    ,\n    \"TEST_7_SPÓJNOŚĆ_POLITYKI_ALOKACJI\": \"PASS\",\n    \"TEST_8_DOCHÓD_IP_VS_NEXUS\": \"PASS\",\n    \"TEST_9_PORÓWNANIE_METOD\"\
-    : \"PASS\"\n  },\n  \"stops_reviews\": {\n    \"reviews\": [\n      \"REVIEW_09\",\n      \"REVIEW_20\"\n    ],\n    \"\
-    stops\": [],\n    \"warnings\": []\n  }\n}"
+    \  },\n  \"tests\": {\n    \"test_1_bilans\": \"PASS\",\n    \"test_2_koszty_prywatne\": \"PASS\",\n    \"test_3_anty_dubel_ZUS\"\
+    : \"PASS\",\n    \"test_4_kaskada\": \"PASS\",\n    \"test_5_podatek_IP\": \"PASS\",\n    \"test_6_nadpłata\": \"PASS\"\
+    ,\n    \"test_7_spójność_polityki_alokacji\": \"PASS\",\n    \"test_8_dochód_IP_vs_NEXUS\": \"PASS\",\n    \"test_9_porównanie_metod\"\
+    : \"PASS\"\n  },\n  \"stops_reviews\": {\n    \"stops\": [],\n    \"warnings\": [\n      \"Brak interpretacji indywidualnej\
+    \ KIS - wysokie ryzyko podatkowe.\"\n    ]\n  }\n}"
   prompt_hash: 3badd5d6ea5b4597
   request_hash: 91f87fdf239b5d3c
   system_prompt_hash: c2c5afcf900231f7
@@ -38,7 +38,7 @@ parsed:
       podatek_NIE_finalny: 363
       podatek_całościowy: 1259
     dochód_IP: 17919.9
-    dochód_NIE: 1910.1
+    dochód_NIE: 1991.1
     klucz_MIX:
       metoda: przychodowa_roczna
       źródło: domyślna_wizard
@@ -47,18 +47,16 @@ parsed:
   monthly_W:
     2025-01: 90.0
   tests:
-    TEST_1_BILANS: PASS
-    TEST_2_KOSZTY_PRYWATNE: PASS
-    TEST_3_ANTY_DUBEL_ZUS: PASS
-    TEST_4_KASKADA: PASS
-    TEST_5_PODATEK_IP: PASS
-    TEST_6_NADPŁATA: PASS
-    TEST_7_SPÓJNOŚĆ_POLITYKI_ALOKACJI: PASS
-    TEST_8_DOCHÓD_IP_VS_NEXUS: PASS
-    TEST_9_PORÓWNANIE_METOD: PASS
+    test_1_bilans: PASS
+    test_2_koszty_prywatne: PASS
+    test_3_anty_dubel_ZUS: PASS
+    test_4_kaskada: PASS
+    test_5_podatek_IP: PASS
+    test_6_nadpłata: PASS
+    test_7_spójność_polityki_alokacji: PASS
+    test_8_dochód_IP_vs_NEXUS: PASS
+    test_9_porównanie_metod: PASS
   stops_reviews:
-    reviews:
-    - REVIEW_09
-    - REVIEW_20
     stops: []
-    warnings: []
+    warnings:
+    - Brak interpretacji indywidualnej KIS - wysokie ryzyko podatkowe.

@@ -4,10 +4,10 @@ meta:
   provider: openrouter
   model: google/gemini-3.5-flash
   fingerprint: v2_be9aedbd727271f4_6ac4d61af1d0d462_openrouter_8d99798a_spc2c5afcf
-  recorded_at: '2026-07-13T22:25:28.072016+00:00'
-  recording_duration_seconds: 3.01
+  recorded_at: '2026-07-14T17:45:43.697824+00:00'
+  recording_duration_seconds: 8.98
   prompt_tokens_estimate: 14543
-  response_tokens_estimate: 176
+  response_tokens_estimate: 184
   algorithm_hash: be9aedbd727271f4
   cassette_format_version: 3
 turns:
@@ -16,10 +16,10 @@ turns:
   response: "{\n  \"result\": {\n    \"rok\": 2025,\n    \"przychody_roczne\": {\n      \"IP\": 0.0,\n      \"NIE\": 20000.0\n\
     \    },\n    \"nexus\": 0.0,\n    \"podatek\": {\n      \"podatek_IP\": 0.0,\n      \"podatek_NIE_finalny\": 0.0,\n  \
     \    \"podatek_całościowy\": 0.0\n    },\n    \"dochód_IP\": 0.0,\n    \"dochód_NIE\": 0.0\n  },\n  \"classifications\"\
-    : [],\n  \"monthly_W\": {\n    \"2025-01\": 100.0\n  },\n  \"tests\": {\n    \"TEST_1_BILANS\": \"PASS\",\n    \"TEST_3_ANTY_DUBEL_ZUS\"\
-    : \"PASS\",\n    \"TEST_4_KASKADA\": \"PASS\",\n    \"TEST_5_PODATEK_IP\": \"PASS\"\n  },\n  \"stops_reviews\": {\n  \
-    \  \"reviews\": [],\n    \"stops\": [\n      \"STOP_12\"\n    ],\n    \"warnings\": [\n      \"IP Box nie łączy się z\
-    \ ryczałtem ewidencjonowanym. Wykryto formę opodatkowania: ryczalt.\"\n    ]\n  }\n}"
+    : [],\n  \"monthly_W\": {\n    \"2025-01\": 100.0\n  },\n  \"tests\": {\n    \"TEST_1_BILANS\": \"PASS\",\n    \"TEST_12_RYCZALT\"\
+    : \"FAIL\"\n  },\n  \"stops_reviews\": {\n    \"stops\": [\n      \"STOP_12: Nieobsługiwana forma opodatkowania (ryczałt\
+    \ ewidencjonowany nie łączy się z ulgą IP Box)\"\n    ],\n    \"warnings\": [\n      \"Zmień formę opodatkowania na podatek\
+    \ liniowy (PIT-36L) lub skalę podatkową (PIT-36), aby móc skorzystać z ulgi IP Box.\"\n    ]\n  }\n}"
   prompt_hash: 315721a557750dbd
   request_hash: 9351eb21c007083a
   system_prompt_hash: c2c5afcf900231f7
@@ -41,12 +41,9 @@ parsed:
     2025-01: 100.0
   tests:
     TEST_1_BILANS: PASS
-    TEST_3_ANTY_DUBEL_ZUS: PASS
-    TEST_4_KASKADA: PASS
-    TEST_5_PODATEK_IP: PASS
+    TEST_12_RYCZALT: FAIL
   stops_reviews:
-    reviews: []
     stops:
-    - STOP_12
+    - 'STOP_12: Nieobsługiwana forma opodatkowania (ryczałt ewidencjonowany nie łączy się z ulgą IP Box)'
     warnings:
-    - 'IP Box nie łączy się z ryczałtem ewidencjonowanym. Wykryto formę opodatkowania: ryczalt.'
+    - Zmień formę opodatkowania na podatek liniowy (PIT-36L) lub skalę podatkową (PIT-36), aby móc skorzystać z ulgi IP Box.

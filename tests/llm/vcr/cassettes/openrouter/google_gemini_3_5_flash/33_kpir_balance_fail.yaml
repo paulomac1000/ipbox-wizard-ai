@@ -4,26 +4,28 @@ meta:
   provider: openrouter
   model: google/gemini-3.5-flash
   fingerprint: v2_be9aedbd727271f4_23f50c2b4a44055d_openrouter_8d99798a_spc2c5afcf
-  recorded_at: '2026-07-13T22:25:12.181418+00:00'
-  recording_duration_seconds: 4.1
+  recorded_at: '2026-07-14T17:45:15.675442+00:00'
+  recording_duration_seconds: 4.66
   prompt_tokens_estimate: 14461
-  response_tokens_estimate: 293
+  response_tokens_estimate: 325
   algorithm_hash: be9aedbd727271f4
   cassette_format_version: 3
 turns:
 - role: user
   prompt: ''
   response: "{\n  \"result\": {\n    \"rok\": 2025,\n    \"przychody_roczne\": {\n      \"IP\": 90000.0,\n      \"NIE\": 10000.0\n\
-    \    },\n    \"nexus\": 1.0,\n    \"podatek\": {\n      \"podatek_IP\": 2000.0,\n      \"podatek_NIE_finalny\": 1900.0,\n\
-    \      \"podatek_całościowy\": 3900.0\n    },\n    \"dochód_IP\": 40000.0,\n    \"dochód_NIE\": 10000.0,\n    \"klucz_MIX\"\
+    \    },\n    \"nexus\": 1.0,\n    \"podatek\": {\n      \"podatek_IP\": 4500.0,\n      \"podatek_NIE_finalny\": 1900.0,\n\
+    \      \"podatek_całościowy\": 6400.0\n    },\n    \"dochód_IP\": 90000.0,\n    \"dochód_NIE\": 10000.0,\n    \"klucz_MIX\"\
     : {\n      \"metoda\": \"przychodowa_roczna\",\n      \"źródło\": \"domyślna_wizard\"\n    }\n  },\n  \"classifications\"\
-    : [\n    \"Koszty ogólne KPiR zaklasyfikowane jako MIX i alokowane kluczem przychodowym rocznym\"\n  ],\n  \"monthly_W\"\
-    : {\n    \"2025-01\": 100.0\n  },\n  \"tests\": {\n    \"test_1_bilans\": \"PASS\",\n    \"test_2_koszty_prywatne\": \"\
-    PASS\",\n    \"test_3_anty_dubel_ZUS\": \"PASS\",\n    \"test_4_kaskada\": \"PASS\",\n    \"test_5_podatek_IP\": \"PASS\"\
-    ,\n    \"test_6_nadpłata\": \"PASS\",\n    \"test_7_spójność_polityki_alokacji\": \"PASS\",\n    \"test_8_dochód_IP_vs_NEXUS\"\
-    : \"PASS\",\n    \"test_9_porównanie_metod\": \"PASS\"\n  },\n  \"stops_reviews\": {\n    \"reviews\": [\n      \"REVIEW_20:\
-    \ Brak interpretacji; użyto domyślnej polityki wizard (przychodowa roczna)\",\n      \"REVIEW_09: Jeden kontrahent odpowiada\
-    \ za 100% łącznych przychodów rocznych\"\n    ],\n    \"stops\": [],\n    \"warnings\": []\n  }\n}"
+    : [\n    \"Przychód IP: 90000.0 PLN (alokacja na podstawie ewidencji)\",\n    \"Przychód NIE: 10000.0 PLN (pozostała część\
+    \ przychodu z KPiR)\"\n  ],\n  \"monthly_W\": {\n    \"2025-01\": 90.0\n  },\n  \"tests\": {\n    \"test_1_bilans\": \"\
+    PASS\",\n    \"test_2_koszty_prywatne\": \"PASS\",\n    \"test_3_anty_dubel_ZUS\": \"PASS\",\n    \"test_4_kaskada\":\
+    \ \"PASS\",\n    \"test_5_podatek_IP\": \"PASS\",\n    \"test_6_nadpłata\": \"PASS\",\n    \"test_7_spójność_polityki_alokacji\"\
+    : \"PASS\",\n    \"test_8_dochód_IP_vs_NEXUS\": \"PASS\",\n    \"test_9_porównanie_metod\": \"PASS\"\n  },\n  \"stops_reviews\"\
+    : {\n    \"reviews\": [\n      \"REVIEW_20: Brak interpretacji; użyto domyślnej polityki wizard (przychodowa roczna)\"\
+    ,\n      \"REVIEW_09: Jeden kontrahent odpowiada za 100% łącznych przychodów rocznych\"\n    ],\n    \"stops\": [],\n\
+    \    \"warnings\": [\n      \"Brak formalnej ochrony wynikający z braku interpretacji indywidualnej KIS.\"\n    ]\n  }\n\
+    }"
   prompt_hash: 01dff82ea89bc7e8
   request_hash: dc3b3717d451c3dd
   system_prompt_hash: c2c5afcf900231f7
@@ -35,18 +37,19 @@ parsed:
       NIE: 10000.0
     nexus: 1.0
     podatek:
-      podatek_IP: 2000.0
+      podatek_IP: 4500.0
       podatek_NIE_finalny: 1900.0
-      podatek_całościowy: 3900.0
-    dochód_IP: 40000.0
+      podatek_całościowy: 6400.0
+    dochód_IP: 90000.0
     dochód_NIE: 10000.0
     klucz_MIX:
       metoda: przychodowa_roczna
       źródło: domyślna_wizard
   classifications:
-  - Koszty ogólne KPiR zaklasyfikowane jako MIX i alokowane kluczem przychodowym rocznym
+  - 'Przychód IP: 90000.0 PLN (alokacja na podstawie ewidencji)'
+  - 'Przychód NIE: 10000.0 PLN (pozostała część przychodu z KPiR)'
   monthly_W:
-    2025-01: 100.0
+    2025-01: 90.0
   tests:
     test_1_bilans: PASS
     test_2_koszty_prywatne: PASS
@@ -62,4 +65,5 @@ parsed:
     - 'REVIEW_20: Brak interpretacji; użyto domyślnej polityki wizard (przychodowa roczna)'
     - 'REVIEW_09: Jeden kontrahent odpowiada za 100% łącznych przychodów rocznych'
     stops: []
-    warnings: []
+    warnings:
+    - Brak formalnej ochrony wynikający z braku interpretacji indywidualnej KIS.

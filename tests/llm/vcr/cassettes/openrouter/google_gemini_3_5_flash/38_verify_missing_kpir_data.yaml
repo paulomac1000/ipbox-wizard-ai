@@ -4,10 +4,10 @@ meta:
   provider: openrouter
   model: google/gemini-3.5-flash
   fingerprint: v2_be9aedbd727271f4_fe6c26e8dd5aea59_openrouter_8d99798a_spc2c5afcf
-  recorded_at: '2026-07-13T22:25:32.326656+00:00'
-  recording_duration_seconds: 4.22
+  recorded_at: '2026-07-14T17:45:46.909713+00:00'
+  recording_duration_seconds: 3.19
   prompt_tokens_estimate: 14578
-  response_tokens_estimate: 237
+  response_tokens_estimate: 242
   algorithm_hash: be9aedbd727271f4
   cassette_format_version: 3
 turns:
@@ -21,8 +21,8 @@ turns:
     : \"PASS\",\n    \"test_2_koszty_prywatne\": \"PASS\",\n    \"test_3_anty_dubel_ZUS\": \"PASS\",\n    \"test_4_kaskada\"\
     : \"PASS\",\n    \"test_5_podatek_IP\": \"PASS\",\n    \"test_6_nadpłata\": \"PASS\",\n    \"test_7_spójność_polityki_alokacji\"\
     : \"PASS\",\n    \"test_8_dochód_IP_vs_NEXUS\": \"PASS\",\n    \"test_9_porównanie_metod\": \"PASS\"\n  },\n  \"stops_reviews\"\
-    : {\n    \"reviews\": [\n      \"REVIEW_09\",\n      \"REVIEW_20\"\n    ],\n    \"stops\": [],\n    \"warnings\": []\n\
-    \  }\n}"
+    : {\n    \"reviews\": [\n      \"REVIEW_01\",\n      \"REVIEW_09\",\n      \"REVIEW_20\"\n    ],\n    \"stops\": [],\n\
+    \    \"warnings\": []\n  }\n}"
   prompt_hash: a91df0550c2ccd12
   request_hash: d362151fdd0eab86
   system_prompt_hash: c2c5afcf900231f7
@@ -58,6 +58,7 @@ parsed:
     test_9_porównanie_metod: PASS
   stops_reviews:
     reviews:
+    - REVIEW_01
     - REVIEW_09
     - REVIEW_20
     stops: []

@@ -4,10 +4,10 @@ meta:
   provider: openrouter
   model: google/gemini-3.5-flash
   fingerprint: v2_be9aedbd727271f4_1a4c9b20d39f3707_openrouter_8d99798a_spc2c5afcf
-  recorded_at: '2026-07-13T22:24:27.494138+00:00'
-  recording_duration_seconds: 5.37
+  recorded_at: '2026-07-14T17:44:22.664459+00:00'
+  recording_duration_seconds: 3.63
   prompt_tokens_estimate: 14495
-  response_tokens_estimate: 291
+  response_tokens_estimate: 292
   algorithm_hash: be9aedbd727271f4
   cassette_format_version: 3
 turns:
@@ -23,7 +23,7 @@ turns:
     ,\n    \"test_7_spójność_polityki_alokacji\": \"PASS\",\n    \"test_8_dochód_IP_vs_NEXUS\": \"PASS\",\n    \"test_9_porównanie_metod\"\
     : \"PASS\"\n  },\n  \"stops_reviews\": {\n    \"reviews\": [\n      \"REVIEW_01\",\n      \"REVIEW_09\",\n      \"REVIEW_20\"\
     \n    ],\n    \"stops\": [],\n    \"warnings\": [\n      \"NEXUS wynosi 0.0 z powodu braku kosztów kwalifikowanych w kategoriach\
-    \ A lub B. Cały dochód IP podlega opodatkowaniu stawką 19%.\"\n    ]\n  }\n}"
+    \ A lub B (koszty powiązane C nie podwyższają wskaźnika NEXUS).\"\n    ]\n  }\n}"
   prompt_hash: fa48193f5638ff29
   request_hash: 039df209808d0068
   system_prompt_hash: c2c5afcf900231f7
@@ -64,5 +64,5 @@ parsed:
     - REVIEW_20
     stops: []
     warnings:
-    - NEXUS wynosi 0.0 z powodu braku kosztów kwalifikowanych w kategoriach A lub B. Cały dochód IP podlega opodatkowaniu
-      stawką 19%.
+    - NEXUS wynosi 0.0 z powodu braku kosztów kwalifikowanych w kategoriach A lub B (koszty powiązane C nie podwyższają wskaźnika
+      NEXUS).
