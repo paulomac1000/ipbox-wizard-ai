@@ -18,6 +18,7 @@ import yaml
 @dataclass
 class CassetteMeta:
     """Metadata for a cassette recording."""
+
     scenario_id: str
     scenario_name: str
     provider: str
@@ -38,6 +39,7 @@ class CassetteMeta:
 @dataclass
 class CassetteTurn:
     """Single conversation turn (request → response)."""
+
     role: str = "user"  # "user" or "assistant"
     prompt: str = ""
     response: str = ""
@@ -49,6 +51,7 @@ class CassetteTurn:
 @dataclass
 class Cassette:
     """Complete cassette with metadata and turns."""
+
     meta: CassetteMeta
     turns: list[CassetteTurn] = field(default_factory=list)
 
@@ -127,9 +130,11 @@ class Cassette:
 # Manifest — index of all cassettes for quick lookup
 # ============================================================================
 
+
 @dataclass
 class CassetteManifest:
     """Index of cassettes with fingerprints for quick validation."""
+
     entries: dict[str, dict[str, str]] = field(default_factory=dict)
     # {scenario_id: {"fingerprint": "...", "file": "...", "recorded_at": "..."}}
 

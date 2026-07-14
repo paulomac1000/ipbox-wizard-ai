@@ -1,4 +1,5 @@
 """LLMRequestSpec — immutable specification of a complete LLM request."""
+
 from __future__ import annotations
 
 import dataclasses

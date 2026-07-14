@@ -1,169 +1,91 @@
-name: "LLM Scenario Tests"
-
-env:
-  LLM_MODEL: google/gemini-3.5-flash
+name: LLM Scenario Record and Playback
 
 on:
-  workflow_call:
   workflow_dispatch:
     inputs:
-      max_scenarios:
-        description: "Maks liczba scenariuszy (0 = wszystkie)"
-        default: "0"
+      model:
+        description: "OpenRouter model ID"
+        required: true
+        default: "google/gemini-3.5-flash"
+
+permissions:
+  contents: read
 
 concurrency:
-  group: llm-tests-${{ github.ref }}
-  cancel-in-progress: true
+  group: llm-record-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
-  # VCR playback tests (zero API cost)
-  vcr-playback:
+  record:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
-
-    if: github.event_name == 'pull_request'
+    timeout-minutes: 60
+    env:
+      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+      LLM_PROVIDER: openrouter
+      LLM_MODEL: ${{ inputs.model }}
+      VCR_MODE: record
+      VCR_CASSETTES_ROOT: ${{ github.workspace }}/generated-cassettes
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+          cache: pip
 
       - name: Install dependencies
         run: pip install -r requirements.txt -r requirements-test.txt
 
-      - name: Run LLM tests (VCR playback only)
-        env:
-          VCR_MODE: playback
-        run: |
-          set -o pipefail
-          mkdir -p reports
-          python -m pytest tests/llm/test_scenarios.py \
-            --run-llm \
-            -v \
-            --vcr-mode=playback \
-            --tb=short \
-            --junitxml=reports/llm-playback.xml \
-            2>&1 | tee reports/llm-output.log
-
-      - name: Upload results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: llm-playback-results
-          path: reports/
-
-      - name: Comment results on PR
-        if: github.event_name == 'pull_request' && always()
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const fs = require('fs');
-            let body = '## LLM Scenario Tests (VCR Playback)\n\n';
-            try {
-              const xml = fs.readFileSync('reports/llm-playback.xml', 'utf8');
-              const testsMatch = xml.match(/tests="(\d+)"/);
-              const failuresMatch = xml.match(/failures="(\d+)"/);
-              const errorsMatch = xml.match(/errors="(\d+)"/);
-              const skippedMatch = xml.match(/skipped="(\d+)"/);
-              const total = testsMatch ? testsMatch[1] : '0';
-              const failures = failuresMatch ? failuresMatch[1] : '0';
-              const errors = errorsMatch ? errorsMatch[1] : '0';
-              const skipped = skippedMatch ? skippedMatch[1] : '0';
-              if (parseInt(failures) > 0 || parseInt(errors) > 0) {
-                body = '## \u274C LLM Scenario Tests (VCR Playback)\n\n';
-              } else {
-                body = '## \u2705 LLM Scenario Tests (VCR Playback)\n\n';
-              }
-              body += '**Total**: ' + total + ' | **Passed**: ' + (total - failures - errors - skipped) + ' | **Failed**: ' + failures + ' | **Errors**: ' + errors + ' | **Skipped**: ' + skipped + '\n';
-            } catch (e) {
-              let log = '';
-              try { log = fs.readFileSync('reports/llm-output.log', 'utf8'); } catch {}
-              const passed = (log.match(/(\d+) passed/) || [])[1] || '?';
-              const failed = (log.match(/(\d+) failed/) || [])[1] || '?';
-              const icon = (failed !== '0' && failed !== '?') ? '\u274C' : '\u2705';
-              body = '## ' + icon + ' LLM Scenario Tests (VCR Playback)\n\n';
-              body += '**Passed**: ' + passed + ' | **Failed**: ' + failed + '\n';
-              if (log) {
-                body += '\n<details><summary>Log (last 80 lines)</summary>\n\n```\n' + log.split('\n').slice(-80).join('\n') + '\n```\n</details>\n';
-              }
-            }
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body,
-            });
-
-  # Full LLM tests with VCR (auto mode) — tylko push/dispatch/workflow_call, nie PR
-  llm-tests:
-    runs-on: ubuntu-latest
-    timeout-minutes: 45
-    if: github.event_name != 'pull_request'
-
-    env:
-      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-      LLM_MODEL: ${{ vars.LLM_MODEL || 'google/gemini-3.5-flash' }}
-      LLM_PROVIDER: openrouter
-      LLM_MAX_CALLS_PER_RUN: ${{ github.event.inputs.max_scenarios || '0' }}
-      # VCR auto mode: use cassettes if valid, record if stale
-      VCR_MODE: auto
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-          pip install -r requirements-test.txt
-
       - name: Validate API key
         run: |
-          if [ -z "$OPENROUTER_API_KEY" ]; then
-            echo "::error::Brak OPENROUTER_API_KEY — dodaj go jako GitHub Secret."
+          set -euo pipefail
+          test -n "$OPENROUTER_API_KEY" || {
+            echo "::error::OPENROUTER_API_KEY is not configured"
             exit 1
-          fi
-          echo "LLM_MODEL=${LLM_MODEL:-google/gemini-3.5-flash}"
+          }
 
-      - name: Budget check
+      - name: Validate deterministic suite before paid calls
         run: |
-          SCENARIO_COUNT=$(ls tests/llm/scenarios/*.yaml 2>/dev/null | wc -l)
-          echo "Dostępne scenariusze: $SCENARIO_COUNT"
-          echo "Limit: $LLM_MAX_CALLS_PER_RUN"
-          if [ "$LLM_MAX_CALLS_PER_RUN" != "0" ] && [ "$SCENARIO_COUNT" -gt "$LLM_MAX_CALLS_PER_RUN" ]; then
-            echo "::notice::Uruchamiam tylko pierwsze $LLM_MAX_CALLS_PER_RUN z $SCENARIO_COUNT scenariuszy."
-          fi
+          set -euo pipefail
+          ruff format --check .
+          ruff check .
+          python -m compileall -q python_helper tests
+          pytest tests/unit             --cov=python_helper             --cov-report=term-missing             --cov-fail-under=90
 
-      - name: Run LLM scenario tests
+      - name: Prepare empty cassette candidate directory
         run: |
-          set -o pipefail
-          mkdir -p reports
-          python -m pytest tests/llm/test_scenarios.py \
-            --run-llm \
-            -v \
-            --tb=long \
-            --junitxml=reports/llm-results.xml \
-            2>&1 | tee reports/llm-output.log
+          set -euo pipefail
+          rm -rf "$VCR_CASSETTES_ROOT"
+          mkdir -p "$VCR_CASSETTES_ROOT" reports
 
-      - name: Save LLM responses
-        if: always()
+      - name: Record genuine responses
         run: |
-          mkdir -p reports/raw_responses
-          cp -r /tmp/ipbox_llm_responses/. reports/raw_responses/ 2>/dev/null || true
+          set -euo pipefail
+          pytest tests/llm/test_scenarios.py             --run-llm             --vcr-mode=record             --junitxml=reports/llm-record.xml             -v --tb=long
 
-      - name: Upload artifacts
+      - name: Verify playback without API key
+        run: |
+          set -euo pipefail
+          unset OPENROUTER_API_KEY
+          export VCR_MODE=playback
+          pytest tests/llm/test_scenarios.py             --run-llm             --vcr-mode=playback             --junitxml=reports/llm-playback.xml             -v --tb=long
+          python scripts/vcr_precommit.py
+
+      - name: Upload reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: llm-results
+          name: llm-reports-${{ github.run_id }}
           path: reports/
-          retention-days: 30
+          if-no-files-found: warn
+          retention-days: 14
 
-
+      - name: Upload verified cassette candidate
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: llm-cassettes-${{ github.run_id }}
+          path: generated-cassettes/
+          if-no-files-found: error
+          retention-days: 14

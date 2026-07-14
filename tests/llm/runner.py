@@ -30,6 +30,7 @@ def _get_vcr_recorder():
     global _vcr_recorder, _vcr_config
     if _vcr_recorder is None:
         from .vcr import VCRConfig, VCRRecorder
+
         _vcr_config = VCRConfig()
         _vcr_recorder = VCRRecorder(_vcr_config)
     return _vcr_recorder
@@ -40,6 +41,7 @@ def _get_vcr_config():
     global _vcr_config
     if _vcr_config is None:
         from .vcr import VCRConfig
+
         _vcr_config = VCRConfig()
     return _vcr_config
 
@@ -60,7 +62,14 @@ class LLMTestRunner:
                 "result": {
                     "rok": 2025,
                     "przychody_roczne": {"IP": 0.0, "NIE": 0.0},
-                    "nexus": {"A": 0.0, "B": 0.0, "C": 0.0, "D": 0.0, "poza_nexus": 0.0, "wartość": 0.0},  # noqa: E501
+                    "nexus": {
+                        "A": 0.0,
+                        "B": 0.0,
+                        "C": 0.0,
+                        "D": 0.0,
+                        "poza_nexus": 0.0,
+                        "wartość": 0.0,
+                    },
                     "podatek": {"podatek_IP": 0, "podatek_NIE_finalny": 0},
                 },
                 "classifications": [

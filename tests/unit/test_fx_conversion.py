@@ -30,7 +30,7 @@ class TestFXConversion:
             amount_currency=1000.0,
             currency="USD",
             issue_date="2025-01-14",
-            payment_date="2025-01-20"
+            payment_date="2025-01-20",
         )
 
         assert res["base_revenue_pln"] == 4300.0
@@ -48,13 +48,14 @@ class TestFXConversion:
             if date in ["2025-01-19", "2025-01-18", "2025-01-17"]:
                 return 4.20
             return None
+
         mock_rate.side_effect = side_effect
 
         res = convert_fx_invoice(
             amount_currency=1000.0,
             currency="USD",
             issue_date="2025-01-14",
-            payment_date="2025-01-20"
+            payment_date="2025-01-20",
         )
 
         assert res["exchange_rate_difference"] == -100.0
@@ -119,10 +120,12 @@ class TestFXConversion:
     @patch("python_helper.ipbox_calculator.get_nbp_rate")
     def test_payment_rate_none_branch(self, mock_rate):
         """When payment rate is None, difference should be 0.0."""
+
         def side_effect(curr, date):
             if date == "2025-01-13":
                 return 4.30
             return None
+
         mock_rate.side_effect = side_effect
         res = convert_fx_invoice(
             amount_currency=1000.0,
@@ -168,6 +171,7 @@ class TestFXConversion:
 
         # Exception
         import requests
+
         mock_get.side_effect = requests.exceptions.RequestException("API error")
         assert get_nbp_rate("USD", "2025-01-14") is None
 

@@ -72,6 +72,7 @@ def main() -> int:
 
     # Only check if we're in a git repo with changes
     import subprocess
+
     try:
         result = subprocess.run(
             ["git", "diff", "--name-only", "HEAD"],

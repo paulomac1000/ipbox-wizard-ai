@@ -24,7 +24,7 @@ class TestVerificationTests:
             kpir_revenue=300.0,
             ip_costs_sum=50.0,
             non_ip_costs_sum=50.0,
-            kpir_costs_net=100.0
+            kpir_costs_net=100.0,
         )
         assert res["status"] == "PASS"
 
@@ -33,9 +33,19 @@ class TestVerificationTests:
     def test_no_double_social_security_pass(self):
         """TC-VT-013: Poprawny anty-dubel."""
         # Scenario A: In KPiR, not in PIT
-        assert verify_no_double_social_security(in_kpir=True, pit_deduction=0, monthly_costs_sum=1500)["status"] == "PASS"  # noqa: E501
+        assert (
+            verify_no_double_social_security(in_kpir=True, pit_deduction=0, monthly_costs_sum=1500)[
+                "status"
+            ]
+            == "PASS"
+        )
         # Scenario B: Not in KPiR, in PIT
-        assert verify_no_double_social_security(in_kpir=False, pit_deduction=1500, monthly_costs_sum=0)["status"] == "PASS"  # noqa: E501
+        assert (
+            verify_no_double_social_security(
+                in_kpir=False, pit_deduction=1500, monthly_costs_sum=0
+            )["status"]
+            == "PASS"
+        )
 
     @pytest.mark.unit
     @pytest.mark.P1
@@ -73,7 +83,7 @@ class TestVerificationTests:
             kpir_revenue=300.0,
             ip_costs_sum=50.0,
             non_ip_costs_sum=50.0,
-            kpir_costs_net=150.0 # mismatch
+            kpir_costs_net=150.0,  # mismatch
         )
         assert res["status"] == "FAIL"
 
@@ -118,12 +128,16 @@ class TestVerificationTests:
     @pytest.mark.P0
     def test_anti_double_dip_fail(self):
         """TC-VT-014: Fail when ZUS is in both KPiR and PIT."""
-        res = verify_no_double_social_security(in_kpir=True, pit_deduction=1000, monthly_costs_sum=0)  # noqa: E501
+        res = verify_no_double_social_security(
+            in_kpir=True, pit_deduction=1000, monthly_costs_sum=0
+        )
         assert res["status"] == "FAIL"
 
     @pytest.mark.unit
     @pytest.mark.P0
     def test_anti_double_dip_pit_path_fail(self):
         """Fail when ZUS deducted in PIT but also appears in costs."""
-        res = verify_no_double_social_security(in_kpir=False, pit_deduction=1000, monthly_costs_sum=500)  # noqa: E501
+        res = verify_no_double_social_security(
+            in_kpir=False, pit_deduction=1000, monthly_costs_sum=500
+        )
         assert res["status"] == "FAIL"

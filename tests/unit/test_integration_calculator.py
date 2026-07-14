@@ -24,8 +24,8 @@ class TestIntegrationCalculator:
 
         # 2. Revenue and Costs (January)
         revenue = 20000.0
-        income_ip_monthly = revenue * (w_coeff/100) # 18000
-        income_non_monthly = revenue * (1 - w_coeff/100) # 2000
+        income_ip_monthly = revenue * (w_coeff / 100)  # 18000
+        income_non_monthly = revenue * (1 - w_coeff / 100)  # 2000
 
         items = [CostItem("Server", 1000.0, basket="MIX")]
         policy = AllocationPolicy(
@@ -39,16 +39,16 @@ class TestIntegrationCalculator:
         # Cost IP = 1000 * 0.9 = 900
         # Cost NON = 1000 * 0.1 = 100
 
-        doch_ip = income_ip_monthly - alloc["costs_ip"] # 18000 - 900 = 17100
-        doch_non = income_non_monthly - alloc["costs_non"] # 2000 - 100 = 1900
+        doch_ip = income_ip_monthly - alloc["costs_ip"]  # 18000 - 900 = 17100
+        doch_non = income_non_monthly - alloc["costs_non"]  # 2000 - 100 = 1900
 
         # 3. Assume same for 12 months
-        doch_ip_annual = doch_ip * 12 # 205200
-        doch_non_annual = doch_non * 12 # 22800
+        doch_ip_annual = doch_ip * 12  # 205200
+        doch_non_annual = doch_non * 12  # 22800
 
         # 4. NEXUS
         nexus_res = calculate_nexus(A=12000)
-        nexus_val = nexus_res["nexus"] # 1.0
+        nexus_val = nexus_res["nexus"]  # 1.0
 
         # 5. Cascade
         cascade = tax_cascade(
@@ -56,7 +56,7 @@ class TestIntegrationCalculator:
             ip_income=doch_ip_annual,
             nexus=nexus_val,
             tax_form="linear_19%",
-            social_security_deduction=15000
+            social_security_deduction=15000,
         )
 
         # Non-IP income after SS: 22800 - 15000 = 7800

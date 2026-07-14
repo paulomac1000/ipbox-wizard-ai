@@ -16,7 +16,7 @@ class TestTaxCascade:
             ip_income=0.0,
             nexus=1.0,
             tax_form="linear_19%",
-            social_security_deduction=20000.0
+            social_security_deduction=20000.0,
         )
         assert res["non_ip_tax_after_relief"] == 0
         assert res["non_ip_base_rounded"] == 0
@@ -33,7 +33,7 @@ class TestTaxCascade:
             nexus=1.0,
             tax_form="linear_19%",
             ikze=6000.0,
-            thermomodernization_pool=10000.0
+            thermomodernization_pool=10000.0,
         )
         # Check order in steps
         assert res["steps"][0]["step"] == "IKZE"
@@ -49,12 +49,7 @@ class TestTaxCascade:
         # 120k * 12% - 3600 = 10800
         # 30k * 32% = 9600
         # Total = 20400
-        res = tax_cascade(
-            non_ip_income=150000.0,
-            ip_income=0.0,
-            nexus=1.0,
-            tax_form="scale"
-        )
+        res = tax_cascade(non_ip_income=150000.0, ip_income=0.0, nexus=1.0, tax_form="scale")
         assert res["non_ip_tax_before_relief"] == 20400
 
     @pytest.mark.unit
@@ -69,7 +64,7 @@ class TestTaxCascade:
             ip_income=0.0,
             nexus=1.0,
             tax_form="scale",
-            extra_income_scale=100000.0
+            extra_income_scale=100000.0,
         )
         assert res["non_ip_tax_before_relief"] == 6800
 
@@ -85,7 +80,7 @@ class TestTaxCascade:
             ikze=6000.0,
             donations=2000.0,
             internet_tax_relief=760.0,
-            thermomodernization_pool=10000.0
+            thermomodernization_pool=10000.0,
         )
         assert res["non_ip_base_rounded"] == 0
         assert res["thermo_used"] == 10000.0 - 6000.0 - 2000.0 - 760.0
@@ -93,12 +88,15 @@ class TestTaxCascade:
 
     @pytest.mark.unit
     @pytest.mark.P1
-    @pytest.mark.parametrize("income,expected_tax", [
-        (30000, 0),        # Tax-free (3600/0.12 = 30000)
-        (40000, 1200),     # (40000*0.12 - 3600) = 1200
-        (120000, 10800),   # (120000*0.12 - 3600) = 10800
-        (200000, 36400),   # 10800 + 80000*0.32 = 10800 + 25600 = 36400
-    ])
+    @pytest.mark.parametrize(
+        "income,expected_tax",
+        [
+            (30000, 0),  # Tax-free (3600/0.12 = 30000)
+            (40000, 1200),  # (40000*0.12 - 3600) = 1200
+            (120000, 10800),  # (120000*0.12 - 3600) = 10800
+            (200000, 36400),  # 10800 + 80000*0.32 = 10800 + 25600 = 36400
+        ],
+    )
     def test_scale_brackets_summary(self, income, expected_tax):
         res = tax_cascade(non_ip_income=income, ip_income=0, nexus=1.0, tax_form="scale")
         assert res["non_ip_tax_before_relief"] == expected_tax
@@ -122,7 +120,9 @@ class TestTaxCascade:
     @pytest.mark.P1
     def test_child_tax_credit_limit_on_tax(self):
         # Tax 1000, relief 2000 -> tax 0.
-        res = tax_cascade(non_ip_income=38333.33, ip_income=0, nexus=1.0, tax_form="scale", child_tax_credit=2000)  # noqa: E501
+        res = tax_cascade(
+            non_ip_income=38333.33, ip_income=0, nexus=1.0, tax_form="scale", child_tax_credit=2000
+        )
         # Scale: 38333 * 0.12 - 3600 = 4600 - 3600 = 1000
         assert res["non_ip_tax_after_relief"] == 0
         assert res["used_child_credit"] == pytest.approx(1000, abs=1)

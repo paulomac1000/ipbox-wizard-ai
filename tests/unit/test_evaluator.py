@@ -80,12 +80,25 @@ class TestValidateAssertionKeys:
 
     def test_all_discovered_keys_are_known(self):
         discovered = {
-            "W_miesieczne", "alokacja_multi_ip", "klucz_MIX_metoda",
-            "klucz_MIX_źródło", "koszty_koszyk", "nexus", "nexus_range",
-            "nie_używaj_W_do_MIX", "podatek_IP_range", "podatek_NIE_range",
-            "przychod_IP_roczny_range", "przychod_NIE_roczny_range",
-            "review_obecne", "roznice_kursowe_w_IP", "stops",
-            "testy_fail", "testy_pass", "warnings", "zus_dubel",
+            "W_miesieczne",
+            "alokacja_multi_ip",
+            "klucz_MIX_metoda",
+            "klucz_MIX_źródło",
+            "koszty_koszyk",
+            "nexus",
+            "nexus_range",
+            "nie_używaj_W_do_MIX",
+            "podatek_IP_range",
+            "podatek_NIE_range",
+            "przychod_IP_roczny_range",
+            "przychod_NIE_roczny_range",
+            "review_obecne",
+            "roznice_kursowe_w_IP",
+            "stops",
+            "testy_fail",
+            "testy_pass",
+            "warnings",
+            "zus_dubel",
         }
         errors = validate_assertion_keys({k: None for k in discovered}, "test")
         assert len(errors) == 0, f"Unexpected errors: {errors}"
@@ -242,11 +255,13 @@ class TestEvaluatorReviews:
             "meta": {"expected_reviews": ["REVIEW_17"]},
         }
         e = Evaluator(scenario)
-        failures, _ = e.evaluate({
-            "result": {},
-            "tests": "",
-            "stops_reviews": {"reviews": ["REVIEW_20"]},
-        })
+        failures, _ = e.evaluate(
+            {
+                "result": {},
+                "tests": "",
+                "stops_reviews": {"reviews": ["REVIEW_20"]},
+            }
+        )
         review_failures = [f for f in failures if f["type"] == "missing_review"]
         assert len(review_failures) >= 2  # One from meta, one from assertions
 
@@ -256,11 +271,13 @@ class TestEvaluatorReviews:
             "meta": {"expected_reviews": ["REVIEW_16"]},
         }
         e = Evaluator(scenario)
-        failures, _ = e.evaluate({
-            "result": {},
-            "tests": "",
-            "stops_reviews": {"reviews": ["REVIEW_16", "REVIEW_20"]},
-        })
+        failures, _ = e.evaluate(
+            {
+                "result": {},
+                "tests": "",
+                "stops_reviews": {"reviews": ["REVIEW_16", "REVIEW_20"]},
+            }
+        )
         assert not any(f["type"] == "missing_review" for f in failures)
 
 
@@ -272,21 +289,25 @@ class TestEvaluatorNexus:
     def test_fails_when_nexus_missing(self):
         scenario = {"assertions": {"nexus": 1.0}}
         e = Evaluator(scenario)
-        failures, _ = e.evaluate({
-            "result": {"przychody_roczne": {"IP": 10000}},
-            "tests": "",
-            "stops_reviews": {},
-        })
+        failures, _ = e.evaluate(
+            {
+                "result": {"przychody_roczne": {"IP": 10000}},
+                "tests": "",
+                "stops_reviews": {},
+            }
+        )
         assert any(f["type"] == "nexus_missing" for f in failures)
 
     def test_passes_when_nexus_correct(self):
         scenario = {"assertions": {"nexus": 1.0}}
         e = Evaluator(scenario)
-        failures, _ = e.evaluate({
-            "result": {"nexus": 1.0},
-            "tests": "",
-            "stops_reviews": {},
-        })
+        failures, _ = e.evaluate(
+            {
+                "result": {"nexus": 1.0},
+                "tests": "",
+                "stops_reviews": {},
+            }
+        )
         assert not any("nexus" in f["type"] for f in failures)
 
 
@@ -298,31 +319,37 @@ class TestEvaluatorKluczMix:
     def test_fails_when_method_mismatch(self):
         scenario = {"assertions": {"klucz_MIX_metoda": "przychodowa_roczna"}}
         e = Evaluator(scenario)
-        failures, _ = e.evaluate({
-            "result": {"alokacja": {"koszty_MIX": {"metoda": "czasowa_W"}}},
-            "tests": "",
-            "stops_reviews": {},
-        })
+        failures, _ = e.evaluate(
+            {
+                "result": {"alokacja": {"koszty_MIX": {"metoda": "czasowa_W"}}},
+                "tests": "",
+                "stops_reviews": {},
+            }
+        )
         assert any(f["type"] == "klucz_mix_metoda_mismatch" for f in failures)
 
     def test_passes_when_method_correct(self):
         scenario = {"assertions": {"klucz_MIX_metoda": "przychodowa_roczna"}}
         e = Evaluator(scenario)
-        failures, _ = e.evaluate({
-            "result": {"alokacja": {"koszty_MIX": {"metoda": "przychodowa_roczna"}}},
-            "tests": "",
-            "stops_reviews": {},
-        })
+        failures, _ = e.evaluate(
+            {
+                "result": {"alokacja": {"koszty_MIX": {"metoda": "przychodowa_roczna"}}},
+                "tests": "",
+                "stops_reviews": {},
+            }
+        )
         assert not any("klucz_mix_metoda" in f["type"] for f in failures)
 
     def test_fails_when_source_mismatch(self):
         scenario = {"assertions": {"klucz_MIX_źródło": "interpretacja_KIS"}}
         e = Evaluator(scenario)
-        failures, _ = e.evaluate({
-            "result": {"alokacja": {"koszty_MIX": {"źródło": "domyślna"}}},
-            "tests": "",
-            "stops_reviews": {},
-        })
+        failures, _ = e.evaluate(
+            {
+                "result": {"alokacja": {"koszty_MIX": {"źródło": "domyślna"}}},
+                "tests": "",
+                "stops_reviews": {},
+            }
+        )
         assert any(f["type"] == "klucz_mix_zrodlo_mismatch" for f in failures)
 
 
@@ -334,23 +361,27 @@ class TestEvaluatorWUsedForMix:
     def test_fails_when_w_used_for_mix(self):
         scenario = {"assertions": {"nie_używaj_W_do_MIX": True}}
         e = Evaluator(scenario)
-        failures, _ = e.evaluate({
-            "result": {"alokacja": {"koszty_MIX": {"metoda": "przychodowa_roczna"}}},
-            "tests": "",
-            "classifications": "Koszty MIX: w = 87.5 (czasowy)\n",
-            "stops_reviews": {},
-        })
+        failures, _ = e.evaluate(
+            {
+                "result": {"alokacja": {"koszty_MIX": {"metoda": "przychodowa_roczna"}}},
+                "tests": "",
+                "classifications": "Koszty MIX: w = 87.5 (czasowy)\n",
+                "stops_reviews": {},
+            }
+        )
         assert any(f["type"] == "w_used_for_mix" for f in failures)
 
     def test_passes_when_w_not_used_for_mix(self):
         scenario = {"assertions": {"nie_używaj_W_do_MIX": True}}
         e = Evaluator(scenario)
-        failures, _ = e.evaluate({
-            "result": {"alokacja": {"koszty_MIX": {"metoda": "przychodowa_roczna"}}},
-            "tests": "",
-            "classifications": "Koszty MIX: przychodowa_roczna\n",
-            "stops_reviews": {},
-        })
+        failures, _ = e.evaluate(
+            {
+                "result": {"alokacja": {"koszty_MIX": {"metoda": "przychodowa_roczna"}}},
+                "tests": "",
+                "classifications": "Koszty MIX: przychodowa_roczna\n",
+                "stops_reviews": {},
+            }
+        )
         assert not any(f["type"] == "w_used_for_mix" for f in failures)
 
 
@@ -362,23 +393,27 @@ class TestEvaluatorAlokacjaMultiIp:
     def test_fails_when_value_missing(self):
         scenario = {"assertions": {"alokacja_multi_ip": {"stage1_software_share": 8000}}}
         e = Evaluator(scenario)
-        failures, _ = e.evaluate({
-            "result": {},
-            "tests": "",
-            "classifications": "",
-            "stops_reviews": {},
-        })
+        failures, _ = e.evaluate(
+            {
+                "result": {},
+                "tests": "",
+                "classifications": "",
+                "stops_reviews": {},
+            }
+        )
         assert any(f["type"] == "alokacja_multi_ip_missing" for f in failures)
 
     def test_passes_when_value_correct(self):
         scenario = {"assertions": {"alokacja_multi_ip": {"stage1_software_share": 8000}}}
         e = Evaluator(scenario)
-        failures, _ = e.evaluate({
-            "result": {"stage1_software_share": 8000},
-            "tests": "",
-            "classifications": "",
-            "stops_reviews": {},
-        })
+        failures, _ = e.evaluate(
+            {
+                "result": {"stage1_software_share": 8000},
+                "tests": "",
+                "classifications": "",
+                "stops_reviews": {},
+            }
+        )
         assert not any("alokacja_multi_ip" in f["type"] for f in failures)
 
 
@@ -398,15 +433,22 @@ class TestEvaluatorSuccessCase:
             "meta": {},
         }
         e = Evaluator(scenario)
-        failures, _ = e.evaluate({
-            "result": {
-                "nexus": 0.75,
-                "alokacja": {"koszty_MIX": {"metoda": "przychodowa_roczna", "źródło": "interpretacja_KIS"}},  # noqa: E501
-            },
-            "tests": "TEST_1: PASS\nTEST_7: PASS",
-            "classifications": "Koszty MIX: przychodowa_roczna\nKoszty IP: IP",
-            "stops_reviews": {"stops": [], "reviews": []},
-        })
+        failures, _ = e.evaluate(
+            {
+                "result": {
+                    "nexus": 0.75,
+                    "alokacja": {
+                        "koszty_MIX": {
+                            "metoda": "przychodowa_roczna",
+                            "źródło": "interpretacja_KIS",
+                        }
+                    },
+                },
+                "tests": "TEST_1: PASS\nTEST_7: PASS",
+                "classifications": "Koszty MIX: przychodowa_roczna\nKoszty IP: IP",
+                "stops_reviews": {"stops": [], "reviews": []},
+            }
+        )
         assert len(failures) == 0, f"Expected 0 failures, got {failures}"
 
 
@@ -426,18 +468,22 @@ class TestFailClosed:
         """TEST_7 FAIL but not in testy_fail → error."""
         scenario = {"assertions": {"testy_fail": ["TEST_3"]}}
         e = Evaluator(scenario)
-        failures, _ = e.evaluate(self._make_parsed(
-            tests_text="TEST_3: FAIL\nTEST_7: FAIL",
-        ))
+        failures, _ = e.evaluate(
+            self._make_parsed(
+                tests_text="TEST_3: FAIL\nTEST_7: FAIL",
+            )
+        )
         assert any("unexpected_fail_TEST_7" in f["type"] for f in failures)
 
     def test_expected_fail_no_error(self):
         """TEST_3 FAIL and in testy_fail → no unexpected FAIL error."""
         scenario = {"assertions": {"testy_fail": ["TEST_3"]}}
         e = Evaluator(scenario)
-        failures, _ = e.evaluate(self._make_parsed(
-            tests_text="TEST_3: FAIL",
-        ))
+        failures, _ = e.evaluate(
+            self._make_parsed(
+                tests_text="TEST_3: FAIL",
+            )
+        )
         unexpected = [f for f in failures if "unexpected_fail" in f["type"]]
         assert len(unexpected) == 0, f"Got unexpected failures: {unexpected}"
 
@@ -445,9 +491,11 @@ class TestFailClosed:
         """Mix: TEST_3 in testy_fail, TEST_7 not → only TEST_7 errors."""
         scenario = {"assertions": {"testy_fail": ["TEST_3"]}}
         e = Evaluator(scenario)
-        failures, _ = e.evaluate(self._make_parsed(
-            tests_text="TEST_3: FAIL\nTEST_7: FAIL",
-        ))
+        failures, _ = e.evaluate(
+            self._make_parsed(
+                tests_text="TEST_3: FAIL\nTEST_7: FAIL",
+            )
+        )
         unexpected = [f for f in failures if "unexpected_fail" in f["type"]]
         assert any("unexpected_fail_TEST_7" in f["type"] for f in unexpected)
         assert not any("unexpected_fail_TEST_3" in f["type"] for f in unexpected)
@@ -456,9 +504,11 @@ class TestFailClosed:
         """All tests PASS, no unexpected failures."""
         scenario = {"assertions": {"testy_pass": ["TEST_1", "TEST_2"]}}
         e = Evaluator(scenario)
-        failures, _ = e.evaluate(self._make_parsed(
-            tests_text="TEST_1: PASS\nTEST_2: PASS",
-        ))
+        failures, _ = e.evaluate(
+            self._make_parsed(
+                tests_text="TEST_1: PASS\nTEST_2: PASS",
+            )
+        )
         unexpected = [f for f in failures if "unexpected_fail" in f["type"]]
         assert len(unexpected) == 0
 

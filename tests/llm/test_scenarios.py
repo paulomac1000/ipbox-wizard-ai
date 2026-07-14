@@ -37,7 +37,10 @@ def discover_scenarios() -> list:
 
 @pytest.fixture(scope="session")
 def llm_client(request):
-    is_vs_code = request.config.pluginmanager.has_plugin("vscode_pytest") or os.getenv("TERM_PROGRAM") == "vscode"  # noqa: E501
+    is_vs_code = (
+        request.config.pluginmanager.has_plugin("vscode_pytest")
+        or os.getenv("TERM_PROGRAM") == "vscode"
+    )
 
     if not request.config.getoption("--run-llm") and not is_vs_code:
         pytest.skip("Skipped LLM tests — run with flag --run-llm")
@@ -46,6 +49,7 @@ def llm_client(request):
 
     # Reset VCR singleton between mode changes
     from .runner import _reset_vcr
+
     _reset_vcr()
 
     # In playback mode we don't need the real API key

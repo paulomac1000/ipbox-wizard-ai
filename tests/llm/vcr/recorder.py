@@ -142,7 +142,9 @@ class VCRRecorder:
 
         # Check staleness (only in AUTO mode)
         if self.config.is_auto and self._is_stale(cassette_path):
-            print(f"  📼 Cassette {scenario_id} older than {self.config.max_age_days}d → will refresh")  # noqa: E501
+            print(
+                f"  📼 Cassette {scenario_id} older than {self.config.max_age_days}d → will refresh"
+            )
             return True
 
         return False
@@ -160,14 +162,14 @@ class VCRRecorder:
         except Exception:
             return True  # Corrupted cassette → re-record
 
-    def _playback(self, cassette_path: Path, scenario_id: str, prompt: str, system_prompt: str = "") -> str:  # noqa: E501
+    def _playback(
+        self, cassette_path: Path, scenario_id: str, prompt: str, system_prompt: str = ""
+    ) -> str:
         """Play back response from cassette."""
         cassette = Cassette.load(cassette_path)
 
         if not cassette.is_valid:
-            raise CassetteCorruptedError(
-                f"Cassette {scenario_id} is empty or corrupted"
-            )
+            raise CassetteCorruptedError(f"Cassette {scenario_id} is empty or corrupted")
 
         # Check prompt hash
         current_prompt_hash = hashlib.sha256(prompt.encode("utf-8")).hexdigest()[:16]
@@ -186,12 +188,14 @@ class VCRRecorder:
 
         # Check system_prompt_hash (allow old cassettes where it's empty)
         if system_prompt:
-            current_system_prompt_hash = hashlib.sha256(system_prompt.encode("utf-8")).hexdigest()[:16]  # noqa: E501
-            stored_system_prompt_hash = cassette.turns[0].system_prompt_hash if cassette.turns else ""  # noqa: E501
+            current_system_prompt_hash = hashlib.sha256(system_prompt.encode("utf-8")).hexdigest()[
+                :16
+            ]
+            stored_system_prompt_hash = (
+                cassette.turns[0].system_prompt_hash if cassette.turns else ""
+            )
             if not stored_system_prompt_hash:
-                raise ValueError(
-                    f"Cassette {scenario_id} has no system_prompt_hash — re-record."
-                )
+                raise ValueError(f"Cassette {scenario_id} has no system_prompt_hash — re-record.")
             if stored_system_prompt_hash != current_system_prompt_hash:
                 raise ValueError(
                     f"System prompt hash mismatch for '{scenario_id}': "
@@ -242,8 +246,10 @@ class VCRRecorder:
         api_call_fn: Callable[[str], str],
     ) -> str:
         """Record new cassette from API call."""
-        print(f"  🔴 Recording: {scenario_id} "
-              f"(provider={self.config.provider}, model={self.config.model})")
+        print(
+            f"  🔴 Recording: {scenario_id} "
+            f"(provider={self.config.provider}, model={self.config.model})"
+        )
 
         start_time = time.time()
 
@@ -251,22 +257,16 @@ class VCRRecorder:
             response = api_call_fn(prompt)
         except Exception as e:
             self._stats["errors"] += 1
-            raise RecordingError(
-                f"Failed to record cassette for {scenario_id}: {e}"
-            ) from e
+            raise RecordingError(f"Failed to record cassette for {scenario_id}: {e}") from e
 
         duration = time.time() - start_time
 
         if not response or not response.strip():
             self._stats["errors"] += 1
-            raise RecordingError(
-                f"Empty response for {scenario_id} — cassette not saved."
-            )
+            raise RecordingError(f"Empty response for {scenario_id} — cassette not saved.")
 
         # Create turn with response
-        prompt_hash = hashlib.sha256(
-            prompt.encode("utf-8")
-        ).hexdigest()[:16]
+        prompt_hash = hashlib.sha256(prompt.encode("utf-8")).hexdigest()[:16]
         spec = LLMRequestSpec(
             provider=self.config.provider,
             model=self.config.model,
@@ -277,7 +277,9 @@ class VCRRecorder:
             json_schema=OUTPUT_JSON_SCHEMA,
         )
         request_hash = spec.compute_hash()
-        system_prompt_hash = hashlib.sha256(system_prompt.encode("utf-8")).hexdigest()[:16] if system_prompt else ""  # noqa: E501
+        system_prompt_hash = (
+            hashlib.sha256(system_prompt.encode("utf-8")).hexdigest()[:16] if system_prompt else ""
+        )
 
         turn = CassetteTurn(
             role="user",
@@ -303,9 +305,10 @@ class VCRRecorder:
 
         # Try to parse response for cached sections
         from ..runner import LLMTestRunner
+
         runner = LLMTestRunner.__new__(LLMTestRunner)
         runner.algorithm_path = "ipbox_algorytm.md"
-        parsed = runner._extract_tags(response) if hasattr(runner, '_extract_tags') else {}
+        parsed = runner._extract_tags(response) if hasattr(runner, "_extract_tags") else {}
 
         # Build cassette
         cassette = Cassette(
@@ -320,11 +323,11 @@ class VCRRecorder:
 
         # Atomic write: save cassette to temp file, then rename
         import tempfile
+
         cassette_dir = cassette_path.parent
         cassette_dir.mkdir(parents=True, exist_ok=True)
         with tempfile.NamedTemporaryFile(
-            mode="w", dir=cassette_dir, suffix=".tmp",
-            prefix=cassette_path.stem + "_", delete=False
+            mode="w", dir=cassette_dir, suffix=".tmp", prefix=cassette_path.stem + "_", delete=False
         ) as tmp_file:
             cassette.save(Path(tmp_file.name))
         Path(tmp_file.name).replace(cassette_path)
@@ -337,8 +340,11 @@ class VCRRecorder:
             filename=cassette_path.name,
         )
         with tempfile.NamedTemporaryFile(
-            mode="w", dir=self.config.cassettes_root, suffix=".tmp",
-            prefix="_manifest_", delete=False
+            mode="w",
+            dir=self.config.cassettes_root,
+            suffix=".tmp",
+            prefix="_manifest_",
+            delete=False,
         ) as tmp_manifest:
             self.manifest.save(Path(tmp_manifest.name))
         Path(tmp_manifest.name).replace(manifest_path)
@@ -371,16 +377,20 @@ class VCRRecorder:
 # Exceptions
 # ============================================================================
 
+
 class CassetteNotFoundError(Exception):
     """Cassette required but not found (in playback mode)."""
+
     pass
 
 
 class CassetteCorruptedError(Exception):
     """Cassette file is corrupted or invalid."""
+
     pass
 
 
 class RecordingError(Exception):
     """Failed to record cassette."""
+
     pass

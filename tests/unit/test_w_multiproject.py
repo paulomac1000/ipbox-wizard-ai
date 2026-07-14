@@ -12,10 +12,7 @@ class TestWMultiproject:
         # Project 1: 10000 PLN, W=75%
         # Project 2: 5000 PLN, W=90%
         # Weighted average: (10000*75 + 5000*90) / 15000 = (750000 + 450000) / 15000 = 1200000 / 15000 = 80%  # noqa: E501
-        projects = [
-            {"revenue": 10000, "W": 75},
-            {"revenue": 5000, "W": 90}
-        ]
+        projects = [{"revenue": 10000, "W": 75}, {"revenue": 5000, "W": 90}]
         assert aggregate_w_multiproject(projects) == 80.0
 
     @pytest.mark.unit
@@ -33,10 +30,7 @@ class TestWMultiproject:
     @pytest.mark.unit
     @pytest.mark.P2
     def test_very_small_revenue(self):
-        projects = [
-            {"revenue": 0.01, "W": 100},
-            {"revenue": 9999.99, "W": 50}
-        ]
+        projects = [{"revenue": 0.01, "W": 100}, {"revenue": 9999.99, "W": 50}]
         assert aggregate_w_multiproject(projects) == pytest.approx(50.0, abs=0.01)
 
     @pytest.mark.unit

@@ -48,9 +48,7 @@ class VCRConfig:
         self.max_age_days = int(environ.get("VCR_MAX_AGE_DAYS", "30"))
 
         # Whether to save full prompt in cassette (for debugging)
-        self.save_full_prompt = environ.get(
-            "VCR_SAVE_FULL_PROMPT", "false"
-        ).lower() == "true"
+        self.save_full_prompt = environ.get("VCR_SAVE_FULL_PROMPT", "false").lower() == "true"
 
         # LLM provider configuration
         self.provider = environ.get("LLM_PROVIDER", "openrouter")
@@ -87,13 +85,7 @@ class VCRConfig:
 
     def _model_slug(self) -> str:
         """Create filesystem-safe model identifier."""
-        return (
-            self.model
-            .replace("/", "_")
-            .replace(".", "_")
-            .replace("-", "_")
-            [:60]
-        )
+        return self.model.replace("/", "_").replace(".", "_").replace("-", "_")[:60]
 
     def __repr__(self) -> str:
         return (

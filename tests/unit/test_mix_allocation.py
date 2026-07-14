@@ -94,9 +94,7 @@ class TestMixAllocationPositive:
             source="użytkownik",
             justification="test direct costs",
         )
-        result = allocate_costs_monthly(
-            items, allocation_policy=policy, ip_direct_costs=ip_direct
-        )
+        result = allocate_costs_monthly(items, allocation_policy=policy, ip_direct_costs=ip_direct)
         # costs_ip = IP_direct(2000) + MIX(10000)*0.75(7500) = 9500
         assert abs(result["costs_ip"] - 9500.0) < 0.01
 
@@ -191,9 +189,7 @@ class TestMixAllocationNegative:
             source="użytkownik",
             justification="metraż override",
         )
-        result = allocate_costs_monthly(
-            items, allocation_policy=policy, w_coefficient=90.0
-        )
+        result = allocate_costs_monthly(items, allocation_policy=policy, w_coefficient=90.0)
         assert abs(result["costs_ip"] - 800.0) < 0.01  # 0.80 wins, not 0.90
 
     @pytest.mark.unit
@@ -311,15 +307,33 @@ class TestMixAllocationNegative:
 
         # mix_key out of range
         with pytest.raises(ValueError, match="mix_key must be between 0 and 1"):
-            AllocationPolicy(policy_id="e5", source="użytkownik", mix_method="metraż", mix_key=1.5, justification="yes")  # noqa: E501
+            AllocationPolicy(
+                policy_id="e5",
+                source="użytkownik",
+                mix_method="metraż",
+                mix_key=1.5,
+                justification="yes",
+            )
 
         # czasowa_W requires mix_key
         with pytest.raises(ValueError, match="czasowa_W requires mix_key"):
-            AllocationPolicy(policy_id="e6", source="użytkownik", mix_method="czasowa_W", mix_key=None, justification="yes")  # noqa: E501
+            AllocationPolicy(
+                policy_id="e6",
+                source="użytkownik",
+                mix_method="czasowa_W",
+                mix_key=None,
+                justification="yes",
+            )
 
         # custom requires justification
         with pytest.raises(ValueError, match="custom requires justification"):
-            AllocationPolicy(policy_id="e7", source="użytkownik", mix_method="custom", mix_key=0.5, justification="")  # noqa: E501
+            AllocationPolicy(
+                policy_id="e7",
+                source="użytkownik",
+                mix_method="custom",
+                mix_key=0.5,
+                justification="",
+            )
 
     @pytest.mark.unit
     @pytest.mark.P1
@@ -447,7 +461,9 @@ class TestMixAllocationNegative:
         assert res["poza_nexus"] == 70.0
 
         # Success with nexus_amount for MIX
-        item_mix_success = CostItem("MIX desc", 100, basket="MIX", nexus_basket="A", nexus_amount=40.0)  # noqa: E501
+        item_mix_success = CostItem(
+            "MIX desc", 100, basket="MIX", nexus_basket="A", nexus_amount=40.0
+        )
         res_mix = aggregate_nexus_costs([item_mix_success])
         assert res_mix["A"] == 40.0
         assert res_mix["poza_nexus"] == 60.0
@@ -466,23 +482,31 @@ class TestMixAllocationNegative:
 
         # Missing split for dokumentowa
         with pytest.raises(ValueError, match="document_split_ip is required"):
-            allocate_revenue_monthly(base_revenue=100, revenue_method="dokumentowa", document_split_ip=None)  # noqa: E501
+            allocate_revenue_monthly(
+                base_revenue=100, revenue_method="dokumentowa", document_split_ip=None
+            )
 
         # Split out of range
         with pytest.raises(ValueError, match="must be between 0 and base_revenue"):
-            allocate_revenue_monthly(base_revenue=100, revenue_method="dokumentowa", document_split_ip=150)  # noqa: E501
+            allocate_revenue_monthly(
+                base_revenue=100, revenue_method="dokumentowa", document_split_ip=150
+            )
 
         # Missing key for other methods
         with pytest.raises(ValueError, match="revenue_key is required"):
             allocate_revenue_monthly(base_revenue=100, revenue_method="czasowa_W", revenue_key=None)
 
         # Success dokumentowa
-        res_doc = allocate_revenue_monthly(base_revenue=100, revenue_method="dokumentowa", document_split_ip=80)  # noqa: E501
+        res_doc = allocate_revenue_monthly(
+            base_revenue=100, revenue_method="dokumentowa", document_split_ip=80
+        )
         assert res_doc["ip_revenue"] == 80.0
         assert res_doc["non_ip_revenue"] == 20.0
 
         # Success non-dokumentowa
-        res_other = allocate_revenue_monthly(base_revenue=100, revenue_method="czasowa_W", revenue_key=0.7)  # noqa: E501
+        res_other = allocate_revenue_monthly(
+            base_revenue=100, revenue_method="czasowa_W", revenue_key=0.7
+        )
         assert res_other["ip_revenue"] == 70.0
         assert res_other["non_ip_revenue"] == 30.0
 
@@ -492,22 +516,32 @@ class TestMixAllocationNegative:
         """annual_mix_allocation_revenue error handling and zero deferred branch."""
         # annual_total_revenue <= 0
         with pytest.raises(ValueError, match="annual_total_revenue must be > 0"):
-            annual_mix_allocation_revenue(annual_total_revenue=0, annual_ip_revenue=10, deferred_mix_total=100)  # noqa: E501
+            annual_mix_allocation_revenue(
+                annual_total_revenue=0, annual_ip_revenue=10, deferred_mix_total=100
+            )
 
         # annual_ip_revenue < 0
         with pytest.raises(ValueError, match="annual_ip_revenue must be >= 0"):
-            annual_mix_allocation_revenue(annual_total_revenue=100, annual_ip_revenue=-10, deferred_mix_total=100)  # noqa: E501
+            annual_mix_allocation_revenue(
+                annual_total_revenue=100, annual_ip_revenue=-10, deferred_mix_total=100
+            )
 
         # annual_ip_revenue > annual_total_revenue
         with pytest.raises(ValueError, match="cannot exceed annual_total_revenue"):
-            annual_mix_allocation_revenue(annual_total_revenue=100, annual_ip_revenue=150, deferred_mix_total=100)  # noqa: E501
+            annual_mix_allocation_revenue(
+                annual_total_revenue=100, annual_ip_revenue=150, deferred_mix_total=100
+            )
 
         # deferred_mix_total < 0
         with pytest.raises(ValueError, match="deferred_mix_total must be >= 0"):
-            annual_mix_allocation_revenue(annual_total_revenue=100, annual_ip_revenue=80, deferred_mix_total=-5)  # noqa: E501
+            annual_mix_allocation_revenue(
+                annual_total_revenue=100, annual_ip_revenue=80, deferred_mix_total=-5
+            )
 
         # deferred_mix_total == 0
-        res = annual_mix_allocation_revenue(annual_total_revenue=100, annual_ip_revenue=80, deferred_mix_total=0)  # noqa: E501
+        res = annual_mix_allocation_revenue(
+            annual_total_revenue=100, annual_ip_revenue=80, deferred_mix_total=0
+        )
         assert res["costs_ip_mix"] == 0.0
         assert res["costs_non_mix"] == 0.0
 
@@ -517,41 +551,79 @@ class TestMixAllocationNegative:
         """allocate_multi_ip validation exceptions."""
         # total_indirect_costs < 0
         with pytest.raises(ValueError, match="total_indirect_costs must be >= 0"):
-            allocate_multi_ip(total_indirect_costs=-10, software_ip_revenue=100, total_revenue=150, ip_revenues={"ip1": 50})  # noqa: E501
+            allocate_multi_ip(
+                total_indirect_costs=-10,
+                software_ip_revenue=100,
+                total_revenue=150,
+                ip_revenues={"ip1": 50},
+            )
 
         # total_revenue <= 0
         with pytest.raises(ValueError, match="total_revenue must be > 0"):
-            allocate_multi_ip(total_indirect_costs=10, software_ip_revenue=100, total_revenue=0, ip_revenues={"ip1": 50})  # noqa: E501
+            allocate_multi_ip(
+                total_indirect_costs=10,
+                software_ip_revenue=100,
+                total_revenue=0,
+                ip_revenues={"ip1": 50},
+            )
 
         # software_ip_revenue < 0
         with pytest.raises(ValueError, match="software_ip_revenue must be >= 0"):
-            allocate_multi_ip(total_indirect_costs=10, software_ip_revenue=-5, total_revenue=100, ip_revenues={"ip1": 50})  # noqa: E501
+            allocate_multi_ip(
+                total_indirect_costs=10,
+                software_ip_revenue=-5,
+                total_revenue=100,
+                ip_revenues={"ip1": 50},
+            )
 
         # software_ip_revenue > total_revenue
         with pytest.raises(ValueError, match="cannot exceed total_revenue"):
-            allocate_multi_ip(total_indirect_costs=10, software_ip_revenue=150, total_revenue=100, ip_revenues={"ip1": 50})  # noqa: E501
+            allocate_multi_ip(
+                total_indirect_costs=10,
+                software_ip_revenue=150,
+                total_revenue=100,
+                ip_revenues={"ip1": 50},
+            )
 
         # empty ip_revenues
         with pytest.raises(ValueError, match="ip_revenues dict must be non-empty"):
-            allocate_multi_ip(total_indirect_costs=10, software_ip_revenue=80, total_revenue=100, ip_revenues={})  # noqa: E501
+            allocate_multi_ip(
+                total_indirect_costs=10, software_ip_revenue=80, total_revenue=100, ip_revenues={}
+            )
 
         # negative individual IP revenue
         with pytest.raises(ValueError, match="must be >= 0"):
-            allocate_multi_ip(total_indirect_costs=10, software_ip_revenue=80, total_revenue=100, ip_revenues={"ip1": -10})  # noqa: E501
+            allocate_multi_ip(
+                total_indirect_costs=10,
+                software_ip_revenue=80,
+                total_revenue=100,
+                ip_revenues={"ip1": -10},
+            )
 
         # total IP revenue <= 0
         with pytest.raises(ValueError, match="Sum of ip_revenues values must be > 0"):
-            allocate_multi_ip(total_indirect_costs=10, software_ip_revenue=80, total_revenue=100, ip_revenues={"ip1": 0.0})  # noqa: E501
+            allocate_multi_ip(
+                total_indirect_costs=10,
+                software_ip_revenue=80,
+                total_revenue=100,
+                ip_revenues={"ip1": 0.0},
+            )
 
         # sum(ip_revenues) != software_ip_revenue (mismatch > 0.02)
         with pytest.raises(ValueError, match="does not match"):
-            allocate_multi_ip(total_indirect_costs=10, software_ip_revenue=100, total_revenue=200, ip_revenues={"ip1": 50, "ip2": 30})  # noqa: E501
+            allocate_multi_ip(
+                total_indirect_costs=10,
+                software_ip_revenue=100,
+                total_revenue=200,
+                ip_revenues={"ip1": 50, "ip2": 30},
+            )
 
     @pytest.mark.unit
     @pytest.mark.P1
     def test_verify_ip_tax_declared_base_mismatch(self):
         """verify_ip_tax verification failures."""
         from python_helper.ipbox_calculator import verify_ip_tax
+
         res = verify_ip_tax(ip_income=10000.0, nexus=1.0, declared_base=8000, declared_tax=400)
         assert res["status"] == "FAIL"
         assert "Expected base" in res["error"]

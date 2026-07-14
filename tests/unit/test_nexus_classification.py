@@ -71,18 +71,24 @@ class TestNexusClassification:
         items = [
             nexus_classify(CostItem("Dev A", 1_000.0, basket="IP"), nexus_source="own_br"),
             nexus_classify(CostItem("Dev B", 2_000.0, basket="IP"), nexus_source="own_br"),
-            nexus_classify(CostItem("UI/UX B2B", 4_000.0, basket="IP"),
-                          nexus_source="unrelated_br_contractor"),
-            nexus_classify(CostItem("Test spółka powiązana", 3_000.0, basket="IP"),
-                          nexus_source="related_br_contractor"),
-            nexus_classify(CostItem("Licencja IP", 1_500.0, basket="IP"),
-                          nexus_source="ip_acquisition"),
-            nexus_classify(CostItem("Czynsz", 2_500.0, basket="MIX"),
-                          nexus_source="indirect_or_general"),
-            nexus_classify(CostItem("Inne nieznane", 500.0, basket="NON"),
-                          nexus_source="unknown"),
-            nexus_classify(CostItem("Więcej ogólnych", 1_200.0, basket="MIX"),
-                          nexus_source="indirect_or_general"),
+            nexus_classify(
+                CostItem("UI/UX B2B", 4_000.0, basket="IP"), nexus_source="unrelated_br_contractor"
+            ),
+            nexus_classify(
+                CostItem("Test spółka powiązana", 3_000.0, basket="IP"),
+                nexus_source="related_br_contractor",
+            ),
+            nexus_classify(
+                CostItem("Licencja IP", 1_500.0, basket="IP"), nexus_source="ip_acquisition"
+            ),
+            nexus_classify(
+                CostItem("Czynsz", 2_500.0, basket="MIX"), nexus_source="indirect_or_general"
+            ),
+            nexus_classify(CostItem("Inne nieznane", 500.0, basket="NON"), nexus_source="unknown"),
+            nexus_classify(
+                CostItem("Więcej ogólnych", 1_200.0, basket="MIX"),
+                nexus_source="indirect_or_general",
+            ),
         ]
 
         aggregated = aggregate_nexus_costs(items)

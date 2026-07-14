@@ -17,7 +17,13 @@ class LLMClient:
         self.api_key = api_key
         self.model_name = environ.get("LLM_MODEL") or "google/gemini-3.5-flash"
 
-    def call(self, system_prompt: str, user_prompt: str, timeout: int = 120, json_schema: dict | None = None) -> str:  # noqa: E501
+    def call(
+        self,
+        system_prompt: str,
+        user_prompt: str,
+        timeout: int = 120,
+        json_schema: dict | None = None,
+    ) -> str:
         headers = {
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json",
@@ -60,10 +66,14 @@ class LLMClient:
         last_exc: Exception | None = None
         for attempt in range(retries + 1):
             try:
-                return self.call(system_prompt, user_prompt, timeout=timeout, json_schema=json_schema)  # noqa: E501
+                return self.call(
+                    system_prompt, user_prompt, timeout=timeout, json_schema=json_schema
+                )
             except Exception as exc:
                 last_exc = exc
                 if attempt < retries:
-                    print(f"[LLMClient] attempt {attempt + 1} failed: {exc}. Retrying in {delay}s...")  # noqa: E501
+                    print(
+                        f"[LLMClient] attempt {attempt + 1} failed: {exc}. Retrying in {delay}s..."
+                    )
                     time.sleep(delay)
         raise last_exc

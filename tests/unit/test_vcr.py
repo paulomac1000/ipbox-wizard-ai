@@ -11,8 +11,13 @@ from tests.llm.vcr.cassette import Cassette, CassetteMeta, CassetteTurn
 from tests.llm.vcr.recorder import CassetteNotFoundError, VCRRecorder
 
 
-def make_temp_cassette(tmp_path: Path, scenario_id: str = "test", prompt: str = "test prompt",
-                       response: str = "test response", fingerprint: str = "fp_v1") -> Path:
+def make_temp_cassette(
+    tmp_path: Path,
+    scenario_id: str = "test",
+    prompt: str = "test prompt",
+    response: str = "test response",
+    fingerprint: str = "fp_v1",
+) -> Path:
     """Create a cassette in tmp_path and return its path."""
     root = tmp_path / "cassettes"
     model_dir = root / "test" / "test_model"
@@ -20,9 +25,17 @@ def make_temp_cassette(tmp_path: Path, scenario_id: str = "test", prompt: str = 
     cassette_path = model_dir / f"{scenario_id}.yaml"
     prompt_hash = hashlib.sha256(prompt.encode()).hexdigest()[:16]
     cassette = Cassette(
-        meta=CassetteMeta(scenario_id=scenario_id, scenario_name=scenario_id,
-                          provider="test", model="test", fingerprint=fingerprint),
-        turns=[CassetteTurn(role="user", prompt=prompt, response=response, prompt_hash=prompt_hash)])  # noqa: E501
+        meta=CassetteMeta(
+            scenario_id=scenario_id,
+            scenario_name=scenario_id,
+            provider="test",
+            model="test",
+            fingerprint=fingerprint,
+        ),
+        turns=[
+            CassetteTurn(role="user", prompt=prompt, response=response, prompt_hash=prompt_hash)
+        ],
+    )
     cassette.save(cassette_path)
     return cassette_path
 
@@ -67,16 +80,24 @@ class TestCassette:
     @pytest.mark.P1
     def test_cassette_is_valid_with_response(self):
         turn = CassetteTurn(response="valid response")
-        cassette = Cassette(meta=CassetteMeta(scenario_id="t", scenario_name="t",
-                            provider="t", model="t", fingerprint="f"), turns=[turn])
+        cassette = Cassette(
+            meta=CassetteMeta(
+                scenario_id="t", scenario_name="t", provider="t", model="t", fingerprint="f"
+            ),
+            turns=[turn],
+        )
         assert cassette.is_valid
 
     @pytest.mark.unit
     @pytest.mark.P1
     def test_cassette_not_valid_with_empty_response(self):
         turn = CassetteTurn(response="")
-        cassette = Cassette(meta=CassetteMeta(scenario_id="t", scenario_name="t",
-                            provider="t", model="t", fingerprint="f"), turns=[turn])
+        cassette = Cassette(
+            meta=CassetteMeta(
+                scenario_id="t", scenario_name="t", provider="t", model="t", fingerprint="f"
+            ),
+            turns=[turn],
+        )
         assert not cassette.is_valid
 
     @pytest.mark.unit
@@ -125,8 +146,10 @@ class TestVCRRecorder:
         config_a.mode = VCRMode.RECORD
         recorder_a = VCRRecorder(config_a)
         resp_a = recorder_a.get_or_record(
-            scenario_id="shared", scenario_path=Path(__file__),
-            prompt="hello", api_call_fn=lambda p: "response_a",
+            scenario_id="shared",
+            scenario_path=Path(__file__),
+            prompt="hello",
+            api_call_fn=lambda p: "response_a",
         )
 
         config_b = VCRConfig()
@@ -136,8 +159,10 @@ class TestVCRRecorder:
         config_b.mode = VCRMode.RECORD
         recorder_b = VCRRecorder(config_b)
         resp_b = recorder_b.get_or_record(
-            scenario_id="shared", scenario_path=Path(__file__),
-            prompt="hello", api_call_fn=lambda p: "response_b",
+            scenario_id="shared",
+            scenario_path=Path(__file__),
+            prompt="hello",
+            api_call_fn=lambda p: "response_b",
         )
 
         assert resp_a == "response_a"
@@ -158,7 +183,8 @@ class TestVCRRecorder:
         recorder = VCRRecorder(config)
         with pytest.raises(CassetteNotFoundError):
             recorder.get_or_record(
-                scenario_id="nonexistent", scenario_path=Path(__file__),
+                scenario_id="nonexistent",
+                scenario_path=Path(__file__),
                 prompt="test",
                 api_call_fn=lambda p: (_ for _ in ()).throw(
                     RuntimeError("live API called in playback")
@@ -170,8 +196,9 @@ class TestVCRRecorder:
     def test_cassette_format_version_3_default(self, tmp_path):
         """New cassettes default to format_version=3."""
         cassette = Cassette(
-            meta=CassetteMeta(scenario_id="t", scenario_name="t",
-                              provider="t", model="t", fingerprint="f"),
+            meta=CassetteMeta(
+                scenario_id="t", scenario_name="t", provider="t", model="t", fingerprint="f"
+            ),
             turns=[CassetteTurn()],
         )
         assert cassette.meta.cassette_format_version == 3

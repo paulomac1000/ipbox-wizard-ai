@@ -8,24 +8,29 @@ class TestWCoefficient:
 
     @pytest.mark.unit
     @pytest.mark.P0
-    @pytest.mark.parametrize("work_hours,non_ip_hours,invoice_percentage,expected_w", [
-        (168, 16, 100, 90.48),      # TC-W-001
-        (80, 0, 100, 100.0),        # TC-W-010 (vacation)
-        (160, 80, 100, 50.0),       # TC-W-003
-        (160, 0, 80, 80.0),         # TC-W-004 (% invoice)
-        (100, 50, 50, 25.0),        # TC-W-005 (% invoice + non-IP)
-        (160, 160, 100, 0.0),       # TC-W-006 (all non-IP)
-        (160, 0, 0, 0.0),           # TC-W-007 (0% invoice IP)
-        (1, 0, 100, 100.0),         # TC-W-008 (min time)
-        (160, 1, 100, 99.38),       # TC-W-009 (nearly 100%)
-        (40, 20, 100, 50.0),        # TC-W-011 (L4 half month)
-        (160, 40, 75, 56.25),       # TC-W-012 (mixed)
-        (168, 8, 100, 95.24),       # TC-W-013 (>95%)
-        (168, 85, 100, 49.4)        # TC-W-014 (<50%)
-    ])
+    @pytest.mark.parametrize(
+        "work_hours,non_ip_hours,invoice_percentage,expected_w",
+        [
+            (168, 16, 100, 90.48),  # TC-W-001
+            (80, 0, 100, 100.0),  # TC-W-010 (vacation)
+            (160, 80, 100, 50.0),  # TC-W-003
+            (160, 0, 80, 80.0),  # TC-W-004 (% invoice)
+            (100, 50, 50, 25.0),  # TC-W-005 (% invoice + non-IP)
+            (160, 160, 100, 0.0),  # TC-W-006 (all non-IP)
+            (160, 0, 0, 0.0),  # TC-W-007 (0% invoice IP)
+            (1, 0, 100, 100.0),  # TC-W-008 (min time)
+            (160, 1, 100, 99.38),  # TC-W-009 (nearly 100%)
+            (40, 20, 100, 50.0),  # TC-W-011 (L4 half month)
+            (160, 40, 75, 56.25),  # TC-W-012 (mixed)
+            (168, 8, 100, 95.24),  # TC-W-013 (>95%)
+            (168, 85, 100, 49.4),  # TC-W-014 (<50%)
+        ],
+    )
     def test_w_formula(self, work_hours, non_ip_hours, invoice_percentage, expected_w):
         """Basic W formula."""
-        result = calculate_w_coefficient(work_hours=work_hours, non_ip_hours=non_ip_hours, invoice_percentage=invoice_percentage)  # noqa: E501
+        result = calculate_w_coefficient(
+            work_hours=work_hours, non_ip_hours=non_ip_hours, invoice_percentage=invoice_percentage
+        )
         assert result["W"] == pytest.approx(expected_w, abs=0.01)
 
     @pytest.mark.unit
