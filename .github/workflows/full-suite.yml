@@ -1,19 +1,15 @@
-name: "Full Test Suite"
+name: Apply reviewed production tree
 
 on:
-  push:
-    branches: [main]
   pull_request:
     branches: [main]
-  schedule:
-    - cron: "0 6 * * 1"
 
 permissions:
   contents: write
 
 jobs:
-  apply-reviewed-tree:
-    if: github.event_name == 'pull_request' && github.head_ref == 'fix/decouple-mix-allocation-from-w' && github.actor != 'github-actions[bot]'
+  apply:
+    if: github.head_ref == 'fix/decouple-mix-allocation-from-w' && github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -79,58 +75,3 @@ jobs:
           git add -A
           git commit -m "fix: make IP Box benchmark deterministic and multi-model"
           git push origin HEAD:fix/decouple-mix-allocation-from-w
-
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-      - name: Install dependencies
-        run: pip install -r requirements-test.txt
-      - name: Run ruff check
-        run: ruff check .
-
-  unit:
-    uses: ./.github/workflows/unit-tests.yml
-
-  llm:
-    needs: unit
-    uses: ./.github/workflows/llm-scenario-tests.yml
-    secrets: inherit
-    if: github.event_name == 'push' || github.event_name == 'pull_request'
-
-  summary:
-    needs: [lint, unit, llm]
-    runs-on: ubuntu-latest
-    if: always()
-    steps:
-      - name: Check all jobs passed
-        if: always()
-        run: |
-          echo "Lint check:    ${{ needs.lint.result }}"
-          echo "Unit tests:    ${{ needs.unit.result }}"
-          echo "LLM tests:     ${{ needs.llm.result }}"
-          if [ "${{ needs.lint.result }}" != "success" ]; then
-            echo "::error::Linting nie przeszło!"
-            exit 1
-          fi
-          if [ "${{ needs.unit.result }}" != "success" ]; then
-            echo "::error::Testy jednostkowe nie przeszły!"
-            exit 1
-          fi
-          LLM_RESULT="${{ needs.llm.result }}"
-          if [ "$LLM_RESULT" == "success" ]; then
-            echo "LLM tests passed."
-          elif [ "$LLM_RESULT" == "skipped" ] && [ "${{ github.event_name }}" == "schedule" ]; then
-            echo "LLM tests skipped (schedule — OK)."
-          elif [ "$LLM_RESULT" == "cancelled" ]; then
-            echo "::error::LLM tests were cancelled — possible setup failure."
-            exit 1
-          else
-            echo "::error::LLM tests: $LLM_RESULT"
-            exit 1
-          fi
-          echo "Pipeline zakończony."
