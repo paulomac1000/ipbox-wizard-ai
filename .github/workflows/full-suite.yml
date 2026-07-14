@@ -57,9 +57,17 @@ jobs:
         working-directory: /tmp/reviewed-tree
         run: ruff format scripts
 
-      - name: Format tests
+      - name: Format test roots
         working-directory: /tmp/reviewed-tree
-        run: ruff format tests
+        run: ruff format tests/__init__.py tests/conftest.py
+
+      - name: Format LLM tests
+        working-directory: /tmp/reviewed-tree
+        run: ruff format tests/llm
+
+      - name: Format unit tests
+        working-directory: /tmp/reviewed-tree
+        run: ruff format tests/unit
 
       - name: Check Python format
         working-directory: /tmp/reviewed-tree
