@@ -49,29 +49,49 @@ jobs:
         working-directory: /tmp/reviewed-tree
         run: pip install -r requirements.txt -r requirements-test.txt
 
-      - name: Format python_helper
+      - name: Format python_helper and scripts
         working-directory: /tmp/reviewed-tree
-        run: ruff format python_helper
+        run: ruff format python_helper scripts tests/__init__.py tests/conftest.py
 
-      - name: Format scripts
+      - name: Format LLM init
         working-directory: /tmp/reviewed-tree
-        run: ruff format scripts
+        run: ruff format tests/llm/__init__.py
 
-      - name: Format test roots
+      - name: Format LLM client
         working-directory: /tmp/reviewed-tree
-        run: ruff format tests/__init__.py tests/conftest.py
+        run: ruff format tests/llm/client.py
 
-      - name: Format LLM root files
+      - name: Format LLM evaluator
         working-directory: /tmp/reviewed-tree
-        run: ruff format tests/llm/*.py
+        run: ruff format tests/llm/evaluator.py
 
-      - name: Format VCR files
+      - name: Format LLM models
         working-directory: /tmp/reviewed-tree
-        run: ruff format tests/llm/vcr
+        run: ruff format tests/llm/models.py
 
-      - name: Format unit tests
+      - name: Format LLM oracle
         working-directory: /tmp/reviewed-tree
-        run: ruff format tests/unit
+        run: ruff format tests/llm/oracle.py
+
+      - name: Format LLM schema
+        working-directory: /tmp/reviewed-tree
+        run: ruff format tests/llm/output_schema.py
+
+      - name: Format LLM request
+        working-directory: /tmp/reviewed-tree
+        run: ruff format tests/llm/request_spec.py
+
+      - name: Format LLM runner
+        working-directory: /tmp/reviewed-tree
+        run: ruff format tests/llm/runner.py
+
+      - name: Format LLM scenarios test
+        working-directory: /tmp/reviewed-tree
+        run: ruff format tests/llm/test_scenarios.py
+
+      - name: Format VCR and unit tests
+        working-directory: /tmp/reviewed-tree
+        run: ruff format tests/llm/vcr tests/unit
 
       - name: Check Python format
         working-directory: /tmp/reviewed-tree
