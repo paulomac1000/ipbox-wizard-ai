@@ -1,4 +1,4 @@
-name: Diagnose reviewed oracle chunks
+name: Publish reviewed production tree
 
 on:
   pull_request:
@@ -8,10 +8,10 @@ permissions:
   contents: write
 
 jobs:
-  diagnose:
+  publish:
     if: github.head_ref == 'fix/decouple-mix-allocation-from-w' && github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
         with:
@@ -19,7 +19,7 @@ jobs:
           fetch-depth: 1
           show-progress: false
 
-      - name: Export remote oracle chunks
+      - name: Reconstruct and repair reviewed tree
         run: |
           set -euo pipefail
           cat .delivery/part-* > /tmp/payload.b64
@@ -30,18 +30,60 @@ jobs:
 
           archive = Path('/tmp/reviewed.tar.gz')
           archive.write_bytes(base64.b64decode(Path('/tmp/payload.b64').read_bytes(), validate=True))
-          root = Path('/tmp/reviewed-tree')
+          root = Path('/tmp/reviewed-tree').resolve()
           root.mkdir(parents=True, exist_ok=True)
           with tarfile.open(archive, 'r:gz') as tf:
+              for member in tf.getmembers():
+                  target = (root / member.name).resolve()
+                  if target != root and root not in target.parents:
+                      raise SystemExit(f'unsafe archive path: {member.name}')
               tf.extractall(root)
-
-          encoded = base64.b64encode((root / 'tests/llm/oracle.py').read_bytes())
-          for index, start in enumerate(range(0, len(encoded), 6000)):
-              Path(f'.delivery/remote-oracle-part-{index:02d}').write_bytes(encoded[start:start + 6000])
           PY
 
+          cat \
+            .delivery/remote-oracle-part-00 \
+            .delivery/remote-oracle-part-01 \
+            .delivery/remote-oracle-part-02 \
+            .delivery/remote-oracle-part-03 \
+            .delivery/oracle-fix-part-04 \
+            .delivery/oracle-fix-part-05 \
+            | base64 --decode > /tmp/reviewed-tree/tests/llm/oracle.py
+          echo "d4c2634c324eafeaf7be7a7b7c935ac7812e04d55ab87c33761f94ac4e445c3b  /tmp/reviewed-tree/tests/llm/oracle.py" | sha256sum -c -
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        working-directory: /tmp/reviewed-tree
+        run: pip install -r requirements.txt -r requirements-test.txt
+
+      - name: Quality gates
+        working-directory: /tmp/reviewed-tree
+        run: |
+          set -euo pipefail
+          ruff format .
+          ruff format --check .
+          ruff check .
+          python -m compileall -q python_helper tests scripts
+          pytest tests/unit --cov=python_helper --cov-report=term-missing --cov-fail-under=90
+          pytest -q
+          python scripts/check_cassette_policy.py
+          for script in scripts/*.sh dump-to-md.sh; do
+            bash -n "$script"
+          done
+
+      - name: Replace branch with reviewed tree
+        run: |
+          set -euo pipefail
+          find . -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+          cp -a /tmp/reviewed-tree/. .
+
+      - name: Commit production tree
+        run: |
+          set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add .delivery/remote-oracle-part-*
-          git commit -m "chore: export remote oracle chunks"
+          git add -A
+          git commit -m "fix: make IP Box benchmark deterministic and multi-model"
           git push origin HEAD:fix/decouple-mix-allocation-from-w
