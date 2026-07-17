@@ -11,7 +11,7 @@ input:
   polityka_alokacji:
     policy_id: scenario-policy
     przychody:
-      metoda: czasowa_W
+      metoda: dokumentowa
     koszty_MIX:
       metoda: przychodowa_roczna
       źródło: interpretacja_KIS
@@ -27,6 +27,7 @@ input:
     - kwota_PLN: 10000
       kontrahent: ClientA
       kwalifikuje_IP: true
+      kwota_IP: 9000
     ewidencja:
       godziny_pracy: 160
       godziny_nie_IP: 20
@@ -53,3 +54,4 @@ assertions:
   review_obecne:
   - REVIEW_16
   - REVIEW_17
+  klucz_MIX_wartość: 0.9

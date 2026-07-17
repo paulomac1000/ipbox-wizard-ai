@@ -187,6 +187,8 @@ def convert_fx_invoice(
     amount_currency = _nonnegative("amount_currency", amount_currency)
     if method not in {"accrual", "cash"}:
         raise ValueError("method must be 'accrual' or 'cash'")
+    if payment_date is None:
+        raise ValueError("payment_date is required to calculate exchange differences")
     try:
         issue = datetime.strptime(issue_date, "%Y-%m-%d")
         payment = datetime.strptime(payment_date, "%Y-%m-%d") if payment_date else None
@@ -194,9 +196,6 @@ def convert_fx_invoice(
         raise ValueError("dates must use YYYY-MM-DD") from exc
     if payment is not None and payment < issue:
         raise ValueError("payment_date cannot be earlier than issue_date")
-    if method == "cash" and payment is None:
-        raise ValueError("cash method requires payment_date")
-
     base_date = issue if method == "accrual" else payment
     assert base_date is not None
     rate_date = (base_date - timedelta(days=1)).strftime("%Y-%m-%d")
@@ -383,18 +382,26 @@ def classify_cost(
         return replace(item, basket="WYKLUCZONE", note="Health contribution handled outside costs")
     if any(re.search(pattern, description) for pattern in EXCLUDED_PATTERNS):
         return replace(item, basket="WYKLUCZONE", note="Statutorily excluded cost")
-    if item.amount > asset_threshold:
-        return replace(
-            item, basket="WYKLUCZONE", note="Fixed asset; depreciation handled separately"
-        )
     if any(keyword in description for keyword in PRIVATE_KEYWORDS):
         return replace(
             item,
             basket="WYKLUCZONE",
             note="Private/personal expense; not a deductible business cost",
         )
+    if item.basket:
+        return item
+    if item.amount > asset_threshold:
+        return replace(
+            item,
+            basket="MIX",
+            note="Potential fixed asset; explicit evidence/policy is required before exclusion",
+        )
     if any(keyword in description for keyword in DIRECT_IP_KEYWORDS):
-        return replace(item, basket="IP", note="Direct software-development cost")
+        return replace(
+            item,
+            basket="MIX",
+            note="Development tool; direct IP requires documented exclusive use",
+        )
     return replace(item, basket="MIX", note="Indirect/common business cost")
 
 
@@ -634,8 +641,8 @@ def allocate_multi_ip(
     total_ip_revenue = sum(
         _nonnegative(f"ip_revenues[{name!r}]", value) for name, value in ip_revenues.items()
     )
-    if not math.isclose(total_ip_revenue, software_ip_revenue, abs_tol=0.005):
-        raise ValueError("sum(ip_revenues) must equal software_ip_revenue")
+    if money(total_ip_revenue) != money(software_ip_revenue):
+        raise ValueError("sum(ip_revenues) must equal software_ip_revenue at PLN-cent precision")
 
     stage1 = money(
         Decimal(str(total_indirect_costs))
@@ -720,6 +727,7 @@ def tax_cascade(
     *,
     previous_losses: float = 0,
     social_security_deduction: float = 0,
+    health_contribution_deduction: float = 0,
     ikze: float = 0,
     donations: float = 0,
     internet_tax_relief: float = 0,
@@ -735,10 +743,12 @@ def tax_cascade(
     nexus = _fraction("nexus", nexus)
     if tax_form not in {"liniowy_19%", "linear_19%", "skala", "scale"}:
         raise ValueError("unsupported tax_form")
+    linear = tax_form in {"liniowy_19%", "linear_19%"}
 
     values = {
         "previous_losses": previous_losses,
         "social_security_deduction": social_security_deduction,
+        "health_contribution_deduction": health_contribution_deduction,
         "ikze": ikze,
         "donations": donations,
         "internet_tax_relief": internet_tax_relief,
@@ -750,12 +760,15 @@ def tax_cascade(
     }
     for name, value in values.items():
         values[name] = _nonnegative(name, value)
+    if values["health_contribution_deduction"] > 0 and not linear:
+        raise ValueError("health contribution deduction is available only for linear tax")
 
     remaining = max(0.0, non_ip_income)
     steps: list[dict[str, float | str]] = []
     for label, key in (
         ("Previous losses", "previous_losses"),
         ("Social security", "social_security_deduction"),
+        ("Health contribution", "health_contribution_deduction"),
         ("IKZE", "ikze"),
         ("Donations", "donations"),
         ("Internet relief", "internet_tax_relief"),
@@ -775,7 +788,6 @@ def tax_cascade(
         steps.append({"step": "Thermomodernization", "deduction": thermo_used, "after": remaining})
 
     non_ip_base = tax_round(remaining)
-    linear = tax_form in {"liniowy_19%", "linear_19%"}
     if linear:
         non_ip_tax_before_credit = tax_round(non_ip_base * 0.19)
     else:

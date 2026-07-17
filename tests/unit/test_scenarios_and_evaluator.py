@@ -243,3 +243,114 @@ def test_oracle_stops_when_no_qualifying_ip_revenue() -> None:
     assert reference["status"] == "STOPPED"
     assert reference["stops_reviews"]["stops"] == ["STOP_03"]
     assert reference["result"]["podatek"]["podatek_IP"] == 0
+
+
+def test_missing_qualification_evidence_defaults_to_non_ip() -> None:
+    loaded = deepcopy(scenario("01_basic_linear"))
+    loaded["input"]["kontrahenci"][0].pop("klauzula_IP")
+    loaded["input"]["miesiace"][0]["faktury"][0].pop("kwalifikuje_IP")
+    reference = compute_reference(loaded)
+    assert reference["status"] == "STOPPED"
+    assert reference["stops_reviews"]["stops"] == ["STOP_03"]
+
+
+def test_oracle_rejects_invalid_w_instead_of_using_zero() -> None:
+    loaded = deepcopy(scenario("01_basic_linear"))
+    evidence = loaded["input"]["miesiace"][0]["ewidencja"]
+    evidence["godziny_pracy"] = 10
+    evidence["godziny_nie_IP"] = 11
+    with pytest.raises(ScenarioError, match="non_ip_hours exceed work_hours"):
+        compute_reference(loaded)
+
+
+def test_valid_zero_w_triggers_low_w_review() -> None:
+    loaded = deepcopy(scenario("01_basic_linear"))
+    evidence = loaded["input"]["miesiace"][0]["ewidencja"]
+    evidence["godziny_nie_IP"] = evidence["godziny_pracy"]
+    reference = compute_reference(loaded)
+    assert reference["monthly_W"] == [{"miesiąc": "2025-01", "wartość": 0.0}]
+    assert "REVIEW_02" in reference["stops_reviews"]["reviews"]
+
+
+def test_revenue_key_outside_fraction_fails_closed() -> None:
+    loaded = deepcopy(scenario("01_basic_linear"))
+    loaded["input"]["polityka_alokacji"]["przychody"] = {
+        "metoda": "custom",
+        "klucz": 1.01,
+    }
+    with pytest.raises(ScenarioError, match="revenue_key"):
+        compute_reference(loaded)
+
+
+def test_health_deduction_applies_once_and_double_dip_stops() -> None:
+    loaded = deepcopy(scenario("12_zus_in_pit_path"))
+    loaded["input"]["zus"]["odliczenie_zdrowotne_PIT"] = 1000
+    reference = compute_reference(loaded)
+    assert reference["result"]["podatek"]["podstawa_NIE"] == 2200
+    assert reference["result"]["podatek"]["podatek_NIE_finalny"] == 418
+
+    loaded["input"]["zus"]["zdrowotna_w_KPiR"] = True
+    stopped = compute_reference(loaded)
+    assert "HEALTH_DOUBLE_DIP" in stopped["stops_reviews"]["stops"]
+    assert stopped["status"] == "STOPPED"
+    assert stopped["result"]["podatek"]["podatek_całościowy"] == 0
+
+
+def test_health_deduction_year_limit_is_enforced() -> None:
+    loaded = deepcopy(scenario("12_zus_in_pit_path"))
+    loaded["input"]["zus"]["odliczenie_zdrowotne_PIT"] = 12900.01
+    with pytest.raises(ScenarioError, match="2025 limit"):
+        compute_reference(loaded)
+
+
+def test_stopped_report_zeros_every_financial_output() -> None:
+    reference = compute_reference(scenario("14_lump_sum_ineligible_check"))
+    assert reference["status"] == "STOPPED"
+    result = reference["result"]
+    assert all(value == 0 for value in result["przychody_roczne"].values())
+    assert all(value == 0 for value in result["koszty_roczne"].values())
+    assert all(value == 0 for value in result["nexus_koszty"].values())
+    assert result["nexus"] == 0
+    assert result["dochód_IP"] == result["dochód_NIE"] == 0
+    assert all(value == 0 for value in result["podatek"].values())
+    assert result["alokacja_multi_ip"] is None
+    assert result["klucz_MIX"]["wartość"] is None
+
+
+def test_evaluator_rejects_duplicate_semantic_keys() -> None:
+    loaded = scenario("45_multi_ip_two_stage")
+    reference = compute_reference(loaded)
+
+    duplicate_month = deepcopy(reference)
+    duplicate_month["monthly_W"].append(deepcopy(duplicate_month["monthly_W"][0]))
+    failures, _ = Evaluator(loaded).evaluate(duplicate_month)
+    assert any(item["type"] == "duplicate_month" for item in failures)
+
+    duplicate_ip = deepcopy(reference)
+    duplicate_ip["result"]["alokacja_multi_ip"]["allocations"].append(
+        deepcopy(duplicate_ip["result"]["alokacja_multi_ip"]["allocations"][0])
+    )
+    failures, _ = Evaluator(loaded).evaluate(duplicate_ip)
+    assert any(item["type"] == "duplicate_multi_ip" for item in failures)
+
+    duplicate_code = deepcopy(reference)
+    duplicate_code["stops_reviews"]["reviews"].append(duplicate_code["stops_reviews"]["reviews"][0])
+    failures, _ = Evaluator(loaded).evaluate(duplicate_code)
+    assert any(item["type"] == "duplicate_reviews" for item in failures)
+
+
+def test_schema_rejects_negative_and_out_of_range_values() -> None:
+    reference = compute_reference(scenario("01_basic_linear"))
+    base = {key: value for key, value in reference.items() if key != "decision_facts"}
+
+    mutations = [
+        lambda value: value["result"]["podatek"].__setitem__("podatek_IP", -1),
+        lambda value: value["result"].__setitem__("nexus", 1.01),
+        lambda value: value["monthly_W"][0].__setitem__("wartość", 100.01),
+        lambda value: value["classifications"][0].__setitem__("allocation_key", 1.01),
+    ]
+    validator = Draft202012Validator(OUTPUT_JSON_SCHEMA["schema"])
+    for mutation in mutations:
+        invalid = deepcopy(base)
+        mutation(invalid)
+        assert list(validator.iter_errors(invalid))

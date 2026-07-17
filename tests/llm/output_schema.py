@@ -5,7 +5,9 @@ from __future__ import annotations
 from typing import Any
 
 MONEY = {"type": "number"}
-NONNEGATIVE_MONEY = {"type": "number"}
+NONNEGATIVE_MONEY = {"type": "number", "minimum": 0}
+FRACTION = {"type": "number", "minimum": 0, "maximum": 1}
+PERCENTAGE = {"type": "number", "minimum": 0, "maximum": 100}
 CODE = {"type": "string", "pattern": "^[A-Z][A-Z0-9_]*$"}
 
 
@@ -18,8 +20,8 @@ DECISION_JSON_SCHEMA: dict[str, Any] = {
         "required": ["status", "stops", "reviews"],
         "properties": {
             "status": {"enum": ["FINAL", "STOPPED"]},
-            "stops": {"type": "array", "items": CODE},
-            "reviews": {"type": "array", "items": CODE},
+            "stops": {"type": "array", "items": CODE, "uniqueItems": True},
+            "reviews": {"type": "array", "items": CODE, "uniqueItems": True},
         },
     },
 }
@@ -86,7 +88,7 @@ OUTPUT_JSON_SCHEMA: dict[str, Any] = {
                             "poza_nexus": NONNEGATIVE_MONEY,
                         },
                     },
-                    "nexus": {"type": "number"},
+                    "nexus": FRACTION,
                     "dochód_IP": MONEY,
                     "dochód_NIE": MONEY,
                     "klucz_MIX": {
@@ -114,7 +116,7 @@ OUTPUT_JSON_SCHEMA: dict[str, Any] = {
                                 ]
                             },
                             "wartość": {
-                                "type": ["number", "null"],
+                                "anyOf": [{"type": "null"}, FRACTION],
                             },
                             "status": {"enum": ["FINAL", "DEFERRED", "NOT_APPLICABLE"]},
                         },
@@ -159,6 +161,7 @@ OUTPUT_JSON_SCHEMA: dict[str, Any] = {
                             "podatek_NIE_finalny",
                             "podatek_całościowy",
                             "nadpłata_lub_dopłata",
+                            "termomodernization_carry_over",
                         ],
                         "properties": {
                             "podstawa_IP": NONNEGATIVE_MONEY,
@@ -167,6 +170,7 @@ OUTPUT_JSON_SCHEMA: dict[str, Any] = {
                             "podatek_NIE_finalny": NONNEGATIVE_MONEY,
                             "podatek_całościowy": NONNEGATIVE_MONEY,
                             "nadpłata_lub_dopłata": MONEY,
+                            "termomodernization_carry_over": NONNEGATIVE_MONEY,
                         },
                     },
                 },
@@ -196,7 +200,7 @@ OUTPUT_JSON_SCHEMA: dict[str, Any] = {
                         "allocation_method": {"type": "string"},
                         "allocation_source": {"type": "string"},
                         "allocation_key": {
-                            "type": ["number", "null"],
+                            "anyOf": [{"type": "null"}, FRACTION],
                         },
                         "ip_amount": NONNEGATIVE_MONEY,
                         "non_ip_amount": NONNEGATIVE_MONEY,
@@ -224,7 +228,7 @@ OUTPUT_JSON_SCHEMA: dict[str, Any] = {
                     "required": ["miesiąc", "wartość"],
                     "properties": {
                         "miesiąc": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}$"},
-                        "wartość": {"type": "number"},
+                        "wartość": PERCENTAGE,
                     },
                 },
             },

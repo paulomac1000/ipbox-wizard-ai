@@ -57,6 +57,7 @@ class VCRRecorder:
             raise ValueError("record/none mode requires an API callback")
         if self.config.is_none:
             response = api_call(request)
+            self._require_complete(response)
             parsed = validate_response(response.content)
             return response, parsed
         return self._record(
@@ -96,6 +97,8 @@ class VCRRecorder:
         if entry.get("request_hash") != request_hash or entry.get("fingerprint") != fingerprint:
             raise CassetteStaleError("Manifest identity mismatch")
         parsed = validate_response(cassette.response)
+        if parsed != cassette.parsed_response:
+            raise CassetteStaleError("Stored parsed_response differs from reparsed response")
         response = LLMResponse(
             content=cassette.response,
             request_id=cassette.meta.request_id,
@@ -125,11 +128,11 @@ class VCRRecorder:
         started = time.monotonic()
         response = api_call(request)
         duration = time.monotonic() - started
-        if response.finish_reason not in {"stop", None}:
+        try:
+            self._require_complete(response)
+        except RecordingRejectedError:
             self._save_rejected(scenario, request_hash, response, "incomplete finish reason")
-            raise RecordingRejectedError(
-                f"Response finish_reason={response.finish_reason!r}; cassette not saved"
-            )
+            raise
         try:
             parsed = validate_response(response.content)
         except Exception as exc:
@@ -162,6 +165,13 @@ class VCRRecorder:
         self.manifest.update(cassette, path.name)
         self.manifest.save(self.config.manifest_path)
         return response, parsed
+
+    @staticmethod
+    def _require_complete(response: LLMResponse) -> None:
+        if response.finish_reason != "stop":
+            raise RecordingRejectedError(
+                f"Response finish_reason={response.finish_reason!r}; response rejected"
+            )
 
     def _save_rejected(
         self,

@@ -45,7 +45,6 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--model", required=True)
     parser.add_argument("--scenario")
-    parser.add_argument("--force", action="store_true")
     parser.add_argument(
         "--max-cost-usd",
         type=float,
@@ -85,7 +84,7 @@ def main() -> int:
     for path in scenarios:
         cassette = model_dir / f"{path.stem}.yaml"
         env["IPBOX_SCENARIO"] = path.stem
-        if cassette.exists() and not args.force:
+        if cassette.exists():
             playback_env = env.copy()
             playback_env.pop("OPENROUTER_API_KEY", None)
             playback_env["VCR_MODE"] = "playback"
@@ -106,7 +105,12 @@ def main() -> int:
                 print(f"SKIP {path.stem}: existing cassette passed offline validation")
                 skipped += 1
                 continue
-            print(f"STALE {path.stem}: preserving old file until a valid replacement is recorded")
+            print(
+                f"STALE {path.stem}: delete the cassette explicitly before re-recording",
+                file=sys.stderr,
+            )
+            failures.append(path.stem)
+            continue
 
         current_cost = recorded_cost(model_dir)
         if args.max_cost_usd and current_cost >= args.max_cost_usd:

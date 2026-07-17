@@ -21,6 +21,12 @@ from tests.llm.vcr.config import VCRConfig  # noqa: E402
 from tests.llm.vcr.fingerprint import compute_fingerprint  # noqa: E402
 
 
+def orphan_cassette_ids(model_directory: Path, expected_ids: set[str]) -> set[str]:
+    return {
+        path.stem for path in model_directory.glob("*.yaml") if path.name != "_manifest.yaml"
+    } - expected_ids
+
+
 def validate_model(model: str) -> list[str]:
     os.environ.update(
         {
@@ -76,6 +82,11 @@ def validate_model(model: str) -> list[str]:
         except Exception as exc:
             errors.append(f"{model}/{scenario_id}: {exc}")
 
+    cassette_ids = {
+        path.stem for path in config.model_directory.glob("*.yaml") if path.name != "_manifest.yaml"
+    }
+    for orphan in sorted(cassette_ids - expected_ids):
+        errors.append(f"{model}: orphan cassette file {orphan}")
     for orphan in sorted(set(manifest.entries) - expected_ids):
         errors.append(f"{model}: orphan manifest entry {orphan}")
     return errors

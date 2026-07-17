@@ -113,9 +113,9 @@ python scripts/record_model.py \
 
 ### Wznowienie po 402, 429 lub 5xx
 
-Nie usuwaj poprawnych kaset. Po doładowaniu konta albo odczekaniu uruchom to samo polecenie. Skrypt sprawdzi istniejące kasety offline i nagra tylko brakujące lub nieaktualne.
+Nie usuwaj poprawnych kaset. Po doładowaniu konta albo odczekaniu uruchom to samo polecenie. Skrypt sprawdzi istniejące kasety offline i nagra tylko brakujące. Nieaktualna kaseta zatrzymuje dany scenariusz do czasu jej jawnego usunięcia.
 
-`--force` stosuj wyłącznie po świadomej zmianie requestu. W normalnym wznowieniu jest zbędne i zwiększa koszt.
+Nie ma opcji `--force`. Poprawna kaseta jest tylko odtwarzana i pomijana, a nieaktualna kaseta blokuje nagranie. Po świadomej zmianie requestu usuń konkretny stary plik lub cały katalog modelu, przejrzyj diff i dopiero wtedy nagraj od nowa.
 
 ## 6. Weryfikacja offline
 

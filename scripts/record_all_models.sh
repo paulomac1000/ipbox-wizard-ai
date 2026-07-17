@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -uo pipefail
+set -euo pipefail
 
 : "${OPENROUTER_API_KEY:?Set OPENROUTER_API_KEY before recording}"
 

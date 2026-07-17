@@ -11,7 +11,7 @@ input:
   polityka_alokacji:
     policy_id: scenario-policy
     przychody:
-      metoda: czasowa_W
+      metoda: dokumentowa
     koszty_MIX:
       metoda: przychodowa_roczna
       źródło: interpretacja_KIS
@@ -23,15 +23,22 @@ input:
     klauzula_IP: true
   - nazwa: ClientB
     klauzula_IP: true
+  - nazwa: ClientC
+    klauzula_IP: false
   miesiace:
   - miesiac: 2025-01
     faktury:
     - kwota_PLN: 30000
       kontrahent: ClientA
       kwalifikuje_IP: true
+      kwota_IP: 30000
     - kwota_PLN: 50000
       kontrahent: ClientB
       kwalifikuje_IP: true
+      kwota_IP: 50000
+    - kwota_PLN: 20000
+      kontrahent: ClientC
+      kwalifikuje_IP: false
     ewidencja:
       godziny_pracy: 160
       godziny_nie_IP: 20

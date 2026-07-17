@@ -4,8 +4,28 @@ from __future__ import annotations
 
 import hashlib
 import json
-from dataclasses import asdict, dataclass
+from collections.abc import Mapping
+from dataclasses import dataclass
+from types import MappingProxyType
 from typing import Any
+
+
+def _freeze_json(value: Any) -> Any:
+    """Recursively snapshot JSON-compatible values into immutable containers."""
+    if isinstance(value, Mapping):
+        return MappingProxyType({str(key): _freeze_json(item) for key, item in value.items()})
+    if isinstance(value, list | tuple):
+        return tuple(_freeze_json(item) for item in value)
+    return value
+
+
+def _thaw_json(value: Any) -> Any:
+    """Return an independent JSON-compatible copy of an immutable snapshot."""
+    if isinstance(value, Mapping):
+        return {str(key): _thaw_json(item) for key, item in value.items()}
+    if isinstance(value, tuple):
+        return [_thaw_json(item) for item in value]
+    return value
 
 
 @dataclass(frozen=True, slots=True)
@@ -21,9 +41,37 @@ class LLMRequestSpec:
     provider_preferences: dict[str, Any] | None = None
     seed: int | None = None
 
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "response_format", _freeze_json(self.response_format))
+        object.__setattr__(
+            self,
+            "reasoning",
+            None if self.reasoning is None else _freeze_json(self.reasoning),
+        )
+        object.__setattr__(
+            self,
+            "provider_preferences",
+            (
+                None
+                if self.provider_preferences is None
+                else _freeze_json(self.provider_preferences)
+            ),
+        )
+
     def canonical_dict(self) -> dict[str, Any]:
-        """Return a stable representation including omitted optional fields."""
-        return asdict(self)
+        """Return a stable, independent representation including optional fields."""
+        return {
+            "provider": self.provider,
+            "model": self.model,
+            "system_prompt": self.system_prompt,
+            "user_prompt": self.user_prompt,
+            "max_tokens": self.max_tokens,
+            "response_format": _thaw_json(self.response_format),
+            "temperature": self.temperature,
+            "reasoning": _thaw_json(self.reasoning),
+            "provider_preferences": _thaw_json(self.provider_preferences),
+            "seed": self.seed,
+        }
 
     def canonical_json(self) -> str:
         return json.dumps(
@@ -45,14 +93,14 @@ class LLMRequestSpec:
             "model": self.model,
             "messages": messages,
             "max_tokens": self.max_tokens,
-            "response_format": self.response_format,
+            "response_format": _thaw_json(self.response_format),
         }
         if self.temperature is not None:
             payload["temperature"] = self.temperature
         if self.reasoning is not None:
-            payload["reasoning"] = self.reasoning
+            payload["reasoning"] = _thaw_json(self.reasoning)
         if self.provider_preferences is not None:
-            payload["provider"] = self.provider_preferences
+            payload["provider"] = _thaw_json(self.provider_preferences)
         if self.seed is not None:
             payload["seed"] = self.seed
         return payload

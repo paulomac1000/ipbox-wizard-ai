@@ -21,6 +21,8 @@ def pytest_configure(config: pytest.Config) -> None:
         os.environ["VCR_MODE"] = mode
     if model := config.getoption("--llm-model"):
         os.environ["LLM_MODEL"] = model
+    if scenario := config.getoption("--scenario"):
+        os.environ["IPBOX_SCENARIO"] = scenario
 
 
 def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item]) -> None:

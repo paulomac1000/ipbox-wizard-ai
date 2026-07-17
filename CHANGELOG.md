@@ -15,6 +15,13 @@
 - Multi-model benchmark for Gemini 3.5 Flash, GPT-5 Mini and Claude Haiku 4.5.
 - Resumable per-model cassette recording and actual-cost reports.
 
+### Fixed
+
+- Review findings in STOP zeroing, health-contribution deduction, FX evidence, conservative cost classification and revenue/W validation.
+- Fail-closed duplicate detection, cassette/manifest integrity, complete finish-reason checks and safe retry behavior.
+- Scenario fixtures now exercise ordinary PIT, thermomodernization carry-over, W-vs-MIX separation and reconciled multi-IP revenues.
+- GitHub Actions checkout/input hardening and recording scripts that cannot overwrite stale cassettes.
+
 ### Changed
 
 - LLM responses contain only `status`, `stops` and `reviews`; max output is reduced to 1024 tokens.

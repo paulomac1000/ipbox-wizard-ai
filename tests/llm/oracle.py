@@ -13,6 +13,7 @@ from python_helper.ipbox_calculator import (
     aggregate_nexus_costs,
     aggregate_w_multiproject,
     allocate_multi_ip,
+    allocate_revenue_monthly,
     calculate_nexus,
     calculate_overpayment,
     calculate_w_coefficient,
@@ -101,7 +102,7 @@ def _month_invoices(month: dict[str, Any]) -> list[dict[str, Any]]:
         return [
             {
                 "kwota_PLN": month["przychody"],
-                "kwalifikuje_IP": month.get("kwalifikuje_IP", True),
+                "kwalifikuje_IP": month.get("kwalifikuje_IP", False),
                 "kontrahent": month.get("kontrahent", "default"),
             }
         ]
@@ -209,13 +210,14 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
     health_contribution_double_counted = False
 
     clients = {
-        str(client.get("nazwa")): bool(client.get("klauzula_IP", True))
+        str(client.get("nazwa")): bool(client.get("klauzula_IP", False))
         for client in input_data.get("kontrahenci", [])
         if isinstance(client, dict) and client.get("nazwa")
     }
     client_revenue: dict[str, Decimal] = {}
     month_w: list[dict[str, Any]] = []
     month_w_map: dict[str, float] = {}
+    valid_w_values: list[float] = []
     invoices_by_month: dict[str, list[dict[str, Any]]] = {}
     positive_ip_claim = False
     has_multiple_projects = False
@@ -236,12 +238,13 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
             amount = money(_invoice_amount(invoice))
             client = str(invoice.get("kontrahent", "default"))
             client_revenue[client] = client_revenue.get(client, Decimal("0")) + amount
-            eligible = bool(invoice.get("kwalifikuje_IP", clients.get(client, True)))
+            eligible = bool(invoice.get("kwalifikuje_IP", clients.get(client, False)))
             if eligible:
                 eligible_amount += amount
                 positive_ip_claim = positive_ip_claim or amount > 0
 
         evidence = _month_evidence(month)
+        valid_w = False
         if month.get("brak_ewidencji") is True or (evidence is None and eligible_amount > 0):
             ip_claim_without_required_records = True
             value = 0.0
@@ -258,7 +261,10 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
                 "procent_faktury_IP",
             )
             result = calculate_w_coefficient(work_hours, non_ip_hours, invoice_percentage)
+            if result.get("status") == "ERROR":
+                raise ScenarioError(f"{month_id}: {result.get('message', 'invalid W evidence')}")
             value = float(result["W"])
+            valid_w = True
             projects = evidence.get("projekty")
             if isinstance(projects, list) and len(projects) > 1:
                 has_multiple_projects = True
@@ -269,18 +275,25 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
                     project_non_ip = _number(
                         project.get("godziny_nie_IP", 0), "project.godziny_nie_IP"
                     )
-                    project_w = calculate_w_coefficient(project_hours, project_non_ip)["W"]
+                    project_result = calculate_w_coefficient(project_hours, project_non_ip)
+                    if project_result.get("status") == "ERROR":
+                        raise ScenarioError(
+                            f"{month_id} project[{project_index}]: "
+                            f"{project_result.get('message', 'invalid W evidence')}"
+                        )
                     weighted_projects.append(
                         {
                             "revenue": _number(project.get("przychod", 0), "project.przychod"),
-                            "W": float(project_w),
+                            "W": float(project_result["W"]),
                         }
                     )
                 value = aggregate_w_multiproject(weighted_projects)
         month_w.append({"miesiąc": month_id, "wartość": value})
         month_w_map[month_id] = value
+        if valid_w:
+            valid_w_values.append(value)
 
-    w_values = [entry["wartość"] for entry in month_w if entry["wartość"] > 0]
+    w_values = valid_w_values
 
     if positive_ip_claim and not input_data.get("kwalifikowane_IP", True):
         claimed_ip_without_qualified_right = True
@@ -295,22 +308,28 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
         for invoice in invoices_by_month[month_id]:
             amount = money(_invoice_amount(invoice))
             client = str(invoice.get("kontrahent", "default"))
-            eligible = bool(invoice.get("kwalifikuje_IP", clients.get(client, True)))
+            eligible = bool(invoice.get("kwalifikuje_IP", clients.get(client, False)))
             if not eligible:
                 annual_non_revenue += amount
                 continue
-            method = revenue_policy["metoda"]
-            if method == "dokumentowa":
-                ip_amount = money(invoice.get("kwota_IP", amount))
-                if ip_amount > amount:
-                    raise ScenarioError("invoice.kwota_IP cannot exceed invoice amount")
-            else:
-                key = revenue_policy.get("klucz")
-                if method == "czasowa_W":
-                    key = float(w_key)
-                if key is None:
-                    raise ScenarioError(f"revenue policy {method} requires klucz")
-                ip_amount = money(amount * Decimal(str(key)))
+            method = str(revenue_policy["metoda"])
+            key = revenue_policy.get("klucz")
+            if method == "czasowa_W":
+                key = float(w_key)
+            try:
+                allocation = allocate_revenue_monthly(
+                    float(amount),
+                    method,
+                    revenue_key=key,
+                    document_split_ip=(
+                        float(money(invoice.get("kwota_IP", amount)))
+                        if method == "dokumentowa"
+                        else None
+                    ),
+                )
+            except ValueError as exc:
+                raise ScenarioError(str(exc)) from exc
+            ip_amount = money(allocation["ip_revenue"])
             annual_ip_revenue += ip_amount
             annual_non_revenue += amount - ip_amount
 
@@ -328,6 +347,14 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
     health_pit_deduction = _number(social.get("odliczenie_zdrowotne_PIT", 0), "health deduction")
     social_contributions_double_counted = social_in_kpir and social_pit_deduction > 0
     health_contribution_double_counted = health_in_kpir and health_pit_deduction > 0
+    if health_pit_deduction > 0 and tax_form != "liniowy_19%":
+        raise ScenarioError("health PIT deduction is supported only for linear tax")
+    health_limits = {2025: 12_900.0, 2026: 14_100.0}
+    health_limit = health_limits.get(year)
+    if health_limit is not None and health_pit_deduction > health_limit:
+        raise ScenarioError(
+            f"health PIT deduction exceeds the {year} limit of {health_limit:.2f} PLN"
+        )
 
     other_stop_condition = any(
         (
@@ -501,7 +528,8 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
         nexus=nexus,
         tax_form=tax_form if tax_form in {"liniowy_19%", "skala"} else "liniowy_19%",
         previous_losses=reliefs.get("straty_poprzednie", 0),
-        social_security_deduction=social_pit_deduction,
+        social_security_deduction=(0 if social_in_kpir else social_pit_deduction),
+        health_contribution_deduction=(0 if health_in_kpir else health_pit_deduction),
         ikze=reliefs.get("ikze", reliefs.get("IKZE", 0)),
         donations=reliefs.get("darowizny", 0),
         internet_tax_relief=reliefs.get("ulga_internet", 0),
@@ -633,6 +661,7 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
                 "podatek_NIE_finalny": tax["non_ip_tax_final"],
                 "podatek_całościowy": tax["total_tax"],
                 "nadpłata_lub_dopłata": settlement_signed,
+                "termomodernization_carry_over": tax.get("thermomodernization_carry_over", 0),
             },
         },
         "classifications": classifications if not stops else [],

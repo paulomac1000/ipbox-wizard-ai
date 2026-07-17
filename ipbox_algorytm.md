@@ -17,7 +17,7 @@
    - klasyfikacja kosztów NEXUS A/B/C/D/poza NEXUS.
 5. Współczynnik czasu `W` nie jest automatycznie kluczem MIX ani NEXUS.
 6. Interpretacja KIS lub udokumentowana polityka użytkownika ma pierwszeństwo przed heurystyką.
-7. Po STOP nie pokazuj finalnego podatku. Status ma być `STOPPED`, a wartości finansowe zgodne z wynikiem narzędzia — zwykle zero.
+7. Po STOP nie pokazuj finalnego podatku ani innych finalnych kwot. Status ma być `STOPPED`, a wszystkie wartości finansowe wyniku muszą być bezwarunkowo wyzerowane.
 
 ## 2. Kwalifikacja i STOP
 
@@ -154,13 +154,14 @@ Kalkulator wykonuje kolejno:
 
 1. dochód NIE;
 2. straty i odliczenia od dochodu w ustalonej kolejności;
-3. ulgę termomodernizacyjną i carry-over;
-4. podatek NIE odpowiedni dla formy;
-5. dodatni dochód IP × NEXUS;
-6. podstawę IP zaokrągloną half-up do pełnych złotych;
-7. 5% podatku IP;
-8. ulgę od podatku;
-9. podatek łączny i nadpłatę/dopłatę.
+3. składkę zdrowotną odliczaną od dochodu tylko dla podatku liniowego, wyłącznie gdy ta sama kwota nie została ujęta w KPiR i po zastosowaniu limitu właściwego dla roku (12 900 zł za 2025 r., 14 100 zł za 2026 r.);
+4. ulgę termomodernizacyjną i carry-over;
+5. podatek NIE odpowiedni dla formy;
+6. dodatni dochód IP × NEXUS;
+7. podstawę IP zaokrągloną half-up do pełnych złotych;
+8. 5% podatku IP;
+9. ulgę od podatku;
+10. podatek łączny i nadpłatę/dopłatę.
 
 Brak kosztów KPiR nie oznacza automatycznie podatku IP równego zero. O wyniku decydują przychód, dochód i NEXUS. Jednocześnie brak jakichkolwiek kwalifikowanych kosztów NEXUS daje NEXUS=0 — model nie może wymyślić A.
 
@@ -224,4 +225,4 @@ Reguły modelu:
 - nie zwracaj obliczeń, TEST-ów ani klasyfikacji — są dołączane deterministycznie;
 - nie dodawaj pól spoza schematu ani komentarzy.
 
-To nie jest uproszczenie reguł podatkowych. Jest to celowe rozdzielenie odpowiedzialności: model wykonuje klasyfikację wymagającą interpretacji, a kod odpowiada za arytmetykę, bilans i serializację pełnego raportu.
+To nie jest uproszczenie reguł podatkowych. Jest to celowe rozdzielenie odpowiedzialności: wszystkie fakty i klasyfikacje są wyznaczane upstream przez zweryfikowany kod/oracle, model mapuje jedynie `decision_facts` na status i kody, a kod odpowiada za arytmetykę, bilans oraz serializację pełnego raportu.

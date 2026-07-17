@@ -1,7 +1,7 @@
 meta:
   id: 28_edge_multiple_carry-overs
   name: Wielokrotne carry-over ulg
-  description: Wielokrotne carry-over ulg
+  description: Niewykorzystana termomodernizacja pozostaje carry-over; IKZE nie tworzy carry-over w tym modelu.
   tags:
   - regression
   priority: P1
@@ -62,3 +62,4 @@ assertions:
   - TEST_5
   - TEST_8
   - TEST_9
+  termomodernization_carry_over: 15000

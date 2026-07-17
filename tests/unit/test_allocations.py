@@ -190,3 +190,13 @@ def test_compare_allocation_methods() -> None:
             ip_income_before_mix=1,
             nexus=1,
         )
+
+
+def test_multi_ip_equality_uses_pln_cents_not_relative_tolerance() -> None:
+    with pytest.raises(ValueError, match="PLN-cent precision"):
+        allocate_multi_ip(
+            100,
+            1_000_000_000,
+            1_000_000_000,
+            {"A": 999_999_999.99},
+        )

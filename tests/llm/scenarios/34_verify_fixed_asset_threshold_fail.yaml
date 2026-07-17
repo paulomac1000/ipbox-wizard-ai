@@ -34,6 +34,8 @@ input:
     koszty:
     - opis: Laptop ThinkPad X1 Carbon
       kwota: 12500
+      kategoria: WYKLUCZONE
+      asset_treatment: amortyzacja_poza_tym_przebiegiem
       nexus_source: outside_nexus
     opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.
 assertions:

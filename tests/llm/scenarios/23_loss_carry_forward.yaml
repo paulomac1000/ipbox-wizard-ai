@@ -21,6 +21,8 @@ input:
   kontrahenci:
   - nazwa: ClientA
     klauzula_IP: true
+  - nazwa: ClientB
+    klauzula_IP: false
   ulgi:
     straty_poprzednie: 5000
   miesiace:
@@ -29,6 +31,9 @@ input:
     - kwota_PLN: 20000
       kontrahent: ClientA
       kwalifikuje_IP: true
+    - kwota_PLN: 10000
+      kontrahent: ClientB
+      kwalifikuje_IP: false
     ewidencja:
       godziny_pracy: 160
       godziny_nie_IP: 16
@@ -50,3 +55,6 @@ assertions:
   - TEST_5
   - TEST_8
   - TEST_9
+  podatek_NIE_range:
+  - 1330
+  - 1330

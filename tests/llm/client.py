@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import time
 from dataclasses import dataclass
+from datetime import UTC, datetime
+from email.utils import parsedate_to_datetime
 from os import environ
 from typing import Any
 
@@ -76,6 +78,24 @@ class LLMClient:
             cost=usage.get("cost"),
         )
 
+    @staticmethod
+    def _retry_after_seconds(response: requests.Response | None) -> float | None:
+        if response is None:
+            return None
+        value = response.headers.get("Retry-After")
+        if not value:
+            return None
+        try:
+            return max(0.0, float(value))
+        except ValueError:
+            try:
+                retry_at = parsedate_to_datetime(value)
+            except (TypeError, ValueError, OverflowError):
+                return None
+            if retry_at.tzinfo is None:
+                retry_at = retry_at.replace(tzinfo=UTC)
+            return max(0.0, (retry_at - datetime.now(UTC)).total_seconds())
+
     def call_with_retry(
         self,
         payload: dict[str, Any],
@@ -86,19 +106,20 @@ class LLMClient:
     ) -> LLMResponse:
         last_error: Exception | None = None
         for attempt in range(retries + 1):
+            sleep_seconds: float | None = None
             try:
                 return self.call(payload, timeout=timeout)
             except requests.HTTPError as exc:
                 last_error = exc
                 status = exc.response.status_code if exc.response is not None else None
-                retryable = status == 429 or (status is not None and 500 <= status < 600)
-                if not retryable or attempt == retries:
+                if status not in {429, 503} or attempt == retries:
                     raise
-            except requests.RequestException as exc:
+                sleep_seconds = self._retry_after_seconds(exc.response)
+            except requests.ConnectTimeout as exc:
                 last_error = exc
                 if attempt == retries:
                     raise
             if attempt < retries:
-                time.sleep(delay * (attempt + 1))
+                time.sleep(sleep_seconds if sleep_seconds is not None else delay * (attempt + 1))
         assert last_error is not None
         raise last_error

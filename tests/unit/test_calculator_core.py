@@ -94,9 +94,9 @@ def test_cost_item_validations() -> None:
         ("Składka zdrowotna", 100, False, True, "MIX"),
         ("Składka zdrowotna", 100, False, False, "WYKLUCZONE"),
         ("Mandat", 100, False, False, "WYKLUCZONE"),
-        ("Laptop", 12000, False, False, "WYKLUCZONE"),
+        ("Laptop", 12000, False, False, "MIX"),
         ("Kawa do domu", 100, False, False, "WYKLUCZONE"),
-        ("Licencja JetBrains", 100, False, False, "IP"),
+        ("Licencja JetBrains", 100, False, False, "MIX"),
         ("Księgowość", 100, False, False, "MIX"),
     ],
 )
@@ -114,3 +114,16 @@ def test_classify_cost(
 def test_classify_cost_threshold_validation() -> None:
     with pytest.raises(ValueError):
         classify_cost(CostItem("x", 1), False, False, asset_threshold=-1)
+
+
+def test_classify_cost_preserves_explicit_evidence() -> None:
+    explicit = CostItem("Licencja wyłącznie do projektu IP", 100, basket="IP")
+    assert classify_cost(explicit, False, False) is explicit
+
+
+def test_ambiguous_asset_and_tool_require_explicit_policy() -> None:
+    asset = classify_cost(CostItem("Laptop", 12000), False, False)
+    tool = classify_cost(CostItem("Licencja JetBrains", 100), False, False)
+    assert asset.basket == tool.basket == "MIX"
+    assert "explicit" in asset.note.lower()
+    assert "documented" in tool.note.lower()

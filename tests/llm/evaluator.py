@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import math
 from typing import Any
 
@@ -12,6 +13,7 @@ KNOWN_ASSERTIONS = {
     "alokacja_multi_ip",
     "klucz_MIX_metoda",
     "klucz_MIX_źródło",
+    "klucz_MIX_wartość",
     "koszty_koszyk",
     "mix_w_nexus_A",
     "nexus",
@@ -26,6 +28,7 @@ KNOWN_ASSERTIONS = {
     "stops",
     "testy_fail",
     "testy_pass",
+    "termomodernization_carry_over",
     "zus_dubel",
 }
 
@@ -56,10 +59,16 @@ def _path(mapping: Any, dotted: str) -> Any:
     return current
 
 
-def _codes(value: Any) -> set[str]:
+def _code_set(value: Any) -> tuple[set[str], set[str]]:
     if not isinstance(value, list):
-        return set()
-    return {str(item).strip().upper() for item in value}
+        return set(), set()
+    normalized = [str(item).strip().upper() for item in value]
+    duplicates = {code for code in normalized if normalized.count(code) > 1}
+    return set(normalized), duplicates
+
+
+def _codes(value: Any) -> set[str]:
+    return _code_set(value)[0]
 
 
 def _tests(value: Any) -> dict[str, str]:
@@ -74,39 +83,47 @@ def _tests(value: Any) -> dict[str, str]:
     return result
 
 
-def _monthly_map(value: Any) -> dict[str, float]:
+def _monthly_map(value: Any) -> tuple[dict[str, float], set[str]]:
     if not isinstance(value, list):
-        return {}
+        return {}, set()
     result: dict[str, float] = {}
+    duplicates: set[str] = set()
     for entry in value:
         if not isinstance(entry, dict):
             continue
         month = str(entry.get("miesiąc", ""))
         number = _number(entry.get("wartość"))
         if month and number is not None:
+            if month in result:
+                duplicates.add(month)
             result[month] = number
-    return result
+    return result, duplicates
 
 
-def _classification_map(value: Any) -> dict[str, dict[str, Any]]:
+def _classification_groups(value: Any) -> dict[str, list[dict[str, Any]]]:
     if not isinstance(value, list):
         return {}
-    result: dict[str, dict[str, Any]] = {}
+    result: dict[str, list[dict[str, Any]]] = {}
     for entry in value:
         if not isinstance(entry, dict):
             continue
         description = str(entry.get("opis", "")).strip().casefold()
         if description:
-            result[description] = entry
+            result.setdefault(description, []).append(entry)
     return result
 
 
-def _multi_ip_map(value: Any) -> dict[str, float] | None:
+def _entry_sort_key(entry: dict[str, Any]) -> str:
+    return json.dumps(entry, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+
+
+def _multi_ip_map(value: Any) -> tuple[dict[str, float], set[str]] | None:
     if value is None:
         return None
     if not isinstance(value, dict):
-        return {}
+        return {}, set()
     result: dict[str, float] = {}
+    duplicates: set[str] = set()
     stage1 = _number(value.get("stage1_software_share"))
     non_software = _number(value.get("stage1_non_software_share"))
     if stage1 is not None:
@@ -120,8 +137,10 @@ def _multi_ip_map(value: Any) -> dict[str, float] | None:
                 name = str(entry.get("ip", ""))
                 amount = _number(entry.get("amount"))
                 if name and amount is not None:
+                    if name in result:
+                        duplicates.add(name)
                     result[name] = amount
-    return result
+    return result, duplicates
 
 
 class Evaluator:
@@ -161,11 +180,27 @@ class Evaluator:
             )
         if expected_status == "STOPPED":
             for key in (
+                "result.przychody_roczne.IP",
+                "result.przychody_roczne.NIE",
+                "result.koszty_roczne.IP",
+                "result.koszty_roczne.NIE",
+                "result.koszty_roczne.MIX",
+                "result.koszty_roczne.WYKLUCZONE",
+                "result.nexus_koszty.A",
+                "result.nexus_koszty.B",
+                "result.nexus_koszty.C",
+                "result.nexus_koszty.D",
+                "result.nexus_koszty.poza_nexus",
+                "result.nexus",
+                "result.dochód_IP",
+                "result.dochód_NIE",
                 "result.podatek.podstawa_IP",
                 "result.podatek.podstawa_NIE",
                 "result.podatek.podatek_IP",
                 "result.podatek.podatek_NIE_finalny",
                 "result.podatek.podatek_całościowy",
+                "result.podatek.nadpłata_lub_dopłata",
+                "result.podatek.termomodernization_carry_over",
             ):
                 value = _number(_path(actual, key))
                 if value is None or value != 0:
@@ -192,6 +227,7 @@ class Evaluator:
             "result.podatek.podatek_NIE_finalny",
             "result.podatek.podatek_całościowy",
             "result.podatek.nadpłata_lub_dopłata",
+            "result.podatek.termomodernization_carry_over",
         )
         for path in money_paths:
             expected = _number(_path(self.reference, path))
@@ -242,8 +278,24 @@ class Evaluator:
             failures.append(_failure("mix_value", "incorrect key", expected_value, actual_value))
 
     def _compare_monthly_w(self, actual: dict[str, Any], failures: list[dict[str, Any]]) -> None:
-        expected = _monthly_map(self.reference.get("monthly_W"))
-        observed = _monthly_map(actual.get("monthly_W"))
+        expected, expected_duplicates = _monthly_map(self.reference.get("monthly_W"))
+        observed, observed_duplicates = _monthly_map(actual.get("monthly_W"))
+        if expected_duplicates:
+            failures.append(
+                _failure(
+                    "reference_duplicate_month",
+                    "oracle monthly_W has duplicate months",
+                    actual=sorted(expected_duplicates),
+                )
+            )
+        if observed_duplicates:
+            failures.append(
+                _failure(
+                    "duplicate_month",
+                    "monthly_W contains duplicate months",
+                    actual=sorted(observed_duplicates),
+                )
+            )
         if set(observed) != set(expected):
             failures.append(
                 _failure("monthly_w_keys", "month set differs", sorted(expected), sorted(observed))
@@ -273,42 +325,32 @@ class Evaluator:
         if not isinstance(actual_section, dict):
             failures.append(_failure("codes_missing", "stops_reviews"))
             return
-        expected_stops = _codes(expected_section.get("stops"))
-        actual_stops = _codes(actual_section.get("stops"))
-        if actual_stops != expected_stops:
-            failures.append(
-                _failure("stops", "stop codes differ", sorted(expected_stops), sorted(actual_stops))
-            )
-        expected_reviews = _codes(expected_section.get("reviews"))
-        actual_reviews = _codes(actual_section.get("reviews"))
-        if actual_reviews != expected_reviews:
-            failures.append(
-                _failure(
-                    "reviews",
-                    "review codes differ",
-                    sorted(expected_reviews),
-                    sorted(actual_reviews),
+        for key in ("stops", "reviews", "warnings"):
+            expected_codes, expected_duplicates = _code_set(expected_section.get(key))
+            actual_codes, actual_duplicates = _code_set(actual_section.get(key))
+            if expected_duplicates:
+                failures.append(
+                    _failure(f"reference_duplicate_{key}", key, actual=sorted(expected_duplicates))
                 )
-            )
-        expected_warnings = _codes(expected_section.get("warnings"))
-        actual_warnings = _codes(actual_section.get("warnings"))
-        if actual_warnings != expected_warnings:
-            failures.append(
-                _failure(
-                    "warnings",
-                    "warning codes differ",
-                    sorted(expected_warnings),
-                    sorted(actual_warnings),
+            if actual_duplicates:
+                failures.append(_failure(f"duplicate_{key}", key, actual=sorted(actual_duplicates)))
+            if actual_codes != expected_codes:
+                failures.append(
+                    _failure(
+                        key,
+                        f"{key} codes differ",
+                        sorted(expected_codes),
+                        sorted(actual_codes),
+                    )
                 )
-            )
 
     def _compare_classifications(
         self,
         actual: dict[str, Any],
         failures: list[dict[str, Any]],
     ) -> None:
-        expected = _classification_map(self.reference.get("classifications"))
-        observed = _classification_map(actual.get("classifications"))
+        expected = _classification_groups(self.reference.get("classifications"))
+        observed = _classification_groups(actual.get("classifications"))
         if set(observed) != set(expected):
             failures.append(
                 _failure(
@@ -318,49 +360,104 @@ class Evaluator:
                     sorted(observed),
                 )
             )
-        for description, expected_entry in expected.items():
-            actual_entry = observed.get(description)
-            if actual_entry is None:
+        for description, expected_entries in expected.items():
+            actual_entries = observed.get(description, [])
+            if len(actual_entries) != len(expected_entries):
+                failures.append(
+                    _failure(
+                        "classification_count",
+                        description,
+                        len(expected_entries),
+                        len(actual_entries),
+                    )
+                )
                 continue
-            for key in ("basket", "nexus_source", "nexus_basket"):
-                if actual_entry.get(key) != expected_entry.get(key):
-                    failures.append(
-                        _failure(
-                            "classification_mismatch",
-                            f"{description}.{key}",
-                            expected_entry.get(key),
-                            actual_entry.get(key),
-                        )
-                    )
-            for key in ("amount", "ip_amount", "non_ip_amount", "nexus_amount"):
-                expected_value = _number(expected_entry.get(key))
-                actual_value = _number(actual_entry.get(key))
-                if (
-                    actual_value is None
-                    or expected_value is None
-                    or abs(actual_value - expected_value) > 0.011
+            for index, (expected_entry, actual_entry) in enumerate(
+                zip(
+                    sorted(expected_entries, key=_entry_sort_key),
+                    sorted(actual_entries, key=_entry_sort_key),
+                    strict=True,
+                )
+            ):
+                for key in (
+                    "basket",
+                    "allocation_method",
+                    "allocation_source",
+                    "nexus_source",
+                    "nexus_basket",
                 ):
-                    failures.append(
-                        _failure(
-                            "classification_amount",
-                            f"{description}.{key}",
-                            expected_value,
-                            actual_value,
+                    if actual_entry.get(key) != expected_entry.get(key):
+                        failures.append(
+                            _failure(
+                                "classification_mismatch",
+                                f"{description}[{index}].{key}",
+                                expected_entry.get(key),
+                                actual_entry.get(key),
+                            )
                         )
-                    )
+                for key in (
+                    "amount",
+                    "allocation_key",
+                    "ip_amount",
+                    "non_ip_amount",
+                    "nexus_amount",
+                ):
+                    if expected_entry.get(key) is None:
+                        if actual_entry.get(key) is not None:
+                            failures.append(
+                                _failure(
+                                    "classification_amount",
+                                    f"{description}[{index}].{key}",
+                                    None,
+                                    actual_entry.get(key),
+                                )
+                            )
+                        continue
+                    expected_value = _number(expected_entry.get(key))
+                    actual_value = _number(actual_entry.get(key))
+                    tolerance = 1e-6 if key == "allocation_key" else 0.011
+                    if (
+                        actual_value is None
+                        or expected_value is None
+                        or abs(actual_value - expected_value) > tolerance
+                    ):
+                        failures.append(
+                            _failure(
+                                "classification_amount",
+                                f"{description}[{index}].{key}",
+                                expected_value,
+                                actual_value,
+                            )
+                        )
 
     def _compare_multi_ip(self, actual: dict[str, Any], failures: list[dict[str, Any]]) -> None:
-        expected = _multi_ip_map(_path(self.reference, "result.alokacja_multi_ip"))
-        observed = _multi_ip_map(_path(actual, "result.alokacja_multi_ip"))
-        if expected is None:
-            if observed is not None:
+        expected_result = _multi_ip_map(_path(self.reference, "result.alokacja_multi_ip"))
+        observed_result = _multi_ip_map(_path(actual, "result.alokacja_multi_ip"))
+        if expected_result is None:
+            if observed_result is not None:
                 failures.append(
-                    _failure("multi_ip_unexpected", "alokacja_multi_ip", None, observed)
+                    _failure("multi_ip_unexpected", "alokacja_multi_ip", None, observed_result[0])
                 )
             return
-        if observed is None:
+        if observed_result is None:
             failures.append(_failure("multi_ip_missing", "alokacja_multi_ip"))
             return
+        expected, expected_duplicates = expected_result
+        observed, observed_duplicates = observed_result
+        if expected_duplicates:
+            failures.append(
+                _failure(
+                    "reference_duplicate_multi_ip",
+                    "oracle duplicate IP names",
+                    actual=sorted(expected_duplicates),
+                )
+            )
+        if observed_duplicates:
+            failures.append(
+                _failure(
+                    "duplicate_multi_ip", "duplicate IP names", actual=sorted(observed_duplicates)
+                )
+            )
         if set(observed) != set(expected):
             failures.append(
                 _failure(
@@ -396,6 +493,19 @@ class Evaluator:
         check_range("podatek_NIE_range", "result.podatek.podatek_NIE_finalny")
         check_range("przychod_IP_roczny_range", "result.przychody_roczne.IP")
         check_range("przychod_NIE_roczny_range", "result.przychody_roczne.NIE")
+
+        if "termomodernization_carry_over" in assertions:
+            observed = _number(_path(actual, "result.podatek.termomodernization_carry_over"))
+            expected = float(assertions["termomodernization_carry_over"])
+            if observed is None or abs(observed - expected) > 0.011:
+                failures.append(
+                    _failure(
+                        "assertion_carry_over",
+                        "termomodernization_carry_over",
+                        expected,
+                        observed,
+                    )
+                )
 
         if "nexus" in assertions:
             observed = _number(_path(actual, "result.nexus"))
@@ -435,16 +545,22 @@ class Evaluator:
             if str(code).upper() not in _codes(actual_codes.get("reviews")):
                 failures.append(_failure("assertion_review", str(code)))
 
-        monthly = _monthly_map(actual.get("monthly_W"))
+        monthly, monthly_duplicates = _monthly_map(actual.get("monthly_W"))
+        if monthly_duplicates:
+            failures.append(
+                _failure(
+                    "assertion_duplicate_month", "monthly_W", actual=sorted(monthly_duplicates)
+                )
+            )
         for month, expected in assertions.get("W_miesieczne", {}).items():
             observed = monthly.get(str(month))
             if observed is None or abs(observed - float(expected)) > 0.011:
                 failures.append(_failure("assertion_w", str(month), expected, observed))
 
-        classifications = _classification_map(actual.get("classifications"))
+        classifications = _classification_groups(actual.get("classifications"))
         for description, basket in assertions.get("koszty_koszyk", {}).items():
-            entry = classifications.get(str(description).casefold())
-            observed = entry.get("basket") if entry else None
+            entries = classifications.get(str(description).casefold(), [])
+            observed = entries[0].get("basket") if len(entries) == 1 else None
             if observed != basket:
                 failures.append(_failure("assertion_basket", description, basket, observed))
 
@@ -469,24 +585,34 @@ class Evaluator:
                     mix.get("źródło"),
                 )
             )
+        if "klucz_MIX_wartość" in assertions:
+            expected_key = float(assertions["klucz_MIX_wartość"])
+            observed_key = _number(mix.get("wartość"))
+            if observed_key is None or abs(observed_key - expected_key) > 1e-6:
+                failures.append(
+                    _failure("assertion_mix_value", "wartość", expected_key, observed_key)
+                )
         if assertions.get("nie_używaj_W_do_MIX") and mix.get("metoda") == "czasowa_W":
             failures.append(_failure("assertion_w_for_mix", "W was used for MIX"))
 
         if assertions.get("mix_w_nexus_A") is False:
-            for entry in classifications.values():
-                if entry.get("basket") == "MIX" and entry.get("nexus_basket") == "A":
-                    failures.append(_failure("assertion_mix_in_a", str(entry.get("opis"))))
+            for entries in classifications.values():
+                for entry in entries:
+                    if entry.get("basket") == "MIX" and entry.get("nexus_basket") == "A":
+                        failures.append(_failure("assertion_mix_in_a", str(entry.get("opis"))))
 
         if assertions.get("roznice_kursowe_w_IP") is False:
-            for entry in classifications.values():
-                if "kurs" in str(entry.get("opis", "")).lower() and entry.get("basket") == "IP":
-                    failures.append(_failure("assertion_fx_in_ip", str(entry.get("opis"))))
+            for entries in classifications.values():
+                for entry in entries:
+                    if "kurs" in str(entry.get("opis", "")).lower() and entry.get("basket") == "IP":
+                        failures.append(_failure("assertion_fx_in_ip", str(entry.get("opis"))))
 
         if assertions.get("zus_dubel") is False and observed_tests.get("TEST_3") != "PASS":
             failures.append(_failure("assertion_zus_double", "TEST_3 must pass"))
 
         if "alokacja_multi_ip" in assertions:
-            observed_multi = _multi_ip_map(_path(actual, "result.alokacja_multi_ip")) or {}
+            observed_result = _multi_ip_map(_path(actual, "result.alokacja_multi_ip"))
+            observed_multi = observed_result[0] if observed_result is not None else {}
             for key, expected in assertions["alokacja_multi_ip"].items():
                 observed = observed_multi.get(key)
                 if observed is None or abs(observed - float(expected)) > 0.011:

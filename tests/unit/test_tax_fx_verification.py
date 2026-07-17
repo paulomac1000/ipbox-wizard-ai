@@ -39,6 +39,7 @@ def test_tax_cascade_linear_and_scale() -> None:
     [
         "previous_losses",
         "social_security_deduction",
+        "health_contribution_deduction",
         "ikze",
         "donations",
         "internet_tax_relief",
@@ -136,7 +137,8 @@ def test_convert_fx_invoice_success_and_missing_payment_rate(monkeypatch) -> Non
 
 def test_convert_fx_invoice_contract_errors(monkeypatch) -> None:
     monkeypatch.setattr(calc, "get_nbp_rate", lambda *a, **k: None)
-    assert "error" in convert_fx_invoice(100, "USD", "2025-01-02")
+    with pytest.raises(ValueError, match="payment_date"):
+        convert_fx_invoice(100, "USD", "2025-01-02")
     with pytest.raises(ValueError):
         convert_fx_invoice(-1, "USD", "2025-01-02")
     with pytest.raises(ValueError):
@@ -147,3 +149,15 @@ def test_convert_fx_invoice_contract_errors(monkeypatch) -> None:
         convert_fx_invoice(1, "USD", "bad")
     with pytest.raises(ValueError):
         convert_fx_invoice(1, "USD", "2025-01-03", "2025-01-02")
+
+
+def test_health_contribution_is_deducted_once_from_linear_income() -> None:
+    result = tax_cascade(10000, 0, 0, "liniowy_19%", health_contribution_deduction=1000)
+    assert result["non_ip_base_rounded"] == 9000
+    assert result["non_ip_tax_final"] == 1710
+    assert any(step["step"] == "Health contribution" for step in result["deduction_steps"])
+
+
+def test_health_contribution_rejected_for_scale() -> None:
+    with pytest.raises(ValueError, match="only for linear"):
+        tax_cascade(10000, 0, 0, "skala", health_contribution_deduction=1000)
