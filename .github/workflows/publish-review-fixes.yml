@@ -1,5 +1,6 @@
 name: Publish reviewed bot fixes
 
+# One-shot publisher; removes itself after verified application.
 on:
   push:
     branches: [fix/decouple-mix-allocation-from-w]
