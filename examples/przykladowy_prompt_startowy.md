@@ -31,10 +31,12 @@ Przy działalności liniowej policz osobne zeznanie skali oddzielnie. Nie stosuj
 przy liniowym zwykłych darowizn, internetu, rehabilitacji ani ulgi na dziecko.
 
 Sprawdź roczne limity zdrowotnej i IKZE. Dla roku bez zweryfikowanego limitu
-zatrzymaj obliczenie. Po STOP wyzeruj finalne liczby.
+zatrzymaj obliczenie. Miesiące muszą mieć format YYYY-MM i rok zgodny z rokiem
+rozliczenia. Pula termomodernizacji nie może przekraczać 53 000 zł. Po STOP
+wyzeruj finalne liczby.
 
 Na końcu pokaż ślad dowodów, alokacji, TEST 1–9, ograniczenia zakresu i pytania
 do księgowej lub doradcy.
 ```
 
-W harnessie model nie dostaje pełnego zadania rachunkowego. Otrzymuje tylko `decision_facts` i zwraca `status/stops/reviews`.
+W harnessie model nie dostaje pełnego zadania rachunkowego ani pełnej mapy faktów. Python ustala `decision_facts`, runner filtruje je do prawdziwych `active_rules` z gotowymi kodami, a model kopiuje wyłącznie te kody do `status/stops/reviews`.
