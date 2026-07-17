@@ -2,7 +2,7 @@
 
 Deterministyczny-first wizard wspierający przygotowanie danych do rozliczenia IP Box programisty B2B.
 
-> To nie jest porada podatkowa ani generator gotowego zeznania. Wynik wymaga sprawdzenia z księgową lub doradcą. Audyt techniczny i prawny wykonano 17 lipca 2026 r.; scenariusze referencyjne dotyczą 2025 r., a zakodowane limity 2026 są jawnie wersjonowane.
+> To nie jest porada podatkowa ani generator gotowego zeznania. Wynik wymaga sprawdzenia z księgową lub doradcą. Audyt techniczny i semantyczny wykonano 17 lipca 2026 r.; scenariusze referencyjne dotyczą 2025 r., a zakodowane limity 2026 są jawnie wersjonowane.
 
 ## Architektura
 
@@ -52,15 +52,30 @@ python scripts/check_cassette_policy.py
 for script in scripts/*.sh dump-to-md.sh; do bash -n "$script"; done
 ```
 
-Stan po audycie protokołu: **167 testów PASS**, coverage `python_helper` **95,30%**; pełny bezpłatny suite: **167 PASS i 36 kontrolowanych skipów LLM**.
+Stan po audycie protokołu: **181 testów PASS**, coverage `python_helper` **94,32%**; pełny bezpłatny suite: **181 PASS i 36 kontrolowanych skipów LLM**.
 
-## Benchmark multi-model
+## Benchmark wielorodzinny
 
-| Dostawca | Model OpenRouter |
-|---|---|
-| Google | `google/gemini-3.5-flash` |
-| OpenAI | `openai/gpt-5-mini` |
-| Anthropic | `anthropic/claude-haiku-4.5` |
+Benchmark używa dziewięciu tanich modeli z dziewięciu niezależnych rodzin:
+
+| Rodzina | Model OpenRouter | Rola w macierzy |
+|---|---|---|
+| Google Gemini | `google/gemini-3-flash-preview` | tańszy i starszy próg zamiast Gemini 3.5 |
+| OpenAI GPT | `openai/gpt-5-nano` | najmniejszy model GPT-5 jako niski próg zgodności |
+| Anthropic Claude | `anthropic/claude-haiku-4.5` | mały model Claude |
+| DeepSeek | `deepseek/deepseek-chat-v3.1` | otwarta rodzina DeepSeek V3 |
+| MiniMax | `minimax/minimax-m2.5` | niezależna rodzina MoE |
+| Moonshot Kimi | `moonshotai/kimi-k2.5` | niezależna rodzina Kimi |
+| Z.ai GLM | `z-ai/glm-4.7-flash` | tani model Flash GLM |
+| Qwen | `qwen/qwen3.5-flash-02-23` | tani model Flash Qwen |
+| Mistral | `mistralai/ministral-3b-2512` | bardzo mały model 3B jako dolna granica |
+
+
+To jest **test przenośności protokołu**, nie dowód poprawności podatkowej i nie
+matematyczna gwarancja zachowania każdego mocniejszego modelu. Jeżeli małe modele
+różnych dostawców przechodzą identyczny ścisły kontrakt bez naprawiania odpowiedzi,
+to rośnie wiarygodność, że zadanie jest jednoznaczne i niezależne od jednej rodziny.
+Prawdą podatkową nadal pozostają Python, oracle i testy deterministyczne.
 
 Nagrywanie jest jawne i płatne:
 
@@ -69,7 +84,9 @@ export OPENROUTER_API_KEY='...'
 ./scripts/record_all_models.sh --max-cost-usd 5
 ```
 
-Pełna procedura: [`docs/testing.md`](docs/testing.md). Niezależny audyt: [`docs/independent-audit-brief.md`](docs/independent-audit-brief.md).
+Pełna procedura: [`docs/testing.md`](docs/testing.md). Dobór modeli i ograniczenia
+wnioskowania: [`docs/model-diversity-benchmark.md`](docs/model-diversity-benchmark.md).
+Niezależny audyt: [`docs/independent-audit-brief.md`](docs/independent-audit-brief.md).
 
 ## Zakres multi-IP
 
@@ -77,11 +94,11 @@ Pełna procedura: [`docs/testing.md`](docs/testing.md). Niezależny audyt: [`doc
 
 ## Stan wydania
 
-Rdzeń deterministyczny i protokół `active_rules` są po audycie. PR pozostaje **draftem**, ponieważ aktualny kontrakt nie ma jeszcze kompletnej macierzy kaset.
+Rdzeń deterministyczny i protokół `active_rules` są po audycie. Pierwsza macierz 108 odpowiedzi została unieważniona: 36 odpowiedzi Claude zawierało Markdown fences akceptowane przez zbyt pobłażliwy parser, a następnie rozszerzono próbę do dziewięciu rodzin. PR pozostaje **draftem**, dopóki nie powstanie kompletna macierz 324 ścisłych odpowiedzi JSON.
 
 Warunki zakończenia:
 
-- 36/36 kaset dla każdego z trzech modeli, czyli 108 aktualnych nagrań;
+- 36/36 kaset dla każdego z dziewięciu modeli, czyli 324 aktualne nagrania;
 - playback bez `OPENROUTER_API_KEY`;
 - ręczny przegląd odpowiedzi, odrzuceń i raportu kosztu;
 - niezależny raport `READY` bez nierozwiązanych uwag;

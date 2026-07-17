@@ -256,6 +256,8 @@ class CostItem:
         amount = _nonnegative("amount", self.amount)
         if self.basket:
             object.__setattr__(self, "basket", canonical_basket(self.basket))
+        if self.basket == "IP" and not self.allocation_source.strip():
+            raise ValueError("direct IP cost requires allocation_source evidence")
         if self.allocation_key is not None:
             _fraction("allocation_key", self.allocation_key)
         if self.nexus_source not in NEXUS_SOURCE_MAP:
@@ -486,6 +488,8 @@ def allocate_costs_monthly(
     for item in extra:
         if item.basket and item.basket != "IP":
             raise ValueError("ip_direct_costs may contain only IP or unclassified items")
+        if not item.allocation_source.strip():
+            raise ValueError("ip_direct_costs require allocation_source evidence")
     extra_ids = {id(item) for item in extra}
 
     totals = {
@@ -507,7 +511,7 @@ def allocate_costs_monthly(
         non_amount = Decimal("0")
         status = "FINAL"
         method = "direct"
-        source = item.allocation_source or "dokument"
+        source = item.allocation_source
         key: float | None = None
 
         if basket == "IP":
@@ -642,6 +646,8 @@ def allocate_multi_ip(
     total_revenue = _nonnegative("total_revenue", total_revenue)
     if total_revenue == 0:
         raise ValueError("total_revenue must be > 0")
+    if software_ip_revenue == 0:
+        raise ValueError("software_ip_revenue must be > 0")
     if software_ip_revenue > total_revenue:
         raise ValueError("software_ip_revenue cannot exceed total_revenue")
     if not ip_revenues:

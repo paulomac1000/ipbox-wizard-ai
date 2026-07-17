@@ -240,13 +240,12 @@ def test_runner_exposes_only_active_decision_rules() -> None:
     expected = []
     for kind, mapping in (("STOP", STOP_FACT_TO_CODE), ("REVIEW", REVIEW_FACT_TO_CODE)):
         expected.extend(
-            {"kind": kind, "fact": fact, "code": code}
+            {"kind": kind, "code": code}
             for fact, code in mapping.items()
             if reference["decision_facts"].get(fact) is True
         )
     context = build_tool_context(reference)
     assert context == {"active_rules": expected}
-    assert all(reference["decision_facts"][item["fact"]] is True for item in expected)
 
     serialized = json.dumps(context, ensure_ascii=False)
     assert "claimed_ip_without_qualified_right" not in serialized
@@ -254,20 +253,22 @@ def test_runner_exposes_only_active_decision_rules() -> None:
     assert "REVIEW_09" in serialized
 
     prompt = LLMTestRunner(None).build_prompt("ignored human documentation", loaded)
-    assert "AKTYWNE REGUŁY" in prompt
+    assert "ACTIVE RULES" in prompt
     assert "deterministic_report" not in prompt
     assert '"result"' not in prompt
     assert "active_rules" in prompt
     assert "claimed_ip_without_qualified_right" not in prompt
     assert "STOP_02" not in prompt
-    assert "status, stops i reviews" in prompt
+    assert "single_positive_revenue_client" not in prompt
+    assert "status, stops, and reviews" in prompt
 
 
 def test_decision_protocol_describes_copying_active_rules_only() -> None:
     protocol = build_decision_protocol()
-    assert "active_rules zawiera wyłącznie reguły" in protocol
-    assert "Nie zwracaj żadnego kodu" in protocol
-    assert "status=STOPPED" in protocol
+    assert "active_rules contains only rules" in protocol
+    assert "Do not invent, omit, or duplicate" in protocol
+    assert "status is STOPPED" in protocol
+    assert "Markdown fences" in protocol
     assert "unsupported_tax_form" not in protocol
     assert "STOP_01" not in protocol
 
@@ -385,7 +386,22 @@ def test_health_deduction_year_limit_is_enforced() -> None:
 
 def test_stopped_report_zeros_every_financial_output() -> None:
     loaded = scenario("14_lump_sum_ineligible_check")
-    loaded["input"]["ulgi"] = {"ulga_internet": 760, "ulga_prorodzinna": 1112.04}
+    loaded["input"]["ulgi"] = {
+        "ulga_internet": 760,
+        "ulga_prorodzinna": 1112.04,
+        "weryfikacja": {
+            "ulga_internet": {
+                "zweryfikowana": True,
+                "kategoria": "pierwsze_dwa_lata",
+                "dowod": "faktury_2025",
+            },
+            "ulga_prorodzinna": {
+                "zweryfikowana": True,
+                "kategoria": "jedno_dziecko",
+                "dowod": "dane_rodzinne_2025",
+            },
+        },
+    }
     reference = compute_reference(loaded)
     assert reference["status"] == "STOPPED"
     result = reference["result"]
@@ -397,6 +413,7 @@ def test_stopped_report_zeros_every_financial_output() -> None:
     assert all(value == 0 for value in result["podatek"].values())
     assert result["alokacja_multi_ip"] is None
     assert result["klucz_MIX"]["wartość"] is None
+    assert reference["classifications"] == []
 
 
 def test_evaluator_rejects_duplicate_semantic_keys() -> None:
@@ -436,3 +453,46 @@ def test_schema_rejects_negative_and_out_of_range_values() -> None:
         invalid = deepcopy(base)
         mutation(invalid)
         assert list(validator.iter_errors(invalid))
+
+
+def test_personal_relief_requires_verified_record() -> None:
+    loaded = deepcopy(scenario("25_rehab_relief"))
+    del loaded["input"]["ulgi"]["weryfikacja"]
+    with pytest.raises(ScenarioError, match="weryfikacja.*must be a mapping"):
+        compute_reference(loaded)
+
+
+def test_b_r_relief_cannot_exceed_documented_qualified_costs() -> None:
+    loaded = deepcopy(scenario("26_rd_relief_nexus"))
+    loaded["input"]["ulgi"]["ulga_BR_IP"] = 501
+    loaded["input"]["ulgi"]["ulga_BR_limit_odliczenia"] = 501
+    with pytest.raises(ScenarioError, match="exceeds documented IP-qualified"):
+        compute_reference(loaded)
+
+
+def test_invalid_shapes_fail_with_scenario_error() -> None:
+    loaded = deepcopy(scenario("45_multi_ip_two_stage"))
+    loaded["input"]["kontrahenci"] = None
+    with pytest.raises(ScenarioError, match="not null"):
+        validate_scenario(loaded)
+
+    loaded = deepcopy(scenario("45_multi_ip_two_stage"))
+    del loaded["input"]["alokacja_multi_ip"]["przychody_IP"]
+    with pytest.raises(ScenarioError, match="przychody_IP is required"):
+        validate_scenario(loaded)
+
+
+def test_direct_ip_cost_requires_real_allocation_source() -> None:
+    loaded = deepcopy(scenario("01_basic_linear"))
+    loaded["input"]["miesiace"][0]["koszty"][0].pop("allocation_source")
+    with pytest.raises(ScenarioError, match="requires allocation_source"):
+        validate_scenario(loaded)
+
+
+def test_fx_scenarios_use_source_currency_and_derived_differences() -> None:
+    fx = compute_reference(scenario("03_fx_usd_single_client"))
+    assert fx["result"]["przychody_roczne"] == {"IP": 20000.0, "NIE": 150.0}
+
+    mixed = compute_reference(scenario("11_multi_client_mixed_currencies"))
+    assert mixed["result"]["przychody_roczne"] == {"IP": 22900.0, "NIE": 50.0}
+    assert mixed["result"]["koszty_roczne"]["NIE"] == 100.0

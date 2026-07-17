@@ -6,7 +6,7 @@ from enum import Enum
 from os import environ
 from pathlib import Path
 
-from ..models import DEFAULT_MODEL, get_model_profile
+from ..models import DEFAULT_MODEL, get_model_profile, model_slug
 
 
 class VCRMode(str, Enum):
@@ -33,7 +33,7 @@ class VCRConfig:
 
     @property
     def model_slug(self) -> str:
-        return self.model.replace("/", "_").replace(".", "_").replace("-", "_")
+        return model_slug(self.model)
 
     @property
     def model_directory(self) -> Path:

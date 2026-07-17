@@ -27,10 +27,26 @@ input:
   miesiace:
   - miesiac: 2025-01
     faktury:
-    - kwota_PLN: 10000
+    - kwota_waluta: 2500
+      waluta: USD
+      data_wystawienia: '2025-01-02'
+      data_zaplaty: '2025-01-10'
+      data_kursu_przychodu: '2024-12-31'
+      kurs_przychodu: 4.0
+      data_kursu_zaplaty: '2025-01-09'
+      kurs_zaplaty: 4.02
+      źródło_kursu: NBP_table_A_fixture
       kontrahent: TechPL
       kwalifikuje_IP: true
-    - kwota_PLN: 12900
+    - kwota_waluta: 3000
+      waluta: EUR
+      data_wystawienia: '2025-01-03'
+      data_zaplaty: '2025-01-15'
+      data_kursu_przychodu: '2025-01-02'
+      kurs_przychodu: 4.3
+      data_kursu_zaplaty: '2025-01-14'
+      kurs_zaplaty: 4.2666666667
+      źródło_kursu: NBP_table_A_fixture
       kontrahent: EuroSoft
       kwalifikuje_IP: true
     ewidencja:
@@ -42,8 +58,8 @@ input:
       kwota: 300
       nexus_source: own_br
       kategoria: IP
+      allocation_source: ewidencja_kosztu_IP
     opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.
-    różnica_kursowa: -50
 assertions:
   roznice_kursowe_w_IP: false
   podatek_IP_range:

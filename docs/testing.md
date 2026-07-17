@@ -2,7 +2,7 @@
 
 ## 1. Co testuje benchmark
 
-Python oblicza liczby, klasyfikacje, W, TEST 1–9 i atomowe `decision_facts`. Runner usuwa wszystkie wartości `false` i tworzy listę `active_rules` zawierającą tylko prawdziwe reguły oraz ich kody. Model otrzymuje wyłącznie tę listę i zwraca:
+Python oblicza liczby, klasyfikacje, W, TEST 1–9 i atomowe `decision_facts`. Runner usuwa wszystkie wartości `false` i tworzy listę `active_rules` zawierającą tylko rodzaj i kod prawdziwych reguł. Model otrzymuje wyłącznie tę listę i zwraca:
 
 ```json
 {"status":"FINAL","stops":[],"reviews":["REVIEW_09"]}
@@ -33,9 +33,9 @@ for script in scripts/*.sh dump-to-md.sh; do bash -n "$script"; done
 
 Stan referencyjny po audycie protokołu z 17 lipca 2026 r.:
 
-- 167 testów jednostkowych PASS;
-- coverage `python_helper` 95,30%;
-- pełny suite: 167 PASS i 36 kontrolowanych skipów LLM;
+- 181 testów jednostkowych PASS;
+- coverage `python_helper` 94,32%;
+- pełny suite: 181 PASS i 36 kontrolowanych skipów LLM;
 - pusty katalog kaset jest dozwolony, częściowa macierz nie jest.
 
 ## 3. Testy semantyczne, które muszą pozostać
@@ -59,19 +59,28 @@ Szczególnie chronione regresje:
 
 ## 4. Dlaczego stare kasety są nieważne
 
-Fingerprint obejmuje protokół decyzji, listę aktywnych reguł, system prompt, request, model, profil, schema i format kasety. Zmiana któregokolwiek elementu unieważnia nagranie. Kasety z pełną mapą `true/false` są nieaktualne i muszą zostać nagrane od nowa.
+Fingerprint obejmuje protokół decyzji, listę aktywnych reguł, system prompt, request, model, profil, schema i format kasety. Zmiana któregokolwiek elementu unieważnia nagranie. Kasety z pełną mapą `true/false` oraz pierwsza macierz `active_rules` z parserem usuwającym Markdown fences są nieaktualne i muszą zostać nagrane od nowa.
 
-Kasety starego pełnego raportu także nie są zgodne z obecną kopertą decyzji. Nie kopiuj ich odpowiedzi, hashy, manifestu ani parsed payloadu. Po obecnych zmianach należy nagrać **108 kaset: 3 modele × 36 scenariuszy**.
+Kasety starego pełnego raportu także nie są zgodne z obecną kopertą decyzji. Nie kopiuj ich odpowiedzi, hashy, manifestu ani parsed payloadu. Po obecnych zmianach należy nagrać **324 kasety: 9 modeli × 36 scenariuszy**.
 
 ## 5. Modele bramkowe
 
-```text
-google/gemini-3.5-flash
-openai/gpt-5-mini
-anthropic/claude-haiku-4.5
-```
+| Rodzina | Model OpenRouter | Rola w macierzy |
+|---|---|---|
+| Google Gemini | `google/gemini-3-flash-preview` | tańszy i starszy próg zamiast Gemini 3.5 |
+| OpenAI GPT | `openai/gpt-5-nano` | najmniejszy model GPT-5 jako niski próg zgodności |
+| Anthropic Claude | `anthropic/claude-haiku-4.5` | mały model Claude |
+| DeepSeek | `deepseek/deepseek-chat-v3.1` | otwarta rodzina DeepSeek V3 |
+| MiniMax | `minimax/minimax-m2.5` | niezależna rodzina MoE |
+| Moonshot Kimi | `moonshotai/kimi-k2.5` | niezależna rodzina Kimi |
+| Z.ai GLM | `z-ai/glm-4.7-flash` | tani model Flash GLM |
+| Qwen | `qwen/qwen3.5-flash-02-23` | tani model Flash Qwen |
+| Mistral | `mistralai/ministral-3b-2512` | bardzo mały model 3B jako dolna granica |
 
-Wykonywalna lista znajduje się w `tests/llm/models.py`.
+
+Wykonywalna lista znajduje się wyłącznie w `tests/llm/models.py`; skrypty shell
+odczytują ją dynamicznie. Uzasadnienie i migawka cen znajdują się w
+[`model-diversity-benchmark.md`](model-diversity-benchmark.md).
 
 ## 6. Nagranie
 
@@ -89,9 +98,9 @@ export OPENROUTER_API_KEY='WKLEJ_KLUCZ'
 Pojedynczy model lub scenariusz:
 
 ```bash
-python scripts/record_model.py --model google/gemini-3.5-flash --max-cost-usd 5
+python scripts/record_model.py --model google/gemini-3-flash-preview --max-cost-usd 5
 python scripts/record_model.py \
-  --model openai/gpt-5-mini \
+  --model openai/gpt-5-nano \
   --scenario 45_multi_ip_two_stage \
   --max-cost-usd 5
 ```
@@ -114,20 +123,20 @@ Dla pojedynczego modelu:
 
 ```bash
 export LLM_PROVIDER=openrouter
-export LLM_MODEL=google/gemini-3.5-flash
+export LLM_MODEL=google/gemini-3-flash-preview
 export VCR_MODE=playback
 pytest tests/llm/test_scenarios.py --run-llm --vcr-mode=playback -v
-python scripts/vcr_precommit.py --model google/gemini-3.5-flash
+python scripts/vcr_precommit.py --model google/gemini-3-flash-preview
 ```
 
 Playback musi przejść przy nieustawionym sekrecie. Live request w tym trybie jest błędem krytycznym.
 
 ## 8. Kryterium zaliczenia
 
-Model zalicza tylko przy 36/36. Każda kaseta musi:
+Model zalicza tylko przy 36/36, a cała macierz przy 324/324. Każda kaseta musi:
 
 - mieć `finish_reason=stop`;
-- zawierać czysty JSON bez pól dodatkowych;
+- zawierać czysty JSON bez pól dodatkowych, Markdown fences ani naprawiania parserem;
 - przejść strict schema decyzji;
 - zwrócić dokładny zestaw STOP/REVIEW bez duplikatów;
 - po złożeniu przejść pełny schema i evaluator;
@@ -175,8 +184,8 @@ git status --short
 git diff --stat
 ```
 
-Repo dopuszcza brak kaset albo kompletną aktualną macierz 3 × 36. Nie commituj `/tmp`, raportów lokalnych ani częściowej macierzy.
+Repo dopuszcza brak kaset albo kompletną aktualną macierz 9 × 36. Nie commituj `/tmp`, raportów lokalnych ani częściowej macierzy.
 
 ## 11. Workflow GitHub
 
-`Paid multi-model LLM benchmark` wymaga jawnego potwierdzenia kosztu. Artefakty nie są commitowane automatycznie. Po pobraniu skopiuj trzy katalogi do `tests/llm/vcr/cassettes/` i wykonaj sekcję 10.
+`Paid multi-model LLM benchmark` wymaga jawnego potwierdzenia kosztu. Artefakty nie są commitowane automatycznie. Po pobraniu skopiuj dziewięć katalogów do `tests/llm/vcr/cassettes/` i wykonaj sekcję 10.

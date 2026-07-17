@@ -2,10 +2,10 @@
 set -euo pipefail
 unset OPENROUTER_API_KEY || true
 
-models=(
-  "google/gemini-3.5-flash"
-  "openai/gpt-5-mini"
-  "anthropic/claude-haiku-4.5"
+mapfile -t models < <(python - <<'PY_MODELS'
+from tests.llm.models import BENCHMARK_MODELS
+print("\n".join(BENCHMARK_MODELS))
+PY_MODELS
 )
 
 for model in "${models[@]}"; do

@@ -22,6 +22,8 @@ def discover_scenarios() -> list[pytest.ParameterSet]:
         paths = [
             path for path in paths if path.stem == requested or path.stem.startswith(requested)
         ]
+        if not paths:
+            raise RuntimeError(f"IPBOX_SCENARIO matched no scenarios: {requested}")
     return [pytest.param(path, id=path.stem) for path in paths]
 
 

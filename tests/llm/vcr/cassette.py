@@ -67,12 +67,12 @@ class Cassette:
         meta_data = data.get("meta")
         if not isinstance(meta_data, dict):
             raise ValueError(f"Cassette {path} has no meta mapping")
-        meta = CassetteMeta(**meta_data)
-        if meta.cassette_format_version != CASSETTE_FORMAT_VERSION:
+        if meta_data.get("cassette_format_version") != CASSETTE_FORMAT_VERSION:
             raise ValueError(
-                f"Unsupported cassette version {meta.cassette_format_version}; "
+                f"Unsupported cassette version {meta_data.get('cassette_format_version')!r}; "
                 f"expected {CASSETTE_FORMAT_VERSION}"
             )
+        meta = CassetteMeta(**meta_data)
         response = data.get("response")
         parsed = data.get("parsed_response")
         if not isinstance(response, str) or not response.strip():

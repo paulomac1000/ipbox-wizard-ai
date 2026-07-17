@@ -4,13 +4,14 @@ quality:
 	ruff format --check .
 	ruff check .
 	python -m compileall -q python_helper tests scripts
+	for script in scripts/*.sh dump-to-md.sh; do bash -n "$$script"; done
 
 test: quality
 	pytest tests/unit --cov=python_helper --cov-report=term-missing --cov-fail-under=90
 	pytest -q
 	python scripts/check_cassette_policy.py
 
-record:
+record: test
 	./scripts/record_all_models.sh
 
 verify:

@@ -76,7 +76,14 @@ def test_resolve_mix_accepts_zero() -> None:
 
 def test_monthly_cost_allocation_trace_and_deferred() -> None:
     items = [
-        CostItem("direct", 100, basket="IP", nexus_source="own_br", nexus_basket="A"),
+        CostItem(
+            "direct",
+            100,
+            basket="IP",
+            allocation_source="cost-ledger",
+            nexus_source="own_br",
+            nexus_basket="A",
+        ),
         CostItem("private", 20, basket="NON"),
         CostItem("asset", 30, basket="WYKLUCZONE"),
         CostItem("shared", 50, basket="MIX"),
@@ -109,7 +116,7 @@ def test_equal_but_distinct_items_do_not_use_identity_incorrectly() -> None:
 
 
 def test_monthly_cost_rejects_duplicates_and_bad_w() -> None:
-    item = CostItem("x", 1, basket="IP")
+    item = CostItem("x", 1, basket="IP", allocation_source="cost-ledger")
     with pytest.raises(ValueError):
         allocate_costs_monthly([item], allocation_policy=policy(), ip_direct_costs=[item])
     with pytest.raises(ValueError):
@@ -130,8 +137,8 @@ def test_annual_mix_allocation() -> None:
 def test_multi_ip_preserves_cents_and_zero_software() -> None:
     result = allocate_multi_ip(10.01, 3, 10, {"A": 1, "B": 1, "C": 1})
     assert sum(result["projects"].values()) == result["stage1_software_share"]
-    zero = allocate_multi_ip(10, 0, 10, {"A": 0, "B": 0})
-    assert zero["projects"] == {"A": 0.0, "B": 0.0}
+    with pytest.raises(ValueError, match="software_ip_revenue must be > 0"):
+        allocate_multi_ip(10, 0, 10, {"A": 0, "B": 0})
 
 
 @pytest.mark.parametrize(
@@ -152,7 +159,9 @@ def test_multi_ip_rejects_bad_input(args) -> None:
 
 
 def test_nexus_classification_and_aggregation() -> None:
-    direct = nexus_classify(CostItem("IDE", 100, basket="IP"), "own_br")
+    direct = nexus_classify(
+        CostItem("IDE", 100, basket="IP", allocation_source="exclusive-use-evidence"), "own_br"
+    )
     shared = nexus_classify(CostItem("Cloud", 100, basket="MIX", nexus_amount=25), "own_br")
     totals = aggregate_nexus_costs([direct, shared])
     assert totals == {"A": 125.0, "B": 0.0, "C": 0.0, "D": 0.0, "poza_nexus": 75.0}
@@ -203,3 +212,8 @@ def test_multi_ip_equality_uses_pln_cents_not_relative_tolerance() -> None:
             1_000_000_000,
             {"A": 999_999_999.99},
         )
+
+
+def test_multi_ip_rejects_zero_software_ip_denominator() -> None:
+    with pytest.raises(ValueError, match="software_ip_revenue must be > 0"):
+        allocate_multi_ip(100, 0, 1000, {"IP_A": 0})

@@ -36,10 +36,12 @@ input:
       kwota: 3000
       nexus_source: own_br
       kategoria: IP
+      allocation_source: ewidencja_kosztu_IP
     - opis: Usługi CodeSis
       kwota: 5000
       nexus_source: related_br_contractor
       kategoria: IP
+      allocation_source: ewidencja_kosztu_IP
     opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.
   - miesiac: 2025-02
     faktury:
@@ -55,10 +57,12 @@ input:
       kwota: 500
       nexus_source: own_br
       kategoria: IP
+      allocation_source: ewidencja_kosztu_IP
     - opis: Usługi CodeSis 2
       kwota: 5000
       nexus_source: related_br_contractor
       kategoria: IP
+      allocation_source: ewidencja_kosztu_IP
     opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.
 assertions:
   nexus_range:

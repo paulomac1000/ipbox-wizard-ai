@@ -37,6 +37,8 @@ wyzeruj finalne liczby.
 
 Na końcu pokaż ślad dowodów, alokacji, TEST 1–9, ograniczenia zakresu i pytania
 do księgowej lub doradcy.
+Nie przedstawiaj wyniku jako porady podatkowej ani kompletnego zeznania.
+To materiał roboczy wymagający weryfikacji przez księgową lub doradcę podatkowego.
 ```
 
 W harnessie model nie dostaje pełnego zadania rachunkowego ani pełnej mapy faktów. Python ustala `decision_facts`, runner filtruje je do prawdziwych `active_rules` z gotowymi kodami, a model kopiuje wyłącznie te kody do `status/stops/reviews`.

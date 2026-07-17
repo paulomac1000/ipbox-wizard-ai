@@ -22,10 +22,9 @@ input:
   - nazwa: ClientA
     klauzula_IP: true
   ulgi:
-    # Art. 30ca ust. 9a: jawnie przypisana do dochodu z kwalifikowanego IP.
-    ulga_BR_IP: 1000
+    ulga_BR_IP: 500
     ulga_BR_NIE: 0
-    ulga_BR_limit_odliczenia: 1000
+    ulga_BR_limit_odliczenia: 500
   miesiace:
   - miesiac: 2025-01
     faktury:
@@ -41,10 +40,15 @@ input:
       kwota: 89
       nexus_source: own_br
       kategoria: IP
+      allocation_source: ewidencja_kosztu_IP
     - opis: Koszt objęty odrębną ulgą B+R
       kwota: 500
-      nexus_source: outside_nexus
-      kategoria: NON
+      nexus_source: own_br
+      kategoria: IP
+      allocation_source: ewidencja_kosztu_IP_BR
+      br_relief_bucket: IP
+      br_relief_amount: 500
+      br_evidence: ewidencja_kosztow_kwalifikowanych_BR_2025_01
     opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.
 assertions:
   nexus: 1.0

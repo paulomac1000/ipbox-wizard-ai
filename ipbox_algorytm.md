@@ -87,7 +87,7 @@ A — własne B+R; B — wyniki B+R od niepowiązanego; C — od powiązanego; D
 
 ## 8. Waluty
 
-Użyj kursu NBP z właściwego poprzedniego dnia roboczego i zapisz kurs oraz datę. Przy metodzie memoriałowej data płatności jest konieczna do różnicy kursowej. Brak kursu lub daty jest błędem. Dodatnia różnica zwiększa NIE, ujemna staje się kosztem `NON`.
+Użyj kursu NBP z właściwego poprzedniego dnia roboczego i zapisz kurs oraz datę. Przy metodzie memoriałowej data płatności jest konieczna do różnicy kursowej. Faktura walutowa zapisuje kwotę i walutę źródłową, datę wystawienia i zapłaty, daty kursów, wartości kursów oraz źródło. Różnica jest wyliczana z tych danych; ręczne pole `różnica_kursowa` jest odrzucane. Brak kursu lub daty jest błędem. Dodatnia różnica zwiększa NIE, ujemna staje się kosztem `NON`.
 
 ## 9. Kaskada podatkowa
 
@@ -99,7 +99,7 @@ Nie używaj pola `ulga_BR`. Podaj:
 - `ulga_BR_NIE` — część przypisana do pozostałej działalności;
 - `ulga_BR_limit_odliczenia` — udokumentowany limit po zastosowaniu właściwego procentu.
 
-`ulga_BR_IP` pomniejsza dochód kwalifikowanego IP przed zastosowaniem NEXUS. Suma części IP i NIE nie może przekroczyć limitu.
+`ulga_BR_IP` pomniejsza dochód kwalifikowanego IP przed zastosowaniem NEXUS. Suma części IP i NIE nie może przekroczyć limitu ani sumy kosztów oznaczonych odpowiednio `br_relief_bucket`, `br_relief_amount` i `br_evidence`.
 
 ### 9.2 Straty
 
@@ -113,7 +113,7 @@ Obsługiwane są wcześniej zweryfikowane kwoty: strata NIE, ZUS społeczne, zdr
 
 Dochód działalności na skali łączy się z `dochody_dodatkowe_skala`. Kalkulator liczy podatek od pełnej wspólnej podstawy. Strata działalności i `ulga_BR_NIE` nie mogą konsumować dochodu z pracy; ZUS, IKZE, darowizny, internet, rehabilitacja i termomodernizacja pomniejszają odpowiednią wspólną podstawę zgodnie z kontraktem.
 
-Zwykłe darowizny mają wspólny limit 6%, internet limit 760 zł. Warunki osobiste i historyczne muszą być zweryfikowane przed przekazaniem kwoty.
+Zwykłe darowizny mają wspólny limit 6%, internet limit 760 zł. Warunki osobiste i historyczne muszą być zweryfikowane przed przekazaniem kwoty. Dodatnia darowizna, internet, rehabilitacja albo ulga na dziecko wymaga rekordu `ulgi.weryfikacja` z `zweryfikowana=true`, kategorią i odwołaniem do dowodu.
 
 ### 9.5 Limity roczne
 
@@ -156,7 +156,7 @@ Model nie zmienia FAIL na PASS.
 
 ## 12. Kontrakt modelu
 
-Python wyznacza liczby, klasyfikacje, TEST-y i pełne `decision_facts`. Runner odrzuca wszystkie fakty `false` i tworzy `active_rules` wyłącznie z faktów prawdziwych. Każda aktywna reguła zawiera `kind`, nazwę faktu i gotowy kod. Model nie widzi reguł nieaktywnych i zwraca wyłącznie:
+Python wyznacza liczby, klasyfikacje, TEST-y i pełne `decision_facts`. Runner odrzuca wszystkie fakty `false` i tworzy `active_rules` wyłącznie z faktów prawdziwych. Każda aktywna reguła zawiera wyłącznie `kind` i gotowy `code`; nazwa faktu nie jest modelowi potrzebna. Model nie widzi reguł nieaktywnych i zwraca wyłącznie czysty JSON bez Markdown fences:
 
 ```json
 {"status":"FINAL","stops":[],"reviews":["REVIEW_09"]}

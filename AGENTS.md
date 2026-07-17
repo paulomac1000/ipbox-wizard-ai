@@ -33,6 +33,7 @@ Sprzeczność między źródłami jest błędem. Nie wybieraj wygodniejszej wers
 - STOP zeruje finalne liczby i klasyfikacje;
 - TEST 1–9 ustala Python;
 - model dostaje tylko aktywne reguły (`true`) i zwraca wyłącznie `status`, `stops`, `reviews`;
+- parser nie naprawia Markdown ani innych odchyleń od czystego JSON;
 - fakt lub kod nieaktywny nie może pojawić się w promptcie modelu;
 - playback nigdy nie wykonuje live requestu;
 - playback i pre-commit odrzucają `finish_reason` inny niż `stop`;
@@ -48,7 +49,7 @@ Sprzeczność między źródłami jest błędem. Nie wybieraj wygodniejszej wers
 - używać niejednoznacznych pól `ulga_BR` albo `straty_poprzednie`;
 - włączać płatnych requestów do standardowego CI;
 - nadpisywać poprawnych kaset;
-- deklarować gotowości bez 108/108 i playbacku offline.
+- deklarować gotowości bez 324/324 i playbacku offline.
 
 ## Bramka jakości
 
@@ -62,8 +63,8 @@ python scripts/check_cassette_policy.py
 for script in scripts/*.sh dump-to-md.sh; do bash -n "$script"; done
 ```
 
-Stan bazowy po audycie protokołu: 167 testów, 95,30% coverage, 36 kontrolowanych skipów LLM.
+Stan bazowy po audycie protokołu: 181 testów, 94,32% coverage, 36 kontrolowanych skipów LLM.
 
 ## Nagrywanie
 
-Nagrywaj przez `scripts/record_model.py`. Po zmianie requestu, algorytmu, scenariusza lub schematu usuń wyłącznie unieważnione kasety. Wydanie wymaga 36/36 dla każdego modelu, playbacku bez sekretu, kontroli manifestu i raportu niezależnego agenta.
+Nagrywaj przez `scripts/record_model.py`. Po zmianie requestu, algorytmu, scenariusza lub schematu usuń wyłącznie unieważnione kasety. Wydanie wymaga 36/36 dla każdego z dziewięciu modeli (324/324), czystego JSON bez Markdown fences, playbacku bez sekretu, kontroli manifestu i raportu niezależnego agenta.

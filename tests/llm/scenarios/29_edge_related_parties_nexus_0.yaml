@@ -36,6 +36,7 @@ input:
       kwota: 15000
       nexus_source: related_br_contractor
       kategoria: IP
+      allocation_source: ewidencja_kosztu_IP
     opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.
 assertions:
   nexus: 0.0

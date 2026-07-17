@@ -1,4 +1,4 @@
-"""Model profiles used by the provider-agnostic benchmark."""
+"""Model profiles used by the provider-agnostic diversity benchmark."""
 
 from __future__ import annotations
 
@@ -10,33 +10,77 @@ from typing import Any
 class ModelProfile:
     model_id: str
     label: str
-    max_tokens: int = 1024
+    family: str
+    max_tokens: int = 512
     temperature: float | None = None
     reasoning: dict[str, Any] | None = None
     response_format_type: str = "json_schema"
 
 
 MODEL_PROFILES: dict[str, ModelProfile] = {
-    "google/gemini-3.5-flash": ModelProfile(
-        model_id="google/gemini-3.5-flash",
-        label="Google Gemini 3.5 Flash",
+    "google/gemini-3-flash-preview": ModelProfile(
+        model_id="google/gemini-3-flash-preview",
+        label="Google Gemini 3 Flash Preview",
+        family="Google Gemini",
         reasoning={"effort": "minimal"},
     ),
-    "openai/gpt-5-mini": ModelProfile(
-        model_id="openai/gpt-5-mini",
-        label="OpenAI GPT-5 Mini",
+    "openai/gpt-5-nano": ModelProfile(
+        model_id="openai/gpt-5-nano",
+        label="OpenAI GPT-5 Nano",
+        family="OpenAI GPT",
         reasoning={"effort": "minimal"},
     ),
     "anthropic/claude-haiku-4.5": ModelProfile(
         model_id="anthropic/claude-haiku-4.5",
         label="Anthropic Claude Haiku 4.5",
+        family="Anthropic Claude",
         temperature=0.0,
-        response_format_type="json_object",
+    ),
+    "deepseek/deepseek-chat-v3.1": ModelProfile(
+        model_id="deepseek/deepseek-chat-v3.1",
+        label="DeepSeek V3.1",
+        family="DeepSeek",
+        temperature=0.0,
+        reasoning={"enabled": False},
+    ),
+    "minimax/minimax-m2.5": ModelProfile(
+        model_id="minimax/minimax-m2.5",
+        label="MiniMax M2.5",
+        family="MiniMax",
+    ),
+    "moonshotai/kimi-k2.5": ModelProfile(
+        model_id="moonshotai/kimi-k2.5",
+        label="Moonshot Kimi K2.5",
+        family="Moonshot Kimi",
+    ),
+    "z-ai/glm-4.7-flash": ModelProfile(
+        model_id="z-ai/glm-4.7-flash",
+        label="Z.ai GLM 4.7 Flash",
+        family="Z.ai GLM",
+        temperature=0.0,
+    ),
+    "qwen/qwen3.5-flash-02-23": ModelProfile(
+        model_id="qwen/qwen3.5-flash-02-23",
+        label="Qwen 3.5 Flash",
+        family="Qwen",
+        temperature=0.0,
+    ),
+    "mistralai/ministral-3b-2512": ModelProfile(
+        model_id="mistralai/ministral-3b-2512",
+        label="Mistral Ministral 3B",
+        family="Mistral",
+        temperature=0.0,
     ),
 }
 
-DEFAULT_MODEL = "google/gemini-3.5-flash"
+DEFAULT_MODEL = "google/gemini-3-flash-preview"
 BENCHMARK_MODELS = tuple(MODEL_PROFILES)
+EXPECTED_MODEL_COUNT = len(BENCHMARK_MODELS)
+
+
+def model_slug(model_id: str) -> str:
+    """Return the canonical filesystem slug for a benchmark model."""
+    return model_id.replace("/", "_").replace(".", "_").replace("-", "_")
 
 
 def get_model_profile(model_id: str) -> ModelProfile:

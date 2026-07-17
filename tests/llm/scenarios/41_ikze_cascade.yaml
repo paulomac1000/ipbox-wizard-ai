@@ -38,6 +38,7 @@ input:
       kwota: 100
       nexus_source: own_br
       kategoria: IP
+      allocation_source: ewidencja_kosztu_IP
     - opis: Księgowość
       kwota: 500
       nexus_source: outside_nexus

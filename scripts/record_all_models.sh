@@ -3,27 +3,30 @@ set -euo pipefail
 
 : "${OPENROUTER_API_KEY:?Set OPENROUTER_API_KEY before recording}"
 
-ruff format --check . || exit 1
-ruff check . || exit 1
-python -m compileall -q python_helper tests scripts || exit 1
-pytest tests/unit --cov=python_helper --cov-report=term-missing --cov-fail-under=90 || exit 1
+ruff format --check .
+ruff check .
+python -m compileall -q python_helper tests scripts
+pytest tests/unit --cov=python_helper --cov-report=term-missing --cov-fail-under=90
+pytest -q
+for script in scripts/*.sh dump-to-md.sh; do bash -n "$script"; done
 
-models=(
-  "google/gemini-3.5-flash"
-  "openai/gpt-5-mini"
-  "anthropic/claude-haiku-4.5"
+mapfile -t models < <(python - <<'PY_MODELS'
+from tests.llm.models import BENCHMARK_MODELS
+print("\n".join(BENCHMARK_MODELS))
+PY_MODELS
 )
 
 failed=()
 for model in "${models[@]}"; do
   if ! python scripts/record_model.py --model "$model" "${@}"; then
     failed+=("$model")
+    break
   fi
 done
 
 python scripts/benchmark_report.py || true
 if ((${#failed[@]})); then
-  printf 'Recording incomplete for: %s\n' "${failed[*]}" >&2
+  printf 'Recording stopped after failure for: %s\n' "${failed[*]}" >&2
   exit 1
 fi
 

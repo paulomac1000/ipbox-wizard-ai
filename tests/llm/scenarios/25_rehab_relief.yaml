@@ -1,8 +1,7 @@
 meta:
   id: 25_rehab_relief
   name: Ulga rehabilitacyjna przy dochodzie opodatkowanym skalą
-  description: Weryfikacja odliczenia od dochodu na skali; scenariusz celowo nie używa
-    podatku liniowego.
+  description: Weryfikacja odliczenia od dochodu na skali; scenariusz celowo nie używa podatku liniowego.
   tags:
   - relief
   priority: P1
@@ -26,6 +25,11 @@ input:
     klauzula_IP: false
   ulgi:
     ulga_rehabilitacyjna: 1000
+    weryfikacja:
+      ulga_rehabilitacyjna:
+        zweryfikowana: true
+        kategoria: wydatek_nielimitowany_zweryfikowany
+        dowod: faktura_i_orzeczenie_2025
   miesiace:
   - miesiac: 2025-01
     faktury:
@@ -44,6 +48,7 @@ input:
       kwota: 89
       nexus_source: own_br
       kategoria: IP
+      allocation_source: ewidencja_kosztu_IP
     opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.
 assertions:
   nexus: 1.0

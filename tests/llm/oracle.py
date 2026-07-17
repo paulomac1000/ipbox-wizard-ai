@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import re
 from copy import deepcopy
+from datetime import datetime
 from decimal import Decimal
 from itertools import pairwise
 from typing import Any
@@ -111,14 +112,52 @@ def _month_invoices(month: dict[str, Any]) -> list[dict[str, Any]]:
     return []
 
 
+def _strict_date(value: Any, name: str) -> datetime:
+    try:
+        return datetime.strptime(str(value), "%Y-%m-%d")
+    except (TypeError, ValueError) as exc:
+        raise ScenarioError(f"{name} must use YYYY-MM-DD") from exc
+
+
 def _invoice_amount(invoice: dict[str, Any]) -> float:
+    if "kwota_waluta" in invoice:
+        amount_currency = _number(invoice["kwota_waluta"], "invoice.kwota_waluta")
+        if amount_currency < 0:
+            raise ScenarioError("invoice.kwota_waluta must be non-negative")
+        currency = str(invoice.get("waluta", "")).upper()
+        if not re.fullmatch(r"[A-Z]{3}", currency) or currency == "PLN":
+            raise ScenarioError("FX invoice.waluta must be a non-PLN three-letter ISO code")
+        issue = _strict_date(invoice.get("data_wystawienia"), "invoice.data_wystawienia")
+        payment = _strict_date(invoice.get("data_zaplaty"), "invoice.data_zaplaty")
+        if payment < issue:
+            raise ScenarioError("invoice.data_zaplaty cannot be earlier than data_wystawienia")
+        revenue_rate = _number(invoice.get("kurs_przychodu"), "invoice.kurs_przychodu")
+        payment_rate = _number(invoice.get("kurs_zaplaty"), "invoice.kurs_zaplaty")
+        if revenue_rate <= 0 or payment_rate <= 0:
+            raise ScenarioError("FX invoice rates must be positive")
+        _strict_date(invoice.get("data_kursu_przychodu"), "invoice.data_kursu_przychodu")
+        _strict_date(invoice.get("data_kursu_zaplaty"), "invoice.data_kursu_zaplaty")
+        if not str(invoice.get("źródło_kursu", "")).strip():
+            raise ScenarioError("FX invoice requires źródło_kursu")
+        return float(money(amount_currency * revenue_rate))
     for key in ("kwota_PLN", "kwota_netto", "base_revenue_pln", "kwota"):
         if key in invoice:
             amount = _number(invoice[key], f"invoice.{key}")
             if amount < 0:
                 raise ScenarioError(f"invoice.{key} must be non-negative")
             return amount
-    raise ScenarioError("invoice requires kwota_PLN/kwota_netto/base_revenue_pln")
+    raise ScenarioError(
+        "invoice requires kwota_PLN/kwota_netto/base_revenue_pln or complete FX fields"
+    )
+
+
+def _invoice_fx_difference(invoice: dict[str, Any]) -> Decimal:
+    if "kwota_waluta" not in invoice:
+        return Decimal("0")
+    amount_currency = Decimal(str(_number(invoice["kwota_waluta"], "invoice.kwota_waluta")))
+    revenue_rate = Decimal(str(_number(invoice["kurs_przychodu"], "invoice.kurs_przychodu")))
+    payment_rate = Decimal(str(_number(invoice["kurs_zaplaty"], "invoice.kurs_zaplaty")))
+    return money(amount_currency * (payment_rate - revenue_rate))
 
 
 def _private_description(description: str) -> bool:
@@ -182,9 +221,25 @@ def validate_scenario(scenario: dict[str, Any]) -> None:
     if reliefs is None:
         reliefs = {}
     reliefs = _mapping(reliefs, "input.ulgi")
+    relief_verification = reliefs.get("weryfikacja", {})
+    if relief_verification is None:
+        relief_verification = {}
+    relief_verification = _mapping(relief_verification, "input.ulgi.weryfikacja")
     for key, value in reliefs.items():
+        if key == "weryfikacja":
+            continue
         if _number(value, f"input.ulgi.{key}") < 0:
             raise ScenarioError(f"input.ulgi.{key} must be non-negative")
+    for key in ("darowizny", "ulga_internet", "ulga_rehabilitacyjna", "ulga_prorodzinna"):
+        if _number(reliefs.get(key, 0), f"input.ulgi.{key}") <= 0:
+            continue
+        record = _mapping(relief_verification.get(key), f"input.ulgi.weryfikacja.{key}")
+        if record.get("zweryfikowana") is not True:
+            raise ScenarioError(f"input.ulgi.{key} requires zweryfikowana=true")
+        if not str(record.get("kategoria", "")).strip():
+            raise ScenarioError(f"input.ulgi.{key} requires a verified category")
+        if not str(record.get("dowod", "")).strip():
+            raise ScenarioError(f"input.ulgi.{key} requires an evidence reference")
     if _number(reliefs.get("ulga_BR", 0), "input.ulgi.ulga_BR") > 0:
         raise ScenarioError(
             "input.ulgi.ulga_BR is ambiguous; use ulga_BR_IP and/or ulga_BR_NIE "
@@ -211,10 +266,24 @@ def validate_scenario(scenario: dict[str, Any]) -> None:
 
     clients = input_data.get("kontrahenci", [])
     if clients is None:
-        clients = []
+        raise ScenarioError("input.kontrahenci must be a list, not null")
     for index, client in enumerate(_list(clients, "input.kontrahenci")):
         _mapping(client, f"input.kontrahenci[{index}]")
 
+    multi_ip = input_data.get("alokacja_multi_ip")
+    if multi_ip is not None:
+        multi_ip = _mapping(multi_ip, "input.alokacja_multi_ip")
+        for key in (
+            "koszty_wspólne_MIX",
+            "przychody_software_IP",
+            "przychody_całkowite",
+            "przychody_IP",
+        ):
+            if key not in multi_ip:
+                raise ScenarioError(f"input.alokacja_multi_ip.{key} is required")
+        _mapping(multi_ip["przychody_IP"], "input.alokacja_multi_ip.przychody_IP")
+
+    rd_evidence = {"IP": Decimal("0"), "NIE": Decimal("0")}
     months = _list(input_data.get("miesiace", []), "input.miesiace")
     seen_months: set[str] = set()
     for index, raw_month in enumerate(months):
@@ -238,8 +307,38 @@ def validate_scenario(scenario: dict[str, Any]) -> None:
                 _invoice_amount(invoice)
         if "koszty" in month:
             costs = _list(month["koszty"], f"month[{index}].koszty")
-            for item_index, cost in enumerate(costs):
-                _mapping(cost, f"month[{index}].koszty[{item_index}]")
+            for item_index, raw_cost in enumerate(costs):
+                cost = _mapping(raw_cost, f"month[{index}].koszty[{item_index}]")
+                amount = _number(cost.get("kwota"), f"month[{index}].koszty[{item_index}].kwota")
+                if amount < 0:
+                    raise ScenarioError(
+                        f"month[{index}].koszty[{item_index}].kwota must be non-negative"
+                    )
+                explicit_basket = str(cost.get("koszyk", cost.get("kategoria", ""))).upper()
+                if explicit_basket == "IP" and not str(cost.get("allocation_source", "")).strip():
+                    raise ScenarioError(
+                        "IP cost requires allocation_source proving exclusive attribution"
+                    )
+                rd_bucket = cost.get("br_relief_bucket")
+                if rd_bucket is not None:
+                    rd_bucket = str(rd_bucket).upper()
+                    if rd_bucket not in rd_evidence:
+                        raise ScenarioError("br_relief_bucket must be IP or NIE")
+                    if (rd_bucket == "IP" and explicit_basket != "IP") or (
+                        rd_bucket == "NIE" and explicit_basket not in {"NON", "NIE"}
+                    ):
+                        raise ScenarioError("B+R relief bucket must match the cost income basket")
+                    rd_amount = _number(
+                        cost.get("br_relief_amount"),
+                        f"month[{index}].koszty[{item_index}].br_relief_amount",
+                    )
+                    if rd_amount <= 0 or rd_amount > amount:
+                        raise ScenarioError(
+                            "br_relief_amount must be positive and cannot exceed cost"
+                        )
+                    if not str(cost.get("br_evidence", "")).strip():
+                        raise ScenarioError("B+R qualified cost requires br_evidence")
+                    rd_evidence[rd_bucket] += money(rd_amount)
         evidence = month.get("ewidencja")
         if evidence is not None:
             evidence = _mapping(evidence, f"month[{index}].ewidencja")
@@ -252,6 +351,13 @@ def validate_scenario(scenario: dict[str, Any]) -> None:
                         project,
                         f"month[{index}].ewidencja.projekty[{project_index}]",
                     )
+
+    requested_rd_ip = money(_number(reliefs.get("ulga_BR_IP", 0), "input.ulgi.ulga_BR_IP"))
+    requested_rd_non = money(_number(reliefs.get("ulga_BR_NIE", 0), "input.ulgi.ulga_BR_NIE"))
+    if requested_rd_ip > rd_evidence["IP"]:
+        raise ScenarioError("ulga_BR_IP exceeds documented IP-qualified B+R costs")
+    if requested_rd_non > rd_evidence["NIE"]:
+        raise ScenarioError("ulga_BR_NIE exceeds documented non-IP B+R costs")
 
 
 def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
@@ -407,11 +513,16 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
             annual_ip_revenue += ip_amount
             annual_non_revenue += amount - ip_amount
 
-        fx = money(month.get("różnica_kursowa", 0))
-        if fx >= 0:
-            annual_non_revenue += fx
-        else:
-            fx_non_cost += -fx
+        if "różnica_kursowa" in month:
+            raise ScenarioError(
+                "manual różnica_kursowa is not accepted; provide source-currency invoice fields"
+            )
+        for invoice in invoices_by_month[month_id]:
+            fx = _invoice_fx_difference(invoice)
+            if fx >= 0:
+                annual_non_revenue += fx
+            else:
+                fx_non_cost += -fx
 
     social = input_data.get("zus", {}) if isinstance(input_data.get("zus"), dict) else {}
     social_method = str(social.get("sposob", "brak"))
@@ -493,13 +604,18 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
                 raise ScenarioError("cost.opis is required")
             amount = _number(cost.get("kwota"), "cost.kwota")
             explicit_basket = cost.get("koszyk", cost.get("kategoria", ""))
+            allocation_source = str(cost.get("allocation_source", "")).strip()
+            if str(explicit_basket).upper() == "IP" and not allocation_source:
+                raise ScenarioError(
+                    "IP cost requires allocation_source proving exclusive attribution"
+                )
             item = CostItem(
                 description=description,
                 amount=amount,
                 basket=str(explicit_basket) if explicit_basket else "",
                 allocation_method=str(cost.get("allocation_method", "")),
                 allocation_key=cost.get("allocation_key"),
-                allocation_source=str(cost.get("allocation_source", "")),
+                allocation_source=allocation_source,
                 nexus_source=str(cost.get("nexus_source", "outside_nexus")),
                 nexus_basket={
                     "own_br": "A",
@@ -559,7 +675,7 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
         non_amount = Decimal("0")
         allocation_key: float | None = None
         allocation_method = "direct"
-        allocation_source = item.allocation_source or "dokument"
+        allocation_source = item.allocation_source
         if item.basket == "IP":
             ip_amount = amount
             allocation_key = 1.0

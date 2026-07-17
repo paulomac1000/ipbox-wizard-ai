@@ -6,8 +6,9 @@
 
 - Atomowy kontrakt `decision_facts`; model zwraca wyłącznie `status/stops/reviews`.
 - Kontrakt `active_rules`, który nie pokazuje modelowi fałszywych przesłanek ani nieaktywnych kodów.
+- Macierz 9 × 36 obejmująca Gemini, GPT, Claude, DeepSeek, MiniMax, Kimi, GLM, Qwen i Mistral.
 - Fail-closed oracle, evaluator, strict JSON Schema i VCR format 4.
-- 36 znormalizowanych scenariuszy oraz trzymodelowy benchmark.
+- 36 znormalizowanych scenariuszy oraz dziewięciorodzinny benchmark tanich modeli.
 - Regresje dla wzoru NEXUS podwyższającego A+B.
 - Jawny podział ulgi B+R na część IP i NIE wraz z odliczeniem IP przed NEXUS.
 - Pełne połączenie działalności na skali z `dochody_dodatkowe_skala`.
@@ -26,10 +27,16 @@
 - Podatek skali obejmuje pełną wspólną podstawę z innymi dochodami skali, zamiast zwracać wyłącznie marginalny podatek działalności.
 - Niejednoznaczne `ulga_BR` i `straty_poprzednie` są odrzucane; używane są pola rozdzielone semantycznie.
 - Ujemne faktury, ujemne odliczenia, błędne mapy ZUS/zaliczek i nieznane limity roczne są odrzucane przed raportem.
+- Faktury walutowe zawierają walutę, daty i źródłowe kursy; różnice kursowe są wyliczane, nie wpisywane ręcznie.
+- Dodatnie ulgi osobiste i B+R wymagają jawnego, zweryfikowanego śladu dowodowego.
+- Bezpośredni koszt IP wymaga `allocation_source`, zamiast syntetycznego źródła „dokument”.
 - STOP zeruje cały wynik, brak danych FX nie staje się zerem, W=0/ERROR i carry-over są fail-closed.
 - Multi-IP zachowuje każdy grosz metodą największych reszt.
 - Retry respektuje `Retry-After`, odpowiedź wymaga `finish_reason=stop`, a playback nie ma live fallbacku.
 - Playback i pre-commit odrzucają niekompletne kasety, a recorder nie nadpisuje istniejącego nagrania.
+- Parser odrzuca Markdown fences zamiast naprawiać odpowiedź modelu.
+- Manifest jest porównywany z kasetą także dla `returned_model`, `recorded_at` i kosztu.
+- Recorder odrzuca podmianę zwróconego modelu i wlicza odrzucone płatne wywołania do limitu kosztu.
 - Walidacja wiąże każdy miesiąc z rokiem rozliczenia i egzekwuje limit termomodernizacji 53 000 zł.
 - Workflowy używają minimalnych uprawnień i `persist-credentials: false`.
 

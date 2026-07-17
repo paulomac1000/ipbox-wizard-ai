@@ -14,11 +14,26 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from scripts.vcr_precommit import validate_model  # noqa: E402
-from tests.llm.models import BENCHMARK_MODELS, get_model_profile  # noqa: E402
+from tests.llm.models import BENCHMARK_MODELS, get_model_profile, model_slug  # noqa: E402
 
 
 def slug(model: str) -> str:
-    return model.replace("/", "_").replace(".", "_").replace("-", "_")
+    return model_slug(model)
+
+
+def scenario_ids_from_yaml() -> set[str]:
+    ids: set[str] = set()
+    for path in sorted((ROOT / "tests/llm/scenarios").glob("*.yaml")):
+        data = yaml.safe_load(path.read_text(encoding="utf-8"))
+        scenario_id = str((data.get("meta") or {}).get("id", ""))
+        if not scenario_id:
+            raise ValueError(f"{path}: missing meta.id")
+        if scenario_id != path.stem:
+            raise ValueError(f"{path}: meta.id={scenario_id!r} must equal filename stem")
+        if scenario_id in ids:
+            raise ValueError(f"duplicate scenario meta.id={scenario_id!r}")
+        ids.add(scenario_id)
+    return ids
 
 
 def summarize_model(model: str, scenario_ids: set[str]) -> dict[str, object]:
@@ -47,7 +62,7 @@ def summarize_model(model: str, scenario_ids: set[str]) -> dict[str, object]:
         "orphan_manifest_entries": sorted(set(entries) - scenario_ids),
         "integrity_errors": errors,
         "actual_cost_usd": round(cost, 6),
-        "complete_and_valid": not errors,
+        "complete_and_valid": not errors and recorded == scenario_ids,
     }
 
 
@@ -61,7 +76,7 @@ def main() -> int:
     for model in models:
         get_model_profile(model)
 
-    scenario_ids = {path.stem for path in (ROOT / "tests/llm/scenarios").glob("*.yaml")}
+    scenario_ids = scenario_ids_from_yaml()
     rows = [summarize_model(model, scenario_ids) for model in models]
     payload = {
         "scenario_count": len(scenario_ids),

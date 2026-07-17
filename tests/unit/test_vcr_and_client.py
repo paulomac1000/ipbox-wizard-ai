@@ -24,8 +24,8 @@ def response(content='{"ok":true}', finish="stop") -> LLMResponse:
     return LLMResponse(
         content=content,
         request_id="req",
-        requested_model="google/gemini-3.5-flash",
-        returned_model="google/gemini-3.5-flash",
+        requested_model="google/gemini-3-flash-preview",
+        returned_model="google/gemini-3-flash-preview",
         finish_reason=finish,
         native_finish_reason="STOP",
         system_fingerprint="fp",
@@ -36,7 +36,7 @@ def response(content='{"ok":true}', finish="stop") -> LLMResponse:
     )
 
 
-def spec(model="google/gemini-3.5-flash") -> LLMRequestSpec:
+def spec(model="google/gemini-3-flash-preview") -> LLMRequestSpec:
     return LLMRequestSpec(
         provider="openrouter",
         model=model,
@@ -56,7 +56,9 @@ def scenario_file(tmp_path: Path) -> tuple[dict, Path]:
     return scenario, path
 
 
-def set_config_env(monkeypatch, tmp_path: Path, mode="playback", model="google/gemini-3.5-flash"):
+def set_config_env(
+    monkeypatch, tmp_path: Path, mode="playback", model="google/gemini-3-flash-preview"
+):
     monkeypatch.setenv("VCR_MODE", mode)
     monkeypatch.setenv("LLM_MODEL", model)
     monkeypatch.setenv("VCR_CASSETTES_ROOT", str(tmp_path / "cassettes"))
@@ -77,13 +79,23 @@ def record_valid_cassette(monkeypatch, tmp_path: Path) -> tuple[dict, Path, VCRR
     return scenario, path, recorder
 
 
-def test_model_profiles_are_three_providers() -> None:
+def test_model_profiles_cover_nine_distinct_families() -> None:
     assert BENCHMARK_MODELS == (
-        "google/gemini-3.5-flash",
-        "openai/gpt-5-mini",
+        "google/gemini-3-flash-preview",
+        "openai/gpt-5-nano",
         "anthropic/claude-haiku-4.5",
+        "deepseek/deepseek-chat-v3.1",
+        "minimax/minimax-m2.5",
+        "moonshotai/kimi-k2.5",
+        "z-ai/glm-4.7-flash",
+        "qwen/qwen3.5-flash-02-23",
+        "mistralai/ministral-3b-2512",
     )
-    assert get_model_profile("openai/gpt-5-mini").reasoning == {"effort": "minimal"}
+    assert len({get_model_profile(model).family for model in BENCHMARK_MODELS}) == 9
+    assert get_model_profile("openai/gpt-5-nano").reasoning == {"effort": "minimal"}
+    assert all(
+        get_model_profile(model).response_format_type == "json_schema" for model in BENCHMARK_MODELS
+    )
     with pytest.raises(ValueError):
         get_model_profile("bad")
 
@@ -206,7 +218,7 @@ def test_record_mode_refuses_to_overwrite_stale_cassette(monkeypatch, tmp_path) 
     original = cassette_path.read_bytes()
     changed = LLMRequestSpec(
         provider="openrouter",
-        model="google/gemini-3.5-flash",
+        model="google/gemini-3-flash-preview",
         system_prompt="system",
         user_prompt="changed",
         temperature=None,
@@ -242,7 +254,7 @@ def test_playback_detects_stale_request(monkeypatch, tmp_path) -> None:
             scenario_path=path,
             request=LLMRequestSpec(
                 provider="openrouter",
-                model="google/gemini-3.5-flash",
+                model="google/gemini-3-flash-preview",
                 system_prompt="s",
                 user_prompt="changed",
                 temperature=None,
@@ -311,7 +323,7 @@ def test_request_spec_snapshots_mutable_inputs_and_returns_independent_payloads(
     reasoning = {"effort": "minimal"}
     request = LLMRequestSpec(
         provider="openrouter",
-        model="google/gemini-3.5-flash",
+        model="google/gemini-3-flash-preview",
         system_prompt="system",
         user_prompt="user",
         max_tokens=100,
@@ -483,7 +495,7 @@ def test_recording_scripts_fail_closed_and_offer_no_force_override() -> None:
             sys.executable,
             str(root / "scripts/record_model.py"),
             "--model",
-            "google/gemini-3.5-flash",
+            "google/gemini-3-flash-preview",
             "--force",
         ],
         cwd=root,
@@ -517,7 +529,7 @@ def test_record_model_refuses_to_overwrite_stale_cassette(monkeypatch, tmp_path)
     cassette_root = tmp_path / "cassettes"
     scenario_dir.mkdir()
     (scenario_dir / "01_case.yaml").write_text("meta: {id: 01_case}\n", encoding="utf-8")
-    model = "google/gemini-3.5-flash"
+    model = "google/gemini-3-flash-preview"
     cassette = cassette_root / record_model.slug(model) / "01_case.yaml"
     cassette.parent.mkdir(parents=True)
     cassette.write_text("do-not-overwrite", encoding="utf-8")
@@ -559,3 +571,113 @@ def test_pytest_scenario_option_filters_collection() -> None:
     assert process.returncode == 0, process.stderr
     assert "1 test collected" in process.stdout
     assert "44_mix_revenue_key_kis" in process.stdout
+
+
+def test_pytest_scenario_option_rejects_no_match() -> None:
+    import subprocess
+    import sys
+
+    root = Path(__file__).parents[2]
+    process = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "pytest",
+            "tests/llm/test_scenarios.py",
+            "--collect-only",
+            "-q",
+            "--scenario",
+            "definitely_missing_scenario",
+        ],
+        cwd=root,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert process.returncode != 0
+    assert "matched no scenarios" in process.stdout + process.stderr
+
+
+def test_runner_rejects_markdown_fenced_json() -> None:
+    from tests.llm.runner import LLMTestRunner
+
+    with pytest.raises(ValueError, match="pure JSON"):
+        LLMTestRunner(None).parse_decision(
+            '```json\n{"status":"FINAL","stops":[],"reviews":[]}\n```'
+        )
+
+
+def test_cassette_requires_explicit_format_version(tmp_path) -> None:
+    path = tmp_path / "unversioned.yaml"
+    path.write_text(
+        yaml.safe_dump(
+            {
+                "meta": {
+                    "scenario_id": "s",
+                    "scenario_name": "S",
+                    "provider": "openrouter",
+                    "requested_model": "google/gemini-3-flash-preview",
+                    "returned_model": "google/gemini-3-flash-preview",
+                    "fingerprint": "f",
+                    "request_hash": "h",
+                    "recorded_at": "2026-01-01T00:00:00+00:00",
+                    "request_id": "r",
+                    "finish_reason": "stop",
+                    "native_finish_reason": "STOP",
+                    "system_fingerprint": None,
+                    "prompt_tokens": 1,
+                    "completion_tokens": 1,
+                    "total_tokens": 2,
+                    "cost": 0.0,
+                    "recording_duration_seconds": 0.1,
+                },
+                "response": '{"ok":true}',
+                "parsed_response": {"ok": True},
+            }
+        ),
+        encoding="utf-8",
+    )
+    with pytest.raises(ValueError, match="Unsupported cassette version None"):
+        Cassette.load(path)
+
+
+def test_record_rejects_provider_model_substitution(monkeypatch, tmp_path) -> None:
+    set_config_env(monkeypatch, tmp_path, "record")
+    scenario, path = scenario_file(tmp_path)
+    substituted = replace(response(), returned_model="provider/other-model")
+    with pytest.raises(RecordingRejectedError, match="does not match requested"):
+        VCRRecorder(VCRConfig()).get_or_record(
+            scenario=scenario,
+            scenario_path=path,
+            request=spec(),
+            api_call=lambda _: substituted,
+            validate_response=json.loads,
+        )
+
+
+def test_policy_detects_unexpected_model_directory(tmp_path) -> None:
+    from scripts.check_cassette_policy import unexpected_model_directories
+
+    (tmp_path / "unexpected_model").mkdir()
+    assert unexpected_model_directories(tmp_path) == {"unexpected_model"}
+
+
+def test_benchmark_scenario_ids_require_filename_identity(tmp_path, monkeypatch) -> None:
+    import scripts.benchmark_report as report
+
+    root = tmp_path
+    scenario_dir = root / "tests/llm/scenarios"
+    scenario_dir.mkdir(parents=True)
+    (scenario_dir / "filename.yaml").write_text("meta: {id: different}\n", encoding="utf-8")
+    monkeypatch.setattr(report, "ROOT", root)
+    with pytest.raises(ValueError, match="must equal filename stem"):
+        report.scenario_ids_from_yaml()
+
+
+def test_paid_entry_points_include_shell_gate_and_make_record_depends_on_test() -> None:
+    root = Path(__file__).parents[2]
+    makefile = (root / "Makefile").read_text(encoding="utf-8")
+    workflow = (root / ".github/workflows/llm-benchmark.yml").read_text(encoding="utf-8")
+    assert "record: test" in makefile
+    assert 'bash -n "$$script"' in makefile
+    assert 'bash -n "$script"' in workflow

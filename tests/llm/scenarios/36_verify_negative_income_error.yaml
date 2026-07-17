@@ -36,10 +36,12 @@ input:
       kwota: 2500
       nexus_source: own_br
       kategoria: IP
+      allocation_source: ewidencja_kosztu_IP
     - opis: Licencja ML
       kwota: 1800
       nexus_source: own_br
       kategoria: IP
+      allocation_source: ewidencja_kosztu_IP
     opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.
   - miesiac: 2025-02
     faktury:
@@ -55,10 +57,12 @@ input:
       kwota: 2500
       nexus_source: own_br
       kategoria: IP
+      allocation_source: ewidencja_kosztu_IP
     - opis: Usługi cloud B+R
       kwota: 2000
       nexus_source: own_br
       kategoria: IP
+      allocation_source: ewidencja_kosztu_IP
     opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.
 assertions:
   podatek_IP_range:

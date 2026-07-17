@@ -22,11 +22,10 @@ from .request_spec import LLMRequestSpec
 from .vcr import VCRConfig, VCRRecorder
 
 SYSTEM_PROMPT = (
-    "Jesteś warstwą wykonującą gotową listę aktywnych reguł systemu IP Box. "
-    "Deterministyczny kod wcześniej ustalił prawdziwość wszystkich przesłanek. "
-    "Każda przekazana active_rule jest prawdziwa; reguła nieobecna jest nieaktywna. "
-    "Nie analizujesz podatków, nazw faktów ani danych źródłowych. Kopiujesz wyłącznie "
-    "kody z aktywnych reguł do krótkiego obiektu JSON."
+    "You execute an already evaluated list of active rules. Python has already "
+    "decided which predicates are true. Every supplied active_rule is active; "
+    "every absent rule is inactive. Do not infer tax facts or add rules. Copy only "
+    "the supplied codes into a strict JSON object, with no Markdown fences."
 )
 RESPONSE_ROOT = Path("/tmp/ipbox_llm_responses")
 
@@ -37,7 +36,7 @@ def build_tool_context(reference: dict[str, Any]) -> dict[str, Any]:
     active_rules: list[dict[str, str]] = []
     for kind, mapping in (("STOP", STOP_FACT_TO_CODE), ("REVIEW", REVIEW_FACT_TO_CODE)):
         active_rules.extend(
-            {"kind": kind, "fact": fact, "code": code}
+            {"kind": kind, "code": code}
             for fact, code in mapping.items()
             if facts.get(fact) is True
         )
@@ -48,15 +47,13 @@ def build_decision_protocol() -> str:
     """Render the provider-neutral copy protocol for already-active rules."""
     return "\n".join(
         [
-            "PROTOKÓŁ DECYZYJNY:",
-            "- active_rules zawiera wyłącznie reguły już uznane przez Python za prawdziwe.",
-            "- Dla kind=STOP skopiuj code do stops.",
-            "- Dla kind=REVIEW skopiuj code do reviews.",
-            "- Nie zwracaj żadnego kodu, którego nie ma w active_rules.",
-            "- Nie pomijaj żadnego kodu obecnego w active_rules i nie powtarzaj kodów.",
-            "- status=STOPPED, gdy active_rules zawiera co najmniej jeden kind=STOP; "
-            "inaczej FINAL.",
-            "- Gdy active_rules jest puste: status=FINAL, stops=[], reviews=[].",
+            "DECISION PROTOCOL:",
+            "- active_rules contains only rules already evaluated as true by Python.",
+            "- Copy each STOP code to stops and each REVIEW code to reviews.",
+            "- Do not invent, omit, or duplicate any code.",
+            "- status is STOPPED when at least one STOP rule exists; otherwise FINAL.",
+            "- For an empty active_rules list return status=FINAL, stops=[], reviews=[].",
+            "- Return one pure JSON object only. Do not use Markdown fences.",
         ]
     )
 
@@ -96,10 +93,10 @@ class LLMTestRunner:
         payload = build_tool_context(reference)
         return (
             f"{build_decision_protocol()}\n\n"
-            "AKTYWNE REGUŁY (wszystkie są prawdziwe):\n"
+            "ACTIVE RULES (all are true):\n"
             f"{json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(',', ':'))}\n\n"
-            "Zwróć wyłącznie pola status, stops i reviews zgodnie ze schematem. "
-            "Nie zwracaj raportu finansowego — system dołączy go deterministycznie.\n"
+            "Return only status, stops, and reviews according to the schema. "
+            "Do not return the financial report; the system attaches it deterministically.\n"
         )
 
     def request_spec(self, prompt: str, config: VCRConfig) -> LLMRequestSpec:
@@ -127,22 +124,9 @@ class LLMTestRunner:
             reasoning=profile.reasoning,
         )
 
-    @staticmethod
-    def _strip_markdown_fence(content: str) -> str:
-        stripped = content.strip()
-        if stripped.startswith("```"):
-            for fence in ("```json\n", "```JSON\n", "```\n"):
-                if stripped.startswith(fence):
-                    stripped = stripped[len(fence) :]
-                    break
-            close_pos = stripped.rfind("\n```")
-            if close_pos >= 0:
-                stripped = stripped[:close_pos]
-        return stripped.strip()
-
     def parse_decision(self, content: str) -> dict[str, Any]:
         try:
-            parsed = json.loads(self._strip_markdown_fence(content))
+            parsed = json.loads(content.strip())
         except json.JSONDecodeError as exc:
             raise ValueError("response must be pure JSON") from exc
         if not isinstance(parsed, dict):

@@ -4,9 +4,11 @@
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 import yaml
@@ -16,11 +18,11 @@ SCENARIO_DIR = ROOT / "tests/llm/scenarios"
 CASSETTE_ROOT = ROOT / "tests/llm/vcr/cassettes"
 sys.path.insert(0, str(ROOT))
 
-from tests.llm.models import get_model_profile  # noqa: E402
+from tests.llm.models import get_model_profile, model_slug  # noqa: E402
 
 
 def slug(model: str) -> str:
-    return model.replace("/", "_").replace(".", "_").replace("-", "_")
+    return model_slug(model)
 
 
 def run(command: list[str], env: dict[str, str]) -> int:
@@ -39,6 +41,22 @@ def recorded_cost(model_dir: Path) -> float:
     return sum(
         float(entry.get("cost") or 0) for entry in entries.values() if isinstance(entry, dict)
     )
+
+
+def rejected_cost(rejected_dir: Path, *, since: float) -> float:
+    """Count paid rejected calls created during this invocation."""
+    total = 0.0
+    if not rejected_dir.exists():
+        return total
+    for path in rejected_dir.glob("*.json"):
+        if path.stat().st_mtime < since:
+            continue
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+            total += float((payload.get("metadata") or {}).get("cost") or 0)
+        except (OSError, TypeError, ValueError, json.JSONDecodeError):
+            continue
+    return total
 
 
 def main() -> int:
@@ -69,6 +87,8 @@ def main() -> int:
         }
     )
     model_dir = CASSETTE_ROOT / slug(args.model)
+    rejected_dir = Path(env.get("VCR_REJECTED_ROOT", "/tmp/ipbox_llm_rejected")) / slug(args.model)
+    started_at = time.time()
     scenarios = sorted(SCENARIO_DIR.glob("*.yaml"))
     if args.scenario:
         scenarios = [
@@ -110,9 +130,9 @@ def main() -> int:
                 file=sys.stderr,
             )
             failures.append(path.stem)
-            continue
+            break
 
-        current_cost = recorded_cost(model_dir)
+        current_cost = recorded_cost(model_dir) + rejected_cost(rejected_dir, since=started_at)
         if args.max_cost_usd and current_cost >= args.max_cost_usd:
             print(
                 f"COST GUARD: {args.model} has recorded ${current_cost:.6f}; "
@@ -140,10 +160,14 @@ def main() -> int:
         )
         if code:
             failures.append(path.stem)
+            break
 
+    accepted_cost = recorded_cost(model_dir)
+    rejected_paid_cost = rejected_cost(rejected_dir, since=started_at)
     print(
         f"Model {args.model}: existing={skipped}, failed={len(set(failures))}, "
-        f"recorded_cost=${recorded_cost(model_dir):.6f}, cassette_dir={model_dir}"
+        f"accepted_cost=${accepted_cost:.6f}, rejected_cost=${rejected_paid_cost:.6f}, "
+        f"total_paid=${accepted_cost + rejected_paid_cost:.6f}, cassette_dir={model_dir}"
     )
     if failures:
         print("Failed scenarios:", ", ".join(sorted(set(failures))), file=sys.stderr)

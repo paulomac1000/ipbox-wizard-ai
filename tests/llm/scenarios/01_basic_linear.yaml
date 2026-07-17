@@ -36,6 +36,7 @@ input:
       kwota: 119
       nexus_source: own_br
       kategoria: IP
+      allocation_source: ewidencja_kosztu_IP
     - opis: Internet firmowy
       kwota: 89
       nexus_source: outside_nexus

@@ -42,6 +42,7 @@ input:
       kwota: 500
       nexus_source: own_br
       kategoria: IP
+      allocation_source: ewidencja_kosztu_IP
     opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.
 assertions:
   nexus: 1.0

@@ -160,6 +160,13 @@ class VCRRecorder:
         except RecordingRejectedError:
             self._save_rejected(scenario, request_hash, response, "incomplete finish reason")
             raise
+        if response.returned_model != request.model:
+            reason = (
+                f"returned_model={response.returned_model!r} does not match "
+                f"requested model {request.model!r}"
+            )
+            self._save_rejected(scenario, request_hash, response, reason)
+            raise RecordingRejectedError(reason)
         try:
             parsed = validate_response(response.content)
         except Exception as exc:

@@ -24,7 +24,15 @@ input:
   miesiace:
   - miesiac: 2025-01
     faktury:
-    - kwota_PLN: 20150
+    - kwota_waluta: 5000
+      waluta: USD
+      data_wystawienia: '2025-01-02'
+      data_zaplaty: '2025-01-10'
+      data_kursu_przychodu: '2024-12-31'
+      kurs_przychodu: 4.0
+      data_kursu_zaplaty: '2025-01-09'
+      kurs_zaplaty: 4.03
+      źródło_kursu: NBP_table_A_fixture
       kontrahent: ClientA
       kwalifikuje_IP: true
     ewidencja:
@@ -36,8 +44,8 @@ input:
       kwota: 500
       nexus_source: own_br
       kategoria: IP
+      allocation_source: ewidencja_kosztu_IP
     opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.
-    różnica_kursowa: 150
 assertions:
   roznice_kursowe_w_IP: false
   testy_pass:

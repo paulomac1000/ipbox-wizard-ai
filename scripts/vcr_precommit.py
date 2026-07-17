@@ -94,6 +94,12 @@ def validate_model(model: str) -> list[str]:
                     errors.append(f"{model}/{scenario_id}: manifest request hash mismatch")
                 if entry.get("fingerprint") != fingerprint:
                     errors.append(f"{model}/{scenario_id}: manifest fingerprint mismatch")
+                if entry.get("returned_model") != cassette.meta.returned_model:
+                    errors.append(f"{model}/{scenario_id}: manifest returned_model mismatch")
+                if entry.get("recorded_at") != cassette.meta.recorded_at:
+                    errors.append(f"{model}/{scenario_id}: manifest recorded_at mismatch")
+                if entry.get("cost") != cassette.meta.cost:
+                    errors.append(f"{model}/{scenario_id}: manifest cost mismatch")
         except Exception as exc:
             errors.append(f"{model}/{scenario_id}: {exc}")
 

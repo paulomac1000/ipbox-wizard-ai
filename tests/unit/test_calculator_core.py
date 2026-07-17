@@ -116,8 +116,15 @@ def test_classify_cost_threshold_validation() -> None:
         classify_cost(CostItem("x", 1), False, False, asset_threshold=-1)
 
 
+def test_direct_ip_cost_requires_explicit_evidence_source() -> None:
+    with pytest.raises(ValueError, match="allocation_source evidence"):
+        CostItem("Licencja wyłącznie do projektu IP", 100, basket="IP")
+
+
 def test_classify_cost_preserves_explicit_evidence() -> None:
-    explicit = CostItem("Licencja wyłącznie do projektu IP", 100, basket="IP")
+    explicit = CostItem(
+        "Licencja wyłącznie do projektu IP", 100, basket="IP", allocation_source="license-ledger"
+    )
     assert classify_cost(explicit, False, False) is explicit
 
 

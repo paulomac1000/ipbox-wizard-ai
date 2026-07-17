@@ -31,7 +31,7 @@ while IFS= read -r -d '' file; do
   printf '\n%s\n\n' "$fence" >> "$TMP"
 done < <(find "$ROOT" -type f -print0 | sort -z)
 
-if grep -Ein '(BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY|Bearer [A-Za-z0-9._-]{20,}|sk-[A-Za-z0-9_-]{20,}|OPENROUTER_API_KEY=[^[:space:]]+)' "$TMP"; then
+if grep -Eqi "(BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY|Bearer [A-Za-z0-9._-]{20,}|sk-[A-Za-z0-9_-]{20,}|OPENROUTER_API_KEY[[:space:]]*[:=][[:space:]]*['\"]?[A-Za-z0-9._-]{20,})" "$TMP"; then
   echo 'Potential secret detected; refusing to write dump' >&2
   exit 1
 fi
