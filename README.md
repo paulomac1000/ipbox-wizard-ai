@@ -52,7 +52,7 @@ python scripts/check_cassette_policy.py
 for script in scripts/*.sh dump-to-md.sh; do bash -n "$script"; done
 ```
 
-Stan po audycie: **158 testów PASS**, coverage `python_helper` **95,27%**; pełny bezpłatny suite: **158 PASS i 36 kontrolowanych skipów LLM**.
+Stan po audycie protokołu: **167 testów PASS**, coverage `python_helper` **95,30%**; pełny bezpłatny suite: **167 PASS i 36 kontrolowanych skipów LLM**.
 
 ## Benchmark multi-model
 
@@ -77,7 +77,7 @@ Pełna procedura: [`docs/testing.md`](docs/testing.md). Niezależny audyt: [`doc
 
 ## Stan wydania
 
-Rdzeń deterministyczny jest po audycie i ma zielone bramki. PR pozostaje **draftem**, ponieważ aktualny kontrakt nie ma jeszcze kompletnej macierzy kaset.
+Rdzeń deterministyczny i protokół `active_rules` są po audycie. PR pozostaje **draftem**, ponieważ aktualny kontrakt nie ma jeszcze kompletnej macierzy kaset.
 
 Warunki zakończenia:
 
