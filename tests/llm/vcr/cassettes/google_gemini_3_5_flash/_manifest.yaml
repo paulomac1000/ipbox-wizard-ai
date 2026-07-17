@@ -1,0 +1,256 @@
+manifest_format_version: 2
+model: google/gemini-3.5-flash
+generated_at: '2026-07-17T21:58:55.694006+00:00'
+entries:
+  01_basic_linear:
+    file: 01_basic_linear.yaml
+    fingerprint: v3_1419097b3c86d6763c42a46e7c4c685209e4f405d918e96e424d2e2ab21d6b87
+    request_hash: e90780cb636dbbadf399a7c89ce8010380234c365d657fc1cbfbbdab79b966c9
+    recorded_at: '2026-07-17T21:57:36.032081+00:00'
+    returned_model: google/gemini-3.5-flash
+    cost: 0.000882
+  02_basic_scale_single_client:
+    file: 02_basic_scale_single_client.yaml
+    fingerprint: v3_4a9f06609b6d1f928ec7ad0678fe4b23c46541d435f2546202b535ade76a11c9
+    request_hash: 71cc094013520ffcb66d890ed8dc76135ec26e570e21c02965a79b26d6bc1e93
+    recorded_at: '2026-07-17T21:57:38.194546+00:00'
+    returned_model: google/gemini-3.5-flash
+    cost: 0.000957
+  03_fx_usd_single_client:
+    file: 03_fx_usd_single_client.yaml
+    fingerprint: v3_0da6ea7dba5778be36e89475905a4e22180655295a914d42132b9bdbcf873df0
+    request_hash: 71cc094013520ffcb66d890ed8dc76135ec26e570e21c02965a79b26d6bc1e93
+    recorded_at: '2026-07-17T21:57:40.380703+00:00'
+    returned_model: google/gemini-3.5-flash
+    cost: 0.000957
+  11_multi_client_mixed_currencies:
+    file: 11_multi_client_mixed_currencies.yaml
+    fingerprint: v3_1208df4026ad8c6e2ce90543d2908fe62833c9b517d99da40bb3f733d6096bf6
+    request_hash: add82a43bd966cea80ef4ec2f1217e8cbf113d09bfe912171c8da531d965e4e4
+    recorded_at: '2026-07-17T21:57:42.564264+00:00'
+    returned_model: google/gemini-3.5-flash
+    cost: 0.0009165
+  12_zus_in_pit_path:
+    file: 12_zus_in_pit_path.yaml
+    fingerprint: v3_606aca9cb9f6456d6e2272cd7111a9cd469aaee99de6354efb05046b461eae25
+    request_hash: add82a43bd966cea80ef4ec2f1217e8cbf113d09bfe912171c8da531d965e4e4
+    recorded_at: '2026-07-17T21:57:44.722284+00:00'
+    returned_model: google/gemini-3.5-flash
+    cost: 0.0008805
+  13_income_from_employment_impact:
+    file: 13_income_from_employment_impact.yaml
+    fingerprint: v3_1e319320395672ec525dfb9d0398a3623b2e581bc4e779bc7eef1c1e46f49fcd
+    request_hash: add82a43bd966cea80ef4ec2f1217e8cbf113d09bfe912171c8da531d965e4e4
+    recorded_at: '2026-07-17T21:57:46.774476+00:00'
+    returned_model: google/gemini-3.5-flash
+    cost: 0.0008805
+  14_lump_sum_ineligible_check:
+    file: 14_lump_sum_ineligible_check.yaml
+    fingerprint: v3_139ab2c277000e933fa47f03e80906fd17da7a12d7ca88326f629e87ee5b022e
+    request_hash: 1a5a70a8fc7968fdc246116b19349b236f5552f6727e0af688e905250f470752
+    recorded_at: '2026-07-17T21:57:48.977244+00:00'
+    returned_model: google/gemini-3.5-flash
+    cost: 0.0008895
+  15_vacation_sick_mix:
+    file: 15_vacation_sick_mix.yaml
+    fingerprint: v3_303154bad83241f141d69dd8ebc69bc9977715cd2269565b86a5c08374f01a99
+    request_hash: e90780cb636dbbadf399a7c89ce8010380234c365d657fc1cbfbbdab79b966c9
+    recorded_at: '2026-07-17T21:57:51.045920+00:00'
+    returned_model: google/gemini-3.5-flash
+    cost: 0.000882
+  16_high_w_review:
+    file: 16_high_w_review.yaml
+    fingerprint: v3_fd7d01548ac67cfc83b83e4402e42f27873c8df9cfc2f960040aea7cf4c6145a
+    request_hash: 71cc094013520ffcb66d890ed8dc76135ec26e570e21c02965a79b26d6bc1e93
+    recorded_at: '2026-07-17T21:57:53.012681+00:00'
+    returned_model: google/gemini-3.5-flash
+    cost: 0.000957
+  17_low_w_review:
+    file: 17_low_w_review.yaml
+    fingerprint: v3_5b0e5ef85e4362e4d6a1cc02379cc7a88e685c07839f423e37169b5145618fd4
+    request_hash: 8ba3ae9322a32f80d48a55502bca53757fe4b179d30536ed040e2c087db99354
+    recorded_at: '2026-07-17T21:57:54.924377+00:00'
+    returned_model: google/gemini-3.5-flash
+    cost: 0.000957
+  18_logic_zero_work_hours:
+    file: 18_logic_zero_work_hours.yaml
+    fingerprint: v3_8b81f90fa97c35936bb769bd516d11502b62e1151d43c26df81649a476c0f0a2
+    request_hash: 7c4c242dc581cdaaa56d1e1b8302fb8fc0d67b4847625482f06e0e2f0ee86db9
+    recorded_at: '2026-07-17T21:57:56.900691+00:00'
+    returned_model: google/gemini-3.5-flash
+    cost: 0.000957
+  21_monthly_loss_impact:
+    file: 21_monthly_loss_impact.yaml
+    fingerprint: v3_722502d8bfe9e126f9a42fde0596ae54e7a1813dc5b2adc4175224d2b58bca80
+    request_hash: 71cc094013520ffcb66d890ed8dc76135ec26e570e21c02965a79b26d6bc1e93
+    recorded_at: '2026-07-17T21:57:58.874967+00:00'
+    returned_model: google/gemini-3.5-flash
+    cost: 0.000957
+  22_related_parties_nexus_reduction:
+    file: 22_related_parties_nexus_reduction.yaml
+    fingerprint: v3_76079ae19bd36d7186d39222e802ecdeadd7306f9353ac45e1a6175459d02446
+    request_hash: 71cc094013520ffcb66d890ed8dc76135ec26e570e21c02965a79b26d6bc1e93
+    recorded_at: '2026-07-17T21:58:01.142967+00:00'
+    returned_model: google/gemini-3.5-flash
+    cost: 0.001155
+  23_loss_carry_forward:
+    file: 23_loss_carry_forward.yaml
+    fingerprint: v3_42961b88e8b59b5a7c479ddc29e9160a9b616faad0cf90a792dfaa777f65e06c
+    request_hash: 84b20d04d4c3077c61fe45f64405f5f250738b12a86262cef2cfa6c3ecf6b33a
+    recorded_at: '2026-07-17T21:58:03.435264+00:00'
+    returned_model: google/gemini-3.5-flash
+    cost: 0.0008145
+  24_donations_relief:
+    file: 24_donations_relief.yaml
+    fingerprint: v3_c915a26958d2efb20e72d7a0c59a08b4a32ed91ace3a08b611ece0794b4e7e65
+    request_hash: 84b20d04d4c3077c61fe45f64405f5f250738b12a86262cef2cfa6c3ecf6b33a
+    recorded_at: '2026-07-17T21:58:05.632217+00:00'
+    returned_model: google/gemini-3.5-flash
+    cost: 0.0008145
+  25_rehab_relief:
+    file: 25_rehab_relief.yaml
+    fingerprint: v3_2e407c0b146995db92b9a932db709e9ef621ffd81824782e985cc605fca345d0
+    request_hash: 84b20d04d4c3077c61fe45f64405f5f250738b12a86262cef2cfa6c3ecf6b33a
+    recorded_at: '2026-07-17T21:58:08.145357+00:00'
+    returned_model: google/gemini-3.5-flash
+    cost: 0.0008145
+  26_rd_relief_nexus:
+    file: 26_rd_relief_nexus.yaml
+    fingerprint: v3_ce84bc1d97b452c7605a3e3b862a0adda2cdaf2b9d9b32e42f09b9ab4488857a
+    request_hash: e90780cb636dbbadf399a7c89ce8010380234c365d657fc1cbfbbdab79b966c9
+    recorded_at: '2026-07-17T21:58:10.427750+00:00'
+    returned_model: google/gemini-3.5-flash
+    cost: 0.000882
+  27_termomodernizacja_full:
+    file: 27_termomodernizacja_full.yaml
+    fingerprint: v3_f955b3a61d9dcc7499da8a70700b208b628438a7113b850d04014632d12e8faf
+    request_hash: e90780cb636dbbadf399a7c89ce8010380234c365d657fc1cbfbbdab79b966c9
+    recorded_at: '2026-07-17T21:58:12.777997+00:00'
+    returned_model: google/gemini-3.5-flash
+    cost: 0.000882
+  28_edge_multiple_carry-overs:
+    file: 28_edge_multiple_carry-overs.yaml
+    fingerprint: v3_29d2df399fe330c5184dd57dc44d7fb1e49b16f6b0a8d4559c368dd01506eb09
+    request_hash: 71cc094013520ffcb66d890ed8dc76135ec26e570e21c02965a79b26d6bc1e93
+    recorded_at: '2026-07-17T21:58:15.259798+00:00'
+    returned_model: google/gemini-3.5-flash
+    cost: 0.000957
+  29_edge_related_parties_nexus_0:
+    file: 29_edge_related_parties_nexus_0.yaml
+    fingerprint: v3_e62b47e85dbfa5186110e7adc080600aafa606ffad932fa69e8ac0ee3f91fe68
+    request_hash: 71cc094013520ffcb66d890ed8dc76135ec26e570e21c02965a79b26d6bc1e93
+    recorded_at: '2026-07-17T21:58:17.159185+00:00'
+    returned_model: google/gemini-3.5-flash
+    cost: 0.000957
+  30_edge_related_parties_nexus_mixed:
+    file: 30_edge_related_parties_nexus_mixed.yaml
+    fingerprint: v3_530eb32ad73958d2b8742567d1af5357fd345d69ed6fce4bdd3547901c8ffc7a
+    request_hash: 71cc094013520ffcb66d890ed8dc76135ec26e570e21c02965a79b26d6bc1e93
+    recorded_at: '2026-07-17T21:58:19.303212+00:00'
+    returned_model: google/gemini-3.5-flash
+    cost: 0.000957
+  31_zus_double_dip_fail:
+    file: 31_zus_double_dip_fail.yaml
+    fingerprint: v3_0c8aa70fcad100d2ed45b75ca008047b771d80c7e8a13669aabd87da2835e263
+    request_hash: fb2a8b69d767dc5189f9402d58d5d108b62d69f3e9751f4a066c7710167fcf10
+    recorded_at: '2026-07-17T21:58:21.707406+00:00'
+    returned_model: google/gemini-3.5-flash
+    cost: 0.0010665
+  32_private_costs_ip_fail:
+    file: 32_private_costs_ip_fail.yaml
+    fingerprint: v3_cb50629ec76fe8e1da0adf5e8df9064a3a947ebe61dec2d2e9ec10ef7a016d97
+    request_hash: 71cc094013520ffcb66d890ed8dc76135ec26e570e21c02965a79b26d6bc1e93
+    recorded_at: '2026-07-17T21:58:24.371432+00:00'
+    returned_model: google/gemini-3.5-flash
+    cost: 0.000957
+  33_kpir_balance_fail:
+    file: 33_kpir_balance_fail.yaml
+    fingerprint: v3_b55db7d5952feac1313004cb0889294d6a0fa2e76eb66bf617b238d15ace675b
+    request_hash: 71cc094013520ffcb66d890ed8dc76135ec26e570e21c02965a79b26d6bc1e93
+    recorded_at: '2026-07-17T21:58:26.873150+00:00'
+    returned_model: google/gemini-3.5-flash
+    cost: 0.000957
+  34_verify_fixed_asset_threshold_fail:
+    file: 34_verify_fixed_asset_threshold_fail.yaml
+    fingerprint: v3_13c98a50bafc316526a5de9d1276447d186e7beba232016c817379487ed471ac
+    request_hash: 71cc094013520ffcb66d890ed8dc76135ec26e570e21c02965a79b26d6bc1e93
+    recorded_at: '2026-07-17T21:58:29.141032+00:00'
+    returned_model: google/gemini-3.5-flash
+    cost: 0.000957
+  35_verify_monthly_w_jump_inconsistency:
+    file: 35_verify_monthly_w_jump_inconsistency.yaml
+    fingerprint: v3_73f9e889701e451b093e59fefcd3045996f5d137f1c23a1261754ec9893a0915
+    request_hash: 034f87ebcf12acf7be014a59d354c5340a7862ac4d829a1169404a747c09cfa5
+    recorded_at: '2026-07-17T21:58:31.221714+00:00'
+    returned_model: google/gemini-3.5-flash
+    cost: 0.0010365
+  36_verify_negative_income_error:
+    file: 36_verify_negative_income_error.yaml
+    fingerprint: v3_0e335feb365f6d4a483e10900f9c843a7a640808628826f958f809b15826a793
+    request_hash: 71cc094013520ffcb66d890ed8dc76135ec26e570e21c02965a79b26d6bc1e93
+    recorded_at: '2026-07-17T21:58:33.252723+00:00'
+    returned_model: google/gemini-3.5-flash
+    cost: 0.000957
+  37_verify_invalid_tax_form_stop:
+    file: 37_verify_invalid_tax_form_stop.yaml
+    fingerprint: v3_cb70e93ab7cfc9fa1852df61014fb0c71de8bbfe72a6227b2e67d789e6251934
+    request_hash: cb3d7d9dfcd23c42957b98e05d7bff1fd39fd7bbef045c70a633069c388f4a22
+    recorded_at: '2026-07-17T21:58:35.537247+00:00'
+    returned_model: google/gemini-3.5-flash
+    cost: 0.001032
+  38_verify_missing_kpir_data:
+    file: 38_verify_missing_kpir_data.yaml
+    fingerprint: v3_9cf53d7b026ff32a1488f66052173e2b795b4bc4bf4f82e1a69a053a44408070
+    request_hash: 29d80b839bd70a7388d000dc84297d02c57903edd7171929c5b24b8527ff6225
+    recorded_at: '2026-07-17T21:58:37.736901+00:00'
+    returned_model: google/gemini-3.5-flash
+    cost: 0.0009615
+  39_multi_project_weighted_W:
+    file: 39_multi_project_weighted_W.yaml
+    fingerprint: v3_6dbdd4d7323dd1b768b2bde6e74ba51c3d7fbe81a186fb4a6c9c7af5fe0681a4
+    request_hash: bc5b44121b6d083c98121d66c4746204dcc38ba8f8ebbc580d4ab33108157351
+    recorded_at: '2026-07-17T21:58:40.010962+00:00'
+    returned_model: google/gemini-3.5-flash
+    cost: 0.000882
+  40_mixed_ip_clause:
+    file: 40_mixed_ip_clause.yaml
+    fingerprint: v3_e8d21ac657223aa24a3f7189eac1020a1ff82da241e5615a9db698cae8bdd40a
+    request_hash: add82a43bd966cea80ef4ec2f1217e8cbf113d09bfe912171c8da531d965e4e4
+    recorded_at: '2026-07-17T21:58:42.148596+00:00'
+    returned_model: google/gemini-3.5-flash
+    cost: 0.0008805
+  41_ikze_cascade:
+    file: 41_ikze_cascade.yaml
+    fingerprint: v3_70ea5ccd6904ccc18fed2bc0acbfd8ea55d45a99dc6f7237433436bf1fbfa4f7
+    request_hash: e90780cb636dbbadf399a7c89ce8010380234c365d657fc1cbfbbdab79b966c9
+    recorded_at: '2026-07-17T21:58:44.453234+00:00'
+    returned_model: google/gemini-3.5-flash
+    cost: 0.000882
+  42_stop_08_no_documentation:
+    file: 42_stop_08_no_documentation.yaml
+    fingerprint: v3_8ed02fd5880c56458fc3b0f8adb59ae15e20a339df00dc880314be3d04f94d1c
+    request_hash: 29d80b839bd70a7388d000dc84297d02c57903edd7171929c5b24b8527ff6225
+    recorded_at: '2026-07-17T21:58:46.912655+00:00'
+    returned_model: google/gemini-3.5-flash
+    cost: 0.0009615
+  43_review_09_single_client_100pct:
+    file: 43_review_09_single_client_100pct.yaml
+    fingerprint: v3_ad55a33db7cd50087a068ade443a3927ed08647413651fe46602767eeb42eff3
+    request_hash: 71cc094013520ffcb66d890ed8dc76135ec26e570e21c02965a79b26d6bc1e93
+    recorded_at: '2026-07-17T21:58:49.364808+00:00'
+    returned_model: google/gemini-3.5-flash
+    cost: 0.000957
+  44_mix_revenue_key_kis:
+    file: 44_mix_revenue_key_kis.yaml
+    fingerprint: v3_e82bf1d96190cb90a9d0e3c912e76508c43bf7553cde416130e7d92ead76695f
+    request_hash: 28568076cba4d43cddfa67c645d813671fe521072682f93609cb206895529663
+    recorded_at: '2026-07-17T21:58:51.836678+00:00'
+    returned_model: google/gemini-3.5-flash
+    cost: 0.001032
+  45_multi_ip_two_stage:
+    file: 45_multi_ip_two_stage.yaml
+    fingerprint: v3_e7d67be32e17f050c622d0097f994124ac7eac4a89335f9e9b47f06ef815d181
+    request_hash: c547227e0b103d1c1401a270ae00eccc8b552aacf3f56cc9f48d55b6d7af2886
+    recorded_at: '2026-07-17T21:58:55.688964+00:00'
+    returned_model: google/gemini-3.5-flash
+    cost: 0.001257

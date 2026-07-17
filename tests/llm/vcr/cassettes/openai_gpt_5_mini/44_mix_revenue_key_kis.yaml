@@ -1,0 +1,102 @@
+meta:
+  scenario_id: 44_mix_revenue_key_kis
+  scenario_name: Klucz przychodowy MIX z interpretacji KIS
+  provider: openrouter
+  requested_model: openai/gpt-5-mini
+  returned_model: openai/gpt-5-mini
+  fingerprint: v3_69ddb92ae0e14e6e4f271d137186ce2d17db3a1254a6adddf2de72caa95850b3
+  request_hash: af84a80f0dbd44b5aaa8d706edff39619ed05afa8d1c01292f577e31d8805c3c
+  recorded_at: '2026-07-17T22:00:36.340367+00:00'
+  request_id: gen-1784325633-WrcgEIymtQsmo0nN20kY
+  finish_reason: stop
+  native_finish_reason: completed
+  system_fingerprint: null
+  prompt_tokens: 435
+  completion_tokens: 51
+  total_tokens: 486
+  cost: 0.00021075
+  recording_duration_seconds: 2.52
+  cassette_format_version: 4
+response: '{"status":"FINAL","stops":[],"reviews":["REVIEW_09","REVIEW_16","REVIEW_17"]}'
+parsed_response:
+  status: FINAL
+  result:
+    rok: 2025
+    przychody_roczne:
+      IP: 9000.0
+      NIE: 1000.0
+    koszty_roczne:
+      IP: 550.0
+      NIE: 50.0
+      MIX: 500.0
+      WYKLUCZONE: 0.0
+    nexus_koszty:
+      A: 100.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 500.0
+    nexus: 1.0
+    dochód_IP: 8450.0
+    dochód_NIE: 950.0
+    klucz_MIX:
+      metoda: przychodowa_roczna
+      źródło: interpretacja_KIS
+      wartość: 0.9
+      status: FINAL
+    alokacja_multi_ip: null
+    podatek:
+      podstawa_IP: 8450
+      podstawa_NIE: 950
+      podatek_IP: 423
+      podatek_NIE_finalny: 181
+      podatek_całościowy: 604
+      nadpłata_lub_dopłata: -604.0
+      termomodernization_carry_over: 0.0
+      ulga_BR_IP_wykorzystana: 0.0
+      ulga_BR_NIE_wykorzystana: 0.0
+      ulga_BR_carry_over: 0.0
+      dochód_dodatkowy_skala: 0.0
+  classifications:
+  - opis: Serwer AWS
+    amount: 500.0
+    basket: MIX
+    allocation_method: przychodowa_roczna
+    allocation_source: interpretacja_KIS
+    allocation_key: 0.9
+    ip_amount: 450.0
+    non_ip_amount: 50.0
+    nexus_source: outside_nexus
+    nexus_basket: poza_nexus
+    nexus_amount: 0.0
+  - opis: Licencja JetBrains
+    amount: 100.0
+    basket: IP
+    allocation_method: direct
+    allocation_source: dokument
+    allocation_key: 1.0
+    ip_amount: 100.0
+    non_ip_amount: 0.0
+    nexus_source: own_br
+    nexus_basket: A
+    nexus_amount: 100.0
+  monthly_W:
+  - miesiąc: 2025-01
+    wartość: 87.5
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+    TEST_3: PASS
+    TEST_4: PASS
+    TEST_5: PASS
+    TEST_6: PASS
+    TEST_7: PASS
+    TEST_8: PASS
+    TEST_9: PASS
+  stops_reviews:
+    stops: []
+    reviews:
+    - REVIEW_09
+    - REVIEW_16
+    - REVIEW_17
+    warnings: []

@@ -1,0 +1,101 @@
+meta:
+  scenario_id: 22_related_parties_nexus_reduction
+  scenario_name: NEXUS z kosztami B i C
+  provider: openrouter
+  requested_model: google/gemini-3.5-flash
+  returned_model: google/gemini-3.5-flash
+  fingerprint: v3_76079ae19bd36d7186d39222e802ecdeadd7306f9353ac45e1a6175459d02446
+  request_hash: 71cc094013520ffcb66d890ed8dc76135ec26e570e21c02965a79b26d6bc1e93
+  recorded_at: '2026-07-17T21:58:01.142967+00:00'
+  request_id: gen-1784325479-ObFFVQjaKRR96b99toW4
+  finish_reason: stop
+  native_finish_reason: STOP
+  system_fingerprint: null
+  prompt_tokens: 518
+  completion_tokens: 42
+  total_tokens: 560
+  cost: 0.001155
+  recording_duration_seconds: 1.638
+  cassette_format_version: 4
+response: "{\n  \"status\": \"FINAL\",\n  \"stops\": [],\n  \"reviews\": [\n    \"REVIEW_01\",\n    \"REVIEW_09\"\n  ]\n}"
+parsed_response:
+  status: FINAL
+  result:
+    rok: 2025
+    przychody_roczne:
+      IP: 20000.0
+      NIE: 0.0
+    koszty_roczne:
+      IP: 10000.0
+      NIE: 0.0
+      MIX: 0.0
+      WYKLUCZONE: 0.0
+    nexus_koszty:
+      A: 0.0
+      B: 5000.0
+      C: 5000.0
+      D: 0.0
+      poza_nexus: 0.0
+    nexus: 0.65
+    dochód_IP: 10000.0
+    dochód_NIE: 0.0
+    klucz_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      wartość: null
+      status: NOT_APPLICABLE
+    alokacja_multi_ip: null
+    podatek:
+      podstawa_IP: 6500
+      podstawa_NIE: 0
+      podatek_IP: 325
+      podatek_NIE_finalny: 0
+      podatek_całościowy: 325
+      nadpłata_lub_dopłata: -325.0
+      termomodernization_carry_over: 0.0
+      ulga_BR_IP_wykorzystana: 0.0
+      ulga_BR_NIE_wykorzystana: 0.0
+      ulga_BR_carry_over: 0.0
+      dochód_dodatkowy_skala: 0.0
+  classifications:
+  - opis: Niepowiązany podwykonawca B+R
+    amount: 5000.0
+    basket: IP
+    allocation_method: direct
+    allocation_source: dokument
+    allocation_key: 1.0
+    ip_amount: 5000.0
+    non_ip_amount: 0.0
+    nexus_source: unrelated_br_contractor
+    nexus_basket: B
+    nexus_amount: 5000.0
+  - opis: Powiązany podwykonawca B+R
+    amount: 5000.0
+    basket: IP
+    allocation_method: direct
+    allocation_source: dokument
+    allocation_key: 1.0
+    ip_amount: 5000.0
+    non_ip_amount: 0.0
+    nexus_source: related_br_contractor
+    nexus_basket: C
+    nexus_amount: 5000.0
+  monthly_W:
+  - miesiąc: 2025-01
+    wartość: 100.0
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+    TEST_3: PASS
+    TEST_4: PASS
+    TEST_5: PASS
+    TEST_6: PASS
+    TEST_7: PASS
+    TEST_8: PASS
+    TEST_9: PASS
+  stops_reviews:
+    stops: []
+    reviews:
+    - REVIEW_01
+    - REVIEW_09
+    warnings: []

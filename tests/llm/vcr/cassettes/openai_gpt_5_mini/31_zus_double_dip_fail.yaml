@@ -1,0 +1,80 @@
+meta:
+  scenario_id: 31_zus_double_dip_fail
+  scenario_name: Dublowanie ZUS
+  provider: openrouter
+  requested_model: openai/gpt-5-mini
+  returned_model: openai/gpt-5-mini
+  fingerprint: v3_6c731d021eba31d8d71ecdf85f31a45e20cf9a69cc18324ca9e7e8885f5e7774
+  request_hash: 241c8c750cc62336334d2e51ca2d6fd9a4983e1fdaecea96eba562b64b2d2d96
+  recorded_at: '2026-07-17T22:00:04.577179+00:00'
+  request_id: gen-1784325601-Kp79KS0XLxBtNcMpO42E
+  finish_reason: stop
+  native_finish_reason: completed
+  system_fingerprint: null
+  prompt_tokens: 434
+  completion_tokens: 52
+  total_tokens: 486
+  cost: 0.0002125
+  recording_duration_seconds: 2.842
+  cassette_format_version: 4
+response: '{"status":"STOPPED","stops":["ZUS_DOUBLE_DIP"],"reviews":["REVIEW_01","REVIEW_09"]}'
+parsed_response:
+  status: STOPPED
+  result:
+    rok: 2025
+    przychody_roczne:
+      IP: 0.0
+      NIE: 0.0
+    koszty_roczne:
+      IP: 0.0
+      NIE: 0.0
+      MIX: 0.0
+      WYKLUCZONE: 0.0
+    nexus_koszty:
+      A: 0.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 0.0
+    nexus: 0.0
+    dochód_IP: 0.0
+    dochód_NIE: 0.0
+    klucz_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      wartość: null
+      status: NOT_APPLICABLE
+    alokacja_multi_ip: null
+    podatek:
+      podstawa_IP: 0
+      podstawa_NIE: 0
+      podatek_IP: 0
+      podatek_NIE_finalny: 0
+      podatek_całościowy: 0
+      nadpłata_lub_dopłata: 0.0
+      termomodernization_carry_over: 0
+      ulga_BR_IP_wykorzystana: 0
+      ulga_BR_NIE_wykorzystana: 0
+      ulga_BR_carry_over: 0
+      dochód_dodatkowy_skala: 0
+  classifications: []
+  monthly_W:
+  - miesiąc: 2025-01
+    wartość: 100.0
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+    TEST_3: FAIL
+    TEST_4: PASS
+    TEST_5: PASS
+    TEST_6: PASS
+    TEST_7: PASS
+    TEST_8: PASS
+    TEST_9: PASS
+  stops_reviews:
+    stops:
+    - ZUS_DOUBLE_DIP
+    reviews:
+    - REVIEW_01
+    - REVIEW_09
+    warnings: []

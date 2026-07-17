@@ -1,0 +1,76 @@
+meta:
+  scenario_id: 14_lump_sum_ineligible_check
+  scenario_name: Ryczałt zatrzymuje przebieg
+  provider: openrouter
+  requested_model: anthropic/claude-haiku-4.5
+  returned_model: anthropic/claude-haiku-4.5
+  fingerprint: v3_43e6e88362d264982aaa6299ab3292e0b9fb9ec8bd2e5ec63c72cedba532f078
+  request_hash: 129004c28a3ad343cfef1c697b336734a39db1d7e3283c16c565ae2c0011ddb7
+  recorded_at: '2026-07-17T22:00:53.238887+00:00'
+  request_id: gen-1784325652-3NZwcLBV8Z3JVOcvUF43
+  finish_reason: stop
+  native_finish_reason: end_turn
+  system_fingerprint: null
+  prompt_tokens: 597
+  completion_tokens: 43
+  total_tokens: 640
+  cost: 0.000812
+  recording_duration_seconds: 1.259
+  cassette_format_version: 4
+response: "```json\n{\n  \"status\": \"STOPPED\",\n  \"stops\": [\n    \"STOP_01\"\n  ],\n  \"reviews\": []\n}\n```"
+parsed_response:
+  status: STOPPED
+  result:
+    rok: 2025
+    przychody_roczne:
+      IP: 0.0
+      NIE: 0.0
+    koszty_roczne:
+      IP: 0.0
+      NIE: 0.0
+      MIX: 0.0
+      WYKLUCZONE: 0.0
+    nexus_koszty:
+      A: 0.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 0.0
+    nexus: 0.0
+    dochód_IP: 0.0
+    dochód_NIE: 0.0
+    klucz_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      wartość: null
+      status: NOT_APPLICABLE
+    alokacja_multi_ip: null
+    podatek:
+      podstawa_IP: 0
+      podstawa_NIE: 0
+      podatek_IP: 0
+      podatek_NIE_finalny: 0
+      podatek_całościowy: 0
+      nadpłata_lub_dopłata: 0.0
+      termomodernization_carry_over: 0
+      ulga_BR_IP_wykorzystana: 0
+      ulga_BR_NIE_wykorzystana: 0
+      ulga_BR_carry_over: 0
+      dochód_dodatkowy_skala: 0
+  classifications: []
+  monthly_W: []
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+    TEST_3: PASS
+    TEST_4: PASS
+    TEST_5: PASS
+    TEST_6: PASS
+    TEST_7: PASS
+    TEST_8: PASS
+    TEST_9: PASS
+  stops_reviews:
+    stops:
+    - STOP_01
+    reviews: []
+    warnings: []
