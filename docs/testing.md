@@ -10,7 +10,7 @@ Python oblicza liczby, klasyfikacje, W, TEST 1–9 i atomowe `decision_facts`. R
 
 Runner składa decyzję z raportem deterministycznym i waliduje całość. Benchmark mierzy zgodność instrukcji i integracji providera, nie umiejętność modelu do ponownego liczenia podatku.
 
-Historyczne kasety pełnego raportu ujawniły wymyślone kursy NBP, automatyczne `JetBrains → IP`, niespójny NEXUS i TEST-y deklarowane przez model jako PASS. Obecny kontrakt świadomie odbiera modelowi te obowiązki.
+Historyczne kasety pełnego raportu ujawniły wymyślone kursy NBP, automatyczne `JetBrains → IP`, niespójny NEXUS i TEST-y deklarowane przez model jako PASS. Pierwsza macierz małej koperty ujawniła inną wadę protokołu: część modeli reinterpretowała nazwy fałszywych faktów i dopisywała nieaktywne kody. `active_rules` usuwa tę dwuznaczność bez wyjątków scenariuszowych.
 
 ## 2. Bezpłatna bramka
 
@@ -31,11 +31,11 @@ python scripts/check_cassette_policy.py
 for script in scripts/*.sh dump-to-md.sh; do bash -n "$script"; done
 ```
 
-Stan referencyjny z 17 lipca 2026 r.:
+Stan referencyjny po audycie protokołu z 17 lipca 2026 r.:
 
-- 158 testów jednostkowych PASS;
-- coverage `python_helper` 95,27%;
-- pełny suite: 158 PASS i 36 kontrolowanych skipów LLM;
+- 167 testów jednostkowych PASS;
+- coverage `python_helper` 95,30%;
+- pełny suite: 167 PASS i 36 kontrolowanych skipów LLM;
 - pusty katalog kaset jest dozwolony, częściowa macierz nie jest.
 
 ## 3. Testy semantyczne, które muszą pozostać
@@ -51,7 +51,9 @@ Szczególnie chronione regresje:
 - limity zdrowotnej/IKZE dla nieobsługiwanego roku są fail-closed;
 - STOP zeruje każde finalne pole;
 - multi-IP zachowuje grosze;
+- prompt zawiera wyłącznie prawdziwe `active_rules`; nieaktywny fakt i kod nie mogą być widoczne;
 - playback nie wywołuje sieci i odrzuca `finish_reason` inny niż `stop`;
+- pre-commit porównuje zapisane `parsed_response` z ponownym parsowaniem;
 - tryb record nie nadpisuje istniejącej kasety;
 - miesiące muszą odpowiadać `input.rok`, a termomodernizacja nie przekracza 53 000 zł.
 
@@ -59,7 +61,7 @@ Szczególnie chronione regresje:
 
 Fingerprint obejmuje protokół decyzji, listę aktywnych reguł, system prompt, request, model, profil, schema i format kasety. Zmiana któregokolwiek elementu unieważnia nagranie. Kasety z pełną mapą `true/false` są nieaktualne i muszą zostać nagrane od nowa.
 
-Kasety starego pełnego raportu nie są zgodne z obecną kopertą decyzji. Nie kopiuj ich odpowiedzi, hashy, manifestu ani parsed payloadu. Po obecnych zmianach należy nagrać **108 kaset: 3 modele × 36 scenariuszy**.
+Kasety starego pełnego raportu także nie są zgodne z obecną kopertą decyzji. Nie kopiuj ich odpowiedzi, hashy, manifestu ani parsed payloadu. Po obecnych zmianach należy nagrać **108 kaset: 3 modele × 36 scenariuszy**.
 
 ## 5. Modele bramkowe
 
@@ -94,9 +96,9 @@ python scripts/record_model.py \
   --max-cost-usd 5
 ```
 
-Skrypt nie nadpisuje poprawnej kasety. Przy 402, 429 lub 5xx uruchom polecenie ponownie. Odrzucenia trafiają do `/tmp/ipbox_llm_rejected/`, a wyniki do `/tmp/ipbox_llm_responses/`.
+Skrypt nie nadpisuje istniejącej kasety. Przy błędzie transportowym uruchom ponownie tylko po sprawdzeniu, że plik nie powstał. Odrzucenia trafiają do `/tmp/ipbox_llm_rejected/`, a wyniki do `/tmp/ipbox_llm_responses/`.
 
-Nie ma `--force`. Nieaktualny plik usuń dopiero po zidentyfikowaniu zmienionego elementu requestu.
+Nie ma `--force`. Nieaktualny plik usuń dopiero po zidentyfikowaniu zmienionego elementu requestu. Nie ponawiaj błędu semantycznego aż do uzyskania „szczęśliwej” odpowiedzi — zachowaj odrzucenie w raporcie i zdiagnozuj przyczynę.
 
 ## 7. Playback offline
 
@@ -140,7 +142,7 @@ Przypisz przyczynę:
 
 1. scenariusz lub asercja;
 2. kalkulator/oracle;
-3. `decision_facts`;
+3. `decision_facts` albo budowa `active_rules`;
 4. schema/integracja providera;
 5. model mimo jednoznacznej instrukcji.
 
@@ -150,6 +152,7 @@ Minimalny ręczny przegląd:
 
 - 13 — pełny podatek wspólnej skali;
 - 14 — tylko `STOP_01`;
+- 17 — tylko `REVIEW_02`, bez nieaktywnego `STOP_02`;
 - 18 — właściwy STOP przy zerowych godzinach;
 - 22 — NEXUS 0,65 dla B=5000 i C=5000;
 - 23 — strata wyłącznie NIE;
