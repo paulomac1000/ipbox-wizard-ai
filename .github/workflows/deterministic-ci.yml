@@ -64,11 +64,11 @@ jobs:
             bash -n "$script"
           done
 
-      - name: Commit and push final code
+      - name: Commit and push non-workflow changes
         run: |
           set -euo pipefail
+          git restore --source=HEAD -- .github/workflows
           rm -rf .review-fix
-          rm -f .github/workflows/publish-review-fixes.yml
           git add -A
           git diff --cached --check
           git config user.name "github-actions[bot]"
