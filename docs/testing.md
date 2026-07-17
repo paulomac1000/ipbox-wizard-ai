@@ -33,9 +33,9 @@ for script in scripts/*.sh dump-to-md.sh; do bash -n "$script"; done
 
 Stan referencyjny po audycie protokołu z 17 lipca 2026 r.:
 
-- 181 testów jednostkowych PASS;
+- 184 testy jednostkowe PASS;
 - coverage `python_helper` 94,32%;
-- pełny suite: 181 PASS i 36 kontrolowanych skipów LLM;
+- pełny suite: 184 PASS i 36 kontrolowanych skipów LLM;
 - pusty katalog kaset jest dozwolony, częściowa macierz nie jest.
 
 ## 3. Testy semantyczne, które muszą pozostać
@@ -53,6 +53,7 @@ Szczególnie chronione regresje:
 - multi-IP zachowuje grosze;
 - prompt zawiera wyłącznie prawdziwe `active_rules`; nieaktywny fakt i kod nie mogą być widoczne;
 - playback nie wywołuje sieci i odrzuca `finish_reason` inny niż `stop`;
+- live run, playback i pre-commit odrzucają substytucję modelu;
 - pre-commit porównuje zapisane `parsed_response` z ponownym parsowaniem;
 - tryb record nie nadpisuje istniejącej kasety;
 - miesiące muszą odpowiadać `input.rok`, a termomodernizacja nie przekracza 53 000 zł.
@@ -76,7 +77,6 @@ Kasety starego pełnego raportu także nie są zgodne z obecną kopertą decyzji
 | Z.ai GLM | `z-ai/glm-4.7-flash` | tani model Flash GLM |
 | Qwen | `qwen/qwen3.5-flash-02-23` | tani model Flash Qwen |
 | Mistral | `mistralai/ministral-3b-2512` | bardzo mały model 3B jako dolna granica |
-
 
 Wykonywalna lista znajduje się wyłącznie w `tests/llm/models.py`; skrypty shell
 odczytują ją dynamicznie. Uzasadnienie i migawka cen znajdują się w
@@ -136,6 +136,7 @@ Playback musi przejść przy nieustawionym sekrecie. Live request w tym trybie j
 Model zalicza tylko przy 36/36, a cała macierz przy 324/324. Każda kaseta musi:
 
 - mieć `finish_reason=stop`;
+- mieć `returned_model` identyczny z modelem żądanym;
 - zawierać czysty JSON bez pól dodatkowych, Markdown fences ani naprawiania parserem;
 - przejść strict schema decyzji;
 - zwrócić dokładny zestaw STOP/REVIEW bez duplikatów;
