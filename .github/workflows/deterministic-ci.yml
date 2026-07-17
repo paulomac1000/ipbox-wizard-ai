@@ -1,45 +1,37 @@
-name: Publish locally verified review fixes
+name: Deterministic CI
 
 on:
+  push:
+    branches: [main]
   pull_request:
     branches: [main]
 
 permissions:
-  contents: write
+  contents: read
+  checks: write
 
 concurrency:
-  group: publish-reviewed-fixes-${{ github.ref }}
+  group: deterministic-ci-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  publish:
-    if: github.head_ref == 'fix/decouple-mix-allocation-from-w' && github.actor != 'github-actions[bot]'
+  deterministic:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
 
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: fix/decouple-mix-allocation-from-w
-          fetch-depth: 0
+          persist-credentials: false
 
-      - name: Reconstruct and apply reviewed patch
-        run: |
-          set -euo pipefail
-          cat .review-fix/part-* | tr -d '[:space:]' > /tmp/ipbox-review-fixes.patch.gz.b64
-          base64 --decode /tmp/ipbox-review-fixes.patch.gz.b64 > /tmp/ipbox-review-fixes.patch.gz
-          echo "da95498d242005876207448e96b3d840c45ea3036d04ded08ed9c13b677b5284  /tmp/ipbox-review-fixes.patch.gz" | sha256sum -c -
-          gzip -dc /tmp/ipbox-review-fixes.patch.gz > /tmp/ipbox-review-fixes.patch
-
-          git show 9c2fc756573d735feb27305fff22fd275da8794f:.github/workflows/deterministic-ci.yml \
-            > .github/workflows/deterministic-ci.yml
-          git apply --check /tmp/ipbox-review-fixes.patch
-          git apply /tmp/ipbox-review-fixes.patch
-          git diff --check
-
-      - uses: actions/setup-python@v5
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: ${{ matrix.python-version }}
           cache: pip
           cache-dependency-path: |
             requirements.txt
@@ -48,30 +40,43 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt -r requirements-test.txt
 
-      - name: Run complete deterministic gates
+      - name: Ruff format
+        run: ruff format --check .
+
+      - name: Ruff lint
+        run: ruff check .
+
+      - name: Compile Python
+        run: python -m compileall -q python_helper tests scripts
+
+      - name: Unit tests with coverage
         run: |
-          set -euo pipefail
-          ruff format --check .
-          ruff check .
-          python -m compileall -q python_helper tests scripts
+          mkdir -p reports
           pytest tests/unit \
             --cov=python_helper \
             --cov-report=term-missing \
-            --cov-fail-under=90
-          pytest -q
-          python scripts/check_cassette_policy.py
+            --cov-report=xml:reports/coverage-py${{ matrix.python-version }}.xml \
+            --cov-fail-under=90 \
+            --junitxml=reports/unit-py${{ matrix.python-version }}.xml
+
+      - name: Full free suite (skip paid LLM)
+        run: pytest -q
+
+      - name: Cassette policy
+        run: python scripts/check_cassette_policy.py
+
+      - name: Shell syntax check
+        run: |
+          set -euo pipefail
           for script in scripts/*.sh dump-to-md.sh; do
             bash -n "$script"
           done
 
-      - name: Commit and push non-workflow changes
-        run: |
-          set -euo pipefail
-          git restore --source=HEAD -- .github/workflows
-          rm -rf .review-fix
-          git add -A
-          git diff --cached --check
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "fix: address deterministic and bot review findings"
-          git push origin HEAD:fix/decouple-mix-allocation-from-w
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: deterministic-reports-py${{ matrix.python-version }}
+          path: reports/
+          if-no-files-found: warn
+          retention-days: 14
