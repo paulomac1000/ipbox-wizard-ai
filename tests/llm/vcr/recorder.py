@@ -112,6 +112,12 @@ class VCRRecorder:
             total_tokens=cassette.meta.total_tokens,
             cost=cassette.meta.cost,
         )
+        try:
+            self._require_complete(response)
+        except RecordingRejectedError as exc:
+            raise CassetteStaleError(
+                f"Cassette finish_reason must be 'stop', got {response.finish_reason!r}"
+            ) from exc
         return response, parsed
 
     def _record(
@@ -125,6 +131,27 @@ class VCRRecorder:
         api_call: Callable[[LLMRequestSpec], LLMResponse],
         validate_response: Callable[[str], dict[str, Any]],
     ) -> tuple[LLMResponse, dict[str, Any]]:
+        scenario_id = str(scenario["meta"]["id"])
+        if path.exists():
+            try:
+                return self._playback(
+                    path,
+                    scenario_id,
+                    request_hash,
+                    fingerprint,
+                    validate_response,
+                )
+            except CassetteError as exc:
+                raise CassetteStaleError(
+                    "Refusing to overwrite an existing cassette. Validate the change, "
+                    "delete the stale cassette explicitly, and record again."
+                ) from exc
+        if scenario_id in self.manifest.entries:
+            raise CassetteStaleError(
+                "Manifest entry exists without its cassette. Repair or delete the stale "
+                "entry explicitly before recording."
+            )
+
         started = time.monotonic()
         response = api_call(request)
         duration = time.monotonic() - started
@@ -142,7 +169,7 @@ class VCRRecorder:
             ) from exc
 
         meta = CassetteMeta(
-            scenario_id=str(scenario["meta"]["id"]),
+            scenario_id=scenario_id,
             scenario_name=str(scenario["meta"]["name"]),
             provider=self.config.provider,
             requested_model=request.model,

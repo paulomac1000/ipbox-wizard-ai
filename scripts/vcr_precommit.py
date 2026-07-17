@@ -7,6 +7,7 @@ import argparse
 import os
 import sys
 from pathlib import Path
+from typing import Any
 
 import yaml
 
@@ -25,6 +26,16 @@ def orphan_cassette_ids(model_directory: Path, expected_ids: set[str]) -> set[st
     return {
         path.stem for path in model_directory.glob("*.yaml") if path.name != "_manifest.yaml"
     } - expected_ids
+
+
+def cassette_payload_errors(cassette: Cassette, reparsed: dict[str, Any]) -> list[str]:
+    """Return payload-integrity errors shared by pre-commit and unit tests."""
+    errors: list[str] = []
+    if cassette.meta.finish_reason != "stop":
+        errors.append(f"finish_reason must be 'stop', got {cassette.meta.finish_reason!r}")
+    if reparsed != cassette.parsed_response:
+        errors.append("stored parsed_response differs from reparsed response")
+    return errors
 
 
 def validate_model(model: str) -> list[str]:
@@ -68,7 +79,11 @@ def validate_model(model: str) -> list[str]:
                 errors.append(f"{model}/{scenario_id}: request hash mismatch")
             if cassette.meta.fingerprint != fingerprint:
                 errors.append(f"{model}/{scenario_id}: fingerprint mismatch")
-            runner.validate_semantics(cassette.response, scenario)
+            reparsed = runner.validate_semantics(cassette.response, scenario)
+            errors.extend(
+                f"{model}/{scenario_id}: {error}"
+                for error in cassette_payload_errors(cassette, reparsed)
+            )
             entry = manifest.entries.get(scenario_id)
             if not isinstance(entry, dict):
                 errors.append(f"{model}/{scenario_id}: manifest entry missing")

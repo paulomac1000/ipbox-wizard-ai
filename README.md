@@ -10,10 +10,11 @@ Model językowy nie wykonuje krytycznej arytmetyki:
 
 1. `python_helper/ipbox_calculator.py` waliduje dane i liczy W, alokacje, NEXUS, ulgi, podatek oraz zaokrąglenia.
 2. `tests/llm/oracle.py` tworzy niezależny wynik referencyjny i atomowe `decision_facts`.
-3. LLM mapuje wyłącznie te fakty na małą kopertę `status/stops/reviews`.
-4. Runner składa kopertę z raportem deterministycznym.
-5. Evaluator i JSON Schema porównują wynik fail-closed.
-6. VCR zapisuje tylko odpowiedź, która przeszła schema, semantykę i ponowne parsowanie.
+3. Runner usuwa wszystkie fakty `false` i przekazuje modelowi wyłącznie aktywne reguły z gotowym kodem STOP/REVIEW.
+4. LLM kopiuje kody aktywnych reguł do małej koperty `status/stops/reviews`; nie widzi reguł nieaktywnych.
+5. Runner składa kopertę z raportem deterministycznym.
+6. Evaluator i JSON Schema porównują wynik fail-closed.
+7. VCR zapisuje tylko odpowiedź, która przeszła schema, semantykę i ponowne parsowanie.
 
 Najważniejszy invariant z issue #1: **przychód IP/NIE, alokacja kosztów pośrednich `MIX` i klasyfikacja NEXUS są trzema niezależnymi decyzjami**. Współczynnik czasu `W` nie jest domyślnym kluczem `MIX`.
 
@@ -29,6 +30,8 @@ Najważniejszy invariant z issue #1: **przychód IP/NIE, alokacja kosztów pośr
 - Działalność na skali łączy `dochody_dodatkowe_skala` z pozostałym dochodem skali i liczy pełny podatek od wspólnej podstawy.
 - Działalność liniowa i dodatkowe dochody na skali wymagają dwóch odrębnych kaskad/zeznań; oracle odmawia ich mieszania.
 - Limity zdrowotnej i IKZE są wersjonowane per rok; nieznany rok z dodatnim odliczeniem kończy się błędem.
+- Miesiąc musi mieć ścisły format `YYYY-MM` i rok zgodny z `input.rok`.
+- Pula ulgi termomodernizacyjnej nie może przekroczyć 53 000 zł na podatnika.
 - Brak kursu, daty płatności, dowodu kwalifikacji lub ujemna faktura jest błędem danych, nie wartością zero.
 
 Szczegółowy kontrakt: [`ipbox_algorytm.md`](ipbox_algorytm.md). Raport audytu: [`docs/audit-2026-07-17.md`](docs/audit-2026-07-17.md).

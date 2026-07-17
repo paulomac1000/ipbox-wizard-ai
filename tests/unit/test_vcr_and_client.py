@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
@@ -152,6 +153,84 @@ def test_record_then_offline_playback(monkeypatch, tmp_path) -> None:
     )
     assert playback.content == live.content
     assert parsed2 == parsed
+
+
+def test_playback_rejects_incomplete_finish_reason(monkeypatch, tmp_path) -> None:
+    scenario, path, recorder = record_valid_cassette(monkeypatch, tmp_path)
+    cassette_path = recorder.config.cassette_path("s")
+    cassette = Cassette.load(cassette_path)
+    Cassette(
+        meta=replace(cassette.meta, finish_reason="length"),
+        response=cassette.response,
+        parsed_response=cassette.parsed_response,
+    ).save(cassette_path)
+
+    monkeypatch.setenv("VCR_MODE", "playback")
+    with pytest.raises(CassetteStaleError, match="finish_reason"):
+        VCRRecorder(VCRConfig()).get_or_record(
+            scenario=scenario,
+            scenario_path=path,
+            request=spec(),
+            api_call=None,
+            validate_response=json.loads,
+        )
+
+
+def test_record_mode_reuses_valid_cassette_without_calling_api(monkeypatch, tmp_path) -> None:
+    scenario, path, recorder = record_valid_cassette(monkeypatch, tmp_path)
+    cassette_path = recorder.config.cassette_path("s")
+    original = cassette_path.read_bytes()
+    called = False
+
+    def api(_):
+        nonlocal called
+        called = True
+        return response(content='{"ok":false}')
+
+    played, parsed = VCRRecorder(VCRConfig()).get_or_record(
+        scenario=scenario,
+        scenario_path=path,
+        request=spec(),
+        api_call=api,
+        validate_response=json.loads,
+    )
+    assert called is False
+    assert parsed == {"ok": True}
+    assert played.content == '{"ok":true}'
+    assert cassette_path.read_bytes() == original
+
+
+def test_record_mode_refuses_to_overwrite_stale_cassette(monkeypatch, tmp_path) -> None:
+    scenario, path, recorder = record_valid_cassette(monkeypatch, tmp_path)
+    cassette_path = recorder.config.cassette_path("s")
+    original = cassette_path.read_bytes()
+    changed = LLMRequestSpec(
+        provider="openrouter",
+        model="google/gemini-3.5-flash",
+        system_prompt="system",
+        user_prompt="changed",
+        temperature=None,
+        max_tokens=100,
+        response_format={"type": "json_object"},
+        reasoning={"effort": "minimal"},
+    )
+    called = False
+
+    def api(_):
+        nonlocal called
+        called = True
+        return response()
+
+    with pytest.raises(CassetteStaleError, match="Refusing to overwrite"):
+        VCRRecorder(VCRConfig()).get_or_record(
+            scenario=scenario,
+            scenario_path=path,
+            request=changed,
+            api_call=api,
+            validate_response=json.loads,
+        )
+    assert called is False
+    assert cassette_path.read_bytes() == original
 
 
 def test_playback_detects_stale_request(monkeypatch, tmp_path) -> None:
@@ -363,6 +442,26 @@ def test_client_does_not_retry_read_timeout_or_decode_failure(monkeypatch) -> No
     with pytest.raises(ValueError, match="invalid JSON"):
         client.call_with_retry({"model": "x"}, retries=2, delay=0)
     assert attempts == 1
+
+
+def test_vcr_precommit_rejects_incomplete_or_tampered_payload(monkeypatch, tmp_path) -> None:
+    from scripts.vcr_precommit import cassette_payload_errors
+
+    _, _, recorder = record_valid_cassette(monkeypatch, tmp_path)
+    cassette = Cassette.load(recorder.config.cassette_path("s"))
+    assert cassette_payload_errors(cassette, {"ok": True}) == []
+
+    incomplete = Cassette(
+        meta=replace(cassette.meta, finish_reason=None),
+        response=cassette.response,
+        parsed_response=cassette.parsed_response,
+    )
+    assert any(
+        "finish_reason" in error for error in cassette_payload_errors(incomplete, {"ok": True})
+    )
+    assert any(
+        "parsed_response" in error for error in cassette_payload_errors(cassette, {"ok": False})
+    )
 
 
 def test_vcr_precommit_detects_orphan_cassette_files(tmp_path) -> None:

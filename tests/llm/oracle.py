@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from copy import deepcopy
 from decimal import Decimal
 from itertools import pairwise
@@ -48,6 +49,7 @@ REVIEW_FACT_TO_CODE = {
     "uses_kis_interpretation": "REVIEW_16",
     "kis_implementation_requires_confirmation": "REVIEW_17",
 }
+MONTH_ID_PATTERN = re.compile(r"^(?P<year>\d{4})-(?P<month>0[1-9]|1[0-2])$")
 
 
 def derive_decision_codes(decision_facts: dict[str, bool]) -> tuple[set[str], set[str]]:
@@ -149,6 +151,10 @@ def validate_scenario(scenario: dict[str, Any]) -> None:
         raise ScenarioError("meta.name is required")
     if "rok" not in input_data:
         raise ScenarioError("input.rok is required")
+    try:
+        year = int(input_data["rok"])
+    except (TypeError, ValueError) as exc:
+        raise ScenarioError("input.rok must be an integer year") from exc
     if "forma_opodatkowania" not in input_data:
         raise ScenarioError("input.forma_opodatkowania is required")
     if not assertions:
@@ -216,6 +222,11 @@ def validate_scenario(scenario: dict[str, Any]) -> None:
         month_id = str(month.get("miesiac", ""))
         if not month_id:
             raise ScenarioError(f"month[{index}].miesiac is required")
+        match = MONTH_ID_PATTERN.fullmatch(month_id)
+        if match is None:
+            raise ScenarioError(f"month[{index}].miesiac must use strict YYYY-MM with month 01-12")
+        if int(match.group("year")) != year:
+            raise ScenarioError(f"month[{index}].miesiac year must match input.rok={year}")
         if month_id in seen_months:
             raise ScenarioError(f"duplicate month {month_id}")
         seen_months.add(month_id)

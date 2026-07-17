@@ -23,6 +23,7 @@ MONEY_QUANT = Decimal("0.01")
 INTEGER_QUANT = Decimal("1")
 CANONICAL_BASKETS = {"IP", "MIX", "NON", "WYKLUCZONE"}
 BASKET_ALIASES = {"EXCLUDED": "WYKLUCZONE", "NIE": "NON"}
+THERMOMODERNIZATION_RELIEF_MAX = 53_000.0
 NEXUS_SOURCE_MAP = {
     "own_br": "A",
     "unrelated_br_contractor": "B",
@@ -794,6 +795,11 @@ def tax_cascade(
     if values["internet_tax_relief"] > INTERNET_RELIEF_MAX:
         raise ValueError(
             f"internet_tax_relief cannot exceed {INTERNET_RELIEF_MAX:.0f} PLN per taxpayer"
+        )
+    if values["thermomodernization_pool"] > THERMOMODERNIZATION_RELIEF_MAX:
+        raise ValueError(
+            "thermomodernization_pool cannot exceed 53000 PLN per taxpayer across "
+            "all thermomodernization projects"
         )
 
     donation_limit_base = max(0.0, non_ip_income) + (

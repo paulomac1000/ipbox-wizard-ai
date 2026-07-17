@@ -2,7 +2,7 @@
 
 ## 1. Co testuje benchmark
 
-Python oblicza liczby, klasyfikacje, W, TEST 1–9 i atomowe `decision_facts`. Model otrzymuje wyłącznie fakty i zwraca:
+Python oblicza liczby, klasyfikacje, W, TEST 1–9 i atomowe `decision_facts`. Runner usuwa wszystkie wartości `false` i tworzy listę `active_rules` zawierającą tylko prawdziwe reguły oraz ich kody. Model otrzymuje wyłącznie tę listę i zwraca:
 
 ```json
 {"status":"FINAL","stops":[],"reviews":["REVIEW_09"]}
@@ -51,11 +51,13 @@ Szczególnie chronione regresje:
 - limity zdrowotnej/IKZE dla nieobsługiwanego roku są fail-closed;
 - STOP zeruje każde finalne pole;
 - multi-IP zachowuje grosze;
-- playback nie wywołuje sieci.
+- playback nie wywołuje sieci i odrzuca `finish_reason` inny niż `stop`;
+- tryb record nie nadpisuje istniejącej kasety;
+- miesiące muszą odpowiadać `input.rok`, a termomodernizacja nie przekracza 53 000 zł.
 
 ## 4. Dlaczego stare kasety są nieważne
 
-Fingerprint obejmuje protokół decyzji, `decision_facts`, system prompt, request, model, profil, schema i format kasety. Zmiana któregokolwiek elementu unieważnia nagranie.
+Fingerprint obejmuje protokół decyzji, listę aktywnych reguł, system prompt, request, model, profil, schema i format kasety. Zmiana któregokolwiek elementu unieważnia nagranie. Kasety z pełną mapą `true/false` są nieaktualne i muszą zostać nagrane od nowa.
 
 Kasety starego pełnego raportu nie są zgodne z obecną kopertą decyzji. Nie kopiuj ich odpowiedzi, hashy, manifestu ani parsed payloadu. Po obecnych zmianach należy nagrać **108 kaset: 3 modele × 36 scenariuszy**.
 

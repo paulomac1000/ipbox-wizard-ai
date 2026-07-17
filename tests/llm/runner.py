@@ -22,35 +22,43 @@ from .request_spec import LLMRequestSpec
 from .vcr import VCRConfig, VCRRecorder
 
 SYSTEM_PROMPT = (
-    "Jesteś warstwą decyzyjną systemu IP Box. Otrzymujesz atomowe fakty ustalone "
-    "przez deterministyczny kod. Nie wykonujesz arytmetyki, nie analizujesz ponownie "
-    "danych podatkowych i nie tworzysz dodatkowych przesłanek. Zwracasz wyłącznie "
-    "krótki obiekt JSON zgodny ze schematem decyzji."
+    "Jesteś warstwą wykonującą gotową listę aktywnych reguł systemu IP Box. "
+    "Deterministyczny kod wcześniej ustalił prawdziwość wszystkich przesłanek. "
+    "Każda przekazana active_rule jest prawdziwa; reguła nieobecna jest nieaktywna. "
+    "Nie analizujesz podatków, nazw faktów ani danych źródłowych. Kopiujesz wyłącznie "
+    "kody z aktywnych reguł do krótkiego obiektu JSON."
 )
 RESPONSE_ROOT = Path("/tmp/ipbox_llm_responses")
 
 
 def build_tool_context(reference: dict[str, Any]) -> dict[str, Any]:
-    """Expose only authoritative atomic facts needed by the model decision layer."""
-    return {"decision_facts": reference["decision_facts"]}
+    """Expose only true, authoritative rules; never show inactive facts to the model."""
+    facts = reference["decision_facts"]
+    active_rules: list[dict[str, str]] = []
+    for kind, mapping in (("STOP", STOP_FACT_TO_CODE), ("REVIEW", REVIEW_FACT_TO_CODE)):
+        active_rules.extend(
+            {"kind": kind, "fact": fact, "code": code}
+            for fact, code in mapping.items()
+            if facts.get(fact) is True
+        )
+    return {"active_rules": active_rules}
 
 
 def build_decision_protocol() -> str:
-    """Render the exact code-owned decision table used by the benchmark prompt."""
-    lines = [
-        "PROTOKÓŁ DECYZYJNY:",
-        "- Dodaj kod wtedy i tylko wtedy, gdy przypisany mu fakt ma wartość true.",
-        "- Nie dodawaj kodów dla faktów false i nie wyprowadzaj nowych faktów.",
-        "- Kolejność kodów nie ma znaczenia, ale nie powtarzaj kodów.",
-        "- status=STOPPED, gdy lista stops nie jest pusta; inaczej status=FINAL.",
-        "",
-        "STOP:",
-    ]
-    lines.extend(f"- {fact}=true -> {code}" for fact, code in STOP_FACT_TO_CODE.items())
-    lines.append("")
-    lines.append("REVIEW:")
-    lines.extend(f"- {fact}=true -> {code}" for fact, code in REVIEW_FACT_TO_CODE.items())
-    return "\n".join(lines)
+    """Render the provider-neutral copy protocol for already-active rules."""
+    return "\n".join(
+        [
+            "PROTOKÓŁ DECYZYJNY:",
+            "- active_rules zawiera wyłącznie reguły już uznane przez Python za prawdziwe.",
+            "- Dla kind=STOP skopiuj code do stops.",
+            "- Dla kind=REVIEW skopiuj code do reviews.",
+            "- Nie zwracaj żadnego kodu, którego nie ma w active_rules.",
+            "- Nie pomijaj żadnego kodu obecnego w active_rules i nie powtarzaj kodów.",
+            "- status=STOPPED, gdy active_rules zawiera co najmniej jeden kind=STOP; "
+            "inaczej FINAL.",
+            "- Gdy active_rules jest puste: status=FINAL, stops=[], reviews=[].",
+        ]
+    )
 
 
 def assemble_response(reference: dict[str, Any], decision: dict[str, Any]) -> dict[str, Any]:
@@ -83,14 +91,12 @@ class LLMTestRunner:
         self.output_validator = Draft202012Validator(OUTPUT_JSON_SCHEMA["schema"])
 
     def build_prompt(self, algorithm: str, scenario: dict[str, Any]) -> str:
-        del (
-            algorithm
-        )  # Human documentation is tested separately; request rules come from code maps.
+        del algorithm  # Human documentation is tested separately; request rules come from code.
         reference = compute_reference(scenario)
         payload = build_tool_context(reference)
         return (
             f"{build_decision_protocol()}\n\n"
-            "AUTORYTATYWNE FAKTY:\n"
+            "AKTYWNE REGUŁY (wszystkie są prawdziwe):\n"
             f"{json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(',', ':'))}\n\n"
             "Zwróć wyłącznie pola status, stops i reviews zgodnie ze schematem. "
             "Nie zwracaj raportu finansowego — system dołączy go deterministycznie.\n"

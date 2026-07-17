@@ -32,7 +32,8 @@ Sprzeczność między źródłami jest błędem. Nie wybieraj wygodniejszej wers
 - dodatnie odliczenie roczne bez zweryfikowanego limitu jest błędem;
 - STOP zeruje finalne liczby i klasyfikacje;
 - TEST 1–9 ustala Python;
-- model zwraca tylko `status`, `stops`, `reviews`;
+- model dostaje tylko aktywne reguły (`true`) i zwraca wyłącznie `status`, `stops`, `reviews`;
+- fakt lub kod nieaktywny nie może pojawić się w promptcie modelu;
 - playback nigdy nie wykonuje live requestu;
 - kaseta powstaje dopiero po schema i semantic PASS.
 

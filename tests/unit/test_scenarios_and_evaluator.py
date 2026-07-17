@@ -9,6 +9,8 @@ from jsonschema import Draft202012Validator
 
 from tests.llm.evaluator import Evaluator
 from tests.llm.oracle import (
+    REVIEW_FACT_TO_CODE,
+    STOP_FACT_TO_CODE,
     ScenarioError,
     compute_reference,
     derive_decision_codes,
@@ -191,6 +193,21 @@ def test_invalid_scenario_contracts() -> None:
             validate_scenario(broken)
 
 
+@pytest.mark.parametrize("month_id", ["2026-01", "2025-13", "2025-1"])
+def test_month_identifier_must_be_strict_and_match_input_year(month_id: str) -> None:
+    loaded = deepcopy(scenario("01_basic_linear"))
+    loaded["input"]["miesiace"][0]["miesiac"] = month_id
+    with pytest.raises(ScenarioError, match="miesiac"):
+        validate_scenario(loaded)
+
+
+def test_thermomodernization_limit_is_fail_closed() -> None:
+    loaded = deepcopy(scenario("27_termomodernizacja_full"))
+    loaded["input"]["ulgi"]["termomodernizacja_pula"] = 53_000.01
+    with pytest.raises(ScenarioError, match="cannot exceed 53000"):
+        compute_reference(loaded)
+
+
 def test_year_dependent_limits_fail_closed() -> None:
     loaded = scenario("41_ikze_cascade")
     excessive = deepcopy(loaded)
@@ -200,6 +217,8 @@ def test_year_dependent_limits_fail_closed() -> None:
 
     unknown_year = deepcopy(loaded)
     unknown_year["input"]["rok"] = 2027
+    for month in unknown_year["input"]["miesiace"]:
+        month["miesiac"] = month["miesiac"].replace("2025-", "2027-")
     with pytest.raises(ScenarioError, match="no verified entrepreneur IKZE limit"):
         compute_reference(unknown_year)
 
@@ -207,29 +226,61 @@ def test_year_dependent_limits_fail_closed() -> None:
     health = deepcopy(health)
     health["input"]["zus"]["odliczenie_zdrowotne_PIT"] = 1
     health["input"]["rok"] = 2027
+    for month in health["input"]["miesiace"]:
+        month["miesiac"] = month["miesiac"].replace("2025-", "2027-")
     with pytest.raises(ScenarioError, match="no verified health-contribution"):
         compute_reference(health)
 
 
-def test_runner_exposes_only_atomic_decision_facts() -> None:
+def test_runner_exposes_only_active_decision_rules() -> None:
+    import json
+
     loaded = scenario("01_basic_linear")
     reference = compute_reference(loaded)
+    expected = []
+    for kind, mapping in (("STOP", STOP_FACT_TO_CODE), ("REVIEW", REVIEW_FACT_TO_CODE)):
+        expected.extend(
+            {"kind": kind, "fact": fact, "code": code}
+            for fact, code in mapping.items()
+            if reference["decision_facts"].get(fact) is True
+        )
     context = build_tool_context(reference)
-    assert context == {"decision_facts": reference["decision_facts"]}
+    assert context == {"active_rules": expected}
+    assert all(reference["decision_facts"][item["fact"]] is True for item in expected)
+
+    serialized = json.dumps(context, ensure_ascii=False)
+    assert "claimed_ip_without_qualified_right" not in serialized
+    assert "STOP_02" not in serialized
+    assert "REVIEW_09" in serialized
 
     prompt = LLMTestRunner(None).build_prompt("ignored human documentation", loaded)
-    assert "AUTORYTATYWNE FAKTY" in prompt
+    assert "AKTYWNE REGUŁY" in prompt
     assert "deterministic_report" not in prompt
-    assert "result" not in prompt
-    assert "decision_facts" in prompt
+    assert '"result"' not in prompt
+    assert "active_rules" in prompt
+    assert "claimed_ip_without_qualified_right" not in prompt
+    assert "STOP_02" not in prompt
     assert "status, stops i reviews" in prompt
 
 
-def test_decision_protocol_is_generated_from_code_maps() -> None:
+def test_decision_protocol_describes_copying_active_rules_only() -> None:
     protocol = build_decision_protocol()
-    assert "unsupported_tax_form=true -> STOP_01" in protocol
-    assert "multiple_projects_or_ips=true -> REVIEW_04" in protocol
+    assert "active_rules zawiera wyłącznie reguły" in protocol
+    assert "Nie zwracaj żadnego kodu" in protocol
     assert "status=STOPPED" in protocol
+    assert "unsupported_tax_form" not in protocol
+    assert "STOP_01" not in protocol
+
+
+def test_active_rules_include_stop_only_when_the_stop_fact_is_true() -> None:
+    final_context = build_tool_context(compute_reference(scenario("01_basic_linear")))
+    stopped_context = build_tool_context(
+        compute_reference(scenario("14_lump_sum_ineligible_check"))
+    )
+    assert not any(item["kind"] == "STOP" for item in final_context["active_rules"])
+    assert {item["code"] for item in stopped_context["active_rules"] if item["kind"] == "STOP"} == {
+        "STOP_01"
+    }
 
 
 def test_runner_assembles_deterministic_report_after_small_model_decision() -> None:

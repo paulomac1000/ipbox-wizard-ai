@@ -96,3 +96,7 @@ Raport ma zawierać:
 9. Werdykt dokładnie `READY` albo `NOT READY`.
 10. Przy `NOT READY` — minimalną uporządkowaną listę blokad.
 11. Potwierdzenie, że PR nie został zmergowany.
+
+## Uzupełnienie: aktywne reguły i integralność VCR
+
+Po nagraniu pierwszej macierzy wykryto jeden wspólny wzorzec błędu: słabsze modele reinterpretowały nazwę fałszywego faktu i dodawały `STOP_02` mimo wartości `false`. Protokół został uproszczony bez wyjątków scenariuszowych: model otrzymuje wyłącznie `active_rules` dla faktów prawdziwych. Nieaktywne nazwy i kody nie trafiają do promptu. Zmiana unieważnia wszystkie wcześniejsze kasety. Playback oraz pre-commit wymagają `finish_reason=stop`, recorder nie nadpisuje istniejących plików, miesiące muszą należeć do `input.rok`, a pula termomodernizacji jest ograniczona do 53 000 zł.

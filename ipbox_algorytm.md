@@ -124,7 +124,7 @@ Oracle zawiera zweryfikowane limity przedsiębiorcy:
 | 2025 | 12 900 zł | 15 611,40 zł |
 | 2026 | 14 100 zł | 16 956 zł |
 
-Dodatnie odliczenie dla innego roku jest blokowane do aktualizacji źródeł i testów.
+Dodatnie odliczenie dla innego roku jest blokowane do aktualizacji źródeł i testów. Identyfikator miesiąca ma ścisły format `YYYY-MM` i musi należeć do `input.rok`. Pula termomodernizacji jest ograniczona do 53 000 zł na podatnika; niewykorzystaną część można przenosić zgodnie z odrębnymi warunkami ustawowymi.
 
 ## 10. TEST 1–9
 
@@ -156,10 +156,10 @@ Model nie zmienia FAIL na PASS.
 
 ## 12. Kontrakt modelu
 
-Python wyznacza liczby, klasyfikacje, TEST-y i `decision_facts`. Model zwraca wyłącznie:
+Python wyznacza liczby, klasyfikacje, TEST-y i pełne `decision_facts`. Runner odrzuca wszystkie fakty `false` i tworzy `active_rules` wyłącznie z faktów prawdziwych. Każda aktywna reguła zawiera `kind`, nazwę faktu i gotowy kod. Model nie widzi reguł nieaktywnych i zwraca wyłącznie:
 
 ```json
 {"status":"FINAL","stops":[],"reviews":["REVIEW_09"]}
 ```
 
-Aplikacja składa i waliduje raport. Model nie analizuje surowych danych ponownie i nie dodaje pól. `status=STOPPED`, gdy `stops` nie jest puste; inaczej `FINAL`.
+Aplikacja składa i waliduje raport. Model kopiuje kod każdej `active_rule` do właściwej listy, nie analizuje nazw faktów ani surowych danych i nie dodaje kodu nieobecnego w aktywnych regułach. `status=STOPPED`, gdy aktywna jest co najmniej jedna reguła STOP; inaczej `FINAL`.

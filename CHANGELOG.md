@@ -5,6 +5,7 @@
 ### Added
 
 - Atomowy kontrakt `decision_facts`; model zwraca wyłącznie `status/stops/reviews`.
+- Kontrakt `active_rules`, który nie pokazuje modelowi fałszywych przesłanek ani nieaktywnych kodów.
 - Fail-closed oracle, evaluator, strict JSON Schema i VCR format 4.
 - 36 znormalizowanych scenariuszy oraz trzymodelowy benchmark.
 - Regresje dla wzoru NEXUS podwyższającego A+B.
@@ -28,6 +29,8 @@
 - STOP zeruje cały wynik, brak danych FX nie staje się zerem, W=0/ERROR i carry-over są fail-closed.
 - Multi-IP zachowuje każdy grosz metodą największych reszt.
 - Retry respektuje `Retry-After`, odpowiedź wymaga `finish_reason=stop`, a playback nie ma live fallbacku.
+- Playback i pre-commit odrzucają niekompletne kasety, a recorder nie nadpisuje istniejącego nagrania.
+- Walidacja wiąże każdy miesiąc z rokiem rozliczenia i egzekwuje limit termomodernizacji 53 000 zł.
 - Workflowy używają minimalnych uprawnień i `persist-credentials: false`.
 
 ### Changed
