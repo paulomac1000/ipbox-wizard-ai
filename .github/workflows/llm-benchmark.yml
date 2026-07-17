@@ -4,15 +4,21 @@ on:
   workflow_dispatch:
     inputs:
       model:
-        description: "Benchmark model (or 'all' for the full 3-model matrix)"
+        description: "Benchmark model (or 'all' for the full nine-family matrix)"
         required: true
         type: choice
         default: "all"
         options:
           - "all"
-          - "google/gemini-3.5-flash"
-          - "openai/gpt-5-mini"
+          - "google/gemini-3-flash-preview"
+          - "openai/gpt-5-nano"
           - "anthropic/claude-haiku-4.5"
+          - "deepseek/deepseek-chat-v3.1"
+          - "minimax/minimax-m2.5"
+          - "moonshotai/kimi-k2.5"
+          - "z-ai/glm-4.7-flash"
+          - "qwen/qwen3.5-flash-02-23"
+          - "mistralai/ministral-3b-2512"
       max-cost-usd:
         description: "Soft per-model cost cap in USD (0 disables the guard)"
         required: true
@@ -89,6 +95,7 @@ jobs:
             --cov-fail-under=90
           pytest -q
           python scripts/check_cassette_policy.py
+          for script in scripts/*.sh dump-to-md.sh; do bash -n "$script"; done
 
       - name: Record cassettes
         run: |
