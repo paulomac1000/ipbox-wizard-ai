@@ -28,11 +28,20 @@ def orphan_cassette_ids(model_directory: Path, expected_ids: set[str]) -> set[st
     } - expected_ids
 
 
-def cassette_payload_errors(cassette: Cassette, reparsed: dict[str, Any]) -> list[str]:
+def cassette_payload_errors(
+    cassette: Cassette,
+    reparsed: dict[str, Any],
+    expected_model: str | None = None,
+) -> list[str]:
     """Return payload-integrity errors shared by pre-commit and unit tests."""
     errors: list[str] = []
     if cassette.meta.finish_reason != "stop":
         errors.append(f"finish_reason must be 'stop', got {cassette.meta.finish_reason!r}")
+    if expected_model is not None and cassette.meta.returned_model != expected_model:
+        errors.append(
+            f"returned_model must equal requested model {expected_model!r}, "
+            f"got {cassette.meta.returned_model!r}"
+        )
     if reparsed != cassette.parsed_response:
         errors.append("stored parsed_response differs from reparsed response")
     return errors
@@ -82,7 +91,7 @@ def validate_model(model: str) -> list[str]:
             reparsed = runner.validate_semantics(cassette.response, scenario)
             errors.extend(
                 f"{model}/{scenario_id}: {error}"
-                for error in cassette_payload_errors(cassette, reparsed)
+                for error in cassette_payload_errors(cassette, reparsed, model)
             )
             entry = manifest.entries.get(scenario_id)
             if not isinstance(entry, dict):

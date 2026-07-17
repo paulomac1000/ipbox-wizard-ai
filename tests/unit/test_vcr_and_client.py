@@ -188,6 +188,31 @@ def test_playback_rejects_incomplete_finish_reason(monkeypatch, tmp_path) -> Non
         )
 
 
+def test_playback_rejects_returned_model_substitution(monkeypatch, tmp_path) -> None:
+    scenario, path, recorder = record_valid_cassette(monkeypatch, tmp_path)
+    cassette_path = recorder.config.cassette_path("s")
+    cassette = Cassette.load(cassette_path)
+    substituted = "provider/substituted-model"
+    Cassette(
+        meta=replace(cassette.meta, returned_model=substituted),
+        response=cassette.response,
+        parsed_response=cassette.parsed_response,
+    ).save(cassette_path)
+    manifest = CassetteManifest.load(recorder.config.manifest_path, recorder.config.model)
+    manifest.entries["s"]["returned_model"] = substituted
+    manifest.save(recorder.config.manifest_path)
+
+    monkeypatch.setenv("VCR_MODE", "playback")
+    with pytest.raises(CassetteStaleError, match="returned_model"):
+        VCRRecorder(VCRConfig()).get_or_record(
+            scenario=scenario,
+            scenario_path=path,
+            request=spec(),
+            api_call=None,
+            validate_response=json.loads,
+        )
+
+
 def test_record_mode_reuses_valid_cassette_without_calling_api(monkeypatch, tmp_path) -> None:
     scenario, path, recorder = record_valid_cassette(monkeypatch, tmp_path)
     cassette_path = recorder.config.cassette_path("s")
@@ -356,6 +381,20 @@ def test_none_mode_requires_complete_finish_reason(monkeypatch, tmp_path) -> Non
         )
 
 
+def test_none_mode_rejects_returned_model_substitution(monkeypatch, tmp_path) -> None:
+    set_config_env(monkeypatch, tmp_path, "none")
+    scenario, path = scenario_file(tmp_path)
+    substituted = replace(response(), returned_model="provider/substituted-model")
+    with pytest.raises(RecordingRejectedError, match="returned_model"):
+        VCRRecorder(VCRConfig()).get_or_record(
+            scenario=scenario,
+            scenario_path=path,
+            request=spec(),
+            api_call=lambda _: substituted,
+            validate_response=json.loads,
+        )
+
+
 def test_playback_rejects_tampered_parsed_response(monkeypatch, tmp_path) -> None:
     set_config_env(monkeypatch, tmp_path, "record")
     scenario, path = scenario_file(tmp_path)
@@ -473,6 +512,17 @@ def test_vcr_precommit_rejects_incomplete_or_tampered_payload(monkeypatch, tmp_p
     )
     assert any(
         "parsed_response" in error for error in cassette_payload_errors(cassette, {"ok": False})
+    )
+    substituted = Cassette(
+        meta=replace(cassette.meta, returned_model="provider/substituted-model"),
+        response=cassette.response,
+        parsed_response=cassette.parsed_response,
+    )
+    assert any(
+        "returned_model" in error
+        for error in cassette_payload_errors(
+            substituted, {"ok": True}, "google/gemini-3-flash-preview"
+        )
     )
 
 

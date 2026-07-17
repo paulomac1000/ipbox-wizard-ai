@@ -58,6 +58,7 @@ class VCRRecorder:
         if self.config.is_none:
             response = api_call(request)
             self._require_complete(response)
+            self._require_requested_model(response, request.model)
             parsed = validate_response(response.content)
             return response, parsed
         return self._record(
@@ -85,6 +86,8 @@ class VCRRecorder:
         cassette = Cassette.load(path)
         if cassette.meta.requested_model != self.config.model:
             raise CassetteStaleError("Cassette requested_model does not match LLM_MODEL")
+        if cassette.meta.returned_model != self.config.model:
+            raise CassetteStaleError("Cassette returned_model does not match LLM_MODEL")
         if cassette.meta.request_hash != request_hash:
             raise CassetteStaleError("Cassette request hash does not match the exact request")
         if cassette.meta.fingerprint != fingerprint:
@@ -205,6 +208,14 @@ class VCRRecorder:
         if response.finish_reason != "stop":
             raise RecordingRejectedError(
                 f"Response finish_reason={response.finish_reason!r}; response rejected"
+            )
+
+    @staticmethod
+    def _require_requested_model(response: LLMResponse, requested_model: str) -> None:
+        if response.returned_model != requested_model:
+            raise RecordingRejectedError(
+                f"returned_model={response.returned_model!r} does not match "
+                f"requested model {requested_model!r}"
             )
 
     def _save_rejected(
