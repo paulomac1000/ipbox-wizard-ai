@@ -35,6 +35,8 @@ Sprzeczność między źródłami jest błędem. Nie wybieraj wygodniejszej wers
 - model dostaje tylko aktywne reguły (`true`) i zwraca wyłącznie `status`, `stops`, `reviews`;
 - fakt lub kod nieaktywny nie może pojawić się w promptcie modelu;
 - playback nigdy nie wykonuje live requestu;
+- playback i pre-commit odrzucają `finish_reason` inny niż `stop`;
+- tryb record nie nadpisuje istniejącej kasety;
 - kaseta powstaje dopiero po schema i semantic PASS.
 
 ## Nie wolno
@@ -60,7 +62,7 @@ python scripts/check_cassette_policy.py
 for script in scripts/*.sh dump-to-md.sh; do bash -n "$script"; done
 ```
 
-Stan bazowy po audycie: 158 testów, 95,27% coverage, 36 kontrolowanych skipów LLM.
+Stan bazowy po audycie protokołu: 167 testów, 95,30% coverage, 36 kontrolowanych skipów LLM.
 
 ## Nagrywanie
 
