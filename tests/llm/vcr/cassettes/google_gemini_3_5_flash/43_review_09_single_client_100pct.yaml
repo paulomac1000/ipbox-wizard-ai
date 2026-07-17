@@ -1,0 +1,116 @@
+meta:
+  scenario_id: 43_review_09_single_client_100pct
+  scenario_name: Jeden klient odpowiada za 100 procent przychodów
+  provider: openrouter
+  requested_model: google/gemini-3.5-flash
+  returned_model: google/gemini-3.5-flash
+  fingerprint: v3_24d5eec5bfbe4175c855c1729c801ddc856271bcc842c0f41859a5a1d069c97a
+  request_hash: 8d9c4a5a2c9ab41aaf5778cfe48423108d55eea90361a11af92bbe7f24ae35d9
+  recorded_at: '2026-07-17T20:23:39.853065+00:00'
+  request_id: gen-1784319818-m6MJzt0QjtDTXYdyp8lX
+  finish_reason: stop
+  native_finish_reason: STOP
+  system_fingerprint: null
+  prompt_tokens: 792
+  completion_tokens: 20
+  total_tokens: 812
+  cost: 0.001368
+  recording_duration_seconds: 1.093
+  cassette_format_version: 4
+response: '{"status":"FINAL","stops":[],"reviews":["REVIEW_01","REVIEW_09"]}'
+parsed_response:
+  status: FINAL
+  result:
+    rok: 2025
+    przychody_roczne:
+      IP: 60000.0
+      NIE: 0.0
+    koszty_roczne:
+      IP: 30.0
+      NIE: 0.0
+      MIX: 0.0
+      WYKLUCZONE: 0.0
+    nexus_koszty:
+      A: 30.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 0.0
+    nexus: 1.0
+    dochód_IP: 59970.0
+    dochód_NIE: 0.0
+    klucz_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      wartość: null
+      status: NOT_APPLICABLE
+    alokacja_multi_ip: null
+    podatek:
+      podstawa_IP: 59970
+      podstawa_NIE: 0
+      podatek_IP: 2999
+      podatek_NIE_finalny: 0
+      podatek_całościowy: 2999
+      nadpłata_lub_dopłata: -2999.0
+      termomodernization_carry_over: 0.0
+      ulga_BR_IP_wykorzystana: 0.0
+      ulga_BR_NIE_wykorzystana: 0.0
+      ulga_BR_carry_over: 0.0
+      dochód_dodatkowy_skala: 0.0
+  classifications:
+  - opis: IDE 1
+    amount: 10.0
+    basket: IP
+    allocation_method: direct
+    allocation_source: dokument
+    allocation_key: 1.0
+    ip_amount: 10.0
+    non_ip_amount: 0.0
+    nexus_source: own_br
+    nexus_basket: A
+    nexus_amount: 10.0
+  - opis: IDE 2
+    amount: 10.0
+    basket: IP
+    allocation_method: direct
+    allocation_source: dokument
+    allocation_key: 1.0
+    ip_amount: 10.0
+    non_ip_amount: 0.0
+    nexus_source: own_br
+    nexus_basket: A
+    nexus_amount: 10.0
+  - opis: IDE 3
+    amount: 10.0
+    basket: IP
+    allocation_method: direct
+    allocation_source: dokument
+    allocation_key: 1.0
+    ip_amount: 10.0
+    non_ip_amount: 0.0
+    nexus_source: own_br
+    nexus_basket: A
+    nexus_amount: 10.0
+  monthly_W:
+  - miesiąc: 2025-01
+    wartość: 100.0
+  - miesiąc: 2025-02
+    wartość: 100.0
+  - miesiąc: 2025-03
+    wartość: 100.0
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+    TEST_3: PASS
+    TEST_4: PASS
+    TEST_5: PASS
+    TEST_6: PASS
+    TEST_7: PASS
+    TEST_8: PASS
+    TEST_9: PASS
+  stops_reviews:
+    stops: []
+    reviews:
+    - REVIEW_01
+    - REVIEW_09
+    warnings: []

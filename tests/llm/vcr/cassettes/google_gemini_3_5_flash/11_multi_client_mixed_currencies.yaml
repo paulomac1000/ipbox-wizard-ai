@@ -1,0 +1,100 @@
+meta:
+  scenario_id: 11_multi_client_mixed_currencies
+  scenario_name: Wiele klientów i walut
+  provider: openrouter
+  requested_model: google/gemini-3.5-flash
+  returned_model: google/gemini-3.5-flash
+  fingerprint: v3_17898dfa6c4780650c6f4f0b52cfefb7f0bfd178ff956d0be6938ab64a0626b4
+  request_hash: c9ddf6f79bb12a93d9fa991bef9c3dcea0a2ad4a55dc574f8c5e23ae16902e0a
+  recorded_at: '2026-07-17T20:22:40.238381+00:00'
+  request_id: gen-1784319759-NN8SH8WCRo6fW4Ck37Gc
+  finish_reason: stop
+  native_finish_reason: STOP
+  system_fingerprint: null
+  prompt_tokens: 792
+  completion_tokens: 34
+  total_tokens: 826
+  cost: 0.001494
+  recording_duration_seconds: 0.973
+  cassette_format_version: 4
+response: "{\n  \"status\": \"FINAL\",\n  \"stops\": [],\n  \"reviews\": [\n    \"REVIEW_01\"\n  ]\n}"
+parsed_response:
+  status: FINAL
+  result:
+    rok: 2025
+    przychody_roczne:
+      IP: 22900.0
+      NIE: 0.0
+    koszty_roczne:
+      IP: 300.0
+      NIE: 50.0
+      MIX: 0.0
+      WYKLUCZONE: 0.0
+    nexus_koszty:
+      A: 300.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 50.0
+    nexus: 1.0
+    dochód_IP: 22600.0
+    dochód_NIE: -50.0
+    klucz_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      wartość: null
+      status: NOT_APPLICABLE
+    alokacja_multi_ip: null
+    podatek:
+      podstawa_IP: 22600
+      podstawa_NIE: 0
+      podatek_IP: 1130
+      podatek_NIE_finalny: 0
+      podatek_całościowy: 1130
+      nadpłata_lub_dopłata: -1130.0
+      termomodernization_carry_over: 0.0
+      ulga_BR_IP_wykorzystana: 0.0
+      ulga_BR_NIE_wykorzystana: 0.0
+      ulga_BR_carry_over: 0.0
+      dochód_dodatkowy_skala: 0.0
+  classifications:
+  - opis: Repozytorium kodu
+    amount: 300.0
+    basket: IP
+    allocation_method: direct
+    allocation_source: dokument
+    allocation_key: 1.0
+    ip_amount: 300.0
+    non_ip_amount: 0.0
+    nexus_source: own_br
+    nexus_basket: A
+    nexus_amount: 300.0
+  - opis: Ujemna różnica kursowa
+    amount: 50.0
+    basket: NON
+    allocation_method: direct
+    allocation_source: dokument
+    allocation_key: 0.0
+    ip_amount: 0.0
+    non_ip_amount: 50.0
+    nexus_source: outside_nexus
+    nexus_basket: poza_nexus
+    nexus_amount: 0.0
+  monthly_W:
+  - miesiąc: 2025-01
+    wartość: 100.0
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+    TEST_3: PASS
+    TEST_4: PASS
+    TEST_5: PASS
+    TEST_6: PASS
+    TEST_7: PASS
+    TEST_8: PASS
+    TEST_9: PASS
+  stops_reviews:
+    stops: []
+    reviews:
+    - REVIEW_01
+    warnings: []

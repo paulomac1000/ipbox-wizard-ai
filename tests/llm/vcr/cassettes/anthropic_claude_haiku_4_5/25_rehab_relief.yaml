@@ -1,0 +1,88 @@
+meta:
+  scenario_id: 25_rehab_relief
+  scenario_name: Ulga rehabilitacyjna przy dochodzie opodatkowanym skalą
+  provider: openrouter
+  requested_model: anthropic/claude-haiku-4.5
+  returned_model: anthropic/claude-haiku-4.5
+  fingerprint: v3_8886d66b4c93e3d7c991fc2a4e54be44ef7cf26e1ce87d6896d9a1d0488b4347
+  request_hash: f0f9dfebe89ae8e6be8928910c83254f89f9e4849b685d148106b8010aa7bd67
+  recorded_at: '2026-07-17T20:25:19.920677+00:00'
+  request_id: gen-1784319918-6Mq6XrJhq91lsNaWG6HS
+  finish_reason: stop
+  native_finish_reason: end_turn
+  system_fingerprint: null
+  prompt_tokens: 865
+  completion_tokens: 32
+  total_tokens: 897
+  cost: 0.001025
+  recording_duration_seconds: 1.469
+  cassette_format_version: 4
+response: "```json\n{\n  \"status\": \"FINAL\",\n  \"stops\": [],\n  \"reviews\": []\n}\n```"
+parsed_response:
+  status: FINAL
+  result:
+    rok: 2025
+    przychody_roczne:
+      IP: 18000.0
+      NIE: 42000.0
+    koszty_roczne:
+      IP: 89.0
+      NIE: 0.0
+      MIX: 0.0
+      WYKLUCZONE: 0.0
+    nexus_koszty:
+      A: 89.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 0.0
+    nexus: 1.0
+    dochód_IP: 17911.0
+    dochód_NIE: 42000.0
+    klucz_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      wartość: null
+      status: NOT_APPLICABLE
+    alokacja_multi_ip: null
+    podatek:
+      podstawa_IP: 17911
+      podstawa_NIE: 41000
+      podatek_IP: 896
+      podatek_NIE_finalny: 1320
+      podatek_całościowy: 2216
+      nadpłata_lub_dopłata: -2216.0
+      termomodernization_carry_over: 0.0
+      ulga_BR_IP_wykorzystana: 0.0
+      ulga_BR_NIE_wykorzystana: 0.0
+      ulga_BR_carry_over: 0.0
+      dochód_dodatkowy_skala: 0.0
+  classifications:
+  - opis: Licencja IDE
+    amount: 89.0
+    basket: IP
+    allocation_method: direct
+    allocation_source: dokument
+    allocation_key: 1.0
+    ip_amount: 89.0
+    non_ip_amount: 0.0
+    nexus_source: own_br
+    nexus_basket: A
+    nexus_amount: 89.0
+  monthly_W:
+  - miesiąc: 2025-01
+    wartość: 90.0
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+    TEST_3: PASS
+    TEST_4: PASS
+    TEST_5: PASS
+    TEST_6: PASS
+    TEST_7: PASS
+    TEST_8: PASS
+    TEST_9: PASS
+  stops_reviews:
+    stops: []
+    reviews: []
+    warnings: []

@@ -1,0 +1,89 @@
+meta:
+  scenario_id: 39_multi_project_weighted_W
+  scenario_name: Ważona średnia W dla wielu projektów
+  provider: openrouter
+  requested_model: anthropic/claude-haiku-4.5
+  returned_model: anthropic/claude-haiku-4.5
+  fingerprint: v3_0e602834a03c79aecd6f0accf3bbcd757bb4082c0a0c334c942f67171a20e6fd
+  request_hash: fa11eb66a5e05153eb125b4240d1eba7611ca344b405586b6d52454921954c03
+  recorded_at: '2026-07-17T20:25:51.586371+00:00'
+  request_id: gen-1784319950-V5j4lPAaIumMFjWGaOXA
+  finish_reason: stop
+  native_finish_reason: end_turn
+  system_fingerprint: null
+  prompt_tokens: 865
+  completion_tokens: 43
+  total_tokens: 908
+  cost: 0.00108
+  recording_duration_seconds: 1.098
+  cassette_format_version: 4
+response: "```json\n{\n  \"status\": \"FINAL\",\n  \"stops\": [],\n  \"reviews\": [\n    \"REVIEW_04\"\n  ]\n}\n```"
+parsed_response:
+  status: FINAL
+  result:
+    rok: 2025
+    przychody_roczne:
+      IP: 18500.0
+      NIE: 6500.0
+    koszty_roczne:
+      IP: 100.0
+      NIE: 0.0
+      MIX: 0.0
+      WYKLUCZONE: 0.0
+    nexus_koszty:
+      A: 100.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 0.0
+    nexus: 1.0
+    dochód_IP: 18400.0
+    dochód_NIE: 6500.0
+    klucz_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      wartość: null
+      status: NOT_APPLICABLE
+    alokacja_multi_ip: null
+    podatek:
+      podstawa_IP: 18400
+      podstawa_NIE: 6500
+      podatek_IP: 920
+      podatek_NIE_finalny: 1235
+      podatek_całościowy: 2155
+      nadpłata_lub_dopłata: -2155.0
+      termomodernization_carry_over: 0.0
+      ulga_BR_IP_wykorzystana: 0.0
+      ulga_BR_NIE_wykorzystana: 0.0
+      ulga_BR_carry_over: 0.0
+      dochód_dodatkowy_skala: 0.0
+  classifications:
+  - opis: IDE
+    amount: 100.0
+    basket: IP
+    allocation_method: direct
+    allocation_source: dokument
+    allocation_key: 1.0
+    ip_amount: 100.0
+    non_ip_amount: 0.0
+    nexus_source: own_br
+    nexus_basket: A
+    nexus_amount: 100.0
+  monthly_W:
+  - miesiąc: 2025-01
+    wartość: 74.0
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+    TEST_3: PASS
+    TEST_4: PASS
+    TEST_5: PASS
+    TEST_6: PASS
+    TEST_7: PASS
+    TEST_8: PASS
+    TEST_9: PASS
+  stops_reviews:
+    stops: []
+    reviews:
+    - REVIEW_04
+    warnings: []

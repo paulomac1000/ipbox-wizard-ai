@@ -1,0 +1,81 @@
+meta:
+  scenario_id: 37_verify_invalid_tax_form_stop
+  scenario_name: Nieprawidłowa forma opodatkowania
+  provider: openrouter
+  requested_model: anthropic/claude-haiku-4.5
+  returned_model: anthropic/claude-haiku-4.5
+  fingerprint: v3_1365871269312923c62a6cc8a871d4e307b75d52cd8f57565dee46caea1db4f9
+  request_hash: dbf2c4b296085a870e8d9e9ae24dbcecf5371a1dd9f557b4680636e2e6486d92
+  recorded_at: '2026-07-17T20:25:48.161357+00:00'
+  request_id: gen-1784319946-eQ8xvovGvaWtoZOL9BDQ
+  finish_reason: stop
+  native_finish_reason: end_turn
+  system_fingerprint: null
+  prompt_tokens: 865
+  completion_tokens: 62
+  total_tokens: 927
+  cost: 0.001175
+  recording_duration_seconds: 2.845
+  cassette_format_version: 4
+response: "```json\n{\n  \"status\": \"STOPPED\",\n  \"stops\": [\n    \"STOP_01\"\n  ],\n  \"reviews\": [\n    \"REVIEW_01\"\
+  ,\n    \"REVIEW_09\"\n  ]\n}\n```"
+parsed_response:
+  status: STOPPED
+  result:
+    rok: 2025
+    przychody_roczne:
+      IP: 0.0
+      NIE: 0.0
+    koszty_roczne:
+      IP: 0.0
+      NIE: 0.0
+      MIX: 0.0
+      WYKLUCZONE: 0.0
+    nexus_koszty:
+      A: 0.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 0.0
+    nexus: 0.0
+    dochód_IP: 0.0
+    dochód_NIE: 0.0
+    klucz_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      wartość: null
+      status: NOT_APPLICABLE
+    alokacja_multi_ip: null
+    podatek:
+      podstawa_IP: 0
+      podstawa_NIE: 0
+      podatek_IP: 0
+      podatek_NIE_finalny: 0
+      podatek_całościowy: 0
+      nadpłata_lub_dopłata: 0.0
+      termomodernization_carry_over: 0
+      ulga_BR_IP_wykorzystana: 0
+      ulga_BR_NIE_wykorzystana: 0
+      ulga_BR_carry_over: 0
+      dochód_dodatkowy_skala: 0
+  classifications: []
+  monthly_W:
+  - miesiąc: 2025-01
+    wartość: 100.0
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+    TEST_3: PASS
+    TEST_4: PASS
+    TEST_5: PASS
+    TEST_6: PASS
+    TEST_7: PASS
+    TEST_8: PASS
+    TEST_9: PASS
+  stops_reviews:
+    stops:
+    - STOP_01
+    reviews:
+    - REVIEW_01
+    - REVIEW_09
+    warnings: []

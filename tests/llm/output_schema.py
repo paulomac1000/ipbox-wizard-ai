@@ -20,8 +20,8 @@ DECISION_JSON_SCHEMA: dict[str, Any] = {
         "required": ["status", "stops", "reviews"],
         "properties": {
             "status": {"enum": ["FINAL", "STOPPED"]},
-            "stops": {"type": "array", "items": CODE, "uniqueItems": True},
-            "reviews": {"type": "array", "items": CODE, "uniqueItems": True},
+            "stops": {"type": "array", "items": CODE},
+            "reviews": {"type": "array", "items": CODE},
         },
     },
 }

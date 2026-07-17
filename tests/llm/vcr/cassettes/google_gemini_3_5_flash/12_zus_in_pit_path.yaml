@@ -1,0 +1,89 @@
+meta:
+  scenario_id: 12_zus_in_pit_path
+  scenario_name: ZUS odliczany wyłącznie w PIT
+  provider: openrouter
+  requested_model: google/gemini-3.5-flash
+  returned_model: google/gemini-3.5-flash
+  fingerprint: v3_72407b2cd70c0fa922c2a914414b843fa4cfaa32efa471b7b4f0a6faf50c535f
+  request_hash: c9ddf6f79bb12a93d9fa991bef9c3dcea0a2ad4a55dc574f8c5e23ae16902e0a
+  recorded_at: '2026-07-17T20:22:43.027438+00:00'
+  request_id: gen-1784319762-gTQ1tHTap9VsNwm9xxI4
+  finish_reason: stop
+  native_finish_reason: STOP
+  system_fingerprint: null
+  prompt_tokens: 792
+  completion_tokens: 15
+  total_tokens: 807
+  cost: 0.001323
+  recording_duration_seconds: 2.159
+  cassette_format_version: 4
+response: '{"status":"FINAL","stops":[],"reviews":["REVIEW_01"]}'
+parsed_response:
+  status: FINAL
+  result:
+    rok: 2025
+    przychody_roczne:
+      IP: 15000.0
+      NIE: 5000.0
+    koszty_roczne:
+      IP: 100.0
+      NIE: 0.0
+      MIX: 0.0
+      WYKLUCZONE: 0.0
+    nexus_koszty:
+      A: 100.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 0.0
+    nexus: 1.0
+    dochód_IP: 14900.0
+    dochód_NIE: 5000.0
+    klucz_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      wartość: null
+      status: NOT_APPLICABLE
+    alokacja_multi_ip: null
+    podatek:
+      podstawa_IP: 14900
+      podstawa_NIE: 3200
+      podatek_IP: 745
+      podatek_NIE_finalny: 608
+      podatek_całościowy: 1353
+      nadpłata_lub_dopłata: -1353.0
+      termomodernization_carry_over: 0.0
+      ulga_BR_IP_wykorzystana: 0.0
+      ulga_BR_NIE_wykorzystana: 0.0
+      ulga_BR_carry_over: 0.0
+      dochód_dodatkowy_skala: 0.0
+  classifications:
+  - opis: Licencja IDE
+    amount: 100.0
+    basket: IP
+    allocation_method: direct
+    allocation_source: dokument
+    allocation_key: 1.0
+    ip_amount: 100.0
+    non_ip_amount: 0.0
+    nexus_source: own_br
+    nexus_basket: A
+    nexus_amount: 100.0
+  monthly_W:
+  - miesiąc: 2025-01
+    wartość: 100.0
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+    TEST_3: PASS
+    TEST_4: PASS
+    TEST_5: PASS
+    TEST_6: PASS
+    TEST_7: PASS
+    TEST_8: PASS
+    TEST_9: PASS
+  stops_reviews:
+    stops: []
+    reviews:
+    - REVIEW_01
+    warnings: []
