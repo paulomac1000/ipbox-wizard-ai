@@ -24,7 +24,7 @@ input:
   - nazwa: ClientB
     klauzula_IP: false
   ulgi:
-    straty_poprzednie: 5000
+    strata_NIE_z_lat_poprzednich: 5000
   miesiace:
   - miesiac: 2025-01
     faktury:

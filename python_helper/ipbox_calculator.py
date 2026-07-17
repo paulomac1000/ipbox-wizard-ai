@@ -353,6 +353,10 @@ PRIVATE_KEYWORDS = (
 EXCLUDED_PATTERNS = (r"kara", r"grzywna", r"odset.*karn", r"sankcj", r"mandat")
 SOCIAL_SECURITY_PATTERN = r"(zus.*społeczn|składk.*społeczn|ubezpiecz.*społeczn)"
 HEALTH_PATTERN = r"(zdrowotn|nfz)"
+INTERNET_RELIEF_MAX = 760.0
+GENERIC_DONATION_LIMIT_RATE = 0.06
+
+
 DIRECT_IP_KEYWORDS = (
     "jetbrains",
     "visual studio",
@@ -393,8 +397,11 @@ def classify_cost(
     if item.amount > asset_threshold:
         return replace(
             item,
-            basket="MIX",
-            note="Potential fixed asset; explicit evidence/policy is required before exclusion",
+            basket="WYKLUCZONE",
+            note=(
+                "Potential fixed asset above the one-off threshold; exclude the purchase "
+                "from this run and enter only documented depreciation/write-off separately"
+            ),
         )
     if any(keyword in description for keyword in DIRECT_IP_KEYWORDS):
         return replace(
@@ -710,11 +717,11 @@ def calculate_nexus(
             "nexus": 0.0,
             "message": "A=B=C=D=0 — no qualifying NEXUS costs",
         }
-    result = min(1.0, (values["A"] * 1.3 + values["B"]) / denominator)
+    result = min(1.0, ((values["A"] + values["B"]) * 1.3) / denominator)
     return {
         **values,
         "denominator": denominator,
-        "formula": "min(1, (A*1.3+B)/(A+B+C+D))",
+        "formula": "min(1, ((A+B)*1.3)/(A+B+C+D))",
         "nexus": round(result, 6),
     }
 
@@ -725,14 +732,16 @@ def tax_cascade(
     nexus: float,
     tax_form: str,
     *,
-    previous_losses: float = 0,
+    previous_non_ip_business_losses: float = 0,
     social_security_deduction: float = 0,
     health_contribution_deduction: float = 0,
     ikze: float = 0,
     donations: float = 0,
     internet_tax_relief: float = 0,
     rehabilitative_relief_income: float = 0,
-    rd_relief: float = 0,
+    rd_relief_non_ip: float = 0,
+    rd_relief_ip: float = 0,
+    rd_relief_limit: float = 0,
     thermomodernization_pool: float = 0,
     child_tax_credit: float = 0,
     extra_income_scale: float = 0,
@@ -746,14 +755,16 @@ def tax_cascade(
     linear = tax_form in {"liniowy_19%", "linear_19%"}
 
     values = {
-        "previous_losses": previous_losses,
+        "previous_non_ip_business_losses": previous_non_ip_business_losses,
         "social_security_deduction": social_security_deduction,
         "health_contribution_deduction": health_contribution_deduction,
         "ikze": ikze,
         "donations": donations,
         "internet_tax_relief": internet_tax_relief,
         "rehabilitative_relief_income": rehabilitative_relief_income,
-        "rd_relief": rd_relief,
+        "rd_relief_non_ip": rd_relief_non_ip,
+        "rd_relief_ip": rd_relief_ip,
+        "rd_relief_limit": rd_relief_limit,
         "thermomodernization_pool": thermomodernization_pool,
         "child_tax_credit": child_tax_credit,
         "extra_income_scale": extra_income_scale,
@@ -762,18 +773,70 @@ def tax_cascade(
         values[name] = _nonnegative(name, value)
     if values["health_contribution_deduction"] > 0 and not linear:
         raise ValueError("health contribution deduction is available only for linear tax")
+    rd_relief_requested = values["rd_relief_non_ip"] + values["rd_relief_ip"]
+    if rd_relief_requested > values["rd_relief_limit"] + 1e-9:
+        raise ValueError(
+            "allocated R&D relief exceeds rd_relief_limit; provide the documented "
+            "deduction limit after applying the taxpayer-specific percentage"
+        )
 
-    remaining = max(0.0, non_ip_income)
+    if linear:
+        unsupported_linear_reliefs = {
+            "donations": values["donations"],
+            "internet_tax_relief": values["internet_tax_relief"],
+            "rehabilitative_relief_income": values["rehabilitative_relief_income"],
+            "child_tax_credit": values["child_tax_credit"],
+        }
+        used = [name for name, amount in unsupported_linear_reliefs.items() if amount > 0]
+        if used:
+            raise ValueError("unsupported relief for linear tax: " + ", ".join(sorted(used)))
+
+    if values["internet_tax_relief"] > INTERNET_RELIEF_MAX:
+        raise ValueError(
+            f"internet_tax_relief cannot exceed {INTERNET_RELIEF_MAX:.0f} PLN per taxpayer"
+        )
+
+    donation_limit_base = max(0.0, non_ip_income) + (
+        0.0 if linear else values["extra_income_scale"]
+    )
+    donation_limit = donation_limit_base * GENERIC_DONATION_LIMIT_RATE
+    if values["donations"] > donation_limit + 1e-9:
+        raise ValueError(
+            "donations exceed the generic 6% income limit; pass only the eligible amount "
+            "or model a separately regulated donation type explicitly"
+        )
+
+    if linear and values["extra_income_scale"] > 0:
+        raise ValueError(
+            "extra_income_scale with linear business tax requires a separate scale-return "
+            "calculation; do not mix PIT-36L and scale income in one cascade"
+        )
+
+    business_remaining = max(0.0, non_ip_income)
     steps: list[dict[str, float | str]] = []
+    # Source-specific deductions cannot consume salary or other scale income.
     for label, key in (
-        ("Previous losses", "previous_losses"),
-        ("Social security", "social_security_deduction"),
+        ("Previous non-IP business losses", "previous_non_ip_business_losses"),
         ("Health contribution", "health_contribution_deduction"),
+        ("R&D relief — non-IP business", "rd_relief_non_ip"),
+    ):
+        amount = values[key]
+        used = min(amount, business_remaining)
+        if used:
+            business_remaining -= used
+            steps.append({"step": label, "deduction": used, "after": business_remaining})
+        if key == "rd_relief_non_ip":
+            rd_relief_non_ip_used = used
+
+    remaining = business_remaining + (0.0 if linear else values["extra_income_scale"])
+    # These deductions reduce the combined scale base (or the linear business base
+    # when no separate scale income is present).
+    for label, key in (
+        ("Social security", "social_security_deduction"),
         ("IKZE", "ikze"),
         ("Donations", "donations"),
         ("Internet relief", "internet_tax_relief"),
         ("Rehabilitative relief", "rehabilitative_relief_income"),
-        ("R&D relief", "rd_relief"),
     ):
         amount = values[key]
         used = min(amount, remaining)
@@ -790,31 +853,38 @@ def tax_cascade(
     non_ip_base = tax_round(remaining)
     if linear:
         non_ip_tax_before_credit = tax_round(non_ip_base * 0.19)
+    elif non_ip_base <= 120_000:
+        non_ip_tax_before_credit = max(0, tax_round(non_ip_base * 0.12 - 3_600))
     else:
-        total_scale_base = non_ip_base + tax_round(values["extra_income_scale"])
-        if total_scale_base <= 120_000:
-            total_scale_tax = max(0, tax_round(total_scale_base * 0.12 - 3_600))
-        else:
-            total_scale_tax = tax_round(10_800 + (total_scale_base - 120_000) * 0.32)
-        other_base = tax_round(values["extra_income_scale"])
-        if other_base <= 120_000:
-            other_tax = max(0, tax_round(other_base * 0.12 - 3_600))
-        else:
-            other_tax = tax_round(10_800 + (other_base - 120_000) * 0.32)
-        non_ip_tax_before_credit = max(0, total_scale_tax - other_tax)
+        non_ip_tax_before_credit = tax_round(10_800 + (non_ip_base - 120_000) * 0.32)
 
     child_used = min(values["child_tax_credit"], non_ip_tax_before_credit)
     non_ip_tax = max(0, non_ip_tax_before_credit - tax_round(child_used))
-    ip_base = tax_round(max(0.0, ip_income * nexus))
+
+    # PIT/IP position 19 reduces income from qualified IP before the nexus
+    # calculation reported in position 20 (art. 30ca ust. 9a and ust. 4 PIT).
+    rd_relief_ip_used = min(values["rd_relief_ip"], max(0.0, ip_income))
+    ip_income_after_rd = max(0.0, ip_income - rd_relief_ip_used)
+    ip_base = tax_round(ip_income_after_rd * nexus)
     ip_tax = tax_round(ip_base * 0.05)
+    rd_relief_carry = (
+        values["rd_relief_ip"]
+        - rd_relief_ip_used
+        + values["rd_relief_non_ip"]
+        - rd_relief_non_ip_used
+    )
     return {
         "deduction_steps": steps,
         "thermomodernization_used": thermo_used,
         "thermomodernization_carry_over": thermo_carry,
         "non_ip_base_rounded": non_ip_base,
+        "extra_income_scale_included": 0.0 if linear else values["extra_income_scale"],
         "non_ip_tax_before_child_relief": non_ip_tax_before_credit,
         "child_tax_credit_used": child_used,
         "non_ip_tax_final": non_ip_tax,
+        "rd_relief_ip_used": rd_relief_ip_used,
+        "rd_relief_non_ip_used": rd_relief_non_ip_used,
+        "rd_relief_carry_over": rd_relief_carry,
         "ip_base_rounded": ip_base,
         "ip_tax": ip_tax,
         "total_tax": non_ip_tax + ip_tax,

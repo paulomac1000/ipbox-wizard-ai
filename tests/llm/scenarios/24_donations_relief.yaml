@@ -1,13 +1,14 @@
 meta:
   id: 24_donations_relief
-  name: Ulga na darowizny
-  description: Ulga na darowizny
+  name: Darowizna przy dochodzie opodatkowanym skalą
+  description: Weryfikacja odliczenia od dochodu na skali; scenariusz celowo nie używa
+    podatku liniowego.
   tags:
   - relief
   priority: P1
 input:
   rok: 2025
-  forma_opodatkowania: liniowy_19%
+  forma_opodatkowania: skala
   polityka_alokacji:
     policy_id: scenario-policy
     przychody:
@@ -31,7 +32,7 @@ input:
     - kwota_PLN: 20000
       kontrahent: ClientA
       kwalifikuje_IP: true
-    - kwota_PLN: 10000
+    - kwota_PLN: 40000
       kontrahent: ClientB
       kwalifikuje_IP: false
     ewidencja:
@@ -56,5 +57,5 @@ assertions:
   - TEST_8
   - TEST_9
   podatek_NIE_range:
-  - 2090
-  - 2090
+  - 1320
+  - 1320

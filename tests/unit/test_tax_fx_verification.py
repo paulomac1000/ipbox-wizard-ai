@@ -25,7 +25,6 @@ def test_tax_cascade_linear_and_scale() -> None:
         "liniowy_19%",
         ikze=1000,
         thermomodernization_pool=2000,
-        child_tax_credit=100,
     )
     assert linear["non_ip_base_rounded"] == 7000
     assert linear["ip_tax"] == 1000
@@ -37,14 +36,16 @@ def test_tax_cascade_linear_and_scale() -> None:
 @pytest.mark.parametrize(
     "name",
     [
-        "previous_losses",
+        "previous_non_ip_business_losses",
         "social_security_deduction",
         "health_contribution_deduction",
         "ikze",
         "donations",
         "internet_tax_relief",
         "rehabilitative_relief_income",
-        "rd_relief",
+        "rd_relief_non_ip",
+        "rd_relief_ip",
+        "rd_relief_limit",
         "thermomodernization_pool",
         "child_tax_credit",
         "extra_income_scale",
@@ -64,6 +65,62 @@ def test_tax_cascade_contract_errors() -> None:
         tax_cascade(1, 1, 2, "liniowy_19%")
     with pytest.raises(ValueError):
         tax_cascade(1, 1, 1, "bad")
+    with pytest.raises(ValueError, match="exceeds rd_relief_limit"):
+        tax_cascade(100, 100, 1, "liniowy_19%", rd_relief_ip=1)
+
+
+def test_tax_cascade_rejects_reliefs_not_available_for_linear_tax() -> None:
+    for field in (
+        "donations",
+        "internet_tax_relief",
+        "rehabilitative_relief_income",
+        "child_tax_credit",
+    ):
+        with pytest.raises(ValueError, match="unsupported relief for linear tax"):
+            tax_cascade(10000, 0, 0, "liniowy_19%", **{field: 1})
+
+
+def test_tax_cascade_validates_personal_relief_limits_and_combined_return() -> None:
+    with pytest.raises(ValueError, match="cannot exceed 760"):
+        tax_cascade(20000, 0, 0, "skala", internet_tax_relief=760.01)
+    with pytest.raises(ValueError, match="6% income limit"):
+        tax_cascade(10000, 0, 0, "skala", donations=600.01)
+    combined = tax_cascade(
+        10000,
+        0,
+        0,
+        "skala",
+        extra_income_scale=100000,
+        ikze=1000,
+        child_tax_credit=100,
+    )
+    assert combined["non_ip_base_rounded"] == 109000
+    assert combined["non_ip_tax_final"] == 9380
+    assert combined["extra_income_scale_included"] == 100000
+    with pytest.raises(ValueError, match="separate scale-return"):
+        tax_cascade(10000, 0, 0, "liniowy_19%", extra_income_scale=1000)
+
+
+def test_tax_cascade_applies_supported_scale_reliefs() -> None:
+    result = tax_cascade(
+        50000,
+        20000,
+        0.5,
+        "skala",
+        donations=1000,
+        internet_tax_relief=760,
+        rd_relief_non_ip=2000,
+        rd_relief_ip=1000,
+        rd_relief_limit=3000,
+    )
+    assert result["non_ip_base_rounded"] == 46240
+    assert result["non_ip_tax_final"] == 1949
+    # PIT/IP position 19 is deducted before applying the nexus in position 20.
+    assert result["rd_relief_ip_used"] == 1000
+    assert result["rd_relief_non_ip_used"] == 2000
+    assert result["rd_relief_carry_over"] == 0
+    assert result["ip_base_rounded"] == 9500
+    assert result["ip_tax"] == 475
 
 
 def test_overpayment_paths_and_validation() -> None:

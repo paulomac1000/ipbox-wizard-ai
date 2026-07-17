@@ -1,17 +1,18 @@
 # Testowanie i nagrywanie kaset
 
-## 1. Architektura benchmarku
+## 1. Co testuje benchmark
 
-Benchmark nie wymaga od modelu przepisywania pełnego raportu finansowego.
+Python oblicza liczby, klasyfikacje, W, TEST 1–9 i atomowe `decision_facts`. Model otrzymuje wyłącznie fakty i zwraca:
 
-1. Python oblicza wynik finansowy, klasyfikacje, W i TEST 1–9.
-2. Python tworzy atomowe `decision_facts` sprzed ewentualnego wyzerowania po STOP.
-3. Model zwraca wyłącznie małą kopertę `status`, `stops`, `reviews`.
-4. Runner dołącza kopertę do raportu deterministycznego i waliduje pełny wynik.
+```json
+{"status":"FINAL","stops":[],"reviews":["REVIEW_09"]}
+```
 
-Ta granica jest celowa. Model nie powinien ponownie wykonywać arytmetyki ani kopiować kilkuset pól, skoro ich prawidłową wartość zna kod. Benchmark sprawdza interpretację jawnych faktów, zgodność z protokołem oraz kompatybilność providera.
+Runner składa decyzję z raportem deterministycznym i waliduje całość. Benchmark mierzy zgodność instrukcji i integracji providera, nie umiejętność modelu do ponownego liczenia podatku.
 
-## 2. Bezpłatna bramka przed API
+Historyczne kasety pełnego raportu ujawniły wymyślone kursy NBP, automatyczne `JetBrains → IP`, niespójny NEXUS i TEST-y deklarowane przez model jako PASS. Obecny kontrakt świadomie odbiera modelowi te obowiązki.
+
+## 2. Bezpłatna bramka
 
 ```bash
 python -m venv .venv
@@ -27,29 +28,38 @@ pytest tests/unit \
   --cov-fail-under=90
 pytest -q
 python scripts/check_cassette_policy.py
+for script in scripts/*.sh dump-to-md.sh; do bash -n "$script"; done
 ```
 
-Oczekiwany stan przed pierwszym nagraniem:
+Stan referencyjny z 17 lipca 2026 r.:
 
-- wszystkie testy jednostkowe przechodzą;
-- coverage wynosi co najmniej 90%;
-- 36 testów LLM jest pominiętych bez `--run-llm`;
-- polityka kaset akceptuje pusty katalog.
+- 158 testów jednostkowych PASS;
+- coverage `python_helper` 95,27%;
+- pełny suite: 158 PASS i 36 kontrolowanych skipów LLM;
+- pusty katalog kaset jest dozwolony, częściowa macierz nie jest.
 
-## 3. Dlaczego wszystkie poprzednie kasety są nieaktualne
+## 3. Testy semantyczne, które muszą pozostać
 
-Tożsamość requestu obejmuje między innymi:
+Szczególnie chronione regresje:
 
-- protokół decyzji wygenerowany z map kodu;
-- `decision_facts` scenariusza;
-- system prompt;
-- model i jego profil;
-- mały JSON Schema decyzji;
-- wersję formatu kasety.
+- NEXUS podwyższa A+B, w tym przypadek B+C = 0,65;
+- B+R IP pomniejsza dochód przed NEXUS;
+- podatek działalności na skali obejmuje inne dochody skali;
+- liniowy nie przyjmuje ulg dostępnych wyłącznie na skali;
+- `straty_poprzednie` i `ulga_BR` są odrzucane jako niejednoznaczne;
+- ujemne faktury, odliczenia i zaliczki są odrzucane;
+- limity zdrowotnej/IKZE dla nieobsługiwanego roku są fail-closed;
+- STOP zeruje każde finalne pole;
+- multi-IP zachowuje grosze;
+- playback nie wywołuje sieci.
 
-Po zmianie z pełnego raportu na kopertę decyzji poprzednie 84 kasety nie reprezentują już tego samego requestu. Nie wolno kopiować ich odpowiedzi, hashy ani manifestów. Należy nagrać pełne **108 nowych kaset: 3 modele × 36 scenariuszy**.
+## 4. Dlaczego stare kasety są nieważne
 
-## 4. Modele bramkowe
+Fingerprint obejmuje protokół decyzji, `decision_facts`, system prompt, request, model, profil, schema i format kasety. Zmiana któregokolwiek elementu unieważnia nagranie.
+
+Kasety starego pełnego raportu nie są zgodne z obecną kopertą decyzji. Nie kopiuj ich odpowiedzi, hashy, manifestu ani parsed payloadu. Po obecnych zmianach należy nagrać **108 kaset: 3 modele × 36 scenariuszy**.
+
+## 5. Modele bramkowe
 
 ```text
 google/gemini-3.5-flash
@@ -57,11 +67,9 @@ openai/gpt-5-mini
 anthropic/claude-haiku-4.5
 ```
 
-Każdy model ma zwrócić ten sam semantyczny wynik. Benchmark nie uznaje częściowego wyniku za sukces.
+Wykonywalna lista znajduje się w `tests/llm/models.py`.
 
-## 5. Nagranie całej macierzy
-
-### Przygotowanie
+## 6. Nagranie
 
 ```bash
 git switch fix/decouple-mix-allocation-from-w
@@ -70,56 +78,25 @@ python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt -r requirements-test.txt
 export OPENROUTER_API_KEY='WKLEJ_KLUCZ'
-```
 
-Najpierw wykonaj bezpłatną bramkę z sekcji 2. Następnie:
-
-```bash
 ./scripts/record_all_models.sh --max-cost-usd 5
 ```
 
-Skrypt:
-
-1. nagrywa modele sekwencyjnie;
-2. nagrywa każdy scenariusz osobno;
-3. wznawia pracę bez ponownego opłacania poprawnych kaset;
-4. zapisuje odrzucone odpowiedzi do `/tmp/ipbox_llm_rejected/`;
-5. zapisuje pełne złożone wyniki do `/tmp/ipbox_llm_responses/`;
-6. stosuje miękki limit kosztu przed kolejnym requestem;
-7. wykonuje późniejszy playback bez klucza API;
-8. generuje raport benchmarku.
-
-### Jeden model
+Pojedynczy model lub scenariusz:
 
 ```bash
-python scripts/record_model.py \
-  --model google/gemini-3.5-flash \
-  --max-cost-usd 5
-```
-
-```bash
-python scripts/record_model.py --model openai/gpt-5-mini --max-cost-usd 5
-python scripts/record_model.py --model anthropic/claude-haiku-4.5 --max-cost-usd 5
-```
-
-### Jeden scenariusz
-
-```bash
+python scripts/record_model.py --model google/gemini-3.5-flash --max-cost-usd 5
 python scripts/record_model.py \
   --model openai/gpt-5-mini \
   --scenario 45_multi_ip_two_stage \
   --max-cost-usd 5
 ```
 
-### Wznowienie po 402, 429 lub 5xx
+Skrypt nie nadpisuje poprawnej kasety. Przy 402, 429 lub 5xx uruchom polecenie ponownie. Odrzucenia trafiają do `/tmp/ipbox_llm_rejected/`, a wyniki do `/tmp/ipbox_llm_responses/`.
 
-Nie usuwaj poprawnych kaset. Po doładowaniu konta albo odczekaniu uruchom to samo polecenie. Skrypt sprawdzi istniejące kasety offline i nagra tylko brakujące. Nieaktualna kaseta zatrzymuje dany scenariusz do czasu jej jawnego usunięcia.
+Nie ma `--force`. Nieaktualny plik usuń dopiero po zidentyfikowaniu zmienionego elementu requestu.
 
-Nie ma opcji `--force`. Poprawna kaseta jest tylko odtwarzana i pomijana, a nieaktualna kaseta blokuje nagranie. Po świadomej zmianie requestu usuń konkretny stary plik lub cały katalog modelu, przejrzyj diff i dopiero wtedy nagraj od nowa.
-
-## 6. Weryfikacja offline
-
-Po nagraniu usuń klucz z procesu:
+## 7. Playback offline
 
 ```bash
 unset OPENROUTER_API_KEY
@@ -135,52 +112,54 @@ Dla pojedynczego modelu:
 export LLM_PROVIDER=openrouter
 export LLM_MODEL=google/gemini-3.5-flash
 export VCR_MODE=playback
-
 pytest tests/llm/test_scenarios.py --run-llm --vcr-mode=playback -v
 python scripts/vcr_precommit.py --model google/gemini-3.5-flash
 ```
 
-## 7. Kryterium zaliczenia
+Playback musi przejść przy nieustawionym sekrecie. Live request w tym trybie jest błędem krytycznym.
 
-Model zalicza benchmark tylko przy **36/36**. Każda kaseta musi:
+## 8. Kryterium zaliczenia
 
-- zakończyć się kompletną odpowiedzią;
-- zawierać czysty JSON decyzji;
-- przejść mały strict JSON Schema;
-- wskazać dokładnie oczekiwane STOP i REVIEW, bez duplikatów i nadmiarowych kodów;
-- po złożeniu z raportem deterministycznym przejść pełny schema i evaluator;
-- mieć zgodny request hash i fingerprint;
+Model zalicza tylko przy 36/36. Każda kaseta musi:
+
+- mieć `finish_reason=stop`;
+- zawierać czysty JSON bez pól dodatkowych;
+- przejść strict schema decyzji;
+- zwrócić dokładny zestaw STOP/REVIEW bez duplikatów;
+- po złożeniu przejść pełny schema i evaluator;
+- mieć zgodny request hash, fingerprint i ponowne parsowanie;
 - przejść playback bez klucza API.
 
-Wynik 35/36 jest informacją diagnostyczną, a nie akceptowalną bramką produkcyjną.
+35/36 jest diagnostyką, nie bramką wydania.
 
-## 8. Analiza odrzuconej odpowiedzi
+## 9. Analiza porażki
 
-```bash
-find /tmp/ipbox_llm_rejected -maxdepth 3 -type f -print
-```
+Przypisz przyczynę:
 
-Dla każdej porażki ustal jedną kategorię:
+1. scenariusz lub asercja;
+2. kalkulator/oracle;
+3. `decision_facts`;
+4. schema/integracja providera;
+5. model mimo jednoznacznej instrukcji.
 
-1. błędny scenariusz lub asercja;
-2. błąd oracle albo kalkulatora;
-3. sprzeczne lub niewidoczne fakty decyzyjne;
-4. błąd schema/integracji providera;
-5. model dodał lub pominął kod mimo jednoznacznej tabeli.
+Najpierw dodaj test deterministyczny. Nie poszerzaj zakresu i nie usuwaj kodu tylko dlatego, że model go pomija.
 
-Nie zmieniaj prawdy testowej pod odpowiedź modelu. Najpierw dodaj deterministyczny test regresyjny pokazujący, jaki powinien być fakt i kod.
+Minimalny ręczny przegląd:
 
-Szczególnie sprawdź:
-
-- 14 — wyłącznie `STOP_01`, bez kaskady;
-- 18 — `STOP_04`, a zero W nie tworzy dodatkowego STOP;
+- 13 — pełny podatek wspólnej skali;
+- 14 — tylko `STOP_01`;
+- 18 — właściwy STOP przy zerowych godzinach;
+- 22 — NEXUS 0,65 dla B=5000 i C=5000;
+- 23 — strata wyłącznie NIE;
+- 24/25 — osobiste ulgi na skali;
+- 26 — B+R IP przed NEXUS;
 - 31 — `ZUS_DOUBLE_DIP` i TEST_3 FAIL;
-- 38/42 — wyłącznie `STOP_08`;
-- 45 — `REVIEW_04`, `REVIEW_16`, `REVIEW_17` oraz alokacja 3000 + 5000.
+- 34 — zakup >10 000 zł wyłączony;
+- 38/42 — tylko `STOP_08`;
+- 44 — KIS MIX bez użycia W;
+- 45 — REVIEW 04/16/17 i alokacja 3000 + 5000.
 
-## 9. Commit kaset
-
-Przed commitem:
+## 10. Commit kaset
 
 ```bash
 ./scripts/verify_all_models.sh
@@ -191,13 +170,8 @@ git status --short
 git diff --stat
 ```
 
-Repozytorium dopuszcza tylko dwa stany:
+Repo dopuszcza brak kaset albo kompletną aktualną macierz 3 × 36. Nie commituj `/tmp`, raportów lokalnych ani częściowej macierzy.
 
-- brak kaset;
-- kompletna i aktualna macierz 3 × 36.
+## 11. Workflow GitHub
 
-Nie commituj częściowej macierzy, katalogów `/tmp/ipbox_llm_rejected`, `/tmp/ipbox_llm_responses` ani lokalnych raportów diagnostycznych.
-
-## 10. Manualny workflow GitHub
-
-Workflow `Paid multi-model LLM benchmark` wymaga jawnego potwierdzenia kosztu. Każdy model działa osobno, a artefakty nie są automatycznie commitowane. Po pobraniu artefaktów skopiuj trzy katalogi modeli do `tests/llm/vcr/cassettes/` i ponownie wykonaj pełną weryfikację z sekcji 9.
+`Paid multi-model LLM benchmark` wymaga jawnego potwierdzenia kosztu. Artefakty nie są commitowane automatycznie. Po pobraniu skopiuj trzy katalogi do `tests/llm/vcr/cassettes/` i wykonaj sekcję 10.

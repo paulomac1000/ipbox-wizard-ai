@@ -4,44 +4,43 @@
 
 ### Added
 
-- Atomic `decision_facts` contract and code-generated STOP/REVIEW protocol.
-- Decision-only model schema; the application assembles the final report deterministically.
-- Regression coverage for STOP cascades, multi-IP REVIEW visibility and hidden metadata leakage.
-
-- Deterministic-first LLM pipeline with Python tool context.
-- Independent full-output oracle and fail-closed evaluator.
-- 36 normalized scenarios with explicit allocation policies and NEXUS evidence.
-- Strict provider-neutral JSON Schema.
-- Multi-model benchmark for Gemini 3.5 Flash, GPT-5 Mini and Claude Haiku 4.5.
-- Resumable per-model cassette recording and actual-cost reports.
+- Atomowy kontrakt `decision_facts`; model zwraca wyłącznie `status/stops/reviews`.
+- Fail-closed oracle, evaluator, strict JSON Schema i VCR format 4.
+- 36 znormalizowanych scenariuszy oraz trzymodelowy benchmark.
+- Regresje dla wzoru NEXUS podwyższającego A+B.
+- Jawny podział ulgi B+R na część IP i NIE wraz z odliczeniem IP przed NEXUS.
+- Pełne połączenie działalności na skali z `dochody_dodatkowe_skala`.
+- Roczne limity odliczenia zdrowotnej i IKZE dla 2025–2026 oraz odmowa dla niezweryfikowanego roku.
+- Niezależny brief audytowy i raport z 17 lipca 2026 r.
 
 ### Fixed
 
-- Review findings in STOP zeroing, health-contribution deduction, FX evidence, conservative cost classification and revenue/W validation.
-- Fail-closed duplicate detection, cassette/manifest integrity, complete finish-reason checks and safe retry behavior.
-- Scenario fixtures now exercise ordinary PIT, thermomodernization carry-over, W-vs-MIX separation and reconciled multi-IP revenues.
-- GitHub Actions checkout/input hardening and recording scripts that cannot overwrite stale cassettes.
+- Rozdzielono przychód, koszty `MIX` i NEXUS zgodnie z issue #1.
+- Poprawiono NEXUS z `(A×1,3+B)` na `((A+B)×1,3)`.
+- Nieudokumentowane IDE, chmura, sprzęt i repozytoria nie są automatycznie kosztami IP.
+- Niesklasyfikowany zakup powyżej 10 000 zł jest wyłączany do udokumentowania odpisu.
+- Osobiste ulgi niedostępne przy podatku liniowym są odrzucane.
+- Ulga internetowa ma limit 760 zł, a zwykłe darowizny wspólny limit 6%.
+- Ulga B+R nie jest już błędnie ograniczona do dochodu NIE-IP.
+- Podatek skali obejmuje pełną wspólną podstawę z innymi dochodami skali, zamiast zwracać wyłącznie marginalny podatek działalności.
+- Niejednoznaczne `ulga_BR` i `straty_poprzednie` są odrzucane; używane są pola rozdzielone semantycznie.
+- Ujemne faktury, ujemne odliczenia, błędne mapy ZUS/zaliczek i nieznane limity roczne są odrzucane przed raportem.
+- STOP zeruje cały wynik, brak danych FX nie staje się zerem, W=0/ERROR i carry-over są fail-closed.
+- Multi-IP zachowuje każdy grosz metodą największych reszt.
+- Retry respektuje `Retry-After`, odpowiedź wymaga `finish_reason=stop`, a playback nie ma live fallbacku.
+- Workflowy używają minimalnych uprawnień i `persist-credentials: false`.
 
 ### Changed
 
-- LLM responses contain only `status`, `stops` and `reviews`; max output is reduced to 1024 tokens.
-- STOP/REVIEW comparison is exact and rejects extra codes.
-- Cassette format is version 4 and all previous partial cassettes are invalidated.
-
-- Revenue, MIX and NEXUS are independent decisions.
-- Annual revenue MIX is deferred and reconciled at year end.
-- Canonical excluded-cost basket is `WYKLUCZONE`; legacy `EXCLUDED` is accepted only at the calculator boundary.
-- Multi-IP uses largest-remainder cent allocation.
-- All financial inputs reject NaN, infinity and invalid negative values.
-- Standard GitHub CI is deterministic and free of API calls.
+- Standardowy CI jest bezpłatny i działa na Pythonie 3.11–3.13.
+- Roczna metoda przychodowa odracza `MIX` do finalnego true-up.
+- `strata_NIE_z_lat_poprzednich` dotyczy wyłącznie pozostałej działalności; straty IP wymagają ewidencji per prawo.
+- Działalność liniowa z dodatkowymi dochodami skali wymaga osobnej kaskady dla osobnego zeznania.
+- Kalkulator multi-IP wspiera podział wspólnych kosztów, ale nie udaje pełnej ewidencji PIT/IP per IP.
 
 ### Removed
 
-- Hidden `meta.expected_reviews` influence on oracle truth.
-- Full financial report copying from the LLM request/response path.
-- Partial 84/108 cassette matrix generated for the obsolete contract.
-
-- All stale and semantically failing historical cassettes.
-- Provider-prefixed cassette directories.
-- Gemini-specific environment aliases.
-- VCR auto mode and live fallback from playback.
+- Wpływ `meta.expected_reviews` na prawdę oracle.
+- Pełny raport finansowy w odpowiedzi LLM.
+- Historyczne, częściowe i semantycznie niepoprawne kasety starego kontraktu.
+- VCR auto, nadpisywanie `--force`, aliasy Gemini i live fallback z playbacku.

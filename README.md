@@ -1,21 +1,37 @@
 # ipbox-wizard-ai
 
-Eksperymentalny, deterministyczny-first wizard wspierający przygotowanie rozliczenia IP Box dla programisty B2B.
+Deterministyczny-first wizard wspierający przygotowanie danych do rozliczenia IP Box programisty B2B.
 
-> To nie jest porada podatkowa. Wynik wymaga sprawdzenia z księgową lub doradcą oraz potwierdzenia reguł zależnych od roku.
+> To nie jest porada podatkowa ani generator gotowego zeznania. Wynik wymaga sprawdzenia z księgową lub doradcą. Audyt techniczny i prawny wykonano 17 lipca 2026 r.; scenariusze referencyjne dotyczą 2025 r., a zakodowane limity 2026 są jawnie wersjonowane.
 
-## Dlaczego ta architektura
+## Architektura
 
-Model językowy nie powinien wykonywać krytycznej arytmetyki podatkowej „w głowie”. System dzieli odpowiedzialność:
+Model językowy nie wykonuje krytycznej arytmetyki:
 
-1. `python_helper/ipbox_calculator.py` — walidacja, alokacje, NEXUS, zaokrąglenia i podatek;
-2. `tests/llm/oracle.py` — deterministyczny scenariuszowy oracle używany wyłącznie przez harness testowy;
-3. Python tworzy atomowe `decision_facts` oraz pełny raport finansowy;
-4. LLM — mapuje wyłącznie fakty na małą kopertę `status/stops/reviews`;
-5. runner dołącza decyzję do raportu, a `tests/llm/evaluator.py` porównuje całość fail-closed;
-6. VCR zapisuje tylko odpowiedź, która przeszła mały schema decyzji i pełną semantykę.
+1. `python_helper/ipbox_calculator.py` waliduje dane i liczy W, alokacje, NEXUS, ulgi, podatek oraz zaokrąglenia.
+2. `tests/llm/oracle.py` tworzy niezależny wynik referencyjny i atomowe `decision_facts`.
+3. LLM mapuje wyłącznie te fakty na małą kopertę `status/stops/reviews`.
+4. Runner składa kopertę z raportem deterministycznym.
+5. Evaluator i JSON Schema porównują wynik fail-closed.
+6. VCR zapisuje tylko odpowiedź, która przeszła schema, semantykę i ponowne parsowanie.
 
-Najważniejszy invariant z issue #1: **alokacja przychodu, kosztów MIX i NEXUS to trzy oddzielne decyzje**. Miesięczne W nie jest domyślnym kluczem MIX.
+Najważniejszy invariant z issue #1: **przychód IP/NIE, alokacja kosztów pośrednich `MIX` i klasyfikacja NEXUS są trzema niezależnymi decyzjami**. Współczynnik czasu `W` nie jest domyślnym kluczem `MIX`.
+
+## Twarde reguły
+
+- NEXUS: `min(1, ((A+B) × 1,3) / (A+B+C+D))`.
+- Brak kosztów A/B/C/D daje NEXUS `0`, nie `1`.
+- Koszt bez dowodu wyłącznego związku nie staje się automatycznie `IP`.
+- Niesklasyfikowany zakup powyżej 10 000 zł jest `WYKLUCZONE` do czasu wprowadzenia udokumentowanego odpisu lub amortyzacji.
+- Zwykłe darowizny, ulga internetowa, rehabilitacyjna i na dziecko są odrzucane dla podatku liniowego.
+- Ulga B+R jest rozdzielana jawnie na `ulga_BR_IP` i `ulga_BR_NIE`; część IP pomniejsza dochód kwalifikowany przed NEXUS.
+- `strata_NIE_z_lat_poprzednich` dotyczy wyłącznie pozostałej działalności. Straty kwalifikowanego IP wymagają osobnej ewidencji per IP.
+- Działalność na skali łączy `dochody_dodatkowe_skala` z pozostałym dochodem skali i liczy pełny podatek od wspólnej podstawy.
+- Działalność liniowa i dodatkowe dochody na skali wymagają dwóch odrębnych kaskad/zeznań; oracle odmawia ich mieszania.
+- Limity zdrowotnej i IKZE są wersjonowane per rok; nieznany rok z dodatnim odliczeniem kończy się błędem.
+- Brak kursu, daty płatności, dowodu kwalifikacji lub ujemna faktura jest błędem danych, nie wartością zero.
+
+Szczegółowy kontrakt: [`ipbox_algorytm.md`](ipbox_algorytm.md). Raport audytu: [`docs/audit-2026-07-17.md`](docs/audit-2026-07-17.md).
 
 ## Szybki start
 
@@ -29,50 +45,41 @@ ruff check .
 python -m compileall -q python_helper tests scripts
 pytest tests/unit --cov=python_helper --cov-report=term-missing --cov-fail-under=90
 pytest -q
+python scripts/check_cassette_policy.py
+for script in scripts/*.sh dump-to-md.sh; do bash -n "$script"; done
 ```
 
-`pytest -q` pomija 36 płatnych testów LLM. Standardowy CI jest całkowicie offline.
+Stan po audycie: **158 testów PASS**, coverage `python_helper` **95,27%**; pełny bezpłatny suite: **158 PASS i 36 kontrolowanych skipów LLM**.
 
 ## Benchmark multi-model
 
-Macierz jest celowo ograniczona do jednego ekonomicznego modelu od każdego dostawcy:
-
-| Dostawca | Model OpenRouter | Rola |
-|---|---|---|
-| Google | `google/gemini-3.5-flash` | referencyjny Flash, minimal reasoning |
-| OpenAI | `openai/gpt-5-mini` | tani, ale wyraźnie mocniejszy od Nano w złożonym instruction following |
-| Anthropic | `anthropic/claude-haiku-4.5` | najtańszy aktualny Claude w tej klasie |
-
-Nie używamy `gpt-5-nano` jako bramki produkcyjnej: oszczędność pojedynczego pełnego runu jest mała wobec kosztu diagnozowania niestabilnych odpowiedzi. Nie używamy Gemini 3.1 Flash Lite jako modelu referencyjnego, bo benchmark obejmuje złożone reguły i strict JSON.
+| Dostawca | Model OpenRouter |
+|---|---|
+| Google | `google/gemini-3.5-flash` |
+| OpenAI | `openai/gpt-5-mini` |
+| Anthropic | `anthropic/claude-haiku-4.5` |
 
 Nagrywanie jest jawne i płatne:
 
 ```bash
 export OPENROUTER_API_KEY='...'
-# Soft budget guard per model; the script still records all models sequentially.
 ./scripts/record_all_models.sh --max-cost-usd 5
 ```
 
-Szczegóły: [`docs/testing.md`](docs/testing.md).
+Pełna procedura: [`docs/testing.md`](docs/testing.md). Niezależny audyt: [`docs/independent-audit-brief.md`](docs/independent-audit-brief.md).
 
-## Struktura
+## Zakres multi-IP
 
-- `ipbox_algorytm.md` — opis pełnego procesu i granicy odpowiedzialności modelu;
-- `python_helper/` — deterministyczny kalkulator;
-- `tests/llm/scenarios/` — 36 znormalizowanych przypadków;
-- `tests/llm/output_schema.py` — mały schema decyzji i schema finalnego raportu;
-- `tests/llm/vcr/` — model-specific, fail-closed cassettes;
-- `scripts/record_model.py` — wznawialne nagrywanie z walidacją istniejących kaset i miękkim limitem kosztu;
-- `scripts/check_cassette_policy.py` — blokuje commit częściowej lub nieaktualnej macierzy kaset;
-- `.github/workflows/deterministic-ci.yml` — bezpłatny CI;
-- `.github/workflows/llm-benchmark.yml` — ręczny, płatny benchmark.
+`allocate_multi_ip()` wykonuje dwustopniowy podział wspólnych kosztów z zachowaniem groszy. Nie zastępuje pełnej ewidencji PIT/IP dla każdego kwalifikowanego prawa. Finalne rozliczenie wielu IP wymaga osobnych przychodów, kosztów bezpośrednich, kosztów NEXUS, dochodu i straty dla każdego IP.
 
-## Stan wydań
+## Stan wydania
 
-Projekt pozostaje pre-release. Gotowość do wydania wymaga:
+Rdzeń deterministyczny jest po audycie i ma zielone bramki. PR pozostaje **draftem**, ponieważ aktualny kontrakt nie ma jeszcze kompletnej macierzy kaset.
 
-- zielonych testów deterministycznych;
-- 36/36 zweryfikowanych kaset dla każdego modelu bramkowego;
-- playbacku bez klucza API;
-- ręcznego przeglądu odpowiedzi i kaset;
-- weryfikacji reguł podatkowych dla obsługiwanego roku.
+Warunki zakończenia:
+
+- 36/36 kaset dla każdego z trzech modeli, czyli 108 aktualnych nagrań;
+- playback bez `OPENROUTER_API_KEY`;
+- ręczny przegląd odpowiedzi, odrzuceń i raportu kosztu;
+- niezależny raport `READY` bez nierozwiązanych uwag;
+- ponowna weryfikacja źródeł przy zmianie roku lub zakresu podatkowego.

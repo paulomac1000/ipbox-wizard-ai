@@ -1,7 +1,8 @@
 meta:
   id: 22_related_parties_nexus_reduction
-  name: Wyłącznie koszt C obniża NEXUS do zera
-  description: Wyłącznie koszt C obniża NEXUS do zera
+  name: NEXUS z kosztami B i C
+  description: Weryfikacja ustawowego podwyższenia 1,3 dla łącznej sumy A+B, także
+    gdy A=0 i B>0.
   tags:
   - regression
   priority: P1
@@ -32,16 +33,20 @@ input:
       godziny_nie_IP: 0
       procent_faktury_IP: 100
     koszty:
-    - opis: Powiązany podwykonawca
-      kwota: 10000
+    - opis: Niepowiązany podwykonawca B+R
+      kwota: 5000
+      nexus_source: unrelated_br_contractor
+      kategoria: IP
+    - opis: Powiązany podwykonawca B+R
+      kwota: 5000
       nexus_source: related_br_contractor
       kategoria: IP
     opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.
 assertions:
-  nexus: 0.0
+  nexus: 0.65
   podatek_IP_range:
-  - 0
-  - 0
+  - 325
+  - 325
   testy_pass:
   - TEST_5
   - TEST_8

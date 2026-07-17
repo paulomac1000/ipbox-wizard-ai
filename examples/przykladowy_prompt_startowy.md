@@ -1,11 +1,40 @@
 # Przykładowy prompt startowy
 
 ```text
-Przeanalizuj moje dane według ipbox_algorytm.md.
-Najpierw wyodrębnij dowody z umowy, KPiR, ewidencji czasu i interpretacji KIS.
-Do wszystkich obliczeń użyj python_helper/ipbox_calculator.py.
-Nie używaj W jako domyślnego klucza kosztów MIX.
-Nie przypisuj MIX do NEXUS A bez jawnego źródła i kwoty.
-Przerwij na warunku STOP i wskaż brakujące dowody.
-Na końcu pokaż ślad alokacji, NEXUS, TEST 1–9 i pytania do księgowej.
+Przeanalizuj moje dane IP Box zgodnie z `ipbox_algorytm.md` i używaj
+`python_helper/ipbox_calculator.py` do wszystkich obliczeń.
+
+Rok: 2025. Forma: liniowy 19% albo skala — ustal na podstawie dokumentów.
+
+Najpierw sprawdź kompletność: kwalifikowane IP, umowy, ewidencję B+R,
+faktury, KPiR, daty płatności i kursy, ZUS, zdrowotną, ulgi, straty,
+zaliczki, interpretację KIS i politykę alokacji. Brak danych nie jest zerem.
+
+Rozdziel:
+1. przychód IP/NIE,
+2. koszty pośrednie MIX,
+3. NEXUS A/B/C/D/poza NEXUS.
+
+Nie używaj W jako domyślnego klucza MIX. IDE, chmura, laptop i repozytorium
+nie są kosztami IP bez dowodu wyłącznego wykorzystania. NEXUS licz jako
+`min(1, ((A+B) × 1,3)/(A+B+C+D))`.
+
+Dla ulgi B+R rozdziel udokumentowaną kwotę na `ulga_BR_IP` i `ulga_BR_NIE`
+oraz podaj `ulga_BR_limit_odliczenia`. Część IP odejmij przed NEXUS.
+Nie używaj ogólnego pola `ulga_BR`.
+
+Stratę pozostałej działalności podaj jako `strata_NIE_z_lat_poprzednich`.
+Nie przypisuj zagregowanej straty do IP bez ewidencji konkretnego prawa.
+
+Przy działalności na skali połącz inne dochody skali w pełnej podstawie.
+Przy działalności liniowej policz osobne zeznanie skali oddzielnie. Nie stosuj
+przy liniowym zwykłych darowizn, internetu, rehabilitacji ani ulgi na dziecko.
+
+Sprawdź roczne limity zdrowotnej i IKZE. Dla roku bez zweryfikowanego limitu
+zatrzymaj obliczenie. Po STOP wyzeruj finalne liczby.
+
+Na końcu pokaż ślad dowodów, alokacji, TEST 1–9, ograniczenia zakresu i pytania
+do księgowej lub doradcy.
 ```
+
+W harnessie model nie dostaje pełnego zadania rachunkowego. Otrzymuje tylko `decision_facts` i zwraca `status/stops/reviews`.

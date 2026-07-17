@@ -22,7 +22,10 @@ input:
   - nazwa: ClientA
     klauzula_IP: true
   ulgi:
-    ulga_BR: 1000
+    # Art. 30ca ust. 9a: jawnie przypisana do dochodu z kwalifikowanego IP.
+    ulga_BR_IP: 1000
+    ulga_BR_NIE: 0
+    ulga_BR_limit_odliczenia: 1000
   miesiace:
   - miesiac: 2025-01
     faktury:
@@ -50,6 +53,9 @@ assertions:
   - 18000
   W_miesieczne:
     2025-01: 90.0
+  podatek_IP_range:
+  - 845
+  - 847
   testy_pass:
   - TEST_5
   - TEST_8

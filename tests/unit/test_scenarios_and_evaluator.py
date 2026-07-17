@@ -175,11 +175,40 @@ def test_invalid_scenario_contracts() -> None:
         lambda value: value["input"].pop("forma_opodatkowania"),
         lambda value: value.update(assertions={}),
         lambda value: value["input"].pop("polityka_alokacji"),
+        lambda value: value["input"].update(ulgi={"ikze": -1}),
+        lambda value: value["input"].update(ulgi={"straty_poprzednie": 1}),
+        lambda value: value["input"].update(zus="not-a-mapping"),
+        lambda value: value["input"].update(zaliczki={"suma": -1}),
+        lambda value: value["input"]["miesiace"][0].update(faktury=["not-a-mapping"]),
+        lambda value: value["input"]["miesiace"][0].update(
+            faktury=[{"kwota_PLN": -1, "kwalifikuje_IP": True}]
+        ),
+        lambda value: value["input"]["miesiace"][0].update(koszty=["not-a-mapping"]),
     ):
         broken = deepcopy(loaded)
         mutation(broken)
         with pytest.raises(ScenarioError):
             validate_scenario(broken)
+
+
+def test_year_dependent_limits_fail_closed() -> None:
+    loaded = scenario("41_ikze_cascade")
+    excessive = deepcopy(loaded)
+    excessive["input"]["ulgi"]["ikze"] = 15611.41
+    with pytest.raises(ScenarioError, match="IKZE deduction exceeds"):
+        compute_reference(excessive)
+
+    unknown_year = deepcopy(loaded)
+    unknown_year["input"]["rok"] = 2027
+    with pytest.raises(ScenarioError, match="no verified entrepreneur IKZE limit"):
+        compute_reference(unknown_year)
+
+    health = scenario("12_zus_in_pit_path")
+    health = deepcopy(health)
+    health["input"]["zus"]["odliczenie_zdrowotne_PIT"] = 1
+    health["input"]["rok"] = 2027
+    with pytest.raises(ScenarioError, match="no verified health-contribution"):
+        compute_reference(health)
 
 
 def test_runner_exposes_only_atomic_decision_facts() -> None:
@@ -304,7 +333,9 @@ def test_health_deduction_year_limit_is_enforced() -> None:
 
 
 def test_stopped_report_zeros_every_financial_output() -> None:
-    reference = compute_reference(scenario("14_lump_sum_ineligible_check"))
+    loaded = scenario("14_lump_sum_ineligible_check")
+    loaded["input"]["ulgi"] = {"ulga_internet": 760, "ulga_prorodzinna": 1112.04}
+    reference = compute_reference(loaded)
     assert reference["status"] == "STOPPED"
     result = reference["result"]
     assert all(value == 0 for value in result["przychody_roczne"].values())

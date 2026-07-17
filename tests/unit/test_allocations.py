@@ -166,6 +166,9 @@ def test_calculate_nexus_zero_and_mixed() -> None:
     assert calculate_nexus(0, 0, 0, 0)["nexus"] == 0
     assert calculate_nexus(100)["nexus"] == 1
     assert calculate_nexus(3500, 0, 10000, 0)["nexus"] == 0.337037
+    assert calculate_nexus(0, 5000, 5000, 0)["nexus"] == 0.65
+    assert calculate_nexus(0, 100, 0, 0)["nexus"] == 1
+    assert calculate_nexus(0, 5000, 5000, 0)["formula"] == ("min(1, ((A+B)*1.3)/(A+B+C+D))")
     with pytest.raises(ValueError):
         calculate_nexus(-1)
 

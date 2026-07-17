@@ -1,4 +1,4 @@
-status: PROVISIONAL
+status: FINAL
 rok: 2025
 polityka_alokacji:
   policy_id: kis-annual-revenue
@@ -9,15 +9,27 @@ polityka_alokacji:
     źródło: interpretacja_KIS
     uzasadnienie: "Treść interpretacji wymaga rocznego klucza przychodowego"
 klucz_MIX:
-  wartość: null
-  status: DEFERRED
+  wartość: 0.80
+  status: FINAL
 nexus:
+  wzór: "min(1, ((A+B) * 1.3) / (A+B+C+D))"
   A: 1000.00
-  B: 0.00
-  C: 0.00
+  B: 500.00
+  C: 500.00
   D: 0.00
   poza_nexus: 500.00
-  wartość: 1.0
+  wartość: 0.975
+podatek:
+  podstawa_IP: 18525
+  podstawa_NIE: 10000
+  podatek_IP: 926
+  podatek_NIE_finalny: 1900
+  podatek_całościowy: 2826
+  ulga_BR_IP_wykorzystana: 1000.00
+  ulga_BR_NIE_wykorzystana: 500.00
+  ulga_BR_carry_over: 0.00
+  dochód_dodatkowy_skala: 0.00
+  termomodernization_carry_over: 0.00
 testy:
   TEST_1: PASS
   TEST_2: PASS
@@ -28,3 +40,6 @@ testy:
   TEST_7: PASS
   TEST_8: PASS
   TEST_9: PASS
+uwagi:
+  - "Kwoty przykładowe; raport wymaga zgodności ze źródłowymi dokumentami."
+  - "Wiele IP wymaga osobnej ewidencji per kwalifikowane prawo."

@@ -112,7 +112,10 @@ def _month_invoices(month: dict[str, Any]) -> list[dict[str, Any]]:
 def _invoice_amount(invoice: dict[str, Any]) -> float:
     for key in ("kwota_PLN", "kwota_netto", "base_revenue_pln", "kwota"):
         if key in invoice:
-            return _number(invoice[key], f"invoice.{key}")
+            amount = _number(invoice[key], f"invoice.{key}")
+            if amount < 0:
+                raise ScenarioError(f"invoice.{key} must be non-negative")
+            return amount
     raise ScenarioError("invoice requires kwota_PLN/kwota_netto/base_revenue_pln")
 
 
@@ -169,6 +172,43 @@ def validate_scenario(scenario: dict[str, Any]) -> None:
         source=str(mix.get("źródło", "domyślna_wizard")),
         justification=str(mix.get("uzasadnienie", "")),
     )
+    reliefs = input_data.get("ulgi", {})
+    if reliefs is None:
+        reliefs = {}
+    reliefs = _mapping(reliefs, "input.ulgi")
+    for key, value in reliefs.items():
+        if _number(value, f"input.ulgi.{key}") < 0:
+            raise ScenarioError(f"input.ulgi.{key} must be non-negative")
+    if _number(reliefs.get("ulga_BR", 0), "input.ulgi.ulga_BR") > 0:
+        raise ScenarioError(
+            "input.ulgi.ulga_BR is ambiguous; use ulga_BR_IP and/or ulga_BR_NIE "
+            "after documenting which qualified costs led to the IP"
+        )
+    if _number(reliefs.get("straty_poprzednie", 0), "input.ulgi.straty_poprzednie") > 0:
+        raise ScenarioError(
+            "input.ulgi.straty_poprzednie is ambiguous; use "
+            "strata_NIE_z_lat_poprzednich. Losses of qualified IP require a "
+            "separate per-IP ledger and are not inferred by this aggregate oracle"
+        )
+    if _number(input_data.get("dochody_dodatkowe_skala", 0), "input.dochody_dodatkowe_skala") < 0:
+        raise ScenarioError("input.dochody_dodatkowe_skala must be non-negative")
+
+    if "zus" in input_data and input_data["zus"] is not None:
+        social = _mapping(input_data["zus"], "input.zus")
+        for key in ("odliczenie_spoleczne_PIT", "odliczenie_zdrowotne_PIT"):
+            if _number(social.get(key, 0), f"input.zus.{key}") < 0:
+                raise ScenarioError(f"input.zus.{key} must be non-negative")
+    if "zaliczki" in input_data and input_data["zaliczki"] is not None:
+        advances = _mapping(input_data["zaliczki"], "input.zaliczki")
+        if _number(advances.get("suma", 0), "input.zaliczki.suma") < 0:
+            raise ScenarioError("input.zaliczki.suma must be non-negative")
+
+    clients = input_data.get("kontrahenci", [])
+    if clients is None:
+        clients = []
+    for index, client in enumerate(_list(clients, "input.kontrahenci")):
+        _mapping(client, f"input.kontrahenci[{index}]")
+
     months = _list(input_data.get("miesiace", []), "input.miesiace")
     seen_months: set[str] = set()
     for index, raw_month in enumerate(months):
@@ -179,6 +219,28 @@ def validate_scenario(scenario: dict[str, Any]) -> None:
         if month_id in seen_months:
             raise ScenarioError(f"duplicate month {month_id}")
         seen_months.add(month_id)
+
+        if "faktury" in month:
+            invoices = _list(month["faktury"], f"month[{index}].faktury")
+            for item_index, invoice in enumerate(invoices):
+                invoice = _mapping(invoice, f"month[{index}].faktury[{item_index}]")
+                _invoice_amount(invoice)
+        if "koszty" in month:
+            costs = _list(month["koszty"], f"month[{index}].koszty")
+            for item_index, cost in enumerate(costs):
+                _mapping(cost, f"month[{index}].koszty[{item_index}]")
+        evidence = month.get("ewidencja")
+        if evidence is not None:
+            evidence = _mapping(evidence, f"month[{index}].ewidencja")
+            projects = evidence.get("projekty", [])
+            if projects is not None:
+                for project_index, project in enumerate(
+                    _list(projects, f"month[{index}].ewidencja.projekty")
+                ):
+                    _mapping(
+                        project,
+                        f"month[{index}].ewidencja.projekty[{project_index}]",
+                    )
 
 
 def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
@@ -200,6 +262,7 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
         source=str(mix_policy.get("źródło", "domyślna_wizard")),
         justification=str(mix_policy.get("uzasadnienie", "")),
     )
+    reliefs = input_data.get("ulgi", {}) or {}
 
     warnings: set[str] = set()
     unsupported_tax_form = tax_form not in {"liniowy_19%", "skala"}
@@ -347,15 +410,6 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
     health_pit_deduction = _number(social.get("odliczenie_zdrowotne_PIT", 0), "health deduction")
     social_contributions_double_counted = social_in_kpir and social_pit_deduction > 0
     health_contribution_double_counted = health_in_kpir and health_pit_deduction > 0
-    if health_pit_deduction > 0 and tax_form != "liniowy_19%":
-        raise ScenarioError("health PIT deduction is supported only for linear tax")
-    health_limits = {2025: 12_900.0, 2026: 14_100.0}
-    health_limit = health_limits.get(year)
-    if health_limit is not None and health_pit_deduction > health_limit:
-        raise ScenarioError(
-            f"health PIT deduction exceeds the {year} limit of {health_limit:.2f} PLN"
-        )
-
     other_stop_condition = any(
         (
             unsupported_tax_form,
@@ -387,6 +441,35 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
         "kis_implementation_requires_confirmation": policy.source == "interpretacja_KIS",
     }
     stops, reviews = derive_decision_codes(decision_facts)
+
+    # Once the scenario is ineligible or fatally incomplete, keep the STOP report
+    # deterministic instead of cascading into tax-form-specific relief errors.
+    if not stops:
+        if health_pit_deduction > 0 and tax_form != "liniowy_19%":
+            raise ScenarioError("health PIT deduction is supported only for linear tax")
+        health_limits = {2025: 12_900.0, 2026: 14_100.0}
+        health_limit = health_limits.get(year)
+        if health_pit_deduction > 0 and health_limit is None:
+            raise ScenarioError(
+                f"no verified health-contribution deduction limit for {year}; "
+                "update the legal constants before calculating"
+            )
+        if health_limit is not None and health_pit_deduction > health_limit:
+            raise ScenarioError(
+                f"health PIT deduction exceeds the {year} limit of {health_limit:.2f} PLN"
+            )
+        ikze = _number(reliefs.get("ikze", reliefs.get("IKZE", 0)), "input.ulgi.ikze")
+        ikze_limits_business = {2025: 15_611.40, 2026: 16_956.0}
+        ikze_limit = ikze_limits_business.get(year)
+        if ikze > 0 and ikze_limit is None:
+            raise ScenarioError(
+                f"no verified entrepreneur IKZE limit for {year}; update legal constants "
+                "before calculating"
+            )
+        if ikze_limit is not None and ikze > ikze_limit:
+            raise ScenarioError(
+                f"IKZE deduction exceeds the {year} entrepreneur limit of {ikze_limit:.2f} PLN"
+            )
 
     all_costs: list[CostItem] = []
     declared_private_business = False
@@ -521,24 +604,42 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
     income_ip = float(annual_ip_revenue - annual_ip_cost)
     income_non = float(annual_non_revenue - annual_non_cost)
 
-    reliefs = input_data.get("ulgi", {}) if isinstance(input_data.get("ulgi"), dict) else {}
-    tax = tax_cascade(
-        non_ip_income=income_non,
-        ip_income=income_ip,
-        nexus=nexus,
-        tax_form=tax_form if tax_form in {"liniowy_19%", "skala"} else "liniowy_19%",
-        previous_losses=reliefs.get("straty_poprzednie", 0),
-        social_security_deduction=(0 if social_in_kpir else social_pit_deduction),
-        health_contribution_deduction=(0 if health_in_kpir else health_pit_deduction),
-        ikze=reliefs.get("ikze", reliefs.get("IKZE", 0)),
-        donations=reliefs.get("darowizny", 0),
-        internet_tax_relief=reliefs.get("ulga_internet", 0),
-        rehabilitative_relief_income=reliefs.get("ulga_rehabilitacyjna", 0),
-        rd_relief=reliefs.get("ulga_BR", 0),
-        thermomodernization_pool=reliefs.get("termomodernizacja_pula", 0),
-        child_tax_credit=reliefs.get("ulga_prorodzinna", 0),
-        extra_income_scale=input_data.get("dochody_dodatkowe_skala", 0),
-    )
+    if stops:
+        tax = {
+            "ip_base_rounded": 0,
+            "non_ip_base_rounded": 0,
+            "ip_tax": 0,
+            "non_ip_tax_final": 0,
+            "total_tax": 0,
+            "thermomodernization_carry_over": 0,
+            "rd_relief_ip_used": 0,
+            "rd_relief_non_ip_used": 0,
+            "rd_relief_carry_over": 0,
+            "extra_income_scale_included": 0,
+        }
+    else:
+        try:
+            tax = tax_cascade(
+                non_ip_income=income_non,
+                ip_income=income_ip,
+                nexus=nexus,
+                tax_form=tax_form,
+                previous_non_ip_business_losses=reliefs.get("strata_NIE_z_lat_poprzednich", 0),
+                social_security_deduction=(0 if social_in_kpir else social_pit_deduction),
+                health_contribution_deduction=(0 if health_in_kpir else health_pit_deduction),
+                ikze=reliefs.get("ikze", reliefs.get("IKZE", 0)),
+                donations=reliefs.get("darowizny", 0),
+                internet_tax_relief=reliefs.get("ulga_internet", 0),
+                rehabilitative_relief_income=reliefs.get("ulga_rehabilitacyjna", 0),
+                rd_relief_non_ip=reliefs.get("ulga_BR_NIE", 0),
+                rd_relief_ip=reliefs.get("ulga_BR_IP", 0),
+                rd_relief_limit=reliefs.get("ulga_BR_limit_odliczenia", 0),
+                thermomodernization_pool=reliefs.get("termomodernizacja_pula", 0),
+                child_tax_credit=reliefs.get("ulga_prorodzinna", 0),
+                extra_income_scale=input_data.get("dochody_dodatkowe_skala", 0),
+            )
+        except ValueError as exc:
+            raise ScenarioError(str(exc)) from exc
     advances = _number(
         (input_data.get("zaliczki") or {}).get("suma", 0)
         if isinstance(input_data.get("zaliczki"), dict)
@@ -555,14 +656,6 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
     if stops:
         income_ip = 0.0
         income_non = 0.0
-        tax = {
-            "ip_base_rounded": 0,
-            "non_ip_base_rounded": 0,
-            "ip_tax": 0,
-            "non_ip_tax_final": 0,
-            "total_tax": 0,
-            "thermomodernization_carry_over": 0,
-        }
         settlement_signed = 0.0
 
     multi_ip_result: dict[str, Any] | None = None
@@ -662,6 +755,10 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
                 "podatek_całościowy": tax["total_tax"],
                 "nadpłata_lub_dopłata": settlement_signed,
                 "termomodernization_carry_over": tax.get("thermomodernization_carry_over", 0),
+                "ulga_BR_IP_wykorzystana": tax.get("rd_relief_ip_used", 0),
+                "ulga_BR_NIE_wykorzystana": tax.get("rd_relief_non_ip_used", 0),
+                "ulga_BR_carry_over": tax.get("rd_relief_carry_over", 0),
+                "dochód_dodatkowy_skala": tax.get("extra_income_scale_included", 0),
             },
         },
         "classifications": classifications if not stops else [],
