@@ -32,6 +32,7 @@ Najważniejszy invariant z issue #1: **przychód IP/NIE, alokacja kosztów pośr
 - Limity zdrowotnej i IKZE są wersjonowane per rok; nieznany rok z dodatnim odliczeniem kończy się błędem.
 - Miesiąc musi mieć ścisły format `YYYY-MM` i rok zgodny z `input.rok`.
 - Pula ulgi termomodernizacyjnej nie może przekroczyć 53 000 zł na podatnika.
+- Odpowiedź z modelem innym niż żądany jest odrzucana podczas live runu, playbacku i pre-commit.
 - Brak kursu, daty płatności, dowodu kwalifikacji lub ujemna faktura jest błędem danych, nie wartością zero.
 
 Szczegółowy kontrakt: [`ipbox_algorytm.md`](ipbox_algorytm.md). Raport audytu: [`docs/audit-2026-07-17.md`](docs/audit-2026-07-17.md).
@@ -52,7 +53,7 @@ python scripts/check_cassette_policy.py
 for script in scripts/*.sh dump-to-md.sh; do bash -n "$script"; done
 ```
 
-Stan po audycie protokołu: **181 testów PASS**, coverage `python_helper` **94,32%**; pełny bezpłatny suite: **181 PASS i 36 kontrolowanych skipów LLM**.
+Stan po audycie protokołu: **184 testy PASS**, coverage `python_helper` **94,32%**; pełny bezpłatny suite: **184 PASS i 36 kontrolowanych skipów LLM**.
 
 ## Benchmark wielorodzinny
 
@@ -69,7 +70,6 @@ Benchmark używa dziewięciu tanich modeli z dziewięciu niezależnych rodzin:
 | Z.ai GLM | `z-ai/glm-4.7-flash` | tani model Flash GLM |
 | Qwen | `qwen/qwen3.5-flash-02-23` | tani model Flash Qwen |
 | Mistral | `mistralai/ministral-3b-2512` | bardzo mały model 3B jako dolna granica |
-
 
 To jest **test przenośności protokołu**, nie dowód poprawności podatkowej i nie
 matematyczna gwarancja zachowania każdego mocniejszego modelu. Jeżeli małe modele
