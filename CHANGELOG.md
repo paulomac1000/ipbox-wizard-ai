@@ -45,5 +45,6 @@
 
 - Wpływ `meta.expected_reviews` na prawdę oracle.
 - Pełny raport finansowy w odpowiedzi LLM.
-- Historyczne, częściowe i semantycznie niepoprawne kasety starego kontraktu.
+- Pełna mapa aktywnych i nieaktywnych faktów w promptcie modelu.
+- Historyczne, częściowe i semantycznie niepoprawne kasety poprzednich kontraktów.
 - VCR auto, nadpisywanie `--force`, aliasy Gemini i live fallback z playbacku.
