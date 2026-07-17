@@ -8,9 +8,10 @@ Pobrać aktualny branch `fix/decouple-mix-allocation-from-w`, niezależnie zwery
 
 - Nie zmieniaj asercji pod odpowiedź modelu.
 - Nie twórz ani nie poprawiaj kaset ręcznie.
-- Nie kopiuj starych kaset pełnego raportu.
+- Nie kopiuj starych kaset pełnego raportu ani kaset starej mapy `true/false`.
 - Nie wymyślaj kursów, limitów, NEXUS ani dowodów.
 - Każdą lukę najpierw pokaż testem deterministycznym.
+- Nie ponawiaj semantycznie błędnej odpowiedzi aż do uzyskania szczęśliwego wyniku.
 - Nie merguj i nie oznaczaj PR jako ready bez 108/108 i playbacku bez klucza.
 - Zachowaj PR jako draft do końca audytu.
 
@@ -36,7 +37,7 @@ python scripts/check_cassette_policy.py
 for script in scripts/*.sh dump-to-md.sh; do bash -n "$script"; done
 ```
 
-Oczekiwany punkt startowy: 158 testów PASS, coverage co najmniej 95,27%, 36 kontrolowanych skipów LLM i pusty katalog kaset.
+Oczekiwany punkt startowy: 167 testów PASS, coverage co najmniej 95,30%, 36 kontrolowanych skipów LLM i pusty katalog kaset poza `.gitkeep`.
 
 ## Niezależny code review
 
@@ -46,15 +47,19 @@ Sprawdź szczególnie:
 2. wzór `((A+B)×1,3)/(A+B+C+D)`;
 3. B+R IP przed NEXUS i limit części IP+NIE;
 4. pełną wspólną podstawę działalności na skali z `dochody_dodatkowe_skala`;
-5. odmowę mieszania działalności liniowej z osobnym zeznaniem skali;
+5. odmowę mieszania liniowego z osobnym zeznaniem skali;
 6. `strata_NIE_z_lat_poprzednich` i brak zgadywania straty per IP;
 7. limity zdrowotnej/IKZE oraz fail-closed dla innego roku;
 8. ujemne faktury, zaliczki, ulgi i błędne typy wejścia;
-9. zachowanie groszy w multi-IP oraz jawne ograniczenie: to nie jest pełna ewidencja per IP;
-10. brak `IDE/chmura/laptop → IP` bez dowodu;
-11. zerowanie wszystkich pól po STOP;
-12. brak live fallbacku, integralność manifestu, retry i `finish_reason`;
-13. zgodność każdego pliku Markdown z kodem.
+9. ścisłe `YYYY-MM`, zgodność roku miesiąca z `input.rok` i limit termomodernizacji 53 000 zł;
+10. zachowanie groszy w multi-IP oraz jawne ograniczenie: to nie jest pełna ewidencja per IP;
+11. brak `IDE/chmura/laptop → IP` bez dowodu;
+12. zerowanie wszystkich pól po STOP;
+13. `active_rules` zawiera tylko fakty prawdziwe, a nieaktywne nazwy i kody nie trafiają do promptu;
+14. brak live fallbacku, integralność manifestu, request hashy i fingerprintów;
+15. playback i pre-commit odrzucają `finish_reason != stop` i niespójne `parsed_response`;
+16. recorder nie nadpisuje istniejącej kasety;
+17. zgodność każdego pliku Markdown z kodem.
 
 Nie ograniczaj się do botów. Uruchom także własne testy właściwości dla alokacji i NEXUS.
 
@@ -65,7 +70,16 @@ export OPENROUTER_API_KEY='...'
 ./scripts/record_all_models.sh --max-cost-usd 5
 ```
 
-Po każdym modelu przejrzyj `/tmp/ipbox_llm_rejected/`, surowe odpowiedzi i raport kosztu. Przy realnym błędzie dodaj regresję, popraw kod i nagraj wyłącznie unieważnione/brakujące kasety.
+Nagraj wszystkie 108 kaset od nowa. Poprzednie 102 pliki miały inny request i fingerprint, dlatego zostały usunięte.
+
+Po każdym modelu przejrzyj `/tmp/ipbox_llm_rejected/`, surowe odpowiedzi i raport kosztu. Przy realnym błędzie zatrzymaj nagranie, sklasyfikuj przyczynę i dodaj regresję przed zmianą kodu. Nie używaj `--force` i nie edytuj kaset.
+
+Szczególnie sprawdź wcześniejsze problematyczne kombinacje:
+
+- Claude Haiku: scenariusz 17;
+- GPT-5 Mini: scenariusze 17, 21, 22, 29 i 30.
+
+Nieaktywne `STOP_02` nie powinno być widoczne w ich promptach.
 
 ## Playback końcowy
 
@@ -79,7 +93,7 @@ git status --short
 git diff --stat
 ```
 
-Potwierdź, że żaden request sieciowy nie został wykonany.
+Potwierdź, że żaden request sieciowy nie został wykonany, wszystkie trzy modele mają 36/36, a macierz ma dokładnie 108 aktualnych kaset.
 
 ## Wymagany raport
 
@@ -91,12 +105,9 @@ Raport ma zawierać:
 4. Potwierdzenie playbacku bez `OPENROUTER_API_KEY`.
 5. Klasyfikację błędów: kod/oracle, scenariusz, instrukcja, provider, model.
 6. Dla poprawki: test regresyjny, pliki, uzasadnienie i wynik po zmianie.
-7. Kontrolę 108 kaset, manifestu, request hashy i fingerprintów.
-8. Ręczne wnioski dla scenariuszy 13, 22, 23, 26, 31, 34, 44 i 45.
-9. Werdykt dokładnie `READY` albo `NOT READY`.
-10. Przy `NOT READY` — minimalną uporządkowaną listę blokad.
-11. Potwierdzenie, że PR nie został zmergowany.
-
-## Uzupełnienie: aktywne reguły i integralność VCR
-
-Po nagraniu pierwszej macierzy wykryto jeden wspólny wzorzec błędu: słabsze modele reinterpretowały nazwę fałszywego faktu i dodawały `STOP_02` mimo wartości `false`. Protokół został uproszczony bez wyjątków scenariuszowych: model otrzymuje wyłącznie `active_rules` dla faktów prawdziwych. Nieaktywne nazwy i kody nie trafiają do promptu. Zmiana unieważnia wszystkie wcześniejsze kasety. Playback oraz pre-commit wymagają `finish_reason=stop`, recorder nie nadpisuje istniejących plików, miesiące muszą należeć do `input.rok`, a pula termomodernizacji jest ograniczona do 53 000 zł.
+7. Kontrolę 108 kaset, manifestu, request hashy, fingerprintów, `finish_reason` i reparsowania.
+8. Ręczne wnioski dla scenariuszy 13, 17, 22, 23, 26, 31, 34, 44 i 45.
+9. Wyjaśnienie pełnego kosztu, łącznie z odrzuconymi próbami.
+10. Werdykt dokładnie `READY` albo `NOT READY`.
+11. Przy `NOT READY` — minimalną uporządkowaną listę blokad.
+12. Potwierdzenie, że PR nie został zmergowany.
