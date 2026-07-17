@@ -33,9 +33,13 @@ jobs:
     env:
       OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
       LLM_PROVIDER: openrouter
+      BENCHMARK_MODEL: ${{ inputs.model }}
+      MAX_COST_USD: ${{ inputs.max-cost-usd }}
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -62,7 +66,7 @@ jobs:
           set -euo pipefail
           python - <<'PY'
           import os, sys
-          raw = os.environ.get("INPUT_MAX_COST_USD", "5").strip()
+          raw = os.environ.get("MAX_COST_USD", "5").strip()
           try:
               value = float(raw)
           except ValueError as exc:
@@ -73,9 +77,6 @@ jobs:
               raise SystemExit(1)
           print(f"Soft per-model cost cap: ${value:.6f}")
           PY
-        env:
-          INPUT_MAX_COST_USD: ${{ inputs.max-cost-usd }}
-
       - name: Deterministic gates before paid calls
         run: |
           set -euo pipefail
@@ -91,30 +92,30 @@ jobs:
 
       - name: Record cassettes
         run: |
-          set -uo pipefail
+          set -euo pipefail
           mkdir -p reports
-          if [ "${{ inputs.model }}" = "all" ]; then
-            ./scripts/record_all_models.sh --max-cost-usd "${{ inputs.max-cost-usd }}"
+          if [ "$BENCHMARK_MODEL" = "all" ]; then
+            ./scripts/record_all_models.sh --max-cost-usd "$MAX_COST_USD"
           else
             python scripts/record_model.py \
-              --model "${{ inputs.model }}" \
-              --max-cost-usd "${{ inputs.max-cost-usd }}"
+              --model "$BENCHMARK_MODEL" \
+              --max-cost-usd "$MAX_COST_USD"
           fi
 
       - name: Offline verification (no API key)
         run: |
           set -euo pipefail
           unset OPENROUTER_API_KEY || true
-          if [ "${{ inputs.model }}" = "all" ]; then
+          if [ "$BENCHMARK_MODEL" = "all" ]; then
             ./scripts/verify_all_models.sh
             python scripts/vcr_precommit.py --all-models
             python scripts/check_cassette_policy.py
           else
             LLM_PROVIDER=openrouter \
-            LLM_MODEL="${{ inputs.model }}" \
+            LLM_MODEL="$BENCHMARK_MODEL" \
             VCR_MODE=playback \
             pytest tests/llm/test_scenarios.py --run-llm --vcr-mode=playback -q
-            python scripts/vcr_precommit.py --model "${{ inputs.model }}"
+            python scripts/vcr_precommit.py --model "$BENCHMARK_MODEL"
           fi
           python scripts/benchmark_report.py
 
