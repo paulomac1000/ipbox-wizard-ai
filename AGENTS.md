@@ -35,6 +35,7 @@ Sprzeczność między źródłami jest błędem. Nie wybieraj wygodniejszej wers
 - model dostaje tylko aktywne reguły (`true`) i zwraca wyłącznie `status`, `stops`, `reviews`;
 - parser nie naprawia Markdown ani innych odchyleń od czystego JSON;
 - fakt lub kod nieaktywny nie może pojawić się w promptcie modelu;
+- `returned_model` musi być identyczny z modelem żądanym podczas live runu, playbacku i pre-commit;
 - playback nigdy nie wykonuje live requestu;
 - playback i pre-commit odrzucają `finish_reason` inny niż `stop`;
 - tryb record nie nadpisuje istniejącej kasety;
@@ -63,8 +64,8 @@ python scripts/check_cassette_policy.py
 for script in scripts/*.sh dump-to-md.sh; do bash -n "$script"; done
 ```
 
-Stan bazowy po audycie protokołu: 181 testów, 94,32% coverage, 36 kontrolowanych skipów LLM.
+Stan bazowy po audycie protokołu: 184 testy, 94,32% coverage, 36 kontrolowanych skipów LLM.
 
 ## Nagrywanie
 
-Nagrywaj przez `scripts/record_model.py`. Po zmianie requestu, algorytmu, scenariusza lub schematu usuń wyłącznie unieważnione kasety. Wydanie wymaga 36/36 dla każdego z dziewięciu modeli (324/324), czystego JSON bez Markdown fences, playbacku bez sekretu, kontroli manifestu i raportu niezależnego agenta.
+Nagrywaj przez `scripts/record_model.py`. Po zmianie requestu, algorytmu, scenariusza lub schematu usuń wyłącznie unieważnione kasety. Wydanie wymaga 36/36 dla każdego z dziewięciu modeli (324/324), czystego JSON bez Markdown fences, zgodnego modelu zwróconego, playbacku bez sekretu, kontroli manifestu i raportu niezależnego agenta.
