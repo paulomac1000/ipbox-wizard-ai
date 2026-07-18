@@ -1,20 +1,22 @@
 # Algorytm IP Box — kontrakt deterministyczny-first
 
-> Narzędzie wspiera przygotowanie danych; nie zastępuje porady podatkowej. Reguły zweryfikowano 17 lipca 2026 r. dla scenariuszy 2025, z jawnymi limitami 2026. Inny rok wymaga aktualizacji źródeł i testów.
+> Narzędzie wspiera przygotowanie i kontrolę danych. Nie zastępuje interpretacji indywidualnej ani porady podatkowej. Reguły roczne są wersjonowane dla każdego roku istnienia IP Box: 2019–2026. Rok spoza tego zakresu jest blokowany, a nie liczony według „najbliższych” zasad.
 
 ## 1. Zasady nadrzędne
 
-1. Każda liczba pochodzi z kalkulatora Python.
-2. Brak danych, kursu, limitu lub dowodu jest błędem albo REVIEW, nigdy automatycznym zerem.
+1. Każda liczba pochodzi z deterministycznego kodu Python.
+2. Brak danych, kursu, limitu, semantyki pola lub dowodu jest błędem albo REVIEW, nigdy automatycznym zerem.
 3. Oznaczaj źródło decyzji: `[PRZEPIS]`, `[DOWÓD]`, `[POLITYKA]`, `[HEURYSTYKA]`.
-4. Rozdziel: przychód IP/NIE, alokację `MIX` i NEXUS.
-5. `W` nie jest automatycznie kluczem `MIX` ani NEXUS.
-6. KIS lub udokumentowana polityka ma pierwszeństwo przed heurystyką.
-7. Po STOP status to `STOPPED`, a finalne liczby i klasyfikacje są zerowane.
+4. Rozdziel cztery decyzje: kwalifikację przychodu, metodę podziału przychodu IP/NIE, alokację kosztów `MIX` oraz NEXUS.
+5. `W` nie jest automatycznie kluczem `MIX`, NEXUS ani dowodem kwalifikacji IP.
+6. Interpretacja KIS lub inna udokumentowana polityka ma pierwszeństwo przed domyślną heurystyką, ale jej treść i faktyczne wdrożenie wymagają zgodności.
+7. Po aktywacji STOP status to `STOPPED`, a finalne liczby, klasyfikacje i rozliczenie są zerowane.
+8. Zeznanie musi uzgadniać się z ewidencją nie tylko sumą globalną, lecz także osobno w przychodach i kosztach IP/NIE.
+9. Testy i przykłady używają wyłącznie danych syntetycznych. Nie kopiuj danych podatnika, identyfikatorów, kontrahentów ani dokładnych rozliczeń do repozytorium.
 
 ## 2. Dane i kwalifikacja
 
-Zbierz rok, formę opodatkowania, kwalifikowane IP, sposób komercjalizacji, umowy, ewidencję B+R, faktury, KPiR, waluty i daty płatności, ZUS, zdrowotną, ulgi, straty, zaliczki i KIS.
+Zbierz rok, formę opodatkowania, kwalifikowane IP, sposób komercjalizacji, umowy, raporty pracy, ewidencję B+R, faktury, KPiR, waluty i daty płatności, ZUS, zdrowotną, ulgi, straty, zaliczki, PIT/IP, zeznanie oraz KIS.
 
 | Fakt | Kod |
 |---|---|
@@ -23,23 +25,67 @@ Zbierz rok, formę opodatkowania, kwalifikowane IP, sposób komercjalizacji, umo
 | `no_qualifying_ip_income_after_complete_evidence` | `STOP_03` |
 | `rd_work_absent` | `STOP_04` |
 | `ip_claim_without_required_records` | `STOP_08` |
+| `revenue_allocation_inconsistent` | `STOP_09` |
+| `invoice_percentage_double_applied` | `STOP_10` |
+| `allocation_method_changed_without_evidence` | `STOP_11` |
+| `return_ledger_reconciliation_failed` | `STOP_12` |
+| `rd_ip_relief_not_available_for_year` | `STOP_13` |
+| `year_limit_exceeded` | `STOP_14` |
+| `health_deduction_mode_invalid_for_year` | `STOP_15` |
+| `unsupported_tax_year` | `STOP_16` |
 | `social_contributions_double_counted` | `ZUS_DOUBLE_DIP` |
 | `health_contribution_double_counted` | `HEALTH_DOUBLE_DIP` |
 
-Kod istnieje wtedy i tylko wtedy, gdy odpowiadający fakt jest `true`. Brak KIS nie jest STOP-em.
+Kod istnieje wtedy i tylko wtedy, gdy odpowiadający fakt jest `true`. Brak KIS sam w sobie nie jest STOP-em.
 
-## 3. Współczynnik W
+## 3. Współczynnik W — najpierw semantyka
+
+Nie wolno zgadywać, czy procent faktury i godziny NIE-IP opisują te same, rozłączne czy warunkowe części wynagrodzenia. Polityka `W.metoda` jest obowiązkowa, gdy oba pola są używane w rozliczeniu historycznym lub ich znaczenie nie jest oczywiste.
+
+### `conditional_product`
+
+Procent faktury jest drugim filtrem stosowanym do czasu potencjalnie kwalifikowanego:
 
 ```text
-W = ((godziny_pracy - godziny_nie_IP) × procent_faktury_IP / 100)
-    / godziny_pracy × 100
+W = ((godziny_pracy - godziny_nie_IP) / godziny_pracy)
+    × procent_faktury_IP
 ```
 
-Mianownik to faktyczne godziny pracy. `W<50%` daje `REVIEW_02`, `W>95%` — `REVIEW_01`, skok >30 p.p. — `REVIEW_08`. Wiele projektów wymaga W per projekt, średniej ważonej przychodem i `REVIEW_04`.
+### `disjoint_components`
+
+Procent faktury i godziny NIE-IP opisują rozłączne części tej samej faktury:
+
+```text
+W = procent_faktury_IP
+    - godziny_nie_IP / godziny_pracy
+```
+
+### `time_only`
+
+Udokumentowana polityka używa wyłącznie czasu:
+
+```text
+W = (godziny_pracy - godziny_nie_IP) / godziny_pracy
+```
+
+Każda metoda musi dawać wynik `0 ≤ W ≤ 1`. Mianownik to faktyczne godziny pracy. `W<50%` daje `REVIEW_02`, `W>95%` — `REVIEW_01`, skok >30 p.p. — `REVIEW_08`. Wiele projektów wymaga W per projekt, średniej ważonej przychodem i `REVIEW_04`.
+
+Kontrola miesięczna rozpoznaje między innymi: zastosowanie procentu raz, zastosowanie go dwukrotnie, oba warianty W, sam czas i przypisanie 100% faktury. Niezgodność z zadeklarowaną metodą, podwójny procent lub niejawna zmiana metody w trakcie roku aktywują STOP.
 
 ## 4. Przychód IP/NIE
 
-Dozwolone metody: `dokumentowa`, `czasowa_W`, `produktowa`, `z_interpretacji`, `custom`. Metoda niedokumentowa wymaga jawnego klucza 0–1 i źródła. Brak dowodu kwalifikacji oznacza NIE. Ujemna faktura jest błędem. Różnice kursowe pozostają poza przychodem kwalifikowanym.
+Dozwolone metody: `dokumentowa`, `czasowa_W`, `produktowa`, `z_interpretacji`, `custom`. Metoda niedokumentowa wymaga jawnego klucza 0–1, źródła i uzasadnienia. Brak dowodu kwalifikacji oznacza NIE. Ujemna faktura jest błędem. Różnice kursowe pozostają poza przychodem kwalifikowanym.
+
+Dla każdego miesiąca zachowaj:
+
+- kwotę całkowitą,
+- kwotę IP i NIE,
+- metodę i wersję polityki,
+- dane wejściowe do W,
+- wynik W,
+- dowód podziału.
+
+`IP + NIE` musi równać się fakturze co do grosza. Algorytm odrzuca arkusz, w którym część miesięcy używa procentu dwukrotnie, a inne przypisują 100% przychodu bez jawnej zmiany polityki.
 
 ## 5. Koszty dochodowe
 
@@ -52,7 +98,7 @@ IDE, chmura, serwer, repozytorium i sprzęt są domyślnie `MIX`, chyba że istn
 
 ## 6. Alokacja MIX
 
-Dla `przychodowa_roczna`:
+### `przychodowa_roczna`
 
 ```text
 klucz_MIX = przychód_IP_roczny / przychód_całkowity_roczny
@@ -62,14 +108,26 @@ MIX_NIE   = MIX - MIX_IP
 
 Koszt miesięczny jest `DEFERRED` do true-up. Klucz `0.0` jest wartością, nie brakiem danych.
 
-Dla wspólnych kosztów wielu IP:
+### `przychodowa_w_dacie_kosztu`
+
+Każdy koszt wspólny otrzymuje klucz z miesiąca jego poniesienia:
+
+```text
+klucz_miesiąca = przychód_IP_miesiąca / przychód_całkowity_miesiąca
+koszt_IP        = koszt_MIX × klucz_miesiąca
+koszt_NIE       = koszt_MIX - koszt_IP
+```
+
+Mianownik miesiąca musi być dodatni. Każda pozycja przechowuje miesiąc, klucz, źródło, wynik IP/NIE i ślad dowodowy. Metoda ta nie jest synonimem rocznego true-up i nie może zostać po cichu zastąpiona `W`.
+
+### Wiele IP
 
 ```text
 stage1 = MIX × przychód_software_IP / przychód_całkowity
 IP_i   = stage1 × przychód_IP_i / przychód_software_IP
 ```
 
-Oba mianowniki muszą być dodatnie. Podział zachowuje grosze. To tylko alokacja kosztu wspólnego; pełne rozliczenie wielu IP wymaga osobnej ewidencji przychodów, kosztów, NEXUS, dochodów i strat per IP.
+Oba mianowniki muszą być dodatnie. Podział zachowuje grosze. Pełne rozliczenie wielu IP wymaga osobnej ewidencji przychodów, kosztów, NEXUS, dochodów i strat per prawo.
 
 ## 7. NEXUS
 
@@ -89,44 +147,72 @@ A — własne B+R; B — wyniki B+R od niepowiązanego; C — od powiązanego; D
 
 Użyj kursu NBP z właściwego poprzedniego dnia roboczego i zapisz kurs oraz datę. Przy metodzie memoriałowej data płatności jest konieczna do różnicy kursowej. Faktura walutowa zapisuje kwotę i walutę źródłową, datę wystawienia i zapłaty, daty kursów, wartości kursów oraz źródło. Różnica jest wyliczana z tych danych; ręczne pole `różnica_kursowa` jest odrzucane. Brak kursu lub daty jest błędem. Dodatnia różnica zwiększa NIE, ujemna staje się kosztem `NON`.
 
-## 9. Kaskada podatkowa
+## 9. Reguły roczne 2019–2026
 
-### 9.1 Ulga B+R i IP Box
+IP Box istnieje od 2019 r. Rok wcześniejszy lub późniejszy niż ostatni zweryfikowany jest `STOP_16`.
 
-Nie używaj pola `ulga_BR`. Podaj:
+| Rok | IKZE przedsiębiorcy | Zdrowotna — sposób obsługi | Limit liniowy |
+|---|---:|---|---:|
+| 2019 | 5 718,00 | udokumentowane odliczenie od podatku według zasad do 2021 r. | brak stałej kwoty rocznej |
+| 2020 | 6 272,40 | jak wyżej | brak stałej kwoty rocznej |
+| 2021 | 9 466,20 | jak wyżej | brak stałej kwoty rocznej |
+| 2022 | 10 659,60 | dochód albo KUP przy liniowym | 8 700,00 |
+| 2023 | 12 483,00 | dochód albo KUP przy liniowym | 10 200,00 |
+| 2024 | 14 083,20 | dochód albo KUP przy liniowym | 11 600,00 |
+| 2025 | 15 611,40 | dochód albo KUP przy liniowym | 12 900,00 |
+| 2026 | 16 956,00 | dochód albo KUP przy liniowym | 14 100,00 |
 
-- `ulga_BR_IP` — kwalifikowane odliczenie przypisane do dochodu z kwalifikowanego IP;
-- `ulga_BR_NIE` — część przypisana do pozostałej działalności;
-- `ulga_BR_limit_odliczenia` — udokumentowany limit po zastosowaniu właściwego procentu.
+Dla 2019–2021 zdrowotna używa osobnego pola `odliczenie_zdrowotne_od_podatku`; dla 2022+ używa `odliczenie_zdrowotne_od_dochodu` albo udokumentowanego kosztu. Mieszanie trybów aktywuje `STOP_15`. Kwoty ponad limit nie są obcinane, lecz aktywują `STOP_14`.
 
-`ulga_BR_IP` pomniejsza dochód kwalifikowanego IP przed zastosowaniem NEXUS. Suma części IP i NIE nie może przekroczyć limitu ani sumy kosztów oznaczonych odpowiednio `br_relief_bucket`, `br_relief_amount` i `br_evidence`.
+Skala:
 
-### 9.2 Straty
+- 2019: 17,75% / 32%, próg 85 528 zł i historyczna zmienna kwota zmniejszająca;
+- 2020–2021: 17% / 32%, próg 85 528 zł i historyczna zmienna kwota zmniejszająca;
+- 2022–2026: 12% / 32%, próg 120 000 zł i kwota zmniejszająca 3 600 zł.
 
-`strata_NIE_z_lat_poprzednich` pomniejsza wyłącznie dochód pozostałej działalności. Nie używaj `straty_poprzednie`. Strata kwalifikowanego IP wymaga identyfikacji konkretnego prawa i osobnej ewidencji; oracle agregujący jej nie zgaduje.
+Jednoczesne pomniejszenie dochodu IP o ulgę B+R jest obsługiwane dopiero od 2022 r. Dodatnia `ulga_BR_IP` dla 2019–2021 aktywuje `STOP_13`.
 
-### 9.3 Podatek liniowy
+## 10. Kaskada podatkowa
 
-Obsługiwane są wcześniej zweryfikowane kwoty: strata NIE, ZUS społeczne, zdrowotna do limitu i bez dubla, IKZE, B+R oraz termomodernizacja. Zwykłe darowizny, internet, rehabilitacja i dziecko są odrzucane. Dodatkowe dochody opodatkowane skalą wymagają osobnego obliczenia zeznania skali i nie są mieszane z PIT-36L.
+### B+R i IP Box
 
-### 9.4 Skala
+Nie używaj niejednoznacznego pola `ulga_BR`. Podaj `ulga_BR_IP`, `ulga_BR_NIE` oraz `ulga_BR_limit_odliczenia`. `ulga_BR_IP` pomniejsza dochód kwalifikowanego IP przed NEXUS. Kwoty nie mogą przekroczyć udokumentowanych kosztów B+R ani limitu właściwego dla podatnika.
 
-Dochód działalności na skali łączy się z `dochody_dodatkowe_skala`. Kalkulator liczy podatek od pełnej wspólnej podstawy. Strata działalności i `ulga_BR_NIE` nie mogą konsumować dochodu z pracy; ZUS, IKZE, darowizny, internet, rehabilitacja i termomodernizacja pomniejszają odpowiednią wspólną podstawę zgodnie z kontraktem.
+### Straty
 
-Zwykłe darowizny mają wspólny limit 6%, internet limit 760 zł. Warunki osobiste i historyczne muszą być zweryfikowane przed przekazaniem kwoty. Dodatnia darowizna, internet, rehabilitacja albo ulga na dziecko wymaga rekordu `ulgi.weryfikacja` z `zweryfikowana=true`, kategorią i odwołaniem do dowodu.
+`strata_NIE_z_lat_poprzednich` pomniejsza wyłącznie dochód pozostałej działalności. Strata kwalifikowanego IP wymaga identyfikacji konkretnego prawa i osobnej ewidencji.
 
-### 9.5 Limity roczne
+### Podatek liniowy
 
-Oracle zawiera zweryfikowane limity przedsiębiorcy:
+Obsługiwane są właściwe dla roku kwoty: strata NIE, ZUS społeczne, zdrowotna bez dubla, IKZE, B+R oraz termomodernizacja. Zwykłe darowizny, internet, rehabilitacja i dziecko są odrzucane. Dodatkowe dochody skali wymagają osobnego obliczenia zeznania skali.
 
-| Rok | zdrowotna liniowa | IKZE przedsiębiorcy |
-|---|---:|---:|
-| 2025 | 12 900 zł | 15 611,40 zł |
-| 2026 | 14 100 zł | 16 956 zł |
+### Skala
 
-Dodatnie odliczenie dla innego roku jest blokowane do aktualizacji źródeł i testów. Identyfikator miesiąca ma ścisły format `YYYY-MM` i musi należeć do `input.rok`. Pula termomodernizacji jest ograniczona do 53 000 zł na podatnika; niewykorzystaną część można przenosić zgodnie z odrębnymi warunkami ustawowymi.
+Dochód działalności łączy się z `dochody_dodatkowe_skala`. Strata działalności i `ulga_BR_NIE` nie mogą konsumować dochodu z pracy; wspólne odliczenia pomniejszają odpowiednią łączną podstawę. Darowizny mają limit 6%, internet 760 zł i wymagają zweryfikowanego dowodu.
 
-## 10. TEST 1–9
+### Termomodernizacja
+
+Preferowane wejście to lista pul z rokiem pierwszego wydatku, kwotą pozostałą i odwołaniem do dowodu. Najstarsze ważne pule są zużywane jako pierwsze. Kwota niewykorzystana może być przenoszona nie dłużej niż sześć lat liczonych od końca roku pierwszego wydatku; kwota wygasła jest jawnie raportowana. Łączna pula podatnika nie może przekroczyć 53 000 zł. Nie podawaj jednocześnie listy pul i jednej zbiorczej puli.
+
+## 11. Uzgodnienie ewidencji, PIT/IP i zeznania
+
+Przed finalizacją porównaj osobno:
+
+```text
+przychód_IP_ewidencja  == przychód_IP_zeznanie
+przychód_NIE_ewidencja == przychód_NIE_zeznanie
+koszt_IP_ewidencja     == koszt_IP_zeznanie
+koszt_NIE_ewidencja    == koszt_NIE_zeznanie
+```
+
+Równość samych sum `IP+NIE` nie wystarcza. Przesunięcie między koszykami przy zachowaniu sumy aktywuje `STOP_12`. Korekta zeznania rozdziela:
+
+- pierwotny podatek i pierwotną nadpłatę,
+- poprawiony podatek i poprawioną nadpłatę,
+- kwotę zwrotu już wypłaconą,
+- dodatkowy zwrot albo kwotę do zwrotu/zaliczenia.
+
+## 12. TEST 1–9
 
 Python ustala:
 
@@ -135,14 +221,14 @@ Python ustala:
 - `TEST_3` — brak podwójnego ZUS/zdrowotnej;
 - `TEST_4` — nieujemne podstawy i carry-over;
 - `TEST_5` — zgodny podatek IP;
-- `TEST_6` — zgodny podatek łączny;
+- `TEST_6` — zgodny podatek łączny z historycznym odliczeniem zdrowotnym;
 - `TEST_7` — zgodna metoda MIX;
 - `TEST_8` — jawny NEXUS kwalifikowanego MIX;
 - `TEST_9` — opis projektu przy przychodzie.
 
-Model nie zmienia FAIL na PASS.
+Dodatkowe strażniki alokacji, limitów rocznych i uzgodnienia zeznania aktywują STOP przed raportem. Model nie zmienia FAIL na PASS.
 
-## 11. REVIEW
+## 13. REVIEW
 
 | Fakt | Kod |
 |---|---|
@@ -154,12 +240,12 @@ Model nie zmienia FAIL na PASS.
 | `uses_kis_interpretation` | `REVIEW_16` |
 | `kis_implementation_requires_confirmation` | `REVIEW_17` |
 
-## 12. Kontrakt modelu
+## 14. Kontrakt modelu
 
-Python wyznacza liczby, klasyfikacje, TEST-y i pełne `decision_facts`. Runner odrzuca wszystkie fakty `false` i tworzy `active_rules` wyłącznie z faktów prawdziwych. Każda aktywna reguła zawiera wyłącznie `kind` i gotowy `code`; nazwa faktu nie jest modelowi potrzebna. Model nie widzi reguł nieaktywnych i zwraca wyłącznie czysty JSON bez Markdown fences:
+Python wyznacza liczby, klasyfikacje, TEST-y i pełne `decision_facts`. Runner usuwa fakty `false` i tworzy wyłącznie prawdziwe `active_rules`. Model nie widzi surowych danych podatkowych ani nieaktywnych reguł. Zwraca czysty JSON:
 
 ```json
 {"status":"FINAL","stops":[],"reviews":["REVIEW_09"]}
 ```
 
-Aplikacja składa i waliduje raport. Model kopiuje kod każdej `active_rule` do właściwej listy, nie analizuje nazw faktów ani surowych danych i nie dodaje kodu nieobecnego w aktywnych regułach. `status=STOPPED`, gdy aktywna jest co najmniej jedna reguła STOP; inaczej `FINAL`.
+Aplikacja składa i waliduje raport. Model kopiuje każdy aktywny kod do właściwej listy, nie dodaje kodów nieobecnych w `active_rules` i nie wykonuje obliczeń podatkowych.
