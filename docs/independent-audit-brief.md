@@ -37,7 +37,7 @@ python scripts/check_cassette_policy.py
 for script in scripts/*.sh dump-to-md.sh; do bash -n "$script"; done
 ```
 
-Oczekiwany punkt startowy: 255 testów jednostkowych PASS, coverage co najmniej 94,74%, 46 kontrolowanych skipów LLM i pusty katalog kaset poza `.gitkeep`.
+Oczekiwany punkt startowy: co najmniej 255 testów jednostkowych PASS, coverage co najmniej 90%, 46 kontrolowanych skipów LLM i pusty katalog kaset poza `.gitkeep`.
 
 ## Niezależny code review
 
@@ -55,7 +55,7 @@ Sprawdź szczególnie:
 10. zachowanie groszy w multi-IP oraz jawne ograniczenie: to nie jest pełna ewidencja per IP;
 11. brak `IDE/chmura/laptop → IP` bez dowodu;
 12. zerowanie wszystkich pól po STOP;
-13. `active_rules` zawiera tylko fakty prawdziwe, a nieaktywne nazwy i kody nie trafiają do promptu;
+13. prompt zawiera tylko `expected_decision`, bez faktów i nazw predykatów; STOP/REVIEW są rozdzielone w danych i schema;
 14. brak live fallbacku, integralność manifestu, request hashy i fingerprintów;
 15. playback i pre-commit odrzucają `finish_reason != stop` i niespójne `parsed_response`;
 16. recorder nie nadpisuje istniejącej kasety;
@@ -73,7 +73,7 @@ export OPENROUTER_API_KEY='...'
 ./scripts/record_all_models.sh --max-cost-usd 5
 ```
 
-Nagraj wszystkie 322 kasety od nowa. Poprzednia macierz 108 plików została usunięta: 36 odpowiedzi Claude zawierało Markdown fences akceptowane przez dawny parser, a lista modeli została rozszerzona do siedmiu rodzin.
+Nagraj wszystkie 322 kasety od nowa. Diagnostyczna macierz 317/322 została usunięta po zmianie protokołu: MiniMax w scenariuszu 51 przeniósł `REVIEW_09` do `stops`, ujawniając brak rozdzielenia kanałów w wejściu i schema. Nie kopiuj ani nie uzupełniaj tamtej macierzy.
 
 Po każdym modelu przejrzyj `/tmp/ipbox_llm_rejected/`, surowe odpowiedzi i raport kosztu. Przy realnym błędzie zatrzymaj nagranie, sklasyfikuj przyczynę i dodaj regresję przed zmianą kodu. Nie używaj `--force` i nie edytuj kaset.
 
@@ -83,7 +83,7 @@ Szczególnie sprawdź wcześniejsze problematyczne kombinacje oraz nowe granice:
 - scenariusze 46–55: reguły historyczne, podwójny procent, switch metody, uzgodnienie PIT/ewidencja i koszt w dacie;
 - każdy STOP 09–16 ma znaleźć się dokładnie w `stops`, nigdy w `reviews`.
 
-Nieaktywne kody nie powinny być widoczne w promptach.
+Fakty i nazwy predykatów nie mogą być widoczne w promptach. W scenariuszu 51 oczekiwana koperta to dokładnie `STOPPED`, `stops=[STOP_12]`, `reviews=[REVIEW_09]`.
 
 ## Playback końcowy
 

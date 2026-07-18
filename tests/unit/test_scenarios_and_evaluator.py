@@ -9,14 +9,12 @@ from jsonschema import Draft202012Validator
 
 from tests.llm.evaluator import Evaluator
 from tests.llm.oracle import (
-    REVIEW_FACT_TO_CODE,
-    STOP_FACT_TO_CODE,
     ScenarioError,
     compute_reference,
     derive_decision_codes,
     validate_scenario,
 )
-from tests.llm.output_schema import OUTPUT_JSON_SCHEMA
+from tests.llm.output_schema import DECISION_JSON_SCHEMA, OUTPUT_JSON_SCHEMA
 from tests.llm.runner import (
     LLMTestRunner,
     build_decision_protocol,
@@ -235,56 +233,71 @@ def test_year_dependent_limits_fail_closed() -> None:
     assert "STOP_16" in health_reference["stops_reviews"]["stops"]
 
 
-def test_runner_exposes_only_active_decision_rules() -> None:
+def test_runner_exposes_only_authoritative_decision_envelope() -> None:
     import json
 
-    loaded = scenario("01_basic_linear")
+    loaded = scenario("51_return_ledger_classification_shift_stop")
     reference = compute_reference(loaded)
-    expected = []
-    for kind, mapping in (("STOP", STOP_FACT_TO_CODE), ("REVIEW", REVIEW_FACT_TO_CODE)):
-        expected.extend(
-            {"kind": kind, "code": code}
-            for fact, code in mapping.items()
-            if reference["decision_facts"].get(fact) is True
-        )
     context = build_tool_context(reference)
-    assert context == {"active_rules": expected}
+    assert context == {
+        "expected_decision": {
+            "status": "STOPPED",
+            "stops": ["STOP_12"],
+            "reviews": ["REVIEW_09"],
+        }
+    }
 
     serialized = json.dumps(context, ensure_ascii=False)
-    assert "claimed_ip_without_qualified_right" not in serialized
-    assert "STOP_02" not in serialized
-    assert "REVIEW_09" in serialized
+    assert "return_ledger_reconciliation_failed" not in serialized
+    assert "single_positive_revenue_client" not in serialized
+    assert "decision_facts" not in serialized
 
     prompt = LLMTestRunner(None).build_prompt("ignored human documentation", loaded)
-    assert "ACTIVE RULES" in prompt
+    assert "AUTHORITATIVE DECISION ENVELOPE" in prompt
+    assert "expected_decision" in prompt
+    assert "active_rules" not in prompt
     assert "deterministic_report" not in prompt
     assert '"result"' not in prompt
-    assert "active_rules" in prompt
-    assert "claimed_ip_without_qualified_right" not in prompt
-    assert "STOP_02" not in prompt
+    assert "return_ledger_reconciliation_failed" not in prompt
     assert "single_positive_revenue_client" not in prompt
-    assert "status, stops, and reviews" in prompt
 
 
-def test_decision_protocol_describes_copying_active_rules_only() -> None:
+def test_decision_protocol_keeps_stop_and_review_channels_independent() -> None:
     protocol = build_decision_protocol()
-    assert "active_rules contains only rules" in protocol
-    assert "Do not invent, omit, or duplicate" in protocol
-    assert "status is STOPPED" in protocol
+    assert "Copy expected_decision.stops exactly" in protocol
+    assert "Copy expected_decision.reviews exactly" in protocol
+    assert "A STOP never moves, suppresses, or converts a REVIEW code" in protocol
+    assert "Do not invent, omit, duplicate, or reclassify" in protocol
     assert "Markdown fences" in protocol
-    assert "unsupported_tax_form" not in protocol
     assert "STOP_01" not in protocol
+    assert "REVIEW_09" not in protocol
 
 
-def test_active_rules_include_stop_only_when_the_stop_fact_is_true() -> None:
+def test_decision_schema_rejects_cross_channel_codes() -> None:
+    validator = Draft202012Validator(DECISION_JSON_SCHEMA["schema"])
+    review_in_stops = {
+        "status": "STOPPED",
+        "stops": ["STOP_12", "REVIEW_09"],
+        "reviews": [],
+    }
+    stop_in_reviews = {
+        "status": "STOPPED",
+        "stops": ["STOP_12"],
+        "reviews": ["STOP_12"],
+    }
+    assert list(validator.iter_errors(review_in_stops))
+    assert list(validator.iter_errors(stop_in_reviews))
+
+
+def test_authoritative_envelope_preserves_empty_and_nonempty_stop_channels() -> None:
     final_context = build_tool_context(compute_reference(scenario("01_basic_linear")))
     stopped_context = build_tool_context(
         compute_reference(scenario("14_lump_sum_ineligible_check"))
     )
-    assert not any(item["kind"] == "STOP" for item in final_context["active_rules"])
-    assert {item["code"] for item in stopped_context["active_rules"] if item["kind"] == "STOP"} == {
-        "STOP_01"
-    }
+    assert final_context["expected_decision"]["stops"] == []
+    assert final_context["expected_decision"]["status"] == "FINAL"
+    assert stopped_context["expected_decision"]["stops"] == ["STOP_01"]
+    assert stopped_context["expected_decision"]["status"] == "STOPPED"
 
 
 def test_runner_assembles_deterministic_report_after_small_model_decision() -> None:

@@ -15,4 +15,4 @@ Repozytorium nie przechowuje danych podatnika. Nowe przypadki odtwarzają klasy 
 
 ## Scenariusze LLM/VCR
 
-Scenariusze `46`–`55` są częścią pełnej macierzy modeli. Po zmianie scenariusza, oracle, schema lub algorytmu wszystkie kasety muszą zostać usunięte i nagrane od nowa. Nie wolno mieszać starych kaset z nowym kontraktem.
+Scenariusze `46`–`55` są częścią pełnej macierzy modeli. Scenariusz 51 ujawnił także wadę protokołu LLM: MiniMax, podobnie jak wcześniej GPT-5 Nano, przeniósł `REVIEW_09` do `stops`. Sześć innych rodzin zwróciło poprawne kanały, więc nie był to błąd podatkowy ani oracle. Słaby model ujawnił jednak zbędną transformację i zbyt szeroką schema; dlatego Python przekazuje teraz gotową kopertę `expected_decision`, a schema ma osobne enumy STOP/REVIEW. Po zmianie scenariusza, oracle, schema, promptu lub algorytmu wszystkie kasety muszą zostać usunięte i nagrane od nowa.

@@ -9,6 +9,26 @@ NONNEGATIVE_MONEY = {"type": "number", "minimum": 0}
 FRACTION = {"type": "number", "minimum": 0, "maximum": 1}
 PERCENTAGE = {"type": "number", "minimum": 0, "maximum": 100}
 CODE = {"type": "string", "pattern": "^[A-Z][A-Z0-9_]*$"}
+LEGACY_STOP_CODES = [
+    "STOP_01",
+    "STOP_02",
+    "STOP_03",
+    "STOP_04",
+    "STOP_08",
+    "ZUS_DOUBLE_DIP",
+    "HEALTH_DOUBLE_DIP",
+]
+REVIEW_CODES = [
+    "REVIEW_01",
+    "REVIEW_02",
+    "REVIEW_04",
+    "REVIEW_08",
+    "REVIEW_09",
+    "REVIEW_16",
+    "REVIEW_17",
+]
+STOP_CODE = {"type": "string", "enum": LEGACY_STOP_CODES}
+REVIEW_CODE = {"type": "string", "enum": REVIEW_CODES}
 
 
 DECISION_JSON_SCHEMA: dict[str, Any] = {
@@ -20,8 +40,8 @@ DECISION_JSON_SCHEMA: dict[str, Any] = {
         "required": ["status", "stops", "reviews"],
         "properties": {
             "status": {"enum": ["FINAL", "STOPPED"]},
-            "stops": {"type": "array", "items": CODE},
-            "reviews": {"type": "array", "items": CODE},
+            "stops": {"type": "array", "items": STOP_CODE, "uniqueItems": True},
+            "reviews": {"type": "array", "items": REVIEW_CODE, "uniqueItems": True},
         },
     },
 }

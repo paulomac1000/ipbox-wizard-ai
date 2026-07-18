@@ -33,9 +33,9 @@ Sprzeczność między źródłami jest błędem. Nie wybieraj wygodniejszej wers
 - dodatnie odliczenie roczne bez zweryfikowanego limitu jest błędem;
 - STOP zeruje finalne liczby i klasyfikacje;
 - TEST 1–9 ustala Python;
-- model dostaje tylko aktywne reguły (`true`) i zwraca wyłącznie `status`, `stops`, `reviews`;
+- Python buduje pełną autorytatywną kopertę `expected_decision`; model kopiuje bez zmian wyłącznie `status`, `stops`, `reviews`;
 - parser nie naprawia Markdown ani innych odchyleń od czystego JSON;
-- fakt lub kod nieaktywny nie może pojawić się w promptcie modelu;
+- fakty podatkowe i nazwy predykatów nie mogą pojawić się w promptcie modelu; kanały STOP i REVIEW są rozdzielone także w JSON Schema;
 - `returned_model` musi być identyczny z modelem żądanym podczas live runu, playbacku i pre-commit;
 - playback nigdy nie wykonuje live requestu;
 - playback i pre-commit odrzucają `finish_reason` inny niż `stop`;
@@ -65,7 +65,7 @@ python scripts/check_cassette_policy.py
 for script in scripts/*.sh dump-to-md.sh; do bash -n "$script"; done
 ```
 
-Stan bazowy po rozszerzeniu regresji: 255 testów jednostkowych, 94,74% coverage i 46 kontrolowanych skipów LLM.
+Stan bazowy po rozszerzeniu regresji: co najmniej 255 testów jednostkowych, coverage powyżej wymaganych 90% i 46 kontrolowanych skipów LLM. Dokładne wartości raportuje CI.
 
 ## Nagrywanie
 

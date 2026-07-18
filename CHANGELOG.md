@@ -5,7 +5,7 @@
 ### Added
 
 - Atomowy kontrakt `decision_facts`; model zwraca wyłącznie `status/stops/reviews`.
-- Kontrakt `active_rules`, który nie pokazuje modelowi fałszywych przesłanek ani nieaktywnych kodów.
+- Autorytatywną kopertę `expected_decision`, która nie pokazuje modelowi faktów podatkowych ani nie wymaga klasyfikowania kodów do kanałów.
 - Fail-closed oracle, evaluator, strict JSON Schema i VCR format 4.
 - Siedmiorodzinny benchmark tanich modeli; rozmiar macierzy jest wyliczany dynamicznie z liczby scenariuszy.
 - Regresje dla wzoru NEXUS podwyższającego A+B.
@@ -52,6 +52,8 @@
 - Retry respektuje `Retry-After`, odpowiedź wymaga `finish_reason=stop`, a playback nie ma live fallbacku.
 - Playback i pre-commit odrzucają niekompletne kasety, a recorder nie nadpisuje istniejącego nagrania.
 - Parser odrzuca Markdown fences zamiast naprawiać odpowiedź modelu.
+- Decision JSON Schema ma oddzielne enumy STOP i REVIEW oraz odrzuca kody w niewłaściwym kanale przed oceną semantyczną.
+- Profil MiniMax używa temperatury `0.0`; scenariusz 51 ma regresję dokładnej koperty `STOP_12` + `REVIEW_09`.
 - Manifest jest porównywany z kasetą także dla `returned_model`, `recorded_at` i kosztu.
 - Recorder odrzuca podmianę zwróconego modelu i wlicza odrzucone płatne wywołania do limitu kosztu.
 - Walidacja wiąże każdy miesiąc z rokiem rozliczenia i egzekwuje limit termomodernizacji 53 000 zł.

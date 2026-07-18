@@ -22,25 +22,29 @@ from .request_spec import LLMRequestSpec
 from .vcr import VCRConfig, VCRRecorder
 
 SYSTEM_PROMPT = (
-    "You execute an already evaluated list of active rules. Python has already "
-    "decided which predicates are true. Every supplied active_rule is active; "
-    "every absent rule is inactive. Do not infer tax facts or add rules. Copy only "
-    "the supplied codes into a strict JSON object, with no Markdown fences."
+    "You copy an authoritative decision envelope already produced by Python. "
+    "The supplied expected_decision contains the final status, STOP codes, and "
+    "REVIEW codes. Copy every field exactly. Never reclassify, move, suppress, "
+    "infer, or add codes. STOP and REVIEW channels remain independent even when "
+    "status is STOPPED. Return a strict JSON object with no Markdown fences."
 )
 RESPONSE_ROOT = Path("/tmp/ipbox_llm_responses")
 
 
 def build_tool_context(reference: dict[str, Any]) -> dict[str, Any]:
-    """Expose only true, authoritative rules; never show inactive facts to the model."""
-    facts = reference["decision_facts"]
-    active_rules: list[dict[str, str]] = []
-    for kind, mapping in (("STOP", STOP_FACT_TO_CODE), ("REVIEW", REVIEW_FACT_TO_CODE)):
-        active_rules.extend(
-            {"kind": kind, "code": code}
-            for fact, code in mapping.items()
-            if facts.get(fact) is True
-        )
-    return {"active_rules": active_rules}
+    """Expose only the authoritative decision envelope; never expose tax facts."""
+    stops = sorted(reference["stops_reviews"]["stops"])
+    reviews = sorted(reference["stops_reviews"]["reviews"])
+    expected_status = "STOPPED" if stops else "FINAL"
+    if reference["status"] != expected_status:
+        raise ValueError("oracle status is inconsistent with its authoritative STOP channel")
+    return {
+        "expected_decision": {
+            "status": expected_status,
+            "stops": stops,
+            "reviews": reviews,
+        }
+    }
 
 
 def build_decision_protocol() -> str:
@@ -48,11 +52,12 @@ def build_decision_protocol() -> str:
     return "\n".join(
         [
             "DECISION PROTOCOL:",
-            "- active_rules contains only rules already evaluated as true by Python.",
-            "- Copy each STOP code to stops and each REVIEW code to reviews.",
-            "- Do not invent, omit, or duplicate any code.",
-            "- status is STOPPED when at least one STOP rule exists; otherwise FINAL.",
-            "- For an empty active_rules list return status=FINAL, stops=[], reviews=[].",
+            "- expected_decision is the complete authoritative result produced by Python.",
+            "- Copy expected_decision.status exactly to status.",
+            "- Copy expected_decision.stops exactly to stops.",
+            "- Copy expected_decision.reviews exactly to reviews.",
+            "- A STOP never moves, suppresses, or converts a REVIEW code.",
+            "- Do not invent, omit, duplicate, or reclassify any code.",
             "- Return one pure JSON object only. Do not use Markdown fences.",
         ]
     )
@@ -93,7 +98,7 @@ class LLMTestRunner:
         payload = build_tool_context(reference)
         return (
             f"{build_decision_protocol()}\n\n"
-            "ACTIVE RULES (all are true):\n"
+            "AUTHORITATIVE DECISION ENVELOPE (copy exactly):\n"
             f"{json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(',', ':'))}\n\n"
             "Return only status, stops, and reviews according to the schema. "
             "Do not return the financial report; the system attaches it deterministically.\n"

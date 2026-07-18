@@ -4,7 +4,7 @@
 
 Pobrać najnowszy branch `fix/decouple-mix-allocation-from-w`, uruchomić wszystkie bezpłatne bramki, potwierdzić pusty katalog VCR i nagrać kompletną macierz od zera dla dokładnych modeli z `tests/llm/models.py`.
 
-Punkt docelowy: **46 scenariuszy × 7 modeli = 322 świeże kasety oraz 7 manifestów**.
+Punkt docelowy: **46 scenariuszy × 7 modeli = 322 świeże kasety oraz 7 manifestów**. Macierz 317/322 z HEAD `b9b6f04` jest wyłącznie materiałem diagnostycznym i została unieważniona po zmianie promptu, schematu i profilu MiniMax.
 
 ## Kroki
 
@@ -44,7 +44,7 @@ bash scripts/vcr_smoke.sh
 - wszystkie testy deterministyczne i playback przechodzą bez klucza API;
 - nie zmieniać oracle ani expected values pod odpowiedź modelu;
 - w razie odrzucenia zachować pliki z `/tmp/ipbox_llm_rejected/<model>/` i opisać przyczynę przed ponowieniem;
-- ręcznie przejrzeć scenariusze 46–55 i potwierdzić poprawne kanały STOP 09–16;
+- ręcznie przejrzeć scenariusze 46–55; dla scenariusza 51 potwierdzić dokładnie `stops=[STOP_12]` i `reviews=[REVIEW_09]`, bez przenoszenia kodów między kanałami;
 - wypchnąć kasety na ten sam branch;
 - po wypchnięciu wywołać świeże `@coderabbitai review`, przeanalizować nowe uwagi na aktualnym HEAD i poprawić tylko zasadne;
 - nie mergować PR i nie oznaczać go ready przed kompletnym playbackiem, świeżym review i niezależnym werdyktem.

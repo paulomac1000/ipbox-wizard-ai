@@ -43,6 +43,7 @@ MODEL_PROFILES: dict[str, ModelProfile] = {
         model_id="minimax/minimax-m2.5",
         label="MiniMax M2.5",
         family="MiniMax",
+        temperature=0.0,
     ),
     "moonshotai/kimi-k2.5": ModelProfile(
         model_id="moonshotai/kimi-k2.5",

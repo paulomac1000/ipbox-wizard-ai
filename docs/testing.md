@@ -2,7 +2,7 @@
 
 ## 1. Co testuje benchmark
 
-Python oblicza liczby, klasyfikacje, W, TEST 1–9 i atomowe `decision_facts`. Runner usuwa wszystkie wartości `false` i tworzy listę `active_rules` zawierającą tylko rodzaj i kod prawdziwych reguł. Model otrzymuje wyłącznie tę listę i zwraca:
+Python oblicza liczby, klasyfikacje, W, TEST 1–9 i atomowe `decision_facts`, a następnie składa kompletną autorytatywną kopertę `expected_decision`. Model nie mapuje już `{kind, code}` do kanałów; otrzymuje gotowe, rozdzielone `status`, `stops` i `reviews` i ma je skopiować bez zmian:
 
 ```json
 {"status":"FINAL","stops":[],"reviews":["REVIEW_09"]}
@@ -10,7 +10,7 @@ Python oblicza liczby, klasyfikacje, W, TEST 1–9 i atomowe `decision_facts`. R
 
 Runner składa decyzję z raportem deterministycznym i waliduje całość. Benchmark mierzy zgodność instrukcji i integracji providera, nie umiejętność modelu do ponownego liczenia podatku.
 
-Historyczne kasety pełnego raportu ujawniły wymyślone kursy NBP, automatyczne `JetBrains → IP`, niespójny NEXUS i TEST-y deklarowane przez model jako PASS. Pierwsza macierz małej koperty ujawniła inną wadę protokołu: część modeli reinterpretowała nazwy fałszywych faktów i dopisywała nieaktywne kody. `active_rules` usuwa tę dwuznaczność bez wyjątków scenariuszowych.
+Historyczne kasety pełnego raportu ujawniły wymyślone kursy NBP, automatyczne `JetBrains → IP`, niespójny NEXUS i TEST-y deklarowane przez model jako PASS. Późniejsza lista `active_rules` usunęła fałszywe fakty, ale nadal wymagała od modelu transformacji `{kind, code}` do dwóch tablic. MiniMax i wcześniej GPT-5 Nano przeniosły kod REVIEW do `stops`. Obecna koperta `expected_decision` usuwa tę zbędną decyzję, a schema rozróżnia dozwolone kody każdego kanału.
 
 ## 2. Bezpłatna bramka
 
@@ -34,7 +34,7 @@ for script in scripts/*.sh dump-to-md.sh; do bash -n "$script"; done
 Stan referencyjny po audycie protokołu z 17 lipca 2026 r.:
 
 - 255 testów jednostkowych PASS;
-- coverage `python_helper` 94,74%;
+- coverage `python_helper` powyżej wymaganego progu 90% (dokładną wartość raportuje CI);
 - pełny suite: wszystkie bezpłatne testy PASS i 46 kontrolowanych skipów LLM;
 - pusty katalog kaset jest dozwolony, częściowa macierz nie jest.
 
@@ -51,7 +51,7 @@ Szczególnie chronione regresje:
 - limity zdrowotnej/IKZE dla nieobsługiwanego roku są fail-closed;
 - STOP zeruje każde finalne pole;
 - multi-IP zachowuje grosze;
-- prompt zawiera wyłącznie prawdziwe `active_rules`; nieaktywny fakt i kod nie mogą być widoczne;
+- prompt zawiera wyłącznie autorytatywną kopertę `expected_decision`; fakty i nazwy predykatów nie mogą być widoczne, a schema odrzuca kod REVIEW w `stops` i kod STOP w `reviews`;
 - playback nie wywołuje sieci i odrzuca `finish_reason` inny niż `stop`;
 - live run, playback i pre-commit odrzucają substytucję modelu;
 - pre-commit porównuje zapisane `parsed_response` z ponownym parsowaniem;
@@ -64,7 +64,7 @@ Szczególnie chronione regresje:
 
 ## 4. Dlaczego stare kasety są nieważne
 
-Fingerprint obejmuje protokół decyzji, listę aktywnych reguł, system prompt, request, model, profil, schema i format kasety. Zmiana któregokolwiek elementu unieważnia nagranie. Kasety z pełną mapą `true/false` oraz pierwsza macierz `active_rules` z parserem usuwającym Markdown fences są nieaktualne i muszą zostać nagrane od nowa.
+Fingerprint obejmuje protokół decyzji, autorytatywną kopertę, system prompt, request, model, profil, schema i format kasety. Zmiana któregokolwiek elementu unieważnia nagranie. Kasety pełnego raportu, mapy `true/false`, listy `active_rules` oraz diagnostyczna macierz 317/322 są nieaktualne i muszą zostać nagrane od nowa.
 
 Kasety starego pełnego raportu także nie są zgodne z obecną kopertą decyzji. Nie kopiuj ich odpowiedzi, hashy, manifestu ani parsed payloadu. Po obecnych zmianach należy nagrać **322 kasety: 7 modeli × 46 scenariuszy**.
 

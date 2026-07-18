@@ -10,8 +10,8 @@ Model językowy nie wykonuje krytycznej arytmetyki:
 
 1. `python_helper/ipbox_calculator.py`, `tax_year_rules.py` i `allocation_audit.py` walidują dane, liczą W, alokacje, NEXUS, reguły roczne, ulgi i podatek.
 2. `tests/llm/oracle_v2.py` tworzy niezależny wynik referencyjny i atomowe `decision_facts`.
-3. Runner usuwa wszystkie fakty `false` i przekazuje modelowi wyłącznie aktywne reguły z gotowym kodem STOP/REVIEW.
-4. LLM kopiuje kody aktywnych reguł do małej koperty `status/stops/reviews`; nie widzi reguł nieaktywnych.
+3. Python składa kompletną autorytatywną kopertę `expected_decision` z rozdzielonymi kanałami STOP i REVIEW.
+4. LLM kopiuje bez zmian `status/stops/reviews`; nie klasyfikuje kodów i nie widzi faktów podatkowych ani nazw predykatów.
 5. Runner składa kopertę z raportem deterministycznym.
 6. Evaluator i JSON Schema porównują wynik fail-closed.
 7. VCR zapisuje tylko odpowiedź, która przeszła schema, semantykę i ponowne parsowanie.
@@ -53,7 +53,7 @@ python scripts/check_cassette_policy.py
 for script in scripts/*.sh dump-to-md.sh; do bash -n "$script"; done
 ```
 
-Stan po rozszerzeniu regresji: **255 testów jednostkowych PASS**, coverage `python_helper` **94,74%**; pełny bezpłatny suite i 46 kontrolowanych przypadków LLM przechodzą na Pythonie 3.11–3.13.
+Stan po rozszerzeniu regresji: co najmniej **255 testów jednostkowych PASS**, coverage `python_helper` powyżej wymaganych **90%**; pełny bezpłatny suite i 46 kontrolowanych przypadków LLM przechodzą na Pythonie 3.11–3.13. Dokładne wartości raportuje CI.
 
 ## Benchmark wielorodzinny
 
@@ -92,7 +92,7 @@ Niezależny audyt: [`docs/independent-audit-brief.md`](docs/independent-audit-br
 
 ## Stan wydania
 
-Rdzeń deterministyczny i protokół `active_rules` są po audycie. Pierwsza macierz 108 odpowiedzi została unieważniona: 36 odpowiedzi Claude zawierało Markdown fences akceptowane przez zbyt pobłażliwy parser, a następnie rozszerzono próbę do siedmiu rodzin. Stara macierz została usunięta po zmianie oracle, schematu i scenariuszy. Repo celowo zawiera pusty katalog kaset; przed review trzeba nagrać od zera macierz 322 odpowiedzi. PR pozostaje **draftem**.
+Rdzeń deterministyczny jest po audycie. Diagnostyczna macierz 317/322 ujawniła, że MiniMax w scenariuszu 51 przeniósł `REVIEW_09` do `stops`; ten sam błąd wcześniej wykonał GPT-5 Nano. Podatek i oracle były poprawne, lecz protokół wymagał zbędnej transformacji listy `{kind, code}`, a schema nie rozróżniała kanałów. Protokół zastąpiono autorytatywną kopertą `expected_decision`, schema ma osobne enumy STOP/REVIEW, a wszystkie stare kasety usunięto. Przed review trzeba nagrać od zera 322 odpowiedzi. PR pozostaje **draftem**.
 
 Warunki zakończenia:
 
