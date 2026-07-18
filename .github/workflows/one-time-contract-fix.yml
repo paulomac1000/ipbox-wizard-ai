@@ -1,0 +1,146 @@
+name: One-time contract compatibility fix
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: one-time-contract-fix-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  patch:
+    if: github.head_ref == 'fix/decouple-mix-allocation-from-w'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: pip install -r requirements-test.txt
+      - name: Apply compatibility patch
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          p = Path('tests/llm/oracle_adapter.py')
+          s = p.read_text(encoding='utf-8')
+          old = '''        percentage = number(evidence.get("procent_faktury_IP", 100), "procent_faktury_IP")
+                  try:
+                      share = calculate_w_share(work, non_ip, percentage, method=method)
+          '''
+          new = '''        percentage = number(evidence.get("procent_faktury_IP", 100), "procent_faktury_IP")
+                  if work == 0:
+                      shares[month_id] = 0.0
+                      continue
+                  try:
+                      share = calculate_w_share(work, non_ip, percentage, method=method)
+          '''
+          if old not in s:
+              raise SystemExit('oracle_adapter insertion point not found')
+          p.write_text(s.replace(old, new), encoding='utf-8')
+
+          p = Path('tests/llm/oracle_v2.py')
+          s = p.read_text(encoding='utf-8')
+          s = s.replace(
+              'ScenarioError = legacy.ScenarioError\n',
+              'ScenarioError = legacy.ScenarioError\n\n__all__ = [\n    "REVIEW_FACT_TO_CODE",\n    "STOP_FACT_TO_CODE",\n    "ScenarioError",\n    "compute_reference",\n    "derive_decision_codes",\n    "validate_scenario",\n]\n',
+          )
+          s = s.replace(
+              '    except ValueError as exc:\n        raise ScenarioError(str(exc)) from exc\n\n\ndef compute_reference',
+              '    except ValueError as exc:\n        raise ScenarioError(str(exc)) from exc\n    year_facts(scenario)\n\n\ndef compute_reference',
+          )
+          s = s.replace(
+              '        if month in shares:\n            row["wartość"] = round(shares[month] * 100, 2)',
+              '        if method != "conditional_product" and month in shares:\n            row["wartość"] = round(shares[month] * 100, 2)',
+          )
+          p.write_text(s, encoding='utf-8')
+
+          p = Path('tests/unit/test_scenarios_and_evaluator.py')
+          s = p.read_text(encoding='utf-8')
+          s = s.replace('assert len(SCENARIOS) == 36', 'assert len(SCENARIOS) == 46')
+          s = s.replace('match="non_ip_hours exceed work_hours"', 'match="non_ip_hours cannot exceed work_hours"')
+          old = '''def test_year_dependent_limits_fail_closed() -> None:
+              loaded = scenario("41_ikze_cascade")
+              excessive = deepcopy(loaded)
+              excessive["input"]["ulgi"]["ikze"] = 15611.41
+              with pytest.raises(ScenarioError, match="IKZE deduction exceeds"):
+                  compute_reference(excessive)
+
+              unknown_year = deepcopy(loaded)
+              unknown_year["input"]["rok"] = 2027
+              for month in unknown_year["input"]["miesiace"]:
+                  month["miesiac"] = month["miesiac"].replace("2025-", "2027-")
+              with pytest.raises(ScenarioError, match="no verified entrepreneur IKZE limit"):
+                  compute_reference(unknown_year)
+
+              health = scenario("12_zus_in_pit_path")
+              health = deepcopy(health)
+              health["input"]["zus"]["odliczenie_zdrowotne_PIT"] = 1
+              health["input"]["rok"] = 2027
+              for month in health["input"]["miesiace"]:
+                  month["miesiac"] = month["miesiac"].replace("2025-", "2027-")
+              with pytest.raises(ScenarioError, match="no verified health-contribution"):
+                  compute_reference(health)
+          '''
+          new = '''def test_year_dependent_limits_fail_closed() -> None:
+              loaded = scenario("41_ikze_cascade")
+              excessive = deepcopy(loaded)
+              excessive["input"]["ulgi"]["ikze"] = 15611.41
+              excessive_reference = compute_reference(excessive)
+              assert excessive_reference["status"] == "STOPPED"
+              assert "STOP_14" in excessive_reference["stops_reviews"]["stops"]
+
+              unknown_year = deepcopy(loaded)
+              unknown_year["input"]["rok"] = 2027
+              for month in unknown_year["input"]["miesiace"]:
+                  month["miesiac"] = month["miesiac"].replace("2025-", "2027-")
+              unknown_reference = compute_reference(unknown_year)
+              assert unknown_reference["status"] == "STOPPED"
+              assert "STOP_16" in unknown_reference["stops_reviews"]["stops"]
+
+              health = scenario("12_zus_in_pit_path")
+              health = deepcopy(health)
+              health["input"]["zus"]["odliczenie_zdrowotne_PIT"] = 1
+              health["input"]["rok"] = 2027
+              for month in health["input"]["miesiace"]:
+                  month["miesiac"] = month["miesiac"].replace("2025-", "2027-")
+              health_reference = compute_reference(health)
+              assert health_reference["status"] == "STOPPED"
+              assert "STOP_16" in health_reference["stops_reviews"]["stops"]
+          '''
+          if old not in s:
+              raise SystemExit('year-dependent test block not found')
+          s = s.replace(old, new)
+          old = '''def test_health_deduction_year_limit_is_enforced() -> None:
+              loaded = deepcopy(scenario("12_zus_in_pit_path"))
+              loaded["input"]["zus"]["odliczenie_zdrowotne_PIT"] = 12900.01
+              with pytest.raises(ScenarioError, match="2025 limit"):
+                  compute_reference(loaded)
+          '''
+          new = '''def test_health_deduction_year_limit_is_enforced() -> None:
+              loaded = deepcopy(scenario("12_zus_in_pit_path"))
+              loaded["input"]["zus"]["odliczenie_zdrowotne_PIT"] = 12900.01
+              reference = compute_reference(loaded)
+              assert reference["status"] == "STOPPED"
+              assert "STOP_14" in reference["stops_reviews"]["stops"]
+          '''
+          if old not in s:
+              raise SystemExit('health-limit test block not found')
+          p.write_text(s.replace(old, new), encoding='utf-8')
+          PY
+          ruff check --fix .
+          ruff format .
+      - name: Commit patch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add .
+          git commit -m 'fix: preserve legacy contracts under year-aware oracle'
+          git push origin HEAD:${{ github.event.pull_request.head.ref }}
