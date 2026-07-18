@@ -1,0 +1,48 @@
+name: One-time apply envelope changes
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: one-time-apply-envelope-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  apply:
+    if: github.head_ref == 'fix/decouple-mix-allocation-from-w'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Apply the audited transformation
+        run: |
+          awk '
+            /python - <<.PY./ { capture=1; next }
+            capture && /^          PY$/ { exit }
+            capture { sub(/^          /, ""); print }
+          ' .github/workflows/one-time-harden-decision-envelope.yml > /tmp/apply_envelope.py
+          test -s /tmp/apply_envelope.py
+          python /tmp/apply_envelope.py
+          python -m pip install ruff==0.12.7
+          ruff format .
+          ruff check --fix .
+      - name: Commit transformation
+        run: |
+          if git diff --quiet; then
+            echo 'No changes to commit.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add .
+          git commit -m 'fix: make LLM decision envelope channel-safe'
+          git push origin HEAD:${{ github.event.pull_request.head.ref }}
