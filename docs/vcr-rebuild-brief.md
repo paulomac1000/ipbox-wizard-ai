@@ -45,8 +45,10 @@ bash scripts/vcr_smoke.sh
 - nie zmieniać oracle ani expected values pod odpowiedź modelu;
 - w razie odrzucenia zachować pliki z `/tmp/ipbox_llm_rejected/<model>/` i opisać przyczynę przed ponowieniem;
 - ręcznie przejrzeć scenariusze 46–55 i potwierdzić poprawne kanały STOP 09–16;
-- wypchnąć kasety na ten sam branch, nie mergować PR i nie oznaczać go ready.
+- wypchnąć kasety na ten sam branch;
+- po wypchnięciu wywołać świeże `@coderabbitai review`, przeanalizować nowe uwagi na aktualnym HEAD i poprawić tylko zasadne;
+- nie mergować PR i nie oznaczać go ready przed kompletnym playbackiem, świeżym review i niezależnym werdyktem.
 
 ## Raport końcowy agenta
 
-Podaj HEAD, wynik unit/coverage, pełnego suite, liczbę scenariuszy, oczekiwaną i rzeczywistą liczbę kaset, wynik 46/46 per model, liczbę retry/odrzuceń, koszt oraz wynik playbacku bez sekretu.
+Podaj HEAD, wynik unit/coverage, pełnego suite, liczbę scenariuszy, oczekiwaną i rzeczywistą liczbę kaset, wynik 46/46 per model, liczbę retry/odrzuceń, koszt, wynik playbacku bez sekretu oraz wynik świeżego CodeRabbit review.
