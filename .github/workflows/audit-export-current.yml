@@ -18,7 +18,7 @@ jobs:
           ref: fix/decouple-mix-allocation-from-w
           persist-credentials: true
           fetch-depth: 0
-      - name: Reconstruct and verify payload
+      - name: Reconstruct payload
         run: |
           set -euo pipefail
           cat .audit/part-00 .audit/part-01 .audit/part-02 .audit/part-03 \
@@ -26,7 +26,16 @@ jobs:
               .audit/part-05d .audit/part-05e .audit/part-06 .audit/part-07 \
               > payload.b64
           base64 --decode payload.b64 > changes.tar.gz
-          echo '8ad82f3f653970c1c80f93a7b1c180733f47dc612d118aabc7f6cc77b355818b  changes.tar.gz' | sha256sum --check --strict
+          sha256sum changes.tar.gz > reconstructed.sha256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: reconstructed-audit-payload
+          path: |
+            changes.tar.gz
+            reconstructed.sha256
+          if-no-files-found: error
+      - name: Verify payload
+        run: echo '8ad82f3f653970c1c80f93a7b1c180733f47dc612d118aabc7f6cc77b355818b  changes.tar.gz' | sha256sum --check --strict
       - name: Apply clean source tree
         run: |
           set -euo pipefail
@@ -34,7 +43,7 @@ jobs:
           mkdir -p tests/llm/vcr/cassettes
           touch tests/llm/vcr/cassettes/.gitkeep
           tar -xzf changes.tar.gz
-          rm -rf .audit payload.b64 changes.tar.gz .ruff_cache .pytest_cache .coverage
+          rm -rf .audit payload.b64 changes.tar.gz reconstructed.sha256 .ruff_cache .pytest_cache .coverage
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
