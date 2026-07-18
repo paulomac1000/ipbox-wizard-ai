@@ -33,12 +33,16 @@ def test_all_ipbox_years_are_supported() -> None:
 def test_historical_limits(year: int, ikze: float, health: float | None) -> None:
     rules = get_tax_year_rules(year)
     assert float(rules.ikze_business_limit) == ikze
-    assert (float(rules.health_linear_limit) if rules.health_linear_limit else None) == health
+    assert (
+        float(rules.health_linear_limit) if rules.health_linear_limit else None
+    ) == health
 
 
 @pytest.mark.parametrize("year", [2019, 2020, 2021])
 def test_pre_2022_rejects_income_health_and_simultaneous_br(year: int) -> None:
-    assert validate_year_amounts(year, health_income_deduction=1) == ["HEALTH_MODE_INVALID"]
+    assert validate_year_amounts(year, health_income_deduction=1) == [
+        "HEALTH_MODE_INVALID"
+    ]
     assert validate_year_amounts(year, rd_relief_ip=1) == ["BR_IPBOX_NOT_SIMULTANEOUS"]
 
 
