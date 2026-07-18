@@ -26,9 +26,9 @@ jobs:
           cache: pip
           cache-dependency-path: requirements-test.txt
       - run: pip install -r requirements-test.txt
-      - name: Apply Ruff
+      - name: Apply Ruff fixes and formatting
         run: |
-          ruff check --fix .
+          ruff check --fix . || true
           ruff format .
       - name: Commit formatting
         run: |
