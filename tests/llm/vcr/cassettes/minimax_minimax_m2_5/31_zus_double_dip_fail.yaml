@@ -6,16 +6,16 @@ meta:
   returned_model: minimax/minimax-m2.5
   fingerprint: v3_c58f8c3057f3c01c4b56fb4697e0ffe35bec5948df8b248df8f27ffa237646b7
   request_hash: c1b394bc6ca24642e71a8d667d57e6750b6ae71746ace0e58cb256e58fbdeadd
-  recorded_at: '2026-07-18T01:11:36.834367+00:00'
-  request_id: gen-1784337093-rjNPn3tpRXuqWWris2y6
+  recorded_at: '2026-07-18T14:01:56.678703+00:00'
+  request_id: gen-1784383308-pCGWZmYnJHul88TZt5Hu
   finish_reason: stop
   native_finish_reason: stop
-  system_fingerprint: null
+  system_fingerprint: vllm-0.21.0-tp4-bf80359e
   prompt_tokens: 244
-  completion_tokens: 302
-  total_tokens: 546
-  cost: 0.00039204
-  recording_duration_seconds: 3.21
+  completion_tokens: 270
+  total_tokens: 514
+  cost: 0.0002796
+  recording_duration_seconds: 7.847
   cassette_format_version: 4
 response: '{"reviews":["REVIEW_01","REVIEW_09"],"status":"STOPPED","stops":["ZUS_DOUBLE_DIP"]}'
 parsed_response:

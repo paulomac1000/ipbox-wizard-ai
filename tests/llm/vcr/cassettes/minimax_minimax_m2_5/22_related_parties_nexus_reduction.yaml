@@ -6,16 +6,16 @@ meta:
   returned_model: minimax/minimax-m2.5
   fingerprint: v3_92d96e095166289808de4a62a97a6236e1ce0564ddb1c96684f4f961bbe3bf59
   request_hash: 809e50e39e380dfc485b08e7ef0a86893d663269f0bc8108743d0c706046254f
-  recorded_at: '2026-07-18T01:10:31.630961+00:00'
-  request_id: gen-1784337027-MHXI5t4uXT9gSt4JfAsO
+  recorded_at: '2026-07-18T14:00:59.253935+00:00'
+  request_id: gen-1784383248-GsGXN9qzik3Z2wtf5AsT
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
   prompt_tokens: 248
-  completion_tokens: 146
-  total_tokens: 394
-  cost: 0.000220205
-  recording_duration_seconds: 3.981
+  completion_tokens: 455
+  total_tokens: 703
+  cost: 0.000646625
+  recording_duration_seconds: 11.298
   cassette_format_version: 4
 response: '{"status":"FINAL","stops":[],"reviews":["REVIEW_01","REVIEW_09"]}'
 parsed_response:

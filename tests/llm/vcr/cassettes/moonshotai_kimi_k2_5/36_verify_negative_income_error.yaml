@@ -6,16 +6,16 @@ meta:
   returned_model: moonshotai/kimi-k2.5
   fingerprint: v3_dc031f2bfc0694708a2b0a7df3b7d10cdd3fc1d67d946e99aa9e9ba56f98e394
   request_hash: bd03941db25138e48b8d489d59bd07d863daa959b911fec7bee9241bb58f76b6
-  recorded_at: '2026-07-18T01:16:22.096647+00:00'
-  request_id: gen-1784337377-IHCt5HsUKUZNqIcY0e6m
+  recorded_at: '2026-07-18T14:08:11.597414+00:00'
+  request_id: gen-1784383682-l7AliDgEVN8O1D9wssQk
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
   prompt_tokens: 227
-  completion_tokens: 240
-  total_tokens: 467
-  cost: 0.00056919
-  recording_duration_seconds: 4.463
+  completion_tokens: 361
+  total_tokens: 588
+  cost: 0.0009144
+  recording_duration_seconds: 8.909
   cassette_format_version: 4
 response: '{"reviews":["REVIEW_01","REVIEW_09"],"status":"FINAL","stops":[]}'
 parsed_response:

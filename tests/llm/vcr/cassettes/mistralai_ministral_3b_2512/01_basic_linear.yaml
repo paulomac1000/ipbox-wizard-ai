@@ -6,8 +6,8 @@ meta:
   returned_model: mistralai/ministral-3b-2512
   fingerprint: v3_da5ac3a59d707aae1b3d0fe42aee5f0c44abc0836b477e7ef10313a5d1270a39
   request_hash: 52fbe5bcfaab58b7279065b371dda99129eb09c11e857ec9d659c4decb205ff7
-  recorded_at: '2026-07-18T01:20:26.624855+00:00'
-  request_id: gen-1784337626-0JBdMk530kCGR41GN17m
+  recorded_at: '2026-07-18T14:12:47.800107+00:00'
+  request_id: gen-1784383967-u8opY8taFLwHtBCqboAI
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
@@ -15,7 +15,7 @@ meta:
   completion_tokens: 24
   total_tokens: 249
   cost: 2.49e-05
-  recording_duration_seconds: 0.356
+  recording_duration_seconds: 0.372
   cassette_format_version: 4
 response: '{"status": "FINAL", "stops": [], "reviews": ["REVIEW_09"]}'
 parsed_response:

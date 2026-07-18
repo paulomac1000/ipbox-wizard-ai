@@ -6,8 +6,8 @@ meta:
   returned_model: anthropic/claude-haiku-4.5
   fingerprint: v3_75096835db09bada9a113bce8807a88973d54be16c6a44b23f868d6613853895
   request_hash: 392c5019ec5e106181327defb4bef702b36fb96eb2cb8a93a75743b4f5b4bd7c
-  recorded_at: '2026-07-18T01:05:04.983091+00:00'
-  request_id: gen-1784336702-Jhb8TkHx7gRc5jWtCPc0
+  recorded_at: '2026-07-18T13:55:50.923688+00:00'
+  request_id: gen-1784382949-B8wJOOF9sy5TzTkWrQCx
   finish_reason: stop
   native_finish_reason: end_turn
   system_fingerprint: null
@@ -15,7 +15,7 @@ meta:
   completion_tokens: 27
   total_tokens: 555
   cost: 0.000663
-  recording_duration_seconds: 2.428
+  recording_duration_seconds: 1.211
   cassette_format_version: 4
 response: '{"status":"FINAL","stops":[],"reviews":["REVIEW_01","REVIEW_09"]}'
 parsed_response:

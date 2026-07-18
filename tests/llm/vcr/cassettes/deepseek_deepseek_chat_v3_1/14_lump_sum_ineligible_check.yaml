@@ -6,18 +6,18 @@ meta:
   returned_model: deepseek/deepseek-chat-v3.1
   fingerprint: v3_e8846090a6f7eef4d033d75ab7cd28d48ed052cdce0412a26c1d41fcce8fbcfc
   request_hash: d69293da948e9d425b0045726078780c86f4cd561655f3fe197e0e13f085dce5
-  recorded_at: '2026-07-18T01:06:40.693536+00:00'
-  request_id: gen-1784336797-6jl2E4IJkfrNLAnXmxPA
+  recorded_at: '2026-07-18T13:57:43.484812+00:00'
+  request_id: gen-1784383061-7jHr5X8AAgKqmIOxi4xd
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
-  prompt_tokens: 221
-  completion_tokens: 29
-  total_tokens: 250
-  cost: 8.867e-05
-  recording_duration_seconds: 2.858
+  prompt_tokens: 469
+  completion_tokens: 30
+  total_tokens: 499
+  cost: 0.00015663
+  recording_duration_seconds: 2.323
   cassette_format_version: 4
-response: "{\n  \"reviews\": [],\n  \"status\": \"STOPPED\",\n  \"stops\": [\"STOP_01\"]\n}"
+response: "{\n    \"status\": \"STOPPED\",\n    \"stops\": [\"STOP_01\"],\n    \"reviews\": []\n}"
 parsed_response:
   status: STOPPED
   result:

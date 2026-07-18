@@ -6,16 +6,16 @@ meta:
   returned_model: qwen/qwen3.5-flash-02-23
   fingerprint: v3_1c78f9b4714c888ba674518fa866034d6cf6926288e5d27ed5a680017d43074f
   request_hash: dfd04d68015b67ce25a199b6fcb9d1d7adaa4af736da7d6a96cb8ba2ded28d25
-  recorded_at: '2026-07-18T01:19:53.447372+00:00'
-  request_id: gen-1784337587-vPPJ8z47KhPAeAyuOdnJ
+  recorded_at: '2026-07-18T14:12:13.696616+00:00'
+  request_id: gen-1784383930-NMwdJfxx29vQPbZwTzzY
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
   prompt_tokens: 238
-  completion_tokens: 908
-  total_tokens: 1146
-  cost: 0.00025155
-  recording_duration_seconds: 5.808
+  completion_tokens: 602
+  total_tokens: 840
+  cost: 0.00017199
+  recording_duration_seconds: 3.117
   cassette_format_version: 4
 response: '{"status":"STOPPED","stops":["STOP_08"],"reviews":["REVIEW_09"]}'
 parsed_response:

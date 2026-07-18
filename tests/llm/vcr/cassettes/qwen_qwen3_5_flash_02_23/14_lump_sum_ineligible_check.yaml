@@ -6,8 +6,8 @@ meta:
   returned_model: qwen/qwen3.5-flash-02-23
   fingerprint: v3_239a97526ba2700f12adb71edeb721a39faadb738c3f4e27bc458d9c91d406a6
   request_hash: d3d6a78b2c4de1b4583a03f60e84ba65e011a096aeb8fff111233a0137552c42
-  recorded_at: '2026-07-18T01:18:16.554758+00:00'
-  request_id: gen-1784337493-27Movc6vTPaoIRwpBXwh
+  recorded_at: '2026-07-18T14:10:15.128603+00:00'
+  request_id: gen-1784383812-4KUMIpwez2IST3LLTDK5
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
@@ -15,7 +15,7 @@ meta:
   completion_tokens: 571
   total_tokens: 796
   cost: 0.000163085
-  recording_duration_seconds: 2.899
+  recording_duration_seconds: 3.048
   cassette_format_version: 4
 response: '{"status":"STOPPED","stops":["STOP_01"],"reviews":[]}'
 parsed_response:

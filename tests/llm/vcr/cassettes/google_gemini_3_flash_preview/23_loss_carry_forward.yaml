@@ -6,18 +6,18 @@ meta:
   returned_model: google/gemini-3-flash-preview
   fingerprint: v3_a2139619fb39f8eb69d3f204b86869e6f9f24da4eac6b57f3124376273d9b949
   request_hash: 4cded59de542de22f94f3212998cebf163c966232c95901dc18d9dc882fc5fd1
-  recorded_at: '2026-07-18T00:16:42.657977+00:00'
-  request_id: gen-1784333801-rhOzNRlaX1wRImBxgYHv
+  recorded_at: '2026-07-18T13:54:27.383277+00:00'
+  request_id: gen-1784382866-DQM4iM5sTUHrCuRWkRLy
   finish_reason: stop
   native_finish_reason: STOP
   system_fingerprint: null
   prompt_tokens: 382
-  completion_tokens: 15
-  total_tokens: 397
-  cost: 0.000236
-  recording_duration_seconds: 1.145
+  completion_tokens: 11
+  total_tokens: 393
+  cost: 0.000224
+  recording_duration_seconds: 0.995
   cassette_format_version: 4
-response: '{"status": "FINAL", "stops": [], "reviews": []}'
+response: '{"status":"FINAL","stops":[],"reviews":[]}'
 parsed_response:
   status: FINAL
   result:

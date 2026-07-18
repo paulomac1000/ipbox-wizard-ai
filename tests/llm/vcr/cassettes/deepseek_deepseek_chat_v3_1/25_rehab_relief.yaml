@@ -6,18 +6,18 @@ meta:
   returned_model: deepseek/deepseek-chat-v3.1
   fingerprint: v3_8e39ce4a45994b793807e846213e734658b71643e9fe82461fa64a65db74c149
   request_hash: f56be3d18f62599c4934624e2260226bde9b68b3e7a12d340faa7f32b0d6ad87
-  recorded_at: '2026-07-18T01:07:24.156619+00:00'
-  request_id: gen-1784336837-PPz7NfnTkOvf0nrSV52f
+  recorded_at: '2026-07-18T13:58:14.842309+00:00'
+  request_id: gen-1784383091-6o4J7JZnFiAdf2Mv1pCU
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
   prompt_tokens: 207
-  completion_tokens: 23
-  total_tokens: 230
-  cost: 4.888e-05
-  recording_duration_seconds: 6.764
+  completion_tokens: 19
+  total_tokens: 226
+  cost: 4.904e-05
+  recording_duration_seconds: 3.516
   cassette_format_version: 4
-response: "{\n  \"status\": \"FINAL\",\n  \"stops\": [],\n  \"reviews\": []\n}"
+response: '{"status": "FINAL", "stops": [], "reviews": []}'
 parsed_response:
   status: FINAL
   result:

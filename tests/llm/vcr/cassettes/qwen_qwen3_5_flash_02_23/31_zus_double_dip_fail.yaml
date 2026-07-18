@@ -6,16 +6,16 @@ meta:
   returned_model: qwen/qwen3.5-flash-02-23
   fingerprint: v3_84c973b2fd075e592cdf0e45a90a2a915d684f88a305198892c043f273173591
   request_hash: 0adee611453a8559463530938722026d103e0f4c85ef99d6b701c4a6c9916764
-  recorded_at: '2026-07-18T01:19:21.789376+00:00'
-  request_id: gen-1784337557-YV3otnsw12880O8bVR57
+  recorded_at: '2026-07-18T14:11:39.857906+00:00'
+  request_id: gen-1784383894-7HRoHDvs3nFXP7XieQsO
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
   prompt_tokens: 251
-  completion_tokens: 795
-  total_tokens: 1046
-  cost: 0.000223015
-  recording_duration_seconds: 4.666
+  completion_tokens: 829
+  total_tokens: 1080
+  cost: 0.000231855
+  recording_duration_seconds: 6.027
   cassette_format_version: 4
 response: '{"status": "STOPPED", "stops": ["ZUS_DOUBLE_DIP"], "reviews": ["REVIEW_01", "REVIEW_09"]}'
 parsed_response:
