@@ -7,9 +7,10 @@ it must already be supported by evidence (payments, returns and ledgers).
 
 from __future__ import annotations
 
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 from decimal import ROUND_HALF_UP, Decimal
-from typing import Any, Iterable, Mapping
+from typing import Any
 
 MONEY = Decimal("0.01")
 INTEGER = Decimal("1")
@@ -41,9 +42,7 @@ class ThermomodernizationLot:
         if self.origin_year < 2019:
             raise ValueError("thermomodernization origin_year cannot precede 2019")
         if self.remaining_amount < 0:
-            raise ValueError(
-                "thermomodernization remaining_amount must be non-negative"
-            )
+            raise ValueError("thermomodernization remaining_amount must be non-negative")
 
 
 # Official-source identifiers are intentionally stable and human-auditable.
@@ -218,9 +217,7 @@ def _historical_tax_reduction(year: int, base: Decimal) -> Decimal:
 def calculate_scale_tax(year: int, rounded_base: int | float | Decimal) -> int:
     """Calculate annual PIT under the scale applicable to ``year``."""
     rules = get_tax_year_rules(year)
-    base = _nonnegative("rounded_base", rounded_base).quantize(
-        INTEGER, rounding=ROUND_HALF_UP
-    )
+    base = _nonnegative("rounded_base", rounded_base).quantize(INTEGER, rounding=ROUND_HALF_UP)
     if year >= 2022:
         if base <= rules.scale_threshold:
             return max(0, tax_round(base * rules.scale_first_rate - Decimal("3600")))
@@ -303,14 +300,10 @@ def apply_thermomodernization_lots(
         else:
             raise ValueError(f"thermomodernization_lots[{index}] must be a mapping")
         if lot.origin_year > tax_year:
-            raise ValueError(
-                "thermomodernization lot cannot originate in a future year"
-            )
+            raise ValueError("thermomodernization lot cannot originate in a future year")
         normalized.append(lot)
 
-    opening_total = sum(
-        (money(lot.remaining_amount) for lot in normalized), Decimal("0")
-    )
+    opening_total = sum((money(lot.remaining_amount) for lot in normalized), Decimal("0"))
     if opening_total > Decimal("53000"):
         raise ValueError("thermomodernization lots exceed the 53000 PLN taxpayer limit")
 
@@ -318,9 +311,7 @@ def apply_thermomodernization_lots(
     used_total = Decimal("0")
     carry_total = Decimal("0")
     expired_total = Decimal("0")
-    for lot in sorted(
-        normalized, key=lambda item: (item.origin_year, item.evidence_ref)
-    ):
+    for lot in sorted(normalized, key=lambda item: (item.origin_year, item.evidence_ref)):
         amount = money(lot.remaining_amount)
         expired = tax_year > lot.origin_year + 6
         if expired:
@@ -365,9 +356,7 @@ def reconcile_correction_settlement(
     advances = money(_nonnegative("advances_paid", advances_paid))
     original_tax = money(_nonnegative("original_tax_due", original_tax_due))
     corrected_tax = money(_nonnegative("corrected_tax_due", corrected_tax_due))
-    disbursed = money(
-        _nonnegative("refund_already_disbursed", refund_already_disbursed)
-    )
+    disbursed = money(_nonnegative("refund_already_disbursed", refund_already_disbursed))
     original_overpayment = max(Decimal("0"), advances - original_tax)
     corrected_overpayment = max(Decimal("0"), advances - corrected_tax)
     cash_delta = corrected_overpayment - disbursed
@@ -405,8 +394,7 @@ def calculate_tax_for_year(
     rd_relief_ip: float = 0,
     rd_relief_limit: float = 0,
     thermomodernization_pool: float = 0,
-    thermomodernization_lots: Iterable[ThermomodernizationLot | Mapping[str, Any]]
-    | None = None,
+    thermomodernization_lots: Iterable[ThermomodernizationLot | Mapping[str, Any]] | None = None,
     child_tax_credit: float = 0,
     extra_income_scale: float = 0,
 ) -> dict[str, Any]:
@@ -460,13 +448,9 @@ def calculate_tax_for_year(
     if violations:
         raise ValueError("year-rule violation: " + ", ".join(violations))
     if normalized_form == "scale" and values["health_income_deduction"] > 0:
-        raise ValueError(
-            "post-2021 health income deduction is available only for linear tax"
-        )
+        raise ValueError("post-2021 health income deduction is available only for linear tax")
     if normalized_form == "linear" and values["extra_income_scale"] > 0:
-        raise ValueError(
-            "linear business and extra scale income require separate returns"
-        )
+        raise ValueError("linear business and extra scale income require separate returns")
     if normalized_form == "linear" and any(
         values[name] > 0
         for name in (
@@ -484,9 +468,7 @@ def calculate_tax_for_year(
     if values["rd_relief_ip"] + values["rd_relief_non_ip"] > values["rd_relief_limit"]:
         raise ValueError("R&D relief exceeds documented limit")
     if thermomodernization_lots is not None and values["thermomodernization_pool"] > 0:
-        raise ValueError(
-            "use thermomodernization_pool or thermomodernization_lots, not both"
-        )
+        raise ValueError("use thermomodernization_pool or thermomodernization_lots, not both")
 
     business_remaining = values["non_ip_income"]
     steps: list[dict[str, float | str]] = []
@@ -576,9 +558,7 @@ def calculate_tax_for_year(
         "thermomodernization_used": float(money(thermo_used)),
         "thermomodernization_carry_over": float(money(thermo_carry)),
         "thermomodernization_expired": (
-            float(thermo_lot_result["expired"])
-            if thermo_lot_result is not None
-            else 0.0
+            float(thermo_lot_result["expired"]) if thermo_lot_result is not None else 0.0
         ),
         "thermomodernization_lots": (
             thermo_lot_result["lots"] if thermo_lot_result is not None else []
@@ -593,12 +573,7 @@ def calculate_tax_for_year(
         "rd_relief_ip_used": float(money(rd_ip_used)),
         "rd_relief_non_ip_used": float(money(rd_non_used)),
         "rd_relief_carry_over": float(
-            money(
-                values["rd_relief_ip"]
-                - rd_ip_used
-                + values["rd_relief_non_ip"]
-                - rd_non_used
-            )
+            money(values["rd_relief_ip"] - rd_ip_used + values["rd_relief_non_ip"] - rd_non_used)
         ),
         "ip_base_rounded": ip_base,
         "ip_tax": ip_tax_before_credits,

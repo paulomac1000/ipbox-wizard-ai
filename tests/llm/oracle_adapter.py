@@ -61,14 +61,14 @@ def month_evidence(month: dict[str, Any]) -> dict[str, Any] | None:
 
 def invoice_amount(invoice: dict[str, Any]) -> float:
     try:
-        return float(legacy._invoice_amount(invoice))  # noqa: SLF001
+        return float(legacy._invoice_amount(invoice))
     except (AttributeError, ValueError) as exc:
         raise ScenarioError(str(exc)) from exc
 
 
 def month_invoices(month: dict[str, Any]) -> list[dict[str, Any]]:
     try:
-        return legacy._month_invoices(month)  # noqa: SLF001
+        return legacy._month_invoices(month)
     except AttributeError as exc:  # pragma: no cover
         raise ScenarioError("legacy oracle lacks _month_invoices") from exc
 
@@ -91,9 +91,7 @@ def prepare_scenario(
         month_id = str(month.get("miesiac", ""))
         work = number(evidence.get("godziny_pracy", 0), "godziny_pracy")
         non_ip = number(evidence.get("godziny_nie_IP", 0), "godziny_nie_IP")
-        percentage = number(
-            evidence.get("procent_faktury_IP", 100), "procent_faktury_IP"
-        )
+        percentage = number(evidence.get("procent_faktury_IP", 100), "procent_faktury_IP")
         try:
             share = calculate_w_share(work, non_ip, percentage, method=method)
         except ValueError as exc:
@@ -113,9 +111,7 @@ def prepare_scenario(
     return transformed, shares, method
 
 
-def prepare_cost_date_policy(
-    input_data: dict[str, Any], shares: dict[str, float]
-) -> None:
+def prepare_cost_date_policy(input_data: dict[str, Any], shares: dict[str, float]) -> None:
     policy = input_data["polityka_alokacji"]
     revenue_policy = policy["przychody"]
     mix_policy = policy["koszty_MIX"]
@@ -138,14 +134,10 @@ def prepare_cost_date_policy(
                 continue
             method = str(revenue_policy.get("metoda"))
             key = (
-                shares.get(month_id, 0.0)
-                if method == "czasowa_W"
-                else revenue_policy.get("klucz")
+                shares.get(month_id, 0.0) if method == "czasowa_W" else revenue_policy.get("klucz")
             )
             split = (
-                float(money(invoice.get("kwota_IP", amount)))
-                if method == "dokumentowa"
-                else None
+                float(money(invoice.get("kwota_IP", amount))) if method == "dokumentowa" else None
             )
             allocation = allocate_revenue_monthly(
                 float(amount), method, revenue_key=key, document_split_ip=split
@@ -165,9 +157,7 @@ def prepare_cost_date_policy(
                 continue
             cost["allocation_key"] = month_key
             cost["allocation_method"] = "przychodowa_w_dacie_kosztu"
-            cost.setdefault(
-                "allocation_source", str(mix_policy.get("źródło", "użytkownik"))
-            )
+            cost.setdefault("allocation_source", str(mix_policy.get("źródło", "użytkownik")))
     mix_policy["metoda"] = "custom"
     mix_policy["klucz"] = 0.0
     mix_policy.setdefault(
@@ -176,9 +166,7 @@ def prepare_cost_date_policy(
     )
 
 
-def legacy_safe_copy(
-    transformed: dict[str, Any], *, for_validation: bool
-) -> dict[str, Any]:
+def legacy_safe_copy(transformed: dict[str, Any], *, for_validation: bool) -> dict[str, Any]:
     result = deepcopy(transformed)
     input_data = result.get("input")
     if not isinstance(input_data, dict):

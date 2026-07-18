@@ -11,7 +11,7 @@ from python_helper.allocation_audit import (
 from python_helper.tax_year_rules import get_tax_year_rules, validate_year_amounts
 
 from . import oracle as legacy
-from .oracle_adapter import month_evidence, month_invoices, number, invoice_amount
+from .oracle_adapter import invoice_amount, month_evidence, month_invoices, number
 
 ScenarioError = legacy.ScenarioError
 STOP_FACT_TO_CODE = {
@@ -29,12 +29,8 @@ REVIEW_FACT_TO_CODE = dict(legacy.REVIEW_FACT_TO_CODE)
 
 
 def derive_decision_codes(facts: dict[str, bool]) -> tuple[set[str], set[str]]:
-    stops = {
-        code for fact, code in STOP_FACT_TO_CODE.items() if facts.get(fact) is True
-    }
-    reviews = {
-        code for fact, code in REVIEW_FACT_TO_CODE.items() if facts.get(fact) is True
-    }
+    stops = {code for fact, code in STOP_FACT_TO_CODE.items() if facts.get(fact) is True}
+    reviews = {code for fact, code in REVIEW_FACT_TO_CODE.items() if facts.get(fact) is True}
     return stops, reviews
 
 
@@ -44,9 +40,7 @@ def audit_facts(
     input_data = scenario.get("input", {})
     rows: list[dict[str, Any]] = []
     for month in input_data.get("miesiace", []) or []:
-        if not isinstance(month, dict) or not isinstance(
-            month.get("kontrola_alokacji"), dict
-        ):
+        if not isinstance(month, dict) or not isinstance(month.get("kontrola_alokacji"), dict):
             continue
         declared = month["kontrola_alokacji"]
         ip = number(declared.get("przychod_IP"), "kontrola.przychod_IP")
@@ -74,16 +68,12 @@ def audit_facts(
             "non_ip_cost": result["result"]["koszty_roczne"]["NIE"],
         }
         tax_return = {
-            "ip_revenue": reconciliation.get(
-                "przychod_IP", reconciliation.get("ip_revenue", 0)
-            ),
+            "ip_revenue": reconciliation.get("przychod_IP", reconciliation.get("ip_revenue", 0)),
             "non_ip_revenue": reconciliation.get(
                 "przychod_NIE", reconciliation.get("non_ip_revenue", 0)
             ),
             "ip_cost": reconciliation.get("koszt_IP", reconciliation.get("ip_cost", 0)),
-            "non_ip_cost": reconciliation.get(
-                "koszt_NIE", reconciliation.get("non_ip_cost", 0)
-            ),
+            "non_ip_cost": reconciliation.get("koszt_NIE", reconciliation.get("non_ip_cost", 0)),
         }
         findings.extend(reconcile_return_to_ledger(ledger, tax_return))
     codes = {finding.code for finding in findings}
@@ -96,13 +86,9 @@ def audit_facts(
                 "FULL_REVENUE_DESPITE_NON_IP_SHARE",
             }
         ),
-        "invoice_percentage_double_applied": "INVOICE_PERCENTAGE_DOUBLE_APPLIED"
-        in codes,
-        "allocation_method_changed_without_evidence": "ALLOCATION_METHOD_SWITCH"
-        in codes,
-        "return_ledger_reconciliation_failed": any(
-            code.startswith("RETURN_") for code in codes
-        ),
+        "invoice_percentage_double_applied": "INVOICE_PERCENTAGE_DOUBLE_APPLIED" in codes,
+        "allocation_method_changed_without_evidence": "ALLOCATION_METHOD_SWITCH" in codes,
+        "return_ledger_reconciliation_failed": any(code.startswith("RETURN_") for code in codes),
     }
     return facts, sorted(codes)
 
@@ -119,12 +105,8 @@ def year_facts(
     except (TypeError, ValueError):
         year = int(year_raw) if str(year_raw).isdigit() else 0
         unsupported = True
-    reliefs = (
-        input_data.get("ulgi", {}) if isinstance(input_data.get("ulgi"), dict) else {}
-    )
-    social = (
-        input_data.get("zus", {}) if isinstance(input_data.get("zus"), dict) else {}
-    )
+    reliefs = input_data.get("ulgi", {}) if isinstance(input_data.get("ulgi"), dict) else {}
+    social = input_data.get("zus", {}) if isinstance(input_data.get("zus"), dict) else {}
     values = {
         "ikze": number(reliefs.get("ikze", reliefs.get("IKZE", 0)), "ulgi.ikze"),
         "health_income": number(
@@ -153,8 +135,7 @@ def year_facts(
             raise ScenarioError(str(exc)) from exc
     facts = {
         "unsupported_tax_year": unsupported,
-        "rd_ip_relief_not_available_for_year": "BR_IPBOX_NOT_SIMULTANEOUS"
-        in violations,
+        "rd_ip_relief_not_available_for_year": "BR_IPBOX_NOT_SIMULTANEOUS" in violations,
         "year_limit_exceeded": bool(
             {"IKZE_LIMIT_EXCEEDED", "HEALTH_LIMIT_EXCEEDED"} & set(violations)
         ),

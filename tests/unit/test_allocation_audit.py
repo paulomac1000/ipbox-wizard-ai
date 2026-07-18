@@ -102,9 +102,7 @@ def test_split_must_balance() -> None:
     assert "REVENUE_SPLIT_DOES_NOT_BALANCE" in codes
 
 
-def test_return_reconciliation_detects_classification_shift_even_when_totals_match() -> (
-    None
-):
+def test_return_reconciliation_detects_classification_shift_even_when_totals_match() -> None:
     findings = reconcile_return_to_ledger(
         {
             "ip_revenue": 80000,
