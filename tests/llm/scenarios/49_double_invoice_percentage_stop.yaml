@@ -1,0 +1,46 @@
+meta:
+  id: 49_double_invoice_percentage_stop
+  name: Podwójne zastosowanie procentu faktury
+  description: Wykrywa zastosowanie procentu faktury dwa razy zamiast jawnej metody W.
+  tags: [regression, allocation, fail-closed]
+  priority: P0
+input:
+  rok: 2025
+  forma_opodatkowania: liniowy_19%
+  polityka_alokacji:
+    policy_id: double-percentage-guard
+    W:
+      metoda: disjoint_components
+    przychody:
+      metoda: czasowa_W
+    koszty_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      uzasadnienie: Syntetyczna polityka testowa.
+  zus:
+    sposob: brak
+  kontrahenci:
+    - nazwa: ClientA
+      klauzula_IP: true
+  miesiace:
+    - miesiac: 2025-01
+      faktury:
+        - kwota_PLN: 10000
+          kontrahent: ClientA
+          kwalifikuje_IP: true
+      ewidencja:
+        godziny_pracy: 160
+        godziny_nie_IP: 16
+        procent_faktury_IP: 80
+      kontrola_alokacji:
+        przychod_IP: 6400
+        przychod_NIE: 3600
+      koszty:
+        - opis: Dedykowany koszt projektu
+          kwota: 100
+          kategoria: IP
+          allocation_source: syntetyczna-ewidencja-projektowa
+          nexus_source: own_br
+      opis_projektu: Rozwój kwalifikowanego programu komputerowego.
+assertions:
+  stops: [STOP_09, STOP_10]
