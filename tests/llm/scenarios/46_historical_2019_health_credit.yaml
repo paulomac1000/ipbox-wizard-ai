@@ -1,0 +1,50 @@
+meta:
+  id: 46_historical_2019_health_credit
+  name: Rok 2019 — liniowy, IKZE i historyczne odliczenie zdrowotne od podatku
+  description: Syntetyczna regresja pierwszego roku IP Box bez danych rzeczywistego podatnika.
+  tags: [historical, regression, health]
+  priority: P0
+input:
+  rok: 2019
+  forma_opodatkowania: liniowy_19%
+  polityka_alokacji:
+    policy_id: historical-2019
+    W:
+      metoda: conditional_product
+    przychody:
+      metoda: czasowa_W
+    koszty_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      uzasadnienie: Syntetyczna polityka regresyjna.
+  zus:
+    sposob: brak
+    odliczenie_zdrowotne_od_podatku: 300
+  kontrahenci:
+    - nazwa: ClientA
+      klauzula_IP: true
+  ulgi:
+    ikze: 1000
+  miesiace:
+    - miesiac: 2019-01
+      faktury:
+        - kwota_PLN: 10000
+          kontrahent: ClientA
+          kwalifikuje_IP: true
+      ewidencja:
+        godziny_pracy: 160
+        godziny_nie_IP: 32
+        procent_faktury_IP: 100
+      koszty:
+        - opis: Dedykowane środowisko projektu
+          kwota: 100
+          kategoria: IP
+          allocation_source: syntetyczna-ewidencja-projektowa
+          nexus_source: own_br
+      opis_projektu: Rozwój kwalifikowanego programu komputerowego.
+assertions:
+  W_miesieczne:
+    2019-01: 80.0
+  podatek_IP_range: [390, 400]
+  podatek_NIE_range: [185, 195]
+  testy_pass: [TEST_4, TEST_5, TEST_6, TEST_8, TEST_9]
