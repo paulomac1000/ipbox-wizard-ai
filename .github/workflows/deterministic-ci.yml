@@ -41,7 +41,12 @@ jobs:
         run: pip install -r requirements.txt -r requirements-test.txt
 
       - name: Ruff format
-        run: ruff format --check .
+        run: |
+          mkdir -p reports
+          if ! ruff format --check .; then
+            ruff format --diff . > reports/ruff-format.diff
+            exit 1
+          fi
 
       - name: Ruff lint
         run: ruff check .
