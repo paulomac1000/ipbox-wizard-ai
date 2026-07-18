@@ -105,9 +105,12 @@ def prepare_scenario(
         compatibility = 100.0 if time_share == 0 else float(share / time_share * 100)
         month["ewidencja"] = {**evidence, "procent_faktury_IP": compatibility}
     policy = input_data.get("polityka_alokacji")
-    if isinstance(policy, dict) and isinstance(policy.get("koszty_MIX"), dict):
-        if policy["koszty_MIX"].get("metoda") == "przychodowa_w_dacie_kosztu":
-            prepare_cost_date_policy(input_data, shares)
+    if (
+        isinstance(policy, dict)
+        and isinstance(policy.get("koszty_MIX"), dict)
+        and policy["koszty_MIX"].get("metoda") == "przychodowa_w_dacie_kosztu"
+    ):
+        prepare_cost_date_policy(input_data, shares)
     return transformed, shares, method
 
 
