@@ -8,6 +8,8 @@ from typing import Any
 
 @dataclass(frozen=True, slots=True)
 class ModelProfile:
+    """Exact provider request parameters for one benchmark model."""
+
     model_id: str
     label: str
     family: str
@@ -22,12 +24,6 @@ MODEL_PROFILES: dict[str, ModelProfile] = {
         model_id="google/gemini-3-flash-preview",
         label="Google Gemini 3 Flash Preview",
         family="Google Gemini",
-        reasoning={"effort": "minimal"},
-    ),
-    "openai/gpt-5-nano": ModelProfile(
-        model_id="openai/gpt-5-nano",
-        label="OpenAI GPT-5 Nano",
-        family="OpenAI GPT",
         reasoning={"effort": "minimal"},
     ),
     "anthropic/claude-haiku-4.5": ModelProfile(
@@ -52,12 +48,6 @@ MODEL_PROFILES: dict[str, ModelProfile] = {
         model_id="moonshotai/kimi-k2.5",
         label="Moonshot Kimi K2.5",
         family="Moonshot Kimi",
-    ),
-    "z-ai/glm-4.7-flash": ModelProfile(
-        model_id="z-ai/glm-4.7-flash",
-        label="Z.ai GLM 4.7 Flash",
-        family="Z.ai GLM",
-        temperature=0.0,
     ),
     "qwen/qwen3.5-flash-02-23": ModelProfile(
         model_id="qwen/qwen3.5-flash-02-23",
