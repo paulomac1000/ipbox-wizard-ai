@@ -1,6 +1,6 @@
 # Onboarding agenta
 
-Repozytorium jest narzędziem **decision-support**, a nie automatycznym doradcą podatkowym. Kontrakt zweryfikowano 17 lipca 2026 r. dla scenariuszy 2025; reguły zależne od roku muszą mieć urzędowe źródło i test.
+Repozytorium jest narzędziem **decision-support**, a nie automatycznym doradcą podatkowym. Kontrakt roczny zweryfikowano 18 lipca 2026 r. dla wszystkich lat obowiązywania IP Box 2019–2026; każdy kolejny rok musi mieć urzędowe źródło i test.
 
 ## Kolejność pracy
 
@@ -12,7 +12,7 @@ Repozytorium jest narzędziem **decision-support**, a nie automatycznym doradcą
 6. Nagrywanie LLM rozpocznij dopiero po zielonym CI i czystym drzewie.
 7. Używaj dokładnych modeli z `tests/llm/models.py`.
 8. Odrzucenia analizuj w `/tmp/ipbox_llm_rejected/<model>/`; wznawiaj tylko brakujące nagrania po sklasyfikowaniu przyczyny.
-9. Zakończenie wymaga 252/252 dla siedmiu rodzin, czystego JSON bez Markdown fences i playbacku bez sekretu i raportu według `docs/independent-audit-brief.md`.
+9. Zakończenie wymaga 322/322 dla siedmiu rodzin, czystego JSON bez Markdown fences i playbacku bez sekretu i raportu według `docs/independent-audit-brief.md`.
 
 ## Model odpowiedzialności
 
@@ -35,8 +35,8 @@ Nie przywracaj pełnej mapy `true/false`. Pierwsza realna macierz wykazała, że
 - Limity zdrowotnej i IKZE są roczne; nie zgaduj limitu dla nieobsługiwanego roku.
 - Miesiąc musi należeć do `input.rok`, a pula termomodernizacji nie może przekraczać 53 000 zł.
 - Kasety historyczne są diagnostyką poprzednich kontraktów, nie dowodem poprawności obecnego kodu.
-- Repo dopuszcza pusty katalog kaset albo kompletną macierz 252/252; częściowej macierzy nie commituj.
+- Repo dopuszcza pusty katalog kaset albo kompletną macierz 322/322; częściowej macierzy nie commituj.
 
 ## Stan bazowy
 
-Przed nowym nagraniem oczekuj 181 testów PASS, coverage 94,32%, 36 kontrolowanych skipów LLM i katalogu kaset zawierającego tylko `.gitkeep`.
+Przed nowym nagraniem oczekuj 255 testów jednostkowych PASS, coverage 94,74%, 46 kontrolowanych skipów LLM i katalogu kaset zawierającego tylko `.gitkeep`.

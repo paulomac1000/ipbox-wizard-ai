@@ -2,14 +2,14 @@
 
 Deterministyczny-first wizard wspierający przygotowanie danych do rozliczenia IP Box programisty B2B.
 
-> To nie jest porada podatkowa ani generator gotowego zeznania. Wynik wymaga sprawdzenia z księgową lub doradcą. Audyt techniczny i semantyczny wykonano 17 lipca 2026 r.; scenariusze referencyjne dotyczą 2025 r., a zakodowane limity 2026 są jawnie wersjonowane.
+> To nie jest porada podatkowa ani generator gotowego zeznania. Wynik wymaga sprawdzenia z księgową lub doradcą. Audyt techniczny i semantyczny wykonano 18 lipca 2026 r.; reguły podatkowe są jawnie wersjonowane dla wszystkich lat obowiązywania IP Box 2019–2026.
 
 ## Architektura
 
 Model językowy nie wykonuje krytycznej arytmetyki:
 
-1. `python_helper/ipbox_calculator.py` waliduje dane i liczy W, alokacje, NEXUS, ulgi, podatek oraz zaokrąglenia.
-2. `tests/llm/oracle.py` tworzy niezależny wynik referencyjny i atomowe `decision_facts`.
+1. `python_helper/ipbox_calculator.py`, `tax_year_rules.py` i `allocation_audit.py` walidują dane, liczą W, alokacje, NEXUS, reguły roczne, ulgi i podatek.
+2. `tests/llm/oracle_v2.py` tworzy niezależny wynik referencyjny i atomowe `decision_facts`.
 3. Runner usuwa wszystkie fakty `false` i przekazuje modelowi wyłącznie aktywne reguły z gotowym kodem STOP/REVIEW.
 4. LLM kopiuje kody aktywnych reguł do małej koperty `status/stops/reviews`; nie widzi reguł nieaktywnych.
 5. Runner składa kopertę z raportem deterministycznym.
@@ -53,11 +53,11 @@ python scripts/check_cassette_policy.py
 for script in scripts/*.sh dump-to-md.sh; do bash -n "$script"; done
 ```
 
-Stan po audycie protokołu: **184 testy PASS**, coverage `python_helper` **94,32%**; pełny bezpłatny suite: **184 PASS i 36 kontrolowanych skipów LLM**.
+Stan po rozszerzeniu regresji: **255 testów jednostkowych PASS**, coverage `python_helper` **94,74%**; pełny bezpłatny suite i 46 kontrolowanych przypadków LLM przechodzą na Pythonie 3.11–3.13.
 
 ## Benchmark wielorodzinny
 
-Benchmark używa dziewięciu tanich modeli z dziewięciu niezależnych rodzin:
+Benchmark używa siedmiu modeli z siedmiu niezależnych rodzin:
 
 | Rodzina | Model OpenRouter | Rola w macierzy |
 |---|---|---|
@@ -92,11 +92,11 @@ Niezależny audyt: [`docs/independent-audit-brief.md`](docs/independent-audit-br
 
 ## Stan wydania
 
-Rdzeń deterministyczny i protokół `active_rules` są po audycie. Pierwsza macierz 108 odpowiedzi została unieważniona: 36 odpowiedzi Claude zawierało Markdown fences akceptowane przez zbyt pobłażliwy parser, a następnie rozszerzono próbę do siedmiu rodzin. Repo zawiera kompletną macierz 252/252 ścisłych odpowiedzi JSON. PR pozostaje **draftem** do końcowego review.
+Rdzeń deterministyczny i protokół `active_rules` są po audycie. Pierwsza macierz 108 odpowiedzi została unieważniona: 36 odpowiedzi Claude zawierało Markdown fences akceptowane przez zbyt pobłażliwy parser, a następnie rozszerzono próbę do siedmiu rodzin. Stara macierz została usunięta po zmianie oracle, schematu i scenariuszy. Repo celowo zawiera pusty katalog kaset; przed review trzeba nagrać od zera macierz 322 odpowiedzi. PR pozostaje **draftem**.
 
 Warunki zakończenia:
 
-- 36/36 kaset dla każdego z siedmiu modeli, czyli 252 aktualne nagrania;
+- 46/46 kaset dla każdego z siedmiu modeli, czyli 322 aktualne nagrania;
 - playback bez `OPENROUTER_API_KEY`;
 - ręczny przegląd odpowiedzi, odrzuceń i raportu kosztu;
 - niezależny raport `READY` bez nierozwiązanych uwag;

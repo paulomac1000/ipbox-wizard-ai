@@ -24,7 +24,7 @@ Model trafia do macierzy, gdy na dzień 18 lipca 2026 r.:
 5. nie jest aliasem routera ani endpointem `:free` o zmiennej dostępności;
 6. wykonuje ten sam ścisły request bez specjalnych wyjątków scenariuszowych.
 
-## Aktualna macierz 7 × 36
+## Aktualna macierz 7 × 46
 
 | Rodzina | Model OpenRouter | Rola w macierzy |
 |---|---|---|
@@ -37,8 +37,8 @@ Model trafia do macierzy, gdy na dzień 18 lipca 2026 r.:
 | Mistral | `mistralai/ministral-3b-2512` | bardzo mały model 3B jako dolna granica |
 
 
-Łącznie wydanie wymaga **252 kaset** i dziewięciu manifestów. Każdy model musi
-osiągnąć 36/36. Wynik częściowy jest wyłącznie diagnostyką.
+Łącznie wydanie wymaga **322 kaset** i siedmiu manifestów. Każdy model musi
+osiągnąć 46/46. Wynik częściowy jest wyłącznie diagnostyką.
 
 ## Migawka cen OpenRouter
 

@@ -33,9 +33,9 @@ for script in scripts/*.sh dump-to-md.sh; do bash -n "$script"; done
 
 Stan referencyjny po audycie protokołu z 17 lipca 2026 r.:
 
-- 184 testy jednostkowe PASS;
-- coverage `python_helper` 94,32%;
-- pełny suite: 184 PASS i 36 kontrolowanych skipów LLM;
+- 255 testów jednostkowych PASS;
+- coverage `python_helper` 94,74%;
+- pełny suite: wszystkie bezpłatne testy PASS i 46 kontrolowanych skipów LLM;
 - pusty katalog kaset jest dozwolony, częściowa macierz nie jest.
 
 ## 3. Testy semantyczne, które muszą pozostać
@@ -56,13 +56,17 @@ Szczególnie chronione regresje:
 - live run, playback i pre-commit odrzucają substytucję modelu;
 - pre-commit porównuje zapisane `parsed_response` z ponownym parsowaniem;
 - tryb record nie nadpisuje istniejącej kasety;
-- miesiące muszą odpowiadać `input.rok`, a termomodernizacja nie przekracza 53 000 zł.
+- miesiące muszą odpowiadać `input.rok`, a termomodernizacja nie przekracza 53 000 zł;
+- jawna semantyka W odróżnia iloczyn warunkowy, rozłączne składniki i sam czas;
+- podwójny procent faktury oraz nieudokumentowana zmiana metody w roku aktywują STOP;
+- ewidencja i zeznanie uzgadniają się osobno w IP/NIE nawet przy równych sumach globalnych;
+- reguły roczne 2019–2026 obejmują IKZE, zdrowotną, skalę i granicę jednoczesnego B+R/IP Box.
 
 ## 4. Dlaczego stare kasety są nieważne
 
 Fingerprint obejmuje protokół decyzji, listę aktywnych reguł, system prompt, request, model, profil, schema i format kasety. Zmiana któregokolwiek elementu unieważnia nagranie. Kasety z pełną mapą `true/false` oraz pierwsza macierz `active_rules` z parserem usuwającym Markdown fences są nieaktualne i muszą zostać nagrane od nowa.
 
-Kasety starego pełnego raportu także nie są zgodne z obecną kopertą decyzji. Nie kopiuj ich odpowiedzi, hashy, manifestu ani parsed payloadu. Po obecnych zmianach należy nagrać **252 kasety: 7 modeli × 36 scenariuszy**.
+Kasety starego pełnego raportu także nie są zgodne z obecną kopertą decyzji. Nie kopiuj ich odpowiedzi, hashy, manifestu ani parsed payloadu. Po obecnych zmianach należy nagrać **322 kasety: 7 modeli × 46 scenariuszy**.
 
 ## 5. Modele bramkowe
 
@@ -130,7 +134,7 @@ Playback musi przejść przy nieustawionym sekrecie. Live request w tym trybie j
 
 ## 8. Kryterium zaliczenia
 
-Model zalicza tylko przy 36/36, a cała macierz przy 252/252. Każda kaseta musi:
+Model zalicza tylko przy 46/46, a cała macierz przy 322/322. Każda kaseta musi:
 
 - mieć `finish_reason=stop`;
 - mieć `returned_model` identyczny z modelem żądanym;
@@ -141,7 +145,7 @@ Model zalicza tylko przy 36/36, a cała macierz przy 252/252. Każda kaseta musi
 - mieć zgodny request hash, fingerprint i ponowne parsowanie;
 - przejść playback bez klucza API.
 
-35/36 jest diagnostyką, nie bramką wydania.
+45/46 jest diagnostyką, nie bramką wydania.
 
 ## 9. Analiza porażki
 
@@ -182,8 +186,8 @@ git status --short
 git diff --stat
 ```
 
-Repo dopuszcza brak kaset albo kompletną aktualną macierz 7 × 36. Nie commituj `/tmp`, raportów lokalnych ani częściowej macierzy.
+Repo dopuszcza brak kaset albo kompletną aktualną macierz 7 × 46. Nie commituj `/tmp`, raportów lokalnych ani częściowej macierzy.
 
 ## 11. Workflow GitHub
 
-`Paid multi-model LLM benchmark` wymaga jawnego potwierdzenia kosztu. Artefakty nie są commitowane automatycznie. Po pobraniu skopiuj dziewięć katalogów do `tests/llm/vcr/cassettes/` i wykonaj sekcję 10.
+`Paid multi-model LLM benchmark` wymaga jawnego potwierdzenia kosztu. Artefakty nie są commitowane automatycznie. Po pobraniu skopiuj siedem katalogów do `tests/llm/vcr/cassettes/` i wykonaj sekcję 10.

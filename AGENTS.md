@@ -7,9 +7,9 @@ Utrzymuj wiarygodne, fail-closed narzędzie wspierające przygotowanie danych do
 ## Źródła prawdy
 
 1. `ipbox_algorytm.md` — reguły i granice zakresu.
-2. `python_helper/ipbox_calculator.py` — deterministyczna matematyka.
-3. `tests/llm/oracle.py` — wynik referencyjny harnessu.
-4. `tests/llm/output_schema.py` — kontrakt raportu.
+2. `python_helper/ipbox_calculator.py`, `tax_year_rules.py` i `allocation_audit.py` — deterministyczna matematyka, reguły roczne i strażniki alokacji.
+3. `tests/llm/oracle_v2.py` — wynik referencyjny harnessu.
+4. `tests/llm/output_schema_v2.py` — kontrakt raportu.
 5. `tests/llm/scenarios/` — przypadki biznesowe.
 6. `tests/unit/` — wykonywalna specyfikacja.
 7. `docs/testing.md` — procedura wydania i VCR.
@@ -25,6 +25,7 @@ Sprzeczność między źródłami jest błędem. Nie wybieraj wygodniejszej wers
 - koszt bez dowodu wyłączności nie staje się `IP`;
 - kwalifikowany `MIX` wymaga `nexus_source` i `nexus_amount`;
 - alokacje zachowują każdy grosz;
+- testy i scenariusze nie zawierają danych osobowych ani rzeczywistych kwot podatnika;
 - B+R jest rozdzielane na część IP i NIE; część IP pomniejsza dochód przed NEXUS;
 - strata pozostałej działalności nie jest stratą konkretnego IP;
 - działalność na skali obejmuje wspólną podstawę z innymi dochodami skali;
@@ -50,7 +51,7 @@ Sprzeczność między źródłami jest błędem. Nie wybieraj wygodniejszej wers
 - używać niejednoznacznych pól `ulga_BR` albo `straty_poprzednie`;
 - włączać płatnych requestów do standardowego CI;
 - nadpisywać poprawnych kaset;
-- deklarować gotowości bez 252/252 i playbacku offline.
+- deklarować gotowości bez 322/322 i playbacku offline.
 
 ## Bramka jakości
 
@@ -64,8 +65,8 @@ python scripts/check_cassette_policy.py
 for script in scripts/*.sh dump-to-md.sh; do bash -n "$script"; done
 ```
 
-Stan bazowy po audycie protokołu: 184 testy, 94,32% coverage, 36 kontrolowanych skipów LLM.
+Stan bazowy po rozszerzeniu regresji: 255 testów jednostkowych, 94,74% coverage i 46 kontrolowanych skipów LLM.
 
 ## Nagrywanie
 
-Nagrywaj przez `scripts/record_model.py`. Po zmianie requestu, algorytmu, scenariusza lub schematu usuń wyłącznie unieważnione kasety. Wydanie wymaga 36/36 dla każdego z siedmiu modeli (252/252), czystego JSON bez Markdown fences, zgodnego modelu zwróconego, playbacku bez sekretu, kontroli manifestu i raportu niezależnego agenta.
+Nagrywaj przez `scripts/record_model.py`. Po zmianie requestu, algorytmu, scenariusza lub schematu usuń wyłącznie unieważnione kasety. Wydanie wymaga 46/46 dla każdego z siedmiu modeli (322/322), czystego JSON bez Markdown fences, zgodnego modelu zwróconego, playbacku bez sekretu, kontroli manifestu i raportu niezależnego agenta.
