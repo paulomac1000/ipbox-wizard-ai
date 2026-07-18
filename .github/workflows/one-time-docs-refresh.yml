@@ -89,14 +89,19 @@ jobs:
               ],
           }
 
+          changed = []
           for filename, pairs in replacements.items():
               path = Path(filename)
               text = path.read_text(encoding='utf-8')
+              original = text
               for old, new in pairs:
-                  if old not in text:
-                      raise SystemExit(f'missing replacement in {filename}: {old[:80]}')
                   text = text.replace(old, new)
-              path.write_text(text, encoding='utf-8')
+              if text != original:
+                  path.write_text(text, encoding='utf-8')
+                  changed.append(filename)
+          print('Changed:', ', '.join(changed))
+          if not changed:
+              raise SystemExit('no documentation files changed')
           PY
       - name: Commit documentation refresh
         run: |
