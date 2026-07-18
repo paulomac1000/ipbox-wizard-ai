@@ -17,7 +17,7 @@ def test_release_gate_contains_exactly_seven_distinct_model_families() -> None:
     assert "z-ai/glm-4.7-flash" not in MODEL_PROFILES
 
 
-def test_runner_rejects_review_codes_routed_to_stops() -> None:
+def test_runner_rejects_review_codes_routed_to_stops_at_schema_boundary() -> None:
     runner = LLMTestRunner(client=None)
     payload = json.dumps(
         {
@@ -27,7 +27,7 @@ def test_runner_rejects_review_codes_routed_to_stops() -> None:
         }
     )
 
-    with pytest.raises(ValueError, match="non-STOP codes in stops"):
+    with pytest.raises(ValueError, match="decision does not match strict schema"):
         runner.parse_decision(payload)
 
 
