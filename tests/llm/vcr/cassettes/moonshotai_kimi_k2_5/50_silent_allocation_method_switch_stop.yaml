@@ -1,0 +1,89 @@
+meta:
+  scenario_id: 50_silent_allocation_method_switch_stop
+  scenario_name: Niejawna zmiana metody alokacji w trakcie roku
+  provider: openrouter
+  requested_model: moonshotai/kimi-k2.5
+  returned_model: moonshotai/kimi-k2.5
+  fingerprint: v3_c04c2bbd4021f532069348e165a07bd1d0edebcb73b61834cefbe5df92444876
+  request_hash: 3bf954efa55435b32310192929acf3d1d86408a05f0d4b886fdced216e939d5b
+  recorded_at: '2026-07-18T21:25:30.196220+00:00'
+  request_id: gen-1784409923-0zDq0IimhvGupfHRcC7V
+  finish_reason: stop
+  native_finish_reason: stop
+  system_fingerprint: null
+  prompt_tokens: 245
+  completion_tokens: 391
+  total_tokens: 636
+  cost: 0.00094136
+  recording_duration_seconds: 7.229
+  cassette_format_version: 4
+response: '{"reviews":["REVIEW_09"],"status":"STOPPED","stops":["STOP_09","STOP_10","STOP_11"]}'
+parsed_response:
+  status: STOPPED
+  result:
+    rok: 2025
+    przychody_roczne:
+      IP: 0.0
+      NIE: 0.0
+    koszty_roczne:
+      IP: 0.0
+      NIE: 0.0
+      MIX: 0.0
+      WYKLUCZONE: 0.0
+    nexus_koszty:
+      A: 0.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 0.0
+    nexus: 0.0
+    dochód_IP: 0.0
+    dochód_NIE: 0.0
+    klucz_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      wartość: null
+      status: NOT_APPLICABLE
+    alokacja_multi_ip: null
+    podatek:
+      podstawa_IP: 0
+      podstawa_NIE: 0
+      podatek_IP: 0
+      podatek_NIE_finalny: 0
+      podatek_całościowy: 0
+      nadpłata_lub_dopłata: 0.0
+      termomodernization_carry_over: 0.0
+      termomodernization_expired: 0.0
+      health_tax_credit_used: 0.0
+      ulga_BR_IP_wykorzystana: 0.0
+      ulga_BR_NIE_wykorzystana: 0.0
+      ulga_BR_carry_over: 0.0
+      dochód_dodatkowy_skala: 0.0
+  classifications: []
+  monthly_W:
+  - miesiąc: 2025-01
+    wartość: 70.0
+  - miesiąc: 2025-02
+    wartość: 90.0
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+    TEST_3: PASS
+    TEST_4: PASS
+    TEST_5: PASS
+    TEST_6: PASS
+    TEST_7: PASS
+    TEST_8: PASS
+    TEST_9: PASS
+  stops_reviews:
+    stops:
+    - STOP_09
+    - STOP_10
+    - STOP_11
+    reviews:
+    - REVIEW_09
+    warnings:
+    - ALLOCATION_METHOD_SWITCH
+    - FULL_REVENUE_DESPITE_NON_IP_SHARE
+    - INVOICE_PERCENTAGE_DOUBLE_APPLIED
+    - REVENUE_ALLOCATION_MISMATCH

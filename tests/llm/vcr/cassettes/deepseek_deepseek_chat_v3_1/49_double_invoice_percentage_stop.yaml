@@ -1,0 +1,85 @@
+meta:
+  scenario_id: 49_double_invoice_percentage_stop
+  scenario_name: Podwójne zastosowanie procentu faktury
+  provider: openrouter
+  requested_model: deepseek/deepseek-chat-v3.1
+  returned_model: deepseek/deepseek-chat-v3.1
+  fingerprint: v3_6c2e050084060c75800a6ede5f5d7014fc4317e9aa614290f85730af97246491
+  request_hash: 825a37617d9c1a415f50ee4ef9773b604d9c25b9e27bfc83d7420636c31fc673
+  recorded_at: '2026-07-18T21:16:00.179549+00:00'
+  request_id: gen-1784409357-NticVdY8en0RTNscj0QU
+  finish_reason: stop
+  native_finish_reason: stop
+  system_fingerprint: null
+  prompt_tokens: 495
+  completion_tokens: 41
+  total_tokens: 536
+  cost: 0.00013145
+  recording_duration_seconds: 2.445
+  cassette_format_version: 4
+response: "{\n    \"status\": \"STOPPED\",\n    \"stops\": [\"STOP_09\", \"STOP_10\"],\n    \"reviews\": [\"REVIEW_09\"]\n\
+  }"
+parsed_response:
+  status: STOPPED
+  result:
+    rok: 2025
+    przychody_roczne:
+      IP: 0.0
+      NIE: 0.0
+    koszty_roczne:
+      IP: 0.0
+      NIE: 0.0
+      MIX: 0.0
+      WYKLUCZONE: 0.0
+    nexus_koszty:
+      A: 0.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 0.0
+    nexus: 0.0
+    dochód_IP: 0.0
+    dochód_NIE: 0.0
+    klucz_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      wartość: null
+      status: NOT_APPLICABLE
+    alokacja_multi_ip: null
+    podatek:
+      podstawa_IP: 0
+      podstawa_NIE: 0
+      podatek_IP: 0
+      podatek_NIE_finalny: 0
+      podatek_całościowy: 0
+      nadpłata_lub_dopłata: 0.0
+      termomodernization_carry_over: 0.0
+      termomodernization_expired: 0.0
+      health_tax_credit_used: 0.0
+      ulga_BR_IP_wykorzystana: 0.0
+      ulga_BR_NIE_wykorzystana: 0.0
+      ulga_BR_carry_over: 0.0
+      dochód_dodatkowy_skala: 0.0
+  classifications: []
+  monthly_W:
+  - miesiąc: 2025-01
+    wartość: 70.0
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+    TEST_3: PASS
+    TEST_4: PASS
+    TEST_5: PASS
+    TEST_6: PASS
+    TEST_7: PASS
+    TEST_8: PASS
+    TEST_9: PASS
+  stops_reviews:
+    stops:
+    - STOP_09
+    - STOP_10
+    reviews:
+    - REVIEW_09
+    warnings:
+    - INVOICE_PERCENTAGE_DOUBLE_APPLIED
+    - REVENUE_ALLOCATION_MISMATCH

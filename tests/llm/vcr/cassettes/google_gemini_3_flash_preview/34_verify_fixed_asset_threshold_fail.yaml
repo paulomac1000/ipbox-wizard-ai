@@ -1,0 +1,92 @@
+meta:
+  scenario_id: 34_verify_fixed_asset_threshold_fail
+  scenario_name: Środek trwały powyżej progu
+  provider: openrouter
+  requested_model: google/gemini-3-flash-preview
+  returned_model: google/gemini-3-flash-preview
+  fingerprint: v3_714e3d9ed6001884f5595610109a6623609fdb8e532944d10957167c42a5aac3
+  request_hash: 0fadd4ecf6dafba3b9893cb4df228a4fa00ef5b378f77583d6708f22a4baa204
+  recorded_at: '2026-07-18T21:11:09.891533+00:00'
+  request_id: gen-1784409068-q2nYFKDBTvIW8VfWAsEK
+  finish_reason: stop
+  native_finish_reason: STOP
+  system_fingerprint: null
+  prompt_tokens: 404
+  completion_tokens: 20
+  total_tokens: 424
+  cost: 0.000262
+  recording_duration_seconds: 1.329
+  cassette_format_version: 4
+response: '{"status":"FINAL","stops":[],"reviews":["REVIEW_01","REVIEW_09"]}'
+parsed_response:
+  status: FINAL
+  result:
+    rok: 2025
+    przychody_roczne:
+      IP: 25000.0
+      NIE: 0.0
+    koszty_roczne:
+      IP: 0.0
+      NIE: 0.0
+      MIX: 0.0
+      WYKLUCZONE: 12500.0
+    nexus_koszty:
+      A: 0.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 12500.0
+    nexus: 0.0
+    dochód_IP: 25000.0
+    dochód_NIE: 0.0
+    klucz_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      wartość: null
+      status: NOT_APPLICABLE
+    alokacja_multi_ip: null
+    podatek:
+      podstawa_IP: 0
+      podstawa_NIE: 0
+      podatek_IP: 0
+      podatek_NIE_finalny: 0
+      podatek_całościowy: 0
+      nadpłata_lub_dopłata: -0.0
+      termomodernization_carry_over: 0.0
+      termomodernization_expired: 0.0
+      health_tax_credit_used: 0.0
+      ulga_BR_IP_wykorzystana: 0.0
+      ulga_BR_NIE_wykorzystana: 0.0
+      ulga_BR_carry_over: 0.0
+      dochód_dodatkowy_skala: 0.0
+  classifications:
+  - opis: Laptop ThinkPad X1 Carbon
+    amount: 12500.0
+    basket: WYKLUCZONE
+    allocation_method: excluded
+    allocation_source: ''
+    allocation_key: null
+    ip_amount: 0.0
+    non_ip_amount: 0.0
+    nexus_source: outside_nexus
+    nexus_basket: poza_nexus
+    nexus_amount: 0.0
+  monthly_W:
+  - miesiąc: 2025-01
+    wartość: 100.0
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+    TEST_3: PASS
+    TEST_4: PASS
+    TEST_5: PASS
+    TEST_6: PASS
+    TEST_7: PASS
+    TEST_8: PASS
+    TEST_9: PASS
+  stops_reviews:
+    stops: []
+    reviews:
+    - REVIEW_01
+    - REVIEW_09
+    warnings: []

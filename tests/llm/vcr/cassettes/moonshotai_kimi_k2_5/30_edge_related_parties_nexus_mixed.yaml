@@ -1,0 +1,127 @@
+meta:
+  scenario_id: 30_edge_related_parties_nexus_mixed
+  scenario_name: Mieszane koszty A i C
+  provider: openrouter
+  requested_model: moonshotai/kimi-k2.5
+  returned_model: moonshotai/kimi-k2.5
+  fingerprint: v3_79d65ecff62e2fd5cc24c59e5b266616e6eed7ac3c1362e9fe042b574b43076b
+  request_hash: bd03941db25138e48b8d489d59bd07d863daa959b911fec7bee9241bb58f76b6
+  recorded_at: '2026-07-18T21:23:06.663111+00:00'
+  request_id: gen-1784409778-0G9fktA8aZgziMsrV3sc
+  finish_reason: stop
+  native_finish_reason: stop
+  system_fingerprint: null
+  prompt_tokens: 227
+  completion_tokens: 440
+  total_tokens: 667
+  cost: 0.00104351
+  recording_duration_seconds: 7.963
+  cassette_format_version: 4
+response: '{"reviews":["REVIEW_01","REVIEW_09"],"status":"FINAL","stops":[]}'
+parsed_response:
+  status: FINAL
+  result:
+    rok: 2025
+    przychody_roczne:
+      IP: 40000.0
+      NIE: 0.0
+    koszty_roczne:
+      IP: 13500.0
+      NIE: 0.0
+      MIX: 0.0
+      WYKLUCZONE: 0.0
+    nexus_koszty:
+      A: 3500.0
+      B: 0.0
+      C: 10000.0
+      D: 0.0
+      poza_nexus: 0.0
+    nexus: 0.337037
+    dochód_IP: 26500.0
+    dochód_NIE: 0.0
+    klucz_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      wartość: null
+      status: NOT_APPLICABLE
+    alokacja_multi_ip: null
+    podatek:
+      podstawa_IP: 8931
+      podstawa_NIE: 0
+      podatek_IP: 447
+      podatek_NIE_finalny: 0
+      podatek_całościowy: 447
+      nadpłata_lub_dopłata: -447.0
+      termomodernization_carry_over: 0.0
+      termomodernization_expired: 0.0
+      health_tax_credit_used: 0.0
+      ulga_BR_IP_wykorzystana: 0.0
+      ulga_BR_NIE_wykorzystana: 0.0
+      ulga_BR_carry_over: 0.0
+      dochód_dodatkowy_skala: 0.0
+  classifications:
+  - opis: Laptop do B+R
+    amount: 3000.0
+    basket: IP
+    allocation_method: direct
+    allocation_source: ewidencja_kosztu_IP
+    allocation_key: 1.0
+    ip_amount: 3000.0
+    non_ip_amount: 0.0
+    nexus_source: own_br
+    nexus_basket: A
+    nexus_amount: 3000.0
+  - opis: Usługi CodeSis
+    amount: 5000.0
+    basket: IP
+    allocation_method: direct
+    allocation_source: ewidencja_kosztu_IP
+    allocation_key: 1.0
+    ip_amount: 5000.0
+    non_ip_amount: 0.0
+    nexus_source: related_br_contractor
+    nexus_basket: C
+    nexus_amount: 5000.0
+  - opis: Licencja JetBrains
+    amount: 500.0
+    basket: IP
+    allocation_method: direct
+    allocation_source: ewidencja_kosztu_IP
+    allocation_key: 1.0
+    ip_amount: 500.0
+    non_ip_amount: 0.0
+    nexus_source: own_br
+    nexus_basket: A
+    nexus_amount: 500.0
+  - opis: Usługi CodeSis 2
+    amount: 5000.0
+    basket: IP
+    allocation_method: direct
+    allocation_source: ewidencja_kosztu_IP
+    allocation_key: 1.0
+    ip_amount: 5000.0
+    non_ip_amount: 0.0
+    nexus_source: related_br_contractor
+    nexus_basket: C
+    nexus_amount: 5000.0
+  monthly_W:
+  - miesiąc: 2025-01
+    wartość: 100.0
+  - miesiąc: 2025-02
+    wartość: 100.0
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+    TEST_3: PASS
+    TEST_4: PASS
+    TEST_5: PASS
+    TEST_6: PASS
+    TEST_7: PASS
+    TEST_8: PASS
+    TEST_9: PASS
+  stops_reviews:
+    stops: []
+    reviews:
+    - REVIEW_01
+    - REVIEW_09
+    warnings: []

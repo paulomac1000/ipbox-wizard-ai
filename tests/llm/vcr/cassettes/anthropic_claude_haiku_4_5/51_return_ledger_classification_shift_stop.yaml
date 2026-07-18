@@ -1,0 +1,87 @@
+meta:
+  scenario_id: 51_return_ledger_classification_shift_stop
+  scenario_name: Zeznanie i ewidencja mają te same sumy, ale inny podział IP i NIE
+  provider: openrouter
+  requested_model: anthropic/claude-haiku-4.5
+  returned_model: anthropic/claude-haiku-4.5
+  fingerprint: v3_1efd1313655129749034ac982a04a4e3585c9a77d7437e5585450ceedfdec978
+  request_hash: a538e41cd2f3cd69a34f349e755d768332269791b156e0a6c9f143ea353b0989
+  recorded_at: '2026-07-18T21:13:10.941887+00:00'
+  request_id: gen-1784409189-RHlTeSSuT1hOHE7W9IAK
+  finish_reason: stop
+  native_finish_reason: end_turn
+  system_fingerprint: null
+  prompt_tokens: 528
+  completion_tokens: 27
+  total_tokens: 555
+  cost: 0.000663
+  recording_duration_seconds: 1.101
+  cassette_format_version: 4
+response: '{"status":"STOPPED","stops":["STOP_12"],"reviews":["REVIEW_09"]}'
+parsed_response:
+  status: STOPPED
+  result:
+    rok: 2025
+    przychody_roczne:
+      IP: 0.0
+      NIE: 0.0
+    koszty_roczne:
+      IP: 0.0
+      NIE: 0.0
+      MIX: 0.0
+      WYKLUCZONE: 0.0
+    nexus_koszty:
+      A: 0.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 0.0
+    nexus: 0.0
+    dochód_IP: 0.0
+    dochód_NIE: 0.0
+    klucz_MIX:
+      metoda: przychodowa_roczna
+      źródło: użytkownik
+      wartość: null
+      status: NOT_APPLICABLE
+    alokacja_multi_ip: null
+    podatek:
+      podstawa_IP: 0
+      podstawa_NIE: 0
+      podatek_IP: 0
+      podatek_NIE_finalny: 0
+      podatek_całościowy: 0
+      nadpłata_lub_dopłata: 0.0
+      termomodernization_carry_over: 0.0
+      termomodernization_expired: 0.0
+      health_tax_credit_used: 0.0
+      ulga_BR_IP_wykorzystana: 0.0
+      ulga_BR_NIE_wykorzystana: 0.0
+      ulga_BR_carry_over: 0.0
+      dochód_dodatkowy_skala: 0.0
+  classifications: []
+  monthly_W:
+  - miesiąc: 2025-12
+    wartość: 80.0
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+    TEST_3: PASS
+    TEST_4: PASS
+    TEST_5: PASS
+    TEST_6: PASS
+    TEST_7: PASS
+    TEST_8: PASS
+    TEST_9: PASS
+  stops_reviews:
+    stops:
+    - STOP_12
+    reviews:
+    - REVIEW_09
+    warnings:
+    - RETURN_COST_CLASSIFICATION_SHIFT
+    - RETURN_IP_COST_MISMATCH
+    - RETURN_IP_REVENUE_MISMATCH
+    - RETURN_NON_IP_COST_MISMATCH
+    - RETURN_NON_IP_REVENUE_MISMATCH
+    - RETURN_REVENUE_CLASSIFICATION_SHIFT

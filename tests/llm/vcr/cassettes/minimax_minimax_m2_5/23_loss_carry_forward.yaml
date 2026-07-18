@@ -1,0 +1,90 @@
+meta:
+  scenario_id: 23_loss_carry_forward
+  scenario_name: Strata z lat ubiegłych
+  provider: openrouter
+  requested_model: minimax/minimax-m2.5
+  returned_model: minimax/minimax-m2.5
+  fingerprint: v3_49fbd9f3076b764c17fd4ae2f5de6f09e6d2edaf2c344feadb18ff9eaf6a24a1
+  request_hash: beb9d85300f042dafef71b796ef6d5a9b134444793daa9cf3c6cd6f9d5d84368
+  recorded_at: '2026-07-18T21:17:53.464083+00:00'
+  request_id: gen-1784409471-m7z0h2kVDpwPiZfCnO4W
+  finish_reason: stop
+  native_finish_reason: stop
+  system_fingerprint: null
+  prompt_tokens: 209
+  completion_tokens: 237
+  total_tokens: 446
+  cost: 0.000281286
+  recording_duration_seconds: 2.164
+  cassette_format_version: 4
+response: '{"reviews":[],"status":"FINAL","stops":[]}'
+parsed_response:
+  status: FINAL
+  result:
+    rok: 2025
+    przychody_roczne:
+      IP: 18000.0
+      NIE: 12000.0
+    koszty_roczne:
+      IP: 89.0
+      NIE: 0.0
+      MIX: 0.0
+      WYKLUCZONE: 0.0
+    nexus_koszty:
+      A: 89.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 0.0
+    nexus: 1.0
+    dochód_IP: 17911.0
+    dochód_NIE: 12000.0
+    klucz_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      wartość: null
+      status: NOT_APPLICABLE
+    alokacja_multi_ip: null
+    podatek:
+      podstawa_IP: 17911
+      podstawa_NIE: 7000
+      podatek_IP: 896
+      podatek_NIE_finalny: 1330
+      podatek_całościowy: 2226
+      nadpłata_lub_dopłata: -2226.0
+      termomodernization_carry_over: 0.0
+      termomodernization_expired: 0.0
+      health_tax_credit_used: 0.0
+      ulga_BR_IP_wykorzystana: 0.0
+      ulga_BR_NIE_wykorzystana: 0.0
+      ulga_BR_carry_over: 0.0
+      dochód_dodatkowy_skala: 0.0
+  classifications:
+  - opis: Licencja IDE
+    amount: 89.0
+    basket: IP
+    allocation_method: direct
+    allocation_source: ewidencja_kosztu_IP
+    allocation_key: 1.0
+    ip_amount: 89.0
+    non_ip_amount: 0.0
+    nexus_source: own_br
+    nexus_basket: A
+    nexus_amount: 89.0
+  monthly_W:
+  - miesiąc: 2025-01
+    wartość: 90.0
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+    TEST_3: PASS
+    TEST_4: PASS
+    TEST_5: PASS
+    TEST_6: PASS
+    TEST_7: PASS
+    TEST_8: PASS
+    TEST_9: PASS
+  stops_reviews:
+    stops: []
+    reviews: []
+    warnings: []

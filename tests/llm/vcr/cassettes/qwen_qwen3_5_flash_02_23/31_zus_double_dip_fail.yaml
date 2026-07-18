@@ -1,0 +1,83 @@
+meta:
+  scenario_id: 31_zus_double_dip_fail
+  scenario_name: Dublowanie ZUS
+  provider: openrouter
+  requested_model: qwen/qwen3.5-flash-02-23
+  returned_model: qwen/qwen3.5-flash-02-23
+  fingerprint: v3_52612eb0a3d81f71a6166df77271ae6fac6e86ce8c27fa774f7061072f6c4da2
+  request_hash: 0adee611453a8559463530938722026d103e0f4c85ef99d6b701c4a6c9916764
+  recorded_at: '2026-07-18T21:28:33.197589+00:00'
+  request_id: gen-1784410108-Rpuzf8SUZgofEMYwLueV
+  finish_reason: stop
+  native_finish_reason: stop
+  system_fingerprint: null
+  prompt_tokens: 251
+  completion_tokens: 810
+  total_tokens: 1061
+  cost: 0.000226915
+  recording_duration_seconds: 4.926
+  cassette_format_version: 4
+response: "{\n  \"status\": \"STOPPED\",\n  \"stops\": [\"ZUS_DOUBLE_DIP\"],\n  \"reviews\": [\"REVIEW_01\", \"REVIEW_09\"\
+  ]\n}"
+parsed_response:
+  status: STOPPED
+  result:
+    rok: 2025
+    przychody_roczne:
+      IP: 0.0
+      NIE: 0.0
+    koszty_roczne:
+      IP: 0.0
+      NIE: 0.0
+      MIX: 0.0
+      WYKLUCZONE: 0.0
+    nexus_koszty:
+      A: 0.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 0.0
+    nexus: 0.0
+    dochód_IP: 0.0
+    dochód_NIE: 0.0
+    klucz_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      wartość: null
+      status: NOT_APPLICABLE
+    alokacja_multi_ip: null
+    podatek:
+      podstawa_IP: 0
+      podstawa_NIE: 0
+      podatek_IP: 0
+      podatek_NIE_finalny: 0
+      podatek_całościowy: 0
+      nadpłata_lub_dopłata: 0.0
+      termomodernization_carry_over: 0.0
+      termomodernization_expired: 0.0
+      health_tax_credit_used: 0.0
+      ulga_BR_IP_wykorzystana: 0.0
+      ulga_BR_NIE_wykorzystana: 0.0
+      ulga_BR_carry_over: 0.0
+      dochód_dodatkowy_skala: 0.0
+  classifications: []
+  monthly_W:
+  - miesiąc: 2025-01
+    wartość: 100.0
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+    TEST_3: FAIL
+    TEST_4: PASS
+    TEST_5: PASS
+    TEST_6: PASS
+    TEST_7: PASS
+    TEST_8: PASS
+    TEST_9: PASS
+  stops_reviews:
+    stops:
+    - ZUS_DOUBLE_DIP
+    reviews:
+    - REVIEW_01
+    - REVIEW_09
+    warnings: []
