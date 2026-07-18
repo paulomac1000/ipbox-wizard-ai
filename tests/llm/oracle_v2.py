@@ -10,6 +10,8 @@ from python_helper.tax_year_rules import calculate_tax_for_year
 from . import oracle as legacy
 from .oracle_adapter import legacy_safe_copy, number, prepare_scenario
 from .oracle_guards import (
+    REVIEW_FACT_TO_CODE,
+    STOP_FACT_TO_CODE,
     audit_facts,
     derive_decision_codes,
     year_facts,
