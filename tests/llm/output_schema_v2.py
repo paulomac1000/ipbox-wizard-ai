@@ -24,6 +24,14 @@ for code in (
     if code not in _stop_codes:
         _stop_codes.append(code)
 
+# The assembled report must enforce the same channel-specific code sets as the
+# small decision envelope.  A generic CODE pattern here would let a tampered
+# report route REVIEW codes through stops even though live parsing rejects it.
+_decision_properties = DECISION_JSON_SCHEMA["schema"]["properties"]
+_report_channels = OUTPUT_JSON_SCHEMA["schema"]["properties"]["stops_reviews"]["properties"]
+_report_channels["stops"]["items"] = deepcopy(_decision_properties["stops"]["items"])
+_report_channels["reviews"]["items"] = deepcopy(_decision_properties["reviews"]["items"])
+
 _result = OUTPUT_JSON_SCHEMA["schema"]["properties"]["result"]["properties"]
 _mix_method = _result["klucz_MIX"]["properties"]["metoda"]["enum"]
 if "przychodowa_w_dacie_kosztu" not in _mix_method:
