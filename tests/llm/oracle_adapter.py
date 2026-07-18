@@ -73,7 +73,9 @@ def month_invoices(month: dict[str, Any]) -> list[dict[str, Any]]:
         raise ScenarioError("legacy oracle lacks _month_invoices") from exc
 
 
-def prepare_scenario(scenario: dict[str, Any]) -> tuple[dict[str, Any], dict[str, float], str]:
+def prepare_scenario(
+    scenario: dict[str, Any],
+) -> tuple[dict[str, Any], dict[str, float], str]:
     transformed = deepcopy(scenario)
     input_data = transformed.get("input")
     if not isinstance(input_data, dict):
@@ -111,7 +113,9 @@ def prepare_scenario(scenario: dict[str, Any]) -> tuple[dict[str, Any], dict[str
     return transformed, shares, method
 
 
-def prepare_cost_date_policy(input_data: dict[str, Any], shares: dict[str, float]) -> None:
+def prepare_cost_date_policy(
+    input_data: dict[str, Any], shares: dict[str, float]
+) -> None:
     policy = input_data["polityka_alokacji"]
     revenue_policy = policy["przychody"]
     mix_policy = policy["koszty_MIX"]
