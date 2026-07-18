@@ -1,0 +1,50 @@
+meta:
+  id: 55_disjoint_w_semantics_clean
+  name: Jawna metoda W dla rozłącznych składników wynagrodzenia
+  description: Procent faktury i godziny NIE-IP są rozłączne, więc nie wolno mnożyć ich ponownie.
+  tags: [regression, allocation, w-semantics]
+  priority: P0
+input:
+  rok: 2025
+  forma_opodatkowania: liniowy_19%
+  polityka_alokacji:
+    policy_id: disjoint-w-clean
+    W:
+      metoda: disjoint_components
+    przychody:
+      metoda: czasowa_W
+    koszty_MIX:
+      metoda: przychodowa_roczna
+      źródło: użytkownik
+      uzasadnienie: Umowa i raport rozdzielają część faktury oraz godziny NIE-IP.
+  zus:
+    sposob: brak
+  kontrahenci:
+    - nazwa: ClientA
+      klauzula_IP: true
+  miesiace:
+    - miesiac: 2025-01
+      faktury:
+        - kwota_PLN: 10000
+          kontrahent: ClientA
+          kwalifikuje_IP: true
+      ewidencja:
+        godziny_pracy: 160
+        godziny_nie_IP: 16
+        procent_faktury_IP: 80
+      kontrola_alokacji:
+        przychod_IP: 7000
+        przychod_NIE: 3000
+      koszty:
+        - opis: Bezpośredni koszt projektu
+          kwota: 100
+          kategoria: IP
+          allocation_source: syntetyczna-ewidencja-projektowa
+          nexus_source: own_br
+      opis_projektu: Rozwój kwalifikowanego programu komputerowego.
+assertions:
+  W_miesieczne:
+    2025-01: 70.0
+  przychod_IP_roczny_range: [7000, 7000]
+  przychod_NIE_roczny_range: [3000, 3000]
+  testy_pass: [TEST_4, TEST_5, TEST_6, TEST_8, TEST_9]
