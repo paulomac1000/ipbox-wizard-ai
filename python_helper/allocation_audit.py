@@ -74,7 +74,9 @@ def calculate_w_share(
     else:
         share = time_share
     if not Decimal("0") <= share <= Decimal("1"):
-        raise ValueError("W method produced a share outside 0-1; field semantics contradict")
+        raise ValueError(
+            "W method produced a share outside 0-1; field semantics contradict"
+        )
     return share
 
 
@@ -151,8 +153,9 @@ def audit_revenue_allocation(
             percentage,
             tolerance_dec,
         )
-        # At 100%, invoice_percentage_once and full_revenue are numerically equal.
-        # Prefer the semantic failure when declared non-IP evidence still gives W < 100%.
+        # A 100% invoice percentage makes ``invoice_percentage_once`` numerically
+        # identical to ``full_revenue``.  The semantic guard must prefer the
+        # latter whenever declared non-IP evidence still produces W < 100%.
         if abs(reported_ip - total) <= tolerance_dec and expected_share < 1:
             signature = "full_revenue"
         signatures.append((month, signature))
@@ -186,7 +189,9 @@ def audit_revenue_allocation(
             )
 
     meaningful = [
-        (month, signature) for month, signature in signatures if signature != "unclassified"
+        (month, signature)
+        for month, signature in signatures
+        if signature != "unclassified"
     ]
     signature_counts = Counter(signature for _, signature in meaningful)
     if len(signature_counts) > 1:
@@ -195,7 +200,8 @@ def audit_revenue_allocation(
                 "ALLOCATION_METHOD_SWITCH",
                 None,
                 detail=", ".join(
-                    f"{name}={count}" for name, count in sorted(signature_counts.items())
+                    f"{name}={count}"
+                    for name, count in sorted(signature_counts.items())
                 ),
             )
         )
@@ -217,9 +223,13 @@ def reconcile_return_to_ledger(
         actual = money(_nonnegative(f"tax_return.{key}", tax_return.get(key, 0)))
         if abs(expected - actual) > tolerance_dec:
             findings.append(
-                AllocationFinding(f"RETURN_{key.upper()}_MISMATCH", None, expected, actual)
+                AllocationFinding(
+                    f"RETURN_{key.upper()}_MISMATCH", None, expected, actual
+                )
             )
-    ledger_revenue = money(ledger.get("ip_revenue", 0) + ledger.get("non_ip_revenue", 0))
+    ledger_revenue = money(
+        ledger.get("ip_revenue", 0) + ledger.get("non_ip_revenue", 0)
+    )
     return_revenue = money(
         tax_return.get("ip_revenue", 0) + tax_return.get("non_ip_revenue", 0)
     )
@@ -240,7 +250,9 @@ def reconcile_return_to_ledger(
         finding.code.endswith("COST_MISMATCH") for finding in findings
     ):
         findings.append(
-            AllocationFinding("RETURN_COST_CLASSIFICATION_SHIFT", None, ledger_cost, return_cost)
+            AllocationFinding(
+                "RETURN_COST_CLASSIFICATION_SHIFT", None, ledger_cost, return_cost
+            )
         )
     if abs(ledger_revenue - return_revenue) > tolerance_dec:
         findings.append(
@@ -250,7 +262,9 @@ def reconcile_return_to_ledger(
         )
     if abs(ledger_cost - return_cost) > tolerance_dec:
         findings.append(
-            AllocationFinding("RETURN_TOTAL_COST_MISMATCH", None, ledger_cost, return_cost)
+            AllocationFinding(
+                "RETURN_TOTAL_COST_MISMATCH", None, ledger_cost, return_cost
+            )
         )
     return findings
 
@@ -268,7 +282,9 @@ def allocate_mix_at_cost_date(
         if not month or month not in monthly_revenue:
             raise ValueError(f"cost[{index}] has no matching monthly revenue")
         amount = money(
-            _nonnegative(f"cost[{index}].amount", raw.get("amount", raw.get("kwota", 0)))
+            _nonnegative(
+                f"cost[{index}].amount", raw.get("amount", raw.get("kwota", 0))
+            )
         )
         revenues = monthly_revenue[month]
         ip_revenue = money(
