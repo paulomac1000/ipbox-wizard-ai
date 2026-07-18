@@ -2,7 +2,9 @@
 
 ## Cel
 
-Pobrać najnowszy branch `fix/decouple-mix-allocation-from-w`, uruchomić wszystkie bezpłatne bramki, usunąć starą macierz VCR i nagrać kompletną macierz od zera dla dokładnych modeli z `tests/llm/models.py`.
+Pobrać najnowszy branch `fix/decouple-mix-allocation-from-w`, uruchomić wszystkie bezpłatne bramki, potwierdzić pusty katalog VCR i nagrać kompletną macierz od zera dla dokładnych modeli z `tests/llm/models.py`.
+
+Punkt docelowy: **46 scenariuszy × 7 modeli = 322 świeże kasety oraz 7 manifestów**.
 
 ## Kroki
 
@@ -34,15 +36,17 @@ bash scripts/vcr_smoke.sh
 
 ## Kryteria odbioru
 
-- liczba scenariuszy jest pobierana dynamicznie z `tests/llm/scenarios`;
-- każdy z siedmiu modeli ma dokładnie jedną świeżą kasetę na scenariusz i kompletny manifest;
+- liczba scenariuszy jest pobierana dynamicznie z `tests/llm/scenarios`, ale aktualnie musi wynosić 46;
+- każdy z siedmiu modeli ma dokładnie 46 świeżych kaset i kompletny manifest;
+- łącznie istnieją dokładnie 322 kasety;
 - zero starych modeli, dodatkowych katalogów i częściowych manifestów;
 - zero odpowiedzi z Markdown fences, złym modelem, złym `finish_reason`, skrzyżowanymi STOP/REVIEW albo niezgodnym fingerprintem;
 - wszystkie testy deterministyczne i playback przechodzą bez klucza API;
 - nie zmieniać oracle ani expected values pod odpowiedź modelu;
 - w razie odrzucenia zachować pliki z `/tmp/ipbox_llm_rejected/<model>/` i opisać przyczynę przed ponowieniem;
-- wypchnąć kasety na ten sam branch, nie mergować PR.
+- ręcznie przejrzeć scenariusze 46–55 i potwierdzić poprawne kanały STOP 09–16;
+- wypchnąć kasety na ten sam branch, nie mergować PR i nie oznaczać go ready.
 
 ## Raport końcowy agenta
 
-Podaj HEAD, wynik unit/coverage, pełnego suite, liczbę scenariuszy, oczekiwaną i rzeczywistą liczbę kaset, wynik per model, liczbę retry/odrzuceń, koszt oraz wynik playbacku bez sekretu.
+Podaj HEAD, wynik unit/coverage, pełnego suite, liczbę scenariuszy, oczekiwaną i rzeczywistą liczbę kaset, wynik 46/46 per model, liczbę retry/odrzuceń, koszt oraz wynik playbacku bez sekretu.
