@@ -142,6 +142,26 @@ class LLMTestRunner:
             codes = parsed[key]
             if len(codes) != len(set(codes)):
                 raise ValueError(f"decision contains duplicate {key} codes")
+
+        stop_codes = set(STOP_FACT_TO_CODE.values())
+        review_codes = set(REVIEW_FACT_TO_CODE.values())
+        invalid_stops = set(parsed["stops"]) - stop_codes
+        invalid_reviews = set(parsed["reviews"]) - review_codes
+        if invalid_stops:
+            raise ValueError(
+                "decision contains non-STOP codes in stops: " + ", ".join(sorted(invalid_stops))
+            )
+        if invalid_reviews:
+            raise ValueError(
+                "decision contains non-REVIEW codes in reviews: "
+                + ", ".join(sorted(invalid_reviews))
+            )
+        expected_status = "STOPPED" if parsed["stops"] else "FINAL"
+        if parsed["status"] != expected_status:
+            raise ValueError(
+                f"decision status {parsed['status']!r} is inconsistent with stops; "
+                f"expected {expected_status!r}"
+            )
         return parsed
 
     def validate_semantics(
