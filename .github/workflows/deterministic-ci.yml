@@ -49,7 +49,9 @@ jobs:
           fi
 
       - name: Ruff lint
-        run: ruff check .
+        run: |
+          mkdir -p reports
+          ruff check . 2>&1 | tee reports/ruff-lint.txt
 
       - name: Compile Python
         run: python -m compileall -q python_helper tests scripts
