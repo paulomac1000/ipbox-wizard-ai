@@ -10,8 +10,6 @@ from python_helper.tax_year_rules import calculate_tax_for_year
 from . import oracle as legacy
 from .oracle_adapter import legacy_safe_copy, number, prepare_scenario
 from .oracle_guards import (
-    REVIEW_FACT_TO_CODE,
-    STOP_FACT_TO_CODE,
     audit_facts,
     derive_decision_codes,
     year_facts,
@@ -53,7 +51,9 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
     extra_facts, audit_codes = audit_facts(scenario, base, method)
     annual_facts, annual_values, violations = year_facts(scenario)
     facts = {**base.get("decision_facts", {}), **extra_facts, **annual_facts}
-    social = input_data.get("zus", {}) if isinstance(input_data.get("zus"), dict) else {}
+    social = (
+        input_data.get("zus", {}) if isinstance(input_data.get("zus"), dict) else {}
+    )
     health_in_kpir = bool(social.get("zdrowotna_w_KPiR", False))
     social_in_kpir = str(social.get("sposob", "brak")) == "w_KPiR"
     if health_in_kpir and (
@@ -89,18 +89,14 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
         ip_income=max(0.0, float(base["result"]["dochód_IP"])),
         nexus=float(base["result"]["nexus"]),
         tax_form=str(input_data["forma_opodatkowania"]),
-        previous_non_ip_business_losses=reliefs.get(
-            "strata_NIE_z_lat_poprzednich", 0
-        ),
+        previous_non_ip_business_losses=reliefs.get("strata_NIE_z_lat_poprzednich", 0),
         social_security_deduction=(
             0 if social_in_kpir else social.get("odliczenie_spoleczne_PIT", 0)
         ),
         health_income_deduction=(
             0 if health_in_kpir else annual_values["health_income"]
         ),
-        health_tax_credit=(
-            0 if health_in_kpir else annual_values["health_credit"]
-        ),
+        health_tax_credit=(0 if health_in_kpir else annual_values["health_credit"]),
         ikze=annual_values["ikze"],
         donations=reliefs.get("darowizny", 0),
         internet_tax_relief=reliefs.get("ulga_internet", 0),
@@ -152,8 +148,7 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
     )
     base["tests"]["TEST_5"] = (
         "PASS"
-        if tax["ip_tax"]
-        == tax_round(float(tax["ip_base_rounded"]) * 0.05)
+        if tax["ip_tax"] == tax_round(float(tax["ip_base_rounded"]) * 0.05)
         else "FAIL"
     )
     expected_total = tax_round(
@@ -161,8 +156,6 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
         + float(tax["ip_tax"])
         - float(tax["health_tax_credit_used"])
     )
-    base["tests"]["TEST_6"] = (
-        "PASS" if tax["total_tax"] == expected_total else "FAIL"
-    )
+    base["tests"]["TEST_6"] = "PASS" if tax["total_tax"] == expected_total else "FAIL"
     base["status"] = "FINAL"
     return base
