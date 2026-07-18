@@ -9,10 +9,11 @@ PY_MODELS
 )
 
 for model in "${models[@]}"; do
+  PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 \
   LLM_PROVIDER=openrouter \
   LLM_MODEL="$model" \
   VCR_MODE=playback \
-  pytest tests/llm/test_scenarios.py --run-llm --vcr-mode=playback -q
+  python -m pytest tests/llm/test_scenarios.py --run-llm --vcr-mode=playback -q
   python scripts/vcr_precommit.py --model "$model"
 done
 python scripts/check_cassette_policy.py
