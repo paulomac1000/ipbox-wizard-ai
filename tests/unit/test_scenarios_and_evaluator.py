@@ -43,7 +43,7 @@ def decision_for(reference: dict) -> dict:
 
 
 def test_exact_scenario_set_and_contracts() -> None:
-    assert len(SCENARIOS) == 36
+    assert len(SCENARIOS) == 46
     ids = []
     for path in SCENARIOS:
         loaded = load(path)
@@ -212,15 +212,17 @@ def test_year_dependent_limits_fail_closed() -> None:
     loaded = scenario("41_ikze_cascade")
     excessive = deepcopy(loaded)
     excessive["input"]["ulgi"]["ikze"] = 15611.41
-    with pytest.raises(ScenarioError, match="IKZE deduction exceeds"):
-        compute_reference(excessive)
+    excessive_reference = compute_reference(excessive)
+    assert excessive_reference["status"] == "STOPPED"
+    assert "STOP_14" in excessive_reference["stops_reviews"]["stops"]
 
     unknown_year = deepcopy(loaded)
     unknown_year["input"]["rok"] = 2027
     for month in unknown_year["input"]["miesiace"]:
         month["miesiac"] = month["miesiac"].replace("2025-", "2027-")
-    with pytest.raises(ScenarioError, match="no verified entrepreneur IKZE limit"):
-        compute_reference(unknown_year)
+    unknown_reference = compute_reference(unknown_year)
+    assert unknown_reference["status"] == "STOPPED"
+    assert "STOP_16" in unknown_reference["stops_reviews"]["stops"]
 
     health = scenario("12_zus_in_pit_path")
     health = deepcopy(health)
@@ -228,8 +230,9 @@ def test_year_dependent_limits_fail_closed() -> None:
     health["input"]["rok"] = 2027
     for month in health["input"]["miesiace"]:
         month["miesiac"] = month["miesiac"].replace("2025-", "2027-")
-    with pytest.raises(ScenarioError, match="no verified health-contribution"):
-        compute_reference(health)
+    health_reference = compute_reference(health)
+    assert health_reference["status"] == "STOPPED"
+    assert "STOP_16" in health_reference["stops_reviews"]["stops"]
 
 
 def test_runner_exposes_only_active_decision_rules() -> None:
@@ -340,7 +343,7 @@ def test_oracle_rejects_invalid_w_instead_of_using_zero() -> None:
     evidence = loaded["input"]["miesiace"][0]["ewidencja"]
     evidence["godziny_pracy"] = 10
     evidence["godziny_nie_IP"] = 11
-    with pytest.raises(ScenarioError, match="non_ip_hours exceed work_hours"):
+    with pytest.raises(ScenarioError, match="non_ip_hours cannot exceed work_hours"):
         compute_reference(loaded)
 
 
@@ -380,8 +383,9 @@ def test_health_deduction_applies_once_and_double_dip_stops() -> None:
 def test_health_deduction_year_limit_is_enforced() -> None:
     loaded = deepcopy(scenario("12_zus_in_pit_path"))
     loaded["input"]["zus"]["odliczenie_zdrowotne_PIT"] = 12900.01
-    with pytest.raises(ScenarioError, match="2025 limit"):
-        compute_reference(loaded)
+    reference = compute_reference(loaded)
+    assert reference["status"] == "STOPPED"
+    assert "STOP_14" in reference["stops_reviews"]["stops"]
 
 
 def test_stopped_report_zeros_every_financial_output() -> None:

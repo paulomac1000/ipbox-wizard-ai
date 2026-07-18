@@ -20,6 +20,15 @@ from .oracle_guards import (
 
 ScenarioError = legacy.ScenarioError
 
+__all__ = [
+    "REVIEW_FACT_TO_CODE",
+    "STOP_FACT_TO_CODE",
+    "ScenarioError",
+    "compute_reference",
+    "derive_decision_codes",
+    "validate_scenario",
+]
+
 
 def validate_scenario(scenario: dict[str, Any]) -> None:
     transformed, _shares, _method = prepare_scenario(scenario)
@@ -29,6 +38,7 @@ def validate_scenario(scenario: dict[str, Any]) -> None:
         raise
     except ValueError as exc:
         raise ScenarioError(str(exc)) from exc
+    year_facts(scenario)
 
 
 def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
@@ -37,7 +47,7 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
     base = legacy.compute_reference(legacy_safe_copy(transformed, for_validation=False))
     for row in base.get("monthly_W", []):
         month = str(row.get("miesiąc", ""))
-        if month in shares:
+        if method != "conditional_product" and month in shares:
             row["wartość"] = round(shares[month] * 100, 2)
 
     input_data = scenario["input"]

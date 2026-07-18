@@ -92,6 +92,9 @@ def prepare_scenario(
         work = number(evidence.get("godziny_pracy", 0), "godziny_pracy")
         non_ip = number(evidence.get("godziny_nie_IP", 0), "godziny_nie_IP")
         percentage = number(evidence.get("procent_faktury_IP", 100), "procent_faktury_IP")
+        if work == 0:
+            shares[month_id] = 0.0
+            continue
         try:
             share = calculate_w_share(work, non_ip, percentage, method=method)
         except ValueError as exc:
