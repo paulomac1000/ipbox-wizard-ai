@@ -1,0 +1,76 @@
+meta:
+  scenario_id: 14_lump_sum_ineligible_check
+  scenario_name: Ryczałt zatrzymuje przebieg
+  provider: openrouter
+  requested_model: minimax/minimax-m2.5
+  returned_model: minimax/minimax-m2.5
+  fingerprint: v3_39e3e15b1dd7ce1a3b7630ba5167382bd34eb52d78763f23420abc1ae418324e
+  request_hash: a4762fa201698418c6e9deece1d19781246dfc2c2bc55fddb3c90456a20a99a4
+  recorded_at: '2026-07-18T01:09:52.121872+00:00'
+  request_id: gen-1784336989-EUnHvF68ZTDGDwxUOyPk
+  finish_reason: stop
+  native_finish_reason: stop
+  system_fingerprint: vllm-0.21.0-tp4-bf80359e
+  prompt_tokens: 219
+  completion_tokens: 170
+  total_tokens: 389
+  cost: 0.00018585
+  recording_duration_seconds: 3.033
+  cassette_format_version: 4
+response: '{"reviews":[],"status":"STOPPED","stops":["STOP_01"]}'
+parsed_response:
+  status: STOPPED
+  result:
+    rok: 2025
+    przychody_roczne:
+      IP: 0.0
+      NIE: 0.0
+    koszty_roczne:
+      IP: 0.0
+      NIE: 0.0
+      MIX: 0.0
+      WYKLUCZONE: 0.0
+    nexus_koszty:
+      A: 0.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 0.0
+    nexus: 0.0
+    dochód_IP: 0.0
+    dochód_NIE: 0.0
+    klucz_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      wartość: null
+      status: NOT_APPLICABLE
+    alokacja_multi_ip: null
+    podatek:
+      podstawa_IP: 0
+      podstawa_NIE: 0
+      podatek_IP: 0
+      podatek_NIE_finalny: 0
+      podatek_całościowy: 0
+      nadpłata_lub_dopłata: 0.0
+      termomodernization_carry_over: 0
+      ulga_BR_IP_wykorzystana: 0
+      ulga_BR_NIE_wykorzystana: 0
+      ulga_BR_carry_over: 0
+      dochód_dodatkowy_skala: 0
+  classifications: []
+  monthly_W: []
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+    TEST_3: PASS
+    TEST_4: PASS
+    TEST_5: PASS
+    TEST_6: PASS
+    TEST_7: PASS
+    TEST_8: PASS
+    TEST_9: PASS
+  stops_reviews:
+    stops:
+    - STOP_01
+    reviews: []
+    warnings: []

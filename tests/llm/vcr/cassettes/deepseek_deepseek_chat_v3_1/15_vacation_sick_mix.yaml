@@ -1,0 +1,89 @@
+meta:
+  scenario_id: 15_vacation_sick_mix
+  scenario_name: Urlop i L4 nie zwiększają mianownika W
+  provider: openrouter
+  requested_model: deepseek/deepseek-chat-v3.1
+  returned_model: deepseek/deepseek-chat-v3.1
+  fingerprint: v3_5b4052c69608c7b4ea960cf3bf2faf9d056ee761d83f54d14ba25d8ceee67a06
+  request_hash: a87892824fe180779034134edcfafe3758627621a0d4eb3ba74451f74f009cef
+  recorded_at: '2026-07-18T01:06:46.362343+00:00'
+  request_id: gen-1784336801-MDgihOpmyM04ootkUzcC
+  finish_reason: stop
+  native_finish_reason: stop
+  system_fingerprint: null
+  prompt_tokens: 220
+  completion_tokens: 24
+  total_tokens: 244
+  cost: 5.152e-05
+  recording_duration_seconds: 5.031
+  cassette_format_version: 4
+response: '{"status": "FINAL", "stops": [], "reviews": ["REVIEW_09"]}'
+parsed_response:
+  status: FINAL
+  result:
+    rok: 2025
+    przychody_roczne:
+      IP: 9000.0
+      NIE: 1000.0
+    koszty_roczne:
+      IP: 270.0
+      NIE: 30.0
+      MIX: 300.0
+      WYKLUCZONE: 0.0
+    nexus_koszty:
+      A: 0.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 300.0
+    nexus: 0.0
+    dochód_IP: 8730.0
+    dochód_NIE: 970.0
+    klucz_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      wartość: 0.9
+      status: FINAL
+    alokacja_multi_ip: null
+    podatek:
+      podstawa_IP: 0
+      podstawa_NIE: 970
+      podatek_IP: 0
+      podatek_NIE_finalny: 184
+      podatek_całościowy: 184
+      nadpłata_lub_dopłata: -184.0
+      termomodernization_carry_over: 0.0
+      ulga_BR_IP_wykorzystana: 0.0
+      ulga_BR_NIE_wykorzystana: 0.0
+      ulga_BR_carry_over: 0.0
+      dochód_dodatkowy_skala: 0.0
+  classifications:
+  - opis: Hosting
+    amount: 300.0
+    basket: MIX
+    allocation_method: przychodowa_roczna
+    allocation_source: domyślna_wizard
+    allocation_key: 0.9
+    ip_amount: 270.0
+    non_ip_amount: 30.0
+    nexus_source: outside_nexus
+    nexus_basket: poza_nexus
+    nexus_amount: 0.0
+  monthly_W:
+  - miesiąc: 2025-01
+    wartość: 90.0
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+    TEST_3: PASS
+    TEST_4: PASS
+    TEST_5: PASS
+    TEST_6: PASS
+    TEST_7: PASS
+    TEST_8: PASS
+    TEST_9: PASS
+  stops_reviews:
+    stops: []
+    reviews:
+    - REVIEW_09
+    warnings: []

@@ -1,0 +1,130 @@
+manifest_format_version: 2
+model: openai/gpt-5-nano
+generated_at: '2026-07-18T00:17:54.810858+00:00'
+entries:
+  01_basic_linear:
+    file: 01_basic_linear.yaml
+    fingerprint: v3_239d94d70e6301f1b529e32b4940f144193286d864558cf8a3e6912ff0e6bfd7
+    request_hash: cf3a0981fd7be14891baa2041d764f53235bf1b9dab018f5c30aaab3623de591
+    recorded_at: '2026-07-18T00:17:25.509066+00:00'
+    returned_model: openai/gpt-5-nano
+    cost: 2.97e-05
+  02_basic_scale_single_client:
+    file: 02_basic_scale_single_client.yaml
+    fingerprint: v3_eed238fd13c471acd76cb30f0055f1dc592fd85d69d1ea8932440383346154e9
+    request_hash: 20dd299ab1b94f53324b9832b40deb0d2d6d8c01c9a28323423ee1f1664ba788
+    recorded_at: '2026-07-18T00:17:27.175871+00:00'
+    returned_model: openai/gpt-5-nano
+    cost: 3.23e-05
+  03_fx_usd_single_client:
+    file: 03_fx_usd_single_client.yaml
+    fingerprint: v3_388349d9eced1dc3e99f25d6c654fafd1244f162ece6699db790e109114caae6
+    request_hash: 20dd299ab1b94f53324b9832b40deb0d2d6d8c01c9a28323423ee1f1664ba788
+    recorded_at: '2026-07-18T00:17:29.039246+00:00'
+    returned_model: openai/gpt-5-nano
+    cost: 3.23e-05
+  11_multi_client_mixed_currencies:
+    file: 11_multi_client_mixed_currencies.yaml
+    fingerprint: v3_a5c43ec46c1268324b56c0700ec44e485c1761bd077a69fabb89fb4ba43bd6a4
+    request_hash: 5846175aaa4aca5be9994561fda9a3a99fb4b9285d4902133c67bd966c405453
+    recorded_at: '2026-07-18T00:17:30.419491+00:00'
+    returned_model: openai/gpt-5-nano
+    cost: 2.97e-05
+  12_zus_in_pit_path:
+    file: 12_zus_in_pit_path.yaml
+    fingerprint: v3_ded749184c4d2d3fe366d31df2c96daf200ed99d35afc20d5f25d38a5af9ccdd
+    request_hash: 5846175aaa4aca5be9994561fda9a3a99fb4b9285d4902133c67bd966c405453
+    recorded_at: '2026-07-18T00:17:32.010215+00:00'
+    returned_model: openai/gpt-5-nano
+    cost: 2.97e-05
+  13_income_from_employment_impact:
+    file: 13_income_from_employment_impact.yaml
+    fingerprint: v3_b3f772705852957955ddbf3cf88e356c7ec8bb20952b4ed3d545b237449eb293
+    request_hash: 5846175aaa4aca5be9994561fda9a3a99fb4b9285d4902133c67bd966c405453
+    recorded_at: '2026-07-18T00:17:33.587677+00:00'
+    returned_model: openai/gpt-5-nano
+    cost: 2.97e-05
+  14_lump_sum_ineligible_check:
+    file: 14_lump_sum_ineligible_check.yaml
+    fingerprint: v3_974fd50f96a6ff92671e37be651f9bcb0e1340c8a84c2b22876881a4a10471af
+    request_hash: 63761252776c58453a2e4f8f37d314862a39f8a4a07bf009ef70b676197f30bd
+    recorded_at: '2026-07-18T00:17:35.527797+00:00'
+    returned_model: openai/gpt-5-nano
+    cost: 2.96e-05
+  15_vacation_sick_mix:
+    file: 15_vacation_sick_mix.yaml
+    fingerprint: v3_c4b5cbc5c5948aa8f5b8a3fe499607a68808da2a1638be16c798d934632f49be
+    request_hash: cf3a0981fd7be14891baa2041d764f53235bf1b9dab018f5c30aaab3623de591
+    recorded_at: '2026-07-18T00:17:37.038726+00:00'
+    returned_model: openai/gpt-5-nano
+    cost: 2.97e-05
+  16_high_w_review:
+    file: 16_high_w_review.yaml
+    fingerprint: v3_bc52bf9300bedffc123cf712bcbdf23a981c0567ad257dceec5a83379d51b2df
+    request_hash: 20dd299ab1b94f53324b9832b40deb0d2d6d8c01c9a28323423ee1f1664ba788
+    recorded_at: '2026-07-18T00:17:38.598659+00:00'
+    returned_model: openai/gpt-5-nano
+    cost: 3.23e-05
+  17_low_w_review:
+    file: 17_low_w_review.yaml
+    fingerprint: v3_f20501a92a5f4a312325829120cbcc3db30df95ff47cd70c814073e6005792d3
+    request_hash: 3841cf9198f38ad64f0673ebce62bc8690bd6441025a9a2a7111307ae9295d8a
+    recorded_at: '2026-07-18T00:17:40.165990+00:00'
+    returned_model: openai/gpt-5-nano
+    cost: 3.23e-05
+  18_logic_zero_work_hours:
+    file: 18_logic_zero_work_hours.yaml
+    fingerprint: v3_6c87e1d2b6334bd375cf787ccb89c0a383c5e769f3014f6b5b403caf8831697f
+    request_hash: c448a32df0984e6d35048cf64d6da70cc0775199d1c3ca11b3caef0fcf680bc0
+    recorded_at: '2026-07-18T00:17:41.735312+00:00'
+    returned_model: openai/gpt-5-nano
+    cost: 3.22e-05
+  21_monthly_loss_impact:
+    file: 21_monthly_loss_impact.yaml
+    fingerprint: v3_c7feda687f095a58b945d7ae1e7f372e42b0bb55022b499eca4dcb13bb27a958
+    request_hash: 20dd299ab1b94f53324b9832b40deb0d2d6d8c01c9a28323423ee1f1664ba788
+    recorded_at: '2026-07-18T00:17:43.280648+00:00'
+    returned_model: openai/gpt-5-nano
+    cost: 3.23e-05
+  22_related_parties_nexus_reduction:
+    file: 22_related_parties_nexus_reduction.yaml
+    fingerprint: v3_a4fec38433e65da975ffcbabdaa43b1717dc6d23b2c04142de1bebe4fda9f268
+    request_hash: 20dd299ab1b94f53324b9832b40deb0d2d6d8c01c9a28323423ee1f1664ba788
+    recorded_at: '2026-07-18T00:17:44.862431+00:00'
+    returned_model: openai/gpt-5-nano
+    cost: 3.23e-05
+  23_loss_carry_forward:
+    file: 23_loss_carry_forward.yaml
+    fingerprint: v3_101f980fa35e2e59e71296c9b541a0effbac28d1f9a51998fd5d8f2734b36c0a
+    request_hash: 8fea3588761dee596272895b49e7efe94ee043bcc1ea2c98a9b7b248c3b39852
+    recorded_at: '2026-07-18T00:17:47.049560+00:00'
+    returned_model: openai/gpt-5-nano
+    cost: 2.7e-05
+  24_donations_relief:
+    file: 24_donations_relief.yaml
+    fingerprint: v3_7a6b832ca028bb5b278cfe082a78ccef6a8948823a4694638fc343c0e39a5004
+    request_hash: 8fea3588761dee596272895b49e7efe94ee043bcc1ea2c98a9b7b248c3b39852
+    recorded_at: '2026-07-18T00:17:49.899069+00:00'
+    returned_model: openai/gpt-5-nano
+    cost: 2.7e-05
+  25_rehab_relief:
+    file: 25_rehab_relief.yaml
+    fingerprint: v3_c47ba89ecbdec584e306ec21eaf7d49a3881c463916ef0ecd8a8c8bb6f1bc0e2
+    request_hash: 8fea3588761dee596272895b49e7efe94ee043bcc1ea2c98a9b7b248c3b39852
+    recorded_at: '2026-07-18T00:17:51.386844+00:00'
+    returned_model: openai/gpt-5-nano
+    cost: 2.7e-05
+  26_rd_relief_nexus:
+    file: 26_rd_relief_nexus.yaml
+    fingerprint: v3_0ed7e4cd763ad9aaba7e369c411d980dac1738f617d4f12443b702ac8cef27d7
+    request_hash: cf3a0981fd7be14891baa2041d764f53235bf1b9dab018f5c30aaab3623de591
+    recorded_at: '2026-07-18T00:17:53.021122+00:00'
+    returned_model: openai/gpt-5-nano
+    cost: 2.97e-05
+  27_termomodernizacja_full:
+    file: 27_termomodernizacja_full.yaml
+    fingerprint: v3_e466a777abf020139ec5b5a672489b5255a686edc298327d8022feb9bf6d2acb
+    request_hash: cf3a0981fd7be14891baa2041d764f53235bf1b9dab018f5c30aaab3623de591
+    recorded_at: '2026-07-18T00:17:54.803802+00:00'
+    returned_model: openai/gpt-5-nano
+    cost: 2.97e-05

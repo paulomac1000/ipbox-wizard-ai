@@ -1,0 +1,79 @@
+meta:
+  scenario_id: 18_logic_zero_work_hours
+  scenario_name: Brak prac B+R w miesiącu
+  provider: openrouter
+  requested_model: moonshotai/kimi-k2.5
+  returned_model: moonshotai/kimi-k2.5
+  fingerprint: v3_73b927231f4c8c8f68546770185b69f5be1ae4c197870970955421d1b6fe76c4
+  request_hash: 188b6ca952752ba50c4dedca12ddad1334d1ec83e367fe2f74874a766d744eea
+  recorded_at: '2026-07-18T01:14:31.030882+00:00'
+  request_id: gen-1784337267-Z6E4VOk9Bm4EZYU0FSPs
+  finish_reason: stop
+  native_finish_reason: stop
+  system_fingerprint: null
+  prompt_tokens: 311
+  completion_tokens: 55
+  total_tokens: 366
+  cost: 0.00031644
+  recording_duration_seconds: 3.329
+  cassette_format_version: 4
+response: '{"reviews": ["REVIEW_09"], "status": "STOPPED", "stops": ["STOP_04"]}'
+parsed_response:
+  status: STOPPED
+  result:
+    rok: 2025
+    przychody_roczne:
+      IP: 0.0
+      NIE: 0.0
+    koszty_roczne:
+      IP: 0.0
+      NIE: 0.0
+      MIX: 0.0
+      WYKLUCZONE: 0.0
+    nexus_koszty:
+      A: 0.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 0.0
+    nexus: 0.0
+    dochód_IP: 0.0
+    dochód_NIE: 0.0
+    klucz_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      wartość: null
+      status: NOT_APPLICABLE
+    alokacja_multi_ip: null
+    podatek:
+      podstawa_IP: 0
+      podstawa_NIE: 0
+      podatek_IP: 0
+      podatek_NIE_finalny: 0
+      podatek_całościowy: 0
+      nadpłata_lub_dopłata: 0.0
+      termomodernization_carry_over: 0
+      ulga_BR_IP_wykorzystana: 0
+      ulga_BR_NIE_wykorzystana: 0
+      ulga_BR_carry_over: 0
+      dochód_dodatkowy_skala: 0
+  classifications: []
+  monthly_W:
+  - miesiąc: 2025-01
+    wartość: 0.0
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+    TEST_3: PASS
+    TEST_4: PASS
+    TEST_5: PASS
+    TEST_6: PASS
+    TEST_7: PASS
+    TEST_8: PASS
+    TEST_9: PASS
+  stops_reviews:
+    stops:
+    - STOP_04
+    reviews:
+    - REVIEW_09
+    warnings: []

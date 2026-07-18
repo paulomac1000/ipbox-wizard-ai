@@ -1,0 +1,79 @@
+meta:
+  scenario_id: 18_logic_zero_work_hours
+  scenario_name: Brak prac B+R w miesiącu
+  provider: openrouter
+  requested_model: qwen/qwen3.5-flash-02-23
+  returned_model: qwen/qwen3.5-flash-02-23
+  fingerprint: v3_c2980d93679d264a3bbfac5f13b6f9f5a14916f68ae61851c7589d7e735ce2dd
+  request_hash: d1b189a30cd35a98b372f3221ebb0e235c883015eda31bcced1b623225c047ef
+  recorded_at: '2026-07-18T01:18:35.988024+00:00'
+  request_id: gen-1784337512-Bsayp6Z53hj8slVdYiw1
+  finish_reason: stop
+  native_finish_reason: stop
+  system_fingerprint: null
+  prompt_tokens: 238
+  completion_tokens: 605
+  total_tokens: 843
+  cost: 0.00017277
+  recording_duration_seconds: 3.059
+  cassette_format_version: 4
+response: '{"status":"STOPPED","stops":["STOP_04"],"reviews":["REVIEW_09"]}'
+parsed_response:
+  status: STOPPED
+  result:
+    rok: 2025
+    przychody_roczne:
+      IP: 0.0
+      NIE: 0.0
+    koszty_roczne:
+      IP: 0.0
+      NIE: 0.0
+      MIX: 0.0
+      WYKLUCZONE: 0.0
+    nexus_koszty:
+      A: 0.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 0.0
+    nexus: 0.0
+    dochód_IP: 0.0
+    dochód_NIE: 0.0
+    klucz_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      wartość: null
+      status: NOT_APPLICABLE
+    alokacja_multi_ip: null
+    podatek:
+      podstawa_IP: 0
+      podstawa_NIE: 0
+      podatek_IP: 0
+      podatek_NIE_finalny: 0
+      podatek_całościowy: 0
+      nadpłata_lub_dopłata: 0.0
+      termomodernization_carry_over: 0
+      ulga_BR_IP_wykorzystana: 0
+      ulga_BR_NIE_wykorzystana: 0
+      ulga_BR_carry_over: 0
+      dochód_dodatkowy_skala: 0
+  classifications: []
+  monthly_W:
+  - miesiąc: 2025-01
+    wartość: 0.0
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+    TEST_3: PASS
+    TEST_4: PASS
+    TEST_5: PASS
+    TEST_6: PASS
+    TEST_7: PASS
+    TEST_8: PASS
+    TEST_9: PASS
+  stops_reviews:
+    stops:
+    - STOP_04
+    reviews:
+    - REVIEW_09
+    warnings: []

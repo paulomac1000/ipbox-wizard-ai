@@ -1,0 +1,89 @@
+meta:
+  scenario_id: 13_income_from_employment_impact
+  scenario_name: Dodatkowy dochód na skali
+  provider: openrouter
+  requested_model: qwen/qwen3.5-flash-02-23
+  returned_model: qwen/qwen3.5-flash-02-23
+  fingerprint: v3_f0233c09a96de385aa4d727912fecf2a8f30103d22273d1702858ed9d2a5d298
+  request_hash: 812371b5c8f681d0b01041fea6a250209c5d290cf560d727247a5de2b75d912a
+  recorded_at: '2026-07-18T01:18:13.034159+00:00'
+  request_id: gen-1784337488-dhsPHbWbx8ebfqJYpOU8
+  finish_reason: stop
+  native_finish_reason: stop
+  system_fingerprint: null
+  prompt_tokens: 227
+  completion_tokens: 663
+  total_tokens: 890
+  cost: 0.000187135
+  recording_duration_seconds: 4.419
+  cassette_format_version: 4
+response: '{"status":"FINAL","stops":[],"reviews":["REVIEW_01"]}'
+parsed_response:
+  status: FINAL
+  result:
+    rok: 2025
+    przychody_roczne:
+      IP: 50000.0
+      NIE: 20000.0
+    koszty_roczne:
+      IP: 500.0
+      NIE: 0.0
+      MIX: 0.0
+      WYKLUCZONE: 0.0
+    nexus_koszty:
+      A: 500.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 0.0
+    nexus: 1.0
+    dochód_IP: 49500.0
+    dochód_NIE: 20000.0
+    klucz_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      wartość: null
+      status: NOT_APPLICABLE
+    alokacja_multi_ip: null
+    podatek:
+      podstawa_IP: 49500
+      podstawa_NIE: 120000
+      podatek_IP: 2475
+      podatek_NIE_finalny: 10800
+      podatek_całościowy: 13275
+      nadpłata_lub_dopłata: -13275.0
+      termomodernization_carry_over: 0.0
+      ulga_BR_IP_wykorzystana: 0.0
+      ulga_BR_NIE_wykorzystana: 0.0
+      ulga_BR_carry_over: 0.0
+      dochód_dodatkowy_skala: 100000.0
+  classifications:
+  - opis: Licencja IDE
+    amount: 500.0
+    basket: IP
+    allocation_method: direct
+    allocation_source: ewidencja_kosztu_IP
+    allocation_key: 1.0
+    ip_amount: 500.0
+    non_ip_amount: 0.0
+    nexus_source: own_br
+    nexus_basket: A
+    nexus_amount: 500.0
+  monthly_W:
+  - miesiąc: 2025-01
+    wartość: 100.0
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+    TEST_3: PASS
+    TEST_4: PASS
+    TEST_5: PASS
+    TEST_6: PASS
+    TEST_7: PASS
+    TEST_8: PASS
+    TEST_9: PASS
+  stops_reviews:
+    stops: []
+    reviews:
+    - REVIEW_01
+    warnings: []

@@ -1,0 +1,79 @@
+meta:
+  scenario_id: 38_verify_missing_kpir_data
+  scenario_name: Brak ewidencji przy deklarowanym IP
+  provider: openrouter
+  requested_model: deepseek/deepseek-chat-v3.1
+  returned_model: deepseek/deepseek-chat-v3.1
+  fingerprint: v3_41e22657382eee8e3892c7c1c70dedab19e4e1e86ab066279e3f96bcad61f8b7
+  request_hash: fe5072c15bae20bba6a6b6cb3e90599ef45fd040e5ba6ef6c4fd6fc423a9c63e
+  recorded_at: '2026-07-18T01:08:18.204338+00:00'
+  request_id: gen-1784336895-mVG1dkGOmvZWM03Rny9w
+  finish_reason: stop
+  native_finish_reason: stop
+  system_fingerprint: null
+  prompt_tokens: 482
+  completion_tokens: 35
+  total_tokens: 517
+  cost: 0.00012194
+  recording_duration_seconds: 3.011
+  cassette_format_version: 4
+response: "{\n    \"status\": \"STOPPED\",\n    \"stops\": [\"STOP_08\"],\n    \"reviews\": [\"REVIEW_09\"]\n}"
+parsed_response:
+  status: STOPPED
+  result:
+    rok: 2025
+    przychody_roczne:
+      IP: 0.0
+      NIE: 0.0
+    koszty_roczne:
+      IP: 0.0
+      NIE: 0.0
+      MIX: 0.0
+      WYKLUCZONE: 0.0
+    nexus_koszty:
+      A: 0.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 0.0
+    nexus: 0.0
+    dochód_IP: 0.0
+    dochód_NIE: 0.0
+    klucz_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      wartość: null
+      status: NOT_APPLICABLE
+    alokacja_multi_ip: null
+    podatek:
+      podstawa_IP: 0
+      podstawa_NIE: 0
+      podatek_IP: 0
+      podatek_NIE_finalny: 0
+      podatek_całościowy: 0
+      nadpłata_lub_dopłata: 0.0
+      termomodernization_carry_over: 0
+      ulga_BR_IP_wykorzystana: 0
+      ulga_BR_NIE_wykorzystana: 0
+      ulga_BR_carry_over: 0
+      dochód_dodatkowy_skala: 0
+  classifications: []
+  monthly_W:
+  - miesiąc: 2025-01
+    wartość: 0.0
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+    TEST_3: PASS
+    TEST_4: PASS
+    TEST_5: PASS
+    TEST_6: PASS
+    TEST_7: PASS
+    TEST_8: PASS
+    TEST_9: PASS
+  stops_reviews:
+    stops:
+    - STOP_08
+    reviews:
+    - REVIEW_09
+    warnings: []
