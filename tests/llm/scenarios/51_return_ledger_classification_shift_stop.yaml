@@ -1,0 +1,51 @@
+meta:
+  id: 51_return_ledger_classification_shift_stop
+  name: Zeznanie i ewidencja mają te same sumy, ale inny podział IP i NIE
+  description: Blokuje pozornie zgodne zeznanie, w którym przesunięto przychody i koszty między IP i NIE.
+  tags: [regression, reconciliation, fail-closed]
+  priority: P0
+input:
+  rok: 2025
+  forma_opodatkowania: liniowy_19%
+  polityka_alokacji:
+    policy_id: return-ledger-reconciliation
+    przychody:
+      metoda: dokumentowa
+    koszty_MIX:
+      metoda: przychodowa_roczna
+      źródło: użytkownik
+      uzasadnienie: Dokumentowy podział przychodu.
+  zus:
+    sposob: brak
+  kontrahenci:
+    - nazwa: ClientA
+      klauzula_IP: true
+  uzgodnienie_zeznania:
+    przychod_IP: 75000
+    przychod_NIE: 25000
+    koszt_IP: 7500
+    koszt_NIE: 2500
+  miesiace:
+    - miesiac: 2025-12
+      faktury:
+        - kwota_PLN: 100000
+          kwota_IP: 80000
+          kontrahent: ClientA
+          kwalifikuje_IP: true
+      ewidencja:
+        godziny_pracy: 160
+        godziny_nie_IP: 32
+        procent_faktury_IP: 100
+      koszty:
+        - opis: Bezpośredni koszt IP
+          kwota: 8000
+          kategoria: IP
+          allocation_source: syntetyczna-ewidencja-projektowa
+          nexus_source: own_br
+        - opis: Koszt wyłącznie działalności NIE
+          kwota: 2000
+          kategoria: NON
+          nexus_source: outside_nexus
+      opis_projektu: Rozwój kwalifikowanego programu komputerowego.
+assertions:
+  stops: [STOP_12]
