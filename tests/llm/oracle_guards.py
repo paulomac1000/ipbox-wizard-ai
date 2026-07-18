@@ -4,11 +4,14 @@ from __future__ import annotations
 
 from typing import Any
 
-from python_helper.allocation_audit import audit_revenue_allocation, reconcile_return_to_ledger
+from python_helper.allocation_audit import (
+    audit_revenue_allocation,
+    reconcile_return_to_ledger,
+)
 from python_helper.tax_year_rules import get_tax_year_rules, validate_year_amounts
 
 from . import oracle as legacy
-from .oracle_adapter import invoice_amount, month_evidence, month_invoices, number
+from .oracle_adapter import month_evidence, month_invoices, number, invoice_amount
 
 ScenarioError = legacy.ScenarioError
 STOP_FACT_TO_CODE = {
@@ -26,8 +29,12 @@ REVIEW_FACT_TO_CODE = dict(legacy.REVIEW_FACT_TO_CODE)
 
 
 def derive_decision_codes(facts: dict[str, bool]) -> tuple[set[str], set[str]]:
-    stops = {code for fact, code in STOP_FACT_TO_CODE.items() if facts.get(fact) is True}
-    reviews = {code for fact, code in REVIEW_FACT_TO_CODE.items() if facts.get(fact) is True}
+    stops = {
+        code for fact, code in STOP_FACT_TO_CODE.items() if facts.get(fact) is True
+    }
+    reviews = {
+        code for fact, code in REVIEW_FACT_TO_CODE.items() if facts.get(fact) is True
+    }
     return stops, reviews
 
 
@@ -128,8 +135,7 @@ def year_facts(
             "zus.health_income",
         ),
         "health_credit": number(
-            social.get("odliczenie_zdrowotne_od_podatku", 0),
-            "zus.health_credit",
+            social.get("odliczenie_zdrowotne_od_podatku", 0), "zus.health_credit"
         ),
         "rd_ip": number(reliefs.get("ulga_BR_IP", 0), "ulgi.ulga_BR_IP"),
     }
@@ -152,8 +158,7 @@ def year_facts(
         "year_limit_exceeded": bool(
             {"IKZE_LIMIT_EXCEEDED", "HEALTH_LIMIT_EXCEEDED"} & set(violations)
         ),
-        "health_deduction_mode_invalid_for_year": "HEALTH_MODE_INVALID"
-        in violations,
+        "health_deduction_mode_invalid_for_year": "HEALTH_MODE_INVALID" in violations,
     }
     return facts, values, violations
 
@@ -161,19 +166,8 @@ def year_facts(
 def zero_after_stop(reference: dict[str, Any]) -> None:
     result = reference["result"]
     result["przychody_roczne"] = {"IP": 0.0, "NIE": 0.0}
-    result["koszty_roczne"] = {
-        "IP": 0.0,
-        "NIE": 0.0,
-        "MIX": 0.0,
-        "WYKLUCZONE": 0.0,
-    }
-    result["nexus_koszty"] = {
-        "A": 0.0,
-        "B": 0.0,
-        "C": 0.0,
-        "D": 0.0,
-        "poza_nexus": 0.0,
-    }
+    result["koszty_roczne"] = {"IP": 0.0, "NIE": 0.0, "MIX": 0.0, "WYKLUCZONE": 0.0}
+    result["nexus_koszty"] = {"A": 0.0, "B": 0.0, "C": 0.0, "D": 0.0, "poza_nexus": 0.0}
     result["nexus"] = 0.0
     result["dochód_IP"] = 0.0
     result["dochód_NIE"] = 0.0
