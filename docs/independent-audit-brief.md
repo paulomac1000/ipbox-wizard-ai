@@ -77,12 +77,13 @@ Nagraj wszystkie 322 kasety od nowa. Poprzednia macierz 108 plików została usu
 
 Po każdym modelu przejrzyj `/tmp/ipbox_llm_rejected/`, surowe odpowiedzi i raport kosztu. Przy realnym błędzie zatrzymaj nagranie, sklasyfikuj przyczynę i dodaj regresję przed zmianą kodu. Nie używaj `--force` i nie edytuj kaset.
 
-Szczególnie sprawdź wcześniejsze problematyczne kombinacje:
+Szczególnie sprawdź wcześniejsze problematyczne kombinacje oraz nowe granice:
 
 - Claude Haiku: scenariusz 17;
-- GPT-5 Mini: scenariusze 17, 21, 22, 29 i 30.
+- scenariusze 46–55: reguły historyczne, podwójny procent, switch metody, uzgodnienie PIT/ewidencja i koszt w dacie;
+- każdy STOP 09–16 ma znaleźć się dokładnie w `stops`, nigdy w `reviews`.
 
-Nieaktywne `STOP_02` nie powinno być widoczne w ich promptach.
+Nieaktywne kody nie powinny być widoczne w promptach.
 
 ## Playback końcowy
 
@@ -108,8 +109,8 @@ Raport ma zawierać:
 4. Potwierdzenie playbacku bez `OPENROUTER_API_KEY`.
 5. Klasyfikację błędów: kod/oracle, scenariusz, instrukcja, provider, model.
 6. Dla poprawki: test regresyjny, pliki, uzasadnienie i wynik po zmianie.
-7. Kontrolę 252 kaset, manifestu, request hashy, fingerprintów, `finish_reason` i reparsowania.
-8. Ręczne wnioski dla scenariuszy 13, 17, 22, 23, 26, 31, 34, 44 i 45.
+7. Kontrolę 322 kaset, manifestu, request hashy, fingerprintów, `finish_reason` i reparsowania.
+8. Ręczne wnioski dla scenariuszy 13, 17, 22, 23, 26, 31, 34, 44, 45 oraz 46–55.
 9. Wyjaśnienie pełnego kosztu, łącznie z odrzuconymi próbami.
 10. Werdykt dokładnie `READY` albo `NOT READY`.
 11. Przy `NOT READY` — minimalną uporządkowaną listę blokad.
