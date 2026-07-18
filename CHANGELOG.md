@@ -8,7 +8,7 @@
 - Kontrakt `active_rules`, który nie pokazuje modelowi fałszywych przesłanek ani nieaktywnych kodów.
 - Macierz 9 × 36 obejmująca Gemini, GPT, Claude, DeepSeek, MiniMax, Kimi, GLM, Qwen i Mistral.
 - Fail-closed oracle, evaluator, strict JSON Schema i VCR format 4.
-- 36 znormalizowanych scenariuszy oraz dziewięciorodzinny benchmark tanich modeli.
+- 36 znormalizowanych scenariuszy oraz siedmiorodzinny benchmark tanich modeli.
 - Regresje dla wzoru NEXUS podwyższającego A+B.
 - Jawny podział ulgi B+R na część IP i NIE wraz z odliczeniem IP przed NEXUS.
 - Pełne połączenie działalności na skali z `dochody_dodatkowe_skala`.

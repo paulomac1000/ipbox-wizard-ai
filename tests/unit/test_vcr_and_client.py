@@ -79,23 +79,24 @@ def record_valid_cassette(monkeypatch, tmp_path: Path) -> tuple[dict, Path, VCRR
     return scenario, path, recorder
 
 
-def test_model_profiles_cover_nine_distinct_families() -> None:
+def test_model_profiles_cover_seven_distinct_families() -> None:
     assert BENCHMARK_MODELS == (
         "google/gemini-3-flash-preview",
-        "openai/gpt-5-nano",
         "anthropic/claude-haiku-4.5",
         "deepseek/deepseek-chat-v3.1",
         "minimax/minimax-m2.5",
         "moonshotai/kimi-k2.5",
-        "z-ai/glm-4.7-flash",
         "qwen/qwen3.5-flash-02-23",
         "mistralai/ministral-3b-2512",
     )
-    assert len({get_model_profile(model).family for model in BENCHMARK_MODELS}) == 9
-    assert get_model_profile("openai/gpt-5-nano").reasoning == {"effort": "minimal"}
+    assert len({get_model_profile(model).family for model in BENCHMARK_MODELS}) == 7
     assert all(
         get_model_profile(model).response_format_type == "json_schema" for model in BENCHMARK_MODELS
     )
+    with pytest.raises(ValueError):
+        get_model_profile("openai/gpt-5-nano")
+    with pytest.raises(ValueError):
+        get_model_profile("z-ai/glm-4.7-flash")
     with pytest.raises(ValueError):
         get_model_profile("bad")
 

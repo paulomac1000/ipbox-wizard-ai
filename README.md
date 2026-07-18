@@ -62,12 +62,10 @@ Benchmark używa dziewięciu tanich modeli z dziewięciu niezależnych rodzin:
 | Rodzina | Model OpenRouter | Rola w macierzy |
 |---|---|---|
 | Google Gemini | `google/gemini-3-flash-preview` | tańszy i starszy próg zamiast Gemini 3.5 |
-| OpenAI GPT | `openai/gpt-5-nano` | najmniejszy model GPT-5 jako niski próg zgodności |
 | Anthropic Claude | `anthropic/claude-haiku-4.5` | mały model Claude |
 | DeepSeek | `deepseek/deepseek-chat-v3.1` | otwarta rodzina DeepSeek V3 |
 | MiniMax | `minimax/minimax-m2.5` | niezależna rodzina MoE |
 | Moonshot Kimi | `moonshotai/kimi-k2.5` | niezależna rodzina Kimi |
-| Z.ai GLM | `z-ai/glm-4.7-flash` | tani model Flash GLM |
 | Qwen | `qwen/qwen3.5-flash-02-23` | tani model Flash Qwen |
 | Mistral | `mistralai/ministral-3b-2512` | bardzo mały model 3B jako dolna granica |
 
@@ -94,11 +92,11 @@ Niezależny audyt: [`docs/independent-audit-brief.md`](docs/independent-audit-br
 
 ## Stan wydania
 
-Rdzeń deterministyczny i protokół `active_rules` są po audycie. Pierwsza macierz 108 odpowiedzi została unieważniona: 36 odpowiedzi Claude zawierało Markdown fences akceptowane przez zbyt pobłażliwy parser, a następnie rozszerzono próbę do dziewięciu rodzin. PR pozostaje **draftem**, dopóki nie powstanie kompletna macierz 324 ścisłych odpowiedzi JSON.
+Rdzeń deterministyczny i protokół `active_rules` są po audycie. Pierwsza macierz 108 odpowiedzi została unieważniona: 36 odpowiedzi Claude zawierało Markdown fences akceptowane przez zbyt pobłażliwy parser, a następnie rozszerzono próbę do siedmiu rodzin. PR pozostaje **draftem**, dopóki nie powstanie kompletna macierz 324 ścisłych odpowiedzi JSON.
 
 Warunki zakończenia:
 
-- 36/36 kaset dla każdego z dziewięciu modeli, czyli 324 aktualne nagrania;
+- 36/36 kaset dla każdego z siedmiu modeli, czyli 324 aktualne nagrania;
 - playback bez `OPENROUTER_API_KEY`;
 - ręczny przegląd odpowiedzi, odrzuceń i raportu kosztu;
 - niezależny raport `READY` bez nierozwiązanych uwag;

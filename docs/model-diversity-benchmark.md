@@ -29,17 +29,15 @@ Model trafia do macierzy, gdy na dzień 18 lipca 2026 r.:
 | Rodzina | Model OpenRouter | Rola w macierzy |
 |---|---|---|
 | Google Gemini | `google/gemini-3-flash-preview` | tańszy i starszy próg zamiast Gemini 3.5 |
-| OpenAI GPT | `openai/gpt-5-nano` | najmniejszy model GPT-5 jako niski próg zgodności |
 | Anthropic Claude | `anthropic/claude-haiku-4.5` | mały model Claude |
 | DeepSeek | `deepseek/deepseek-chat-v3.1` | otwarta rodzina DeepSeek V3 |
 | MiniMax | `minimax/minimax-m2.5` | niezależna rodzina MoE |
 | Moonshot Kimi | `moonshotai/kimi-k2.5` | niezależna rodzina Kimi |
-| Z.ai GLM | `z-ai/glm-4.7-flash` | tani model Flash GLM |
 | Qwen | `qwen/qwen3.5-flash-02-23` | tani model Flash Qwen |
 | Mistral | `mistralai/ministral-3b-2512` | bardzo mały model 3B jako dolna granica |
 
 
-Łącznie wydanie wymaga **324 kaset** i dziewięciu manifestów. Każdy model musi
+Łącznie wydanie wymaga **252 kaset** i dziewięciu manifestów. Każdy model musi
 osiągnąć 36/36. Wynik częściowy jest wyłącznie diagnostyką.
 
 ## Migawka cen OpenRouter
@@ -75,7 +73,7 @@ Naprawa:
 - parser nie usuwa już Markdown;
 - wszystkie modele używają schema-based structured output;
 - stare kasety usunięto, ponieważ nie spełniają nowego requestu;
-- macierz rozszerzono do dziewięciu rodzin.
+- macierz rozszerzono do siedmiu rodzin.
 
 To pokazuje, dlaczego sama liczba „36/36” nie wystarcza bez audytu surowych
 odpowiedzi, request hashy, manifestów i zasad parsera.

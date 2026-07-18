@@ -62,19 +62,17 @@ Szczególnie chronione regresje:
 
 Fingerprint obejmuje protokół decyzji, listę aktywnych reguł, system prompt, request, model, profil, schema i format kasety. Zmiana któregokolwiek elementu unieważnia nagranie. Kasety z pełną mapą `true/false` oraz pierwsza macierz `active_rules` z parserem usuwającym Markdown fences są nieaktualne i muszą zostać nagrane od nowa.
 
-Kasety starego pełnego raportu także nie są zgodne z obecną kopertą decyzji. Nie kopiuj ich odpowiedzi, hashy, manifestu ani parsed payloadu. Po obecnych zmianach należy nagrać **324 kasety: 9 modeli × 36 scenariuszy**.
+Kasety starego pełnego raportu także nie są zgodne z obecną kopertą decyzji. Nie kopiuj ich odpowiedzi, hashy, manifestu ani parsed payloadu. Po obecnych zmianach należy nagrać **252 kasety: 7 modeli × 36 scenariuszy**.
 
 ## 5. Modele bramkowe
 
 | Rodzina | Model OpenRouter | Rola w macierzy |
 |---|---|---|
 | Google Gemini | `google/gemini-3-flash-preview` | tańszy i starszy próg zamiast Gemini 3.5 |
-| OpenAI GPT | `openai/gpt-5-nano` | najmniejszy model GPT-5 jako niski próg zgodności |
 | Anthropic Claude | `anthropic/claude-haiku-4.5` | mały model Claude |
 | DeepSeek | `deepseek/deepseek-chat-v3.1` | otwarta rodzina DeepSeek V3 |
 | MiniMax | `minimax/minimax-m2.5` | niezależna rodzina MoE |
 | Moonshot Kimi | `moonshotai/kimi-k2.5` | niezależna rodzina Kimi |
-| Z.ai GLM | `z-ai/glm-4.7-flash` | tani model Flash GLM |
 | Qwen | `qwen/qwen3.5-flash-02-23` | tani model Flash Qwen |
 | Mistral | `mistralai/ministral-3b-2512` | bardzo mały model 3B jako dolna granica |
 
@@ -100,7 +98,6 @@ Pojedynczy model lub scenariusz:
 ```bash
 python scripts/record_model.py --model google/gemini-3-flash-preview --max-cost-usd 5
 python scripts/record_model.py \
-  --model openai/gpt-5-nano \
   --scenario 45_multi_ip_two_stage \
   --max-cost-usd 5
 ```
@@ -133,7 +130,7 @@ Playback musi przejść przy nieustawionym sekrecie. Live request w tym trybie j
 
 ## 8. Kryterium zaliczenia
 
-Model zalicza tylko przy 36/36, a cała macierz przy 324/324. Każda kaseta musi:
+Model zalicza tylko przy 36/36, a cała macierz przy 252/252. Każda kaseta musi:
 
 - mieć `finish_reason=stop`;
 - mieć `returned_model` identyczny z modelem żądanym;

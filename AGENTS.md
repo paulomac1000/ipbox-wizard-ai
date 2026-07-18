@@ -50,7 +50,7 @@ Sprzeczność między źródłami jest błędem. Nie wybieraj wygodniejszej wers
 - używać niejednoznacznych pól `ulga_BR` albo `straty_poprzednie`;
 - włączać płatnych requestów do standardowego CI;
 - nadpisywać poprawnych kaset;
-- deklarować gotowości bez 324/324 i playbacku offline.
+- deklarować gotowości bez 252/252 i playbacku offline.
 
 ## Bramka jakości
 
@@ -68,4 +68,4 @@ Stan bazowy po audycie protokołu: 184 testy, 94,32% coverage, 36 kontrolowanych
 
 ## Nagrywanie
 
-Nagrywaj przez `scripts/record_model.py`. Po zmianie requestu, algorytmu, scenariusza lub schematu usuń wyłącznie unieważnione kasety. Wydanie wymaga 36/36 dla każdego z dziewięciu modeli (324/324), czystego JSON bez Markdown fences, zgodnego modelu zwróconego, playbacku bez sekretu, kontroli manifestu i raportu niezależnego agenta.
+Nagrywaj przez `scripts/record_model.py`. Po zmianie requestu, algorytmu, scenariusza lub schematu usuń wyłącznie unieważnione kasety. Wydanie wymaga 36/36 dla każdego z siedmiu modeli (252/252), czystego JSON bez Markdown fences, zgodnego modelu zwróconego, playbacku bez sekretu, kontroli manifestu i raportu niezależnego agenta.

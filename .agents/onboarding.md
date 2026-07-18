@@ -12,7 +12,7 @@ Repozytorium jest narzędziem **decision-support**, a nie automatycznym doradcą
 6. Nagrywanie LLM rozpocznij dopiero po zielonym CI i czystym drzewie.
 7. Używaj dokładnych modeli z `tests/llm/models.py`.
 8. Odrzucenia analizuj w `/tmp/ipbox_llm_rejected/<model>/`; wznawiaj tylko brakujące nagrania po sklasyfikowaniu przyczyny.
-9. Zakończenie wymaga 324/324 dla dziewięciu rodzin, czystego JSON bez Markdown fences i playbacku bez sekretu i raportu według `docs/independent-audit-brief.md`.
+9. Zakończenie wymaga 252/252 dla siedmiu rodzin, czystego JSON bez Markdown fences i playbacku bez sekretu i raportu według `docs/independent-audit-brief.md`.
 
 ## Model odpowiedzialności
 
@@ -35,7 +35,7 @@ Nie przywracaj pełnej mapy `true/false`. Pierwsza realna macierz wykazała, że
 - Limity zdrowotnej i IKZE są roczne; nie zgaduj limitu dla nieobsługiwanego roku.
 - Miesiąc musi należeć do `input.rok`, a pula termomodernizacji nie może przekraczać 53 000 zł.
 - Kasety historyczne są diagnostyką poprzednich kontraktów, nie dowodem poprawności obecnego kodu.
-- Repo dopuszcza pusty katalog kaset albo kompletną macierz 324/324; częściowej macierzy nie commituj.
+- Repo dopuszcza pusty katalog kaset albo kompletną macierz 252/252; częściowej macierzy nie commituj.
 
 ## Stan bazowy
 

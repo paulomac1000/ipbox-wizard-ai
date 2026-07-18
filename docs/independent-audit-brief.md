@@ -12,7 +12,7 @@ Pobrać aktualny branch `fix/decouple-mix-allocation-from-w`, niezależnie zwery
 - Nie wymyślaj kursów, limitów, NEXUS ani dowodów.
 - Każdą lukę najpierw pokaż testem deterministycznym.
 - Nie ponawiaj semantycznie błędnej odpowiedzi aż do uzyskania szczęśliwego wyniku.
-- Nie merguj i nie oznaczaj PR jako ready bez 324/324 i playbacku bez klucza.
+- Nie merguj i nie oznaczaj PR jako ready bez 252/252 i playbacku bez klucza.
 - Zachowaj PR jako draft do końca audytu.
 
 ## Pobranie i bramki
@@ -70,7 +70,7 @@ export OPENROUTER_API_KEY='...'
 ./scripts/record_all_models.sh --max-cost-usd 5
 ```
 
-Nagraj wszystkie 324 kasety od nowa. Poprzednia macierz 108 plików została usunięta: 36 odpowiedzi Claude zawierało Markdown fences akceptowane przez dawny parser, a lista modeli została rozszerzona do dziewięciu rodzin.
+Nagraj wszystkie 252 kasety od nowa. Poprzednia macierz 108 plików została usunięta: 36 odpowiedzi Claude zawierało Markdown fences akceptowane przez dawny parser, a lista modeli została rozszerzona do siedmiu rodzin.
 
 Po każdym modelu przejrzyj `/tmp/ipbox_llm_rejected/`, surowe odpowiedzi i raport kosztu. Przy realnym błędzie zatrzymaj nagranie, sklasyfikuj przyczynę i dodaj regresję przed zmianą kodu. Nie używaj `--force` i nie edytuj kaset.
 
@@ -93,7 +93,7 @@ git status --short
 git diff --stat
 ```
 
-Potwierdź, że żaden request sieciowy nie został wykonany, wszystkie dziewięć modeli ma 36/36, a macierz ma dokładnie 324 aktualne kasety.
+Potwierdź, że żaden request sieciowy nie został wykonany, wszystkie siedem modeli ma 36/36, a macierz ma dokładnie 324 aktualne kasety.
 
 ## Wymagany raport
 
@@ -101,11 +101,11 @@ Raport ma zawierać:
 
 1. SHA audytowanego commita i stan drzewa.
 2. Wynik każdej bramki i coverage.
-3. Wynik 36/36 dla każdego z dziewięciu modeli, koszt, retry i odrzucenia.
+3. Wynik 36/36 dla każdego z siedmiu modeli, koszt, retry i odrzucenia.
 4. Potwierdzenie playbacku bez `OPENROUTER_API_KEY`.
 5. Klasyfikację błędów: kod/oracle, scenariusz, instrukcja, provider, model.
 6. Dla poprawki: test regresyjny, pliki, uzasadnienie i wynik po zmianie.
-7. Kontrolę 324 kaset, manifestu, request hashy, fingerprintów, `finish_reason` i reparsowania.
+7. Kontrolę 252 kaset, manifestu, request hashy, fingerprintów, `finish_reason` i reparsowania.
 8. Ręczne wnioski dla scenariuszy 13, 17, 22, 23, 26, 31, 34, 44 i 45.
 9. Wyjaśnienie pełnego kosztu, łącznie z odrzuconymi próbami.
 10. Werdykt dokładnie `READY` albo `NOT READY`.
