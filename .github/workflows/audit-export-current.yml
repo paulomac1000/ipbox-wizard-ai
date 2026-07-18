@@ -1,5 +1,8 @@
 name: Audit export current branch
 on:
+  pull_request:
+    branches:
+      - main
   push:
     branches:
       - fix/decouple-mix-allocation-from-w
