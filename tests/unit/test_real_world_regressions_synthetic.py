@@ -66,7 +66,9 @@ def test_cost_date_revenue_policy_uses_month_specific_keys() -> None:
     assert result["status"] == "FINAL"
     assert result["result"]["klucz_MIX"]["metoda"] == "przychodowa_w_dacie_kosztu"
     shared = {
-        item["opis"]: item for item in result["classifications"] if item["basket"] == "MIX"
+        item["opis"]: item
+        for item in result["classifications"]
+        if item["basket"] == "MIX"
     }
     assert shared["Wspólny koszt styczniowy"]["allocation_key"] == 0.8
     assert shared["Wspólny koszt lutowy"]["allocation_key"] == 0.2
