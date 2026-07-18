@@ -5,7 +5,7 @@ on:
       - fix/decouple-mix-allocation-from-w
 jobs:
   apply:
-    if: ${{ hashFiles('.audit/part-00') != '' }}
+    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -18,7 +18,9 @@ jobs:
         run: |
           set -euo pipefail
           cat .audit/part-00 .audit/part-01 .audit/part-02 .audit/part-03 \
-              .audit/part-04 .audit/part-05 .audit/part-06 .audit/part-07 > payload.b64
+              .audit/part-04 .audit/part-05a .audit/part-05b .audit/part-05c \
+              .audit/part-05d .audit/part-05e .audit/part-06 .audit/part-07 \
+              > payload.b64
           base64 --decode payload.b64 > changes.tar.gz
           echo '8ad82f3f653970c1c80f93a7b1c180733f47dc612d118aabc7f6cc77b355818b  changes.tar.gz' | sha256sum --check --strict
       - name: Apply clean source tree
