@@ -1,0 +1,23 @@
+name: Audit export current branch
+on:
+  push:
+    branches:
+      - fix/decouple-mix-allocation-from-w
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Create source archive
+        run: |
+          set -euo pipefail
+          git archive --format=tar.gz --output=ipbox-current.tar.gz HEAD
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ipbox-current-source
+          path: ipbox-current.tar.gz
+          if-no-files-found: error
