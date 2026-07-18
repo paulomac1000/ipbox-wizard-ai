@@ -1,5 +1,8 @@
 name: Apply verified audit fixes
 on:
+  pull_request:
+    branches:
+      - main
   push:
     branches:
       - fix/decouple-mix-allocation-from-w
@@ -12,6 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: fix/decouple-mix-allocation-from-w
           persist-credentials: true
           fetch-depth: 0
       - name: Reconstruct and verify payload
