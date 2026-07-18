@@ -24,7 +24,7 @@ Model trafia do macierzy, gdy na dzień 18 lipca 2026 r.:
 5. nie jest aliasem routera ani endpointem `:free` o zmiennej dostępności;
 6. wykonuje ten sam ścisły request bez specjalnych wyjątków scenariuszowych.
 
-## Aktualna macierz 9 × 36
+## Aktualna macierz 7 × 36
 
 | Rodzina | Model OpenRouter | Rola w macierzy |
 |---|---|---|

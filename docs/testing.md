@@ -182,7 +182,7 @@ git status --short
 git diff --stat
 ```
 
-Repo dopuszcza brak kaset albo kompletną aktualną macierz 9 × 36. Nie commituj `/tmp`, raportów lokalnych ani częściowej macierzy.
+Repo dopuszcza brak kaset albo kompletną aktualną macierz 7 × 36. Nie commituj `/tmp`, raportów lokalnych ani częściowej macierzy.
 
 ## 11. Workflow GitHub
 

@@ -6,7 +6,7 @@
 
 - Atomowy kontrakt `decision_facts`; model zwraca wyłącznie `status/stops/reviews`.
 - Kontrakt `active_rules`, który nie pokazuje modelowi fałszywych przesłanek ani nieaktywnych kodów.
-- Macierz 9 × 36 obejmująca Gemini, GPT, Claude, DeepSeek, MiniMax, Kimi, GLM, Qwen i Mistral.
+- Macierz 7 × 36 obejmująca Gemini, GPT, Claude, DeepSeek, MiniMax, Kimi, GLM, Qwen i Mistral.
 - Fail-closed oracle, evaluator, strict JSON Schema i VCR format 4.
 - 36 znormalizowanych scenariuszy oraz siedmiorodzinny benchmark tanich modeli.
 - Regresje dla wzoru NEXUS podwyższającego A+B.

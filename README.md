@@ -92,11 +92,11 @@ Niezależny audyt: [`docs/independent-audit-brief.md`](docs/independent-audit-br
 
 ## Stan wydania
 
-Rdzeń deterministyczny i protokół `active_rules` są po audycie. Pierwsza macierz 108 odpowiedzi została unieważniona: 36 odpowiedzi Claude zawierało Markdown fences akceptowane przez zbyt pobłażliwy parser, a następnie rozszerzono próbę do siedmiu rodzin. PR pozostaje **draftem**, dopóki nie powstanie kompletna macierz 324 ścisłych odpowiedzi JSON.
+Rdzeń deterministyczny i protokół `active_rules` są po audycie. Pierwsza macierz 108 odpowiedzi została unieważniona: 36 odpowiedzi Claude zawierało Markdown fences akceptowane przez zbyt pobłażliwy parser, a następnie rozszerzono próbę do siedmiu rodzin. Repo zawiera kompletną macierz 252/252 ścisłych odpowiedzi JSON. PR pozostaje **draftem** do końcowego review.
 
 Warunki zakończenia:
 
-- 36/36 kaset dla każdego z siedmiu modeli, czyli 324 aktualne nagrania;
+- 36/36 kaset dla każdego z siedmiu modeli, czyli 252 aktualne nagrania;
 - playback bez `OPENROUTER_API_KEY`;
 - ręczny przegląd odpowiedzi, odrzuceń i raportu kosztu;
 - niezależny raport `READY` bez nierozwiązanych uwag;
