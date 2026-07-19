@@ -45,16 +45,12 @@ Nie wolno zgadywać, czy procent faktury i godziny NIE-IP opisują te same, roz�
 
 ### `conditional_product`
 
-Procent faktury jest drugim filtrem stosowanym do czasu potencjalnie kwalifikowanego:
-
 ```text
 W = ((godziny_pracy - godziny_nie_IP) / godziny_pracy)
     × procent_faktury_IP
 ```
 
 ### `disjoint_components`
-
-Procent faktury i godziny NIE-IP opisują rozłączne części tej samej faktury:
 
 ```text
 W = procent_faktury_IP
@@ -63,30 +59,47 @@ W = procent_faktury_IP
 
 ### `time_only`
 
-Udokumentowana polityka używa wyłącznie czasu:
-
 ```text
 W = (godziny_pracy - godziny_nie_IP) / godziny_pracy
 ```
 
 Każda metoda musi dawać wynik `0 ≤ W ≤ 1`. Mianownik to faktyczne godziny pracy. `W<50%` daje `REVIEW_02`, `W>95%` — `REVIEW_01`, skok >30 p.p. — `REVIEW_08`. Wiele projektów wymaga W per projekt, średniej ważonej przychodem i `REVIEW_04`.
 
-Kontrola miesięczna rozpoznaje między innymi: zastosowanie procentu raz, zastosowanie go dwukrotnie, oba warianty W, sam czas i przypisanie 100% faktury. Niezgodność z zadeklarowaną metodą, podwójny procent lub niejawna zmiana metody w trakcie roku aktywują STOP.
+### Precyzja arkusza
 
-## 4. Przychód IP/NIE
+Audyt odróżnia błąd od prawidłowego wyniku powstałego po zaokrągleniu pośrednim. Jeżeli arkusz zapisuje `W` z dokładnością `q` punktu procentowego, ukryta wartość może różnić się o najwyżej `q/2`. Dla kontrolowanego przychodu `R` minimalna koperta kwotowa wynosi:
+
+```text
+tolerancja_W = R × q / 200 + tolerancja_zaokrągleń_kwotowych
+```
+
+Domyślne `q` to `0,01 pp`. Jeżeli arkusz przechowuje widoczne `W`, kontrola najpierw sprawdza, czy samo `W` mieści się w jego deklarowanej precyzji, a następnie odtwarza kwotę z tej zapisanej wartości. Stała tolerancja 0,02 zł nie może zastępować koperty wynikającej z precyzji procentu i wielkości przychodu.
+
+Rozpoznawanie sygnatur — procent zastosowany raz, procent zastosowany dwukrotnie, warianty W, sam czas i pełny przychód — używa analogicznych przedziałów wynikających z precyzji wejścia. Zaokrąglenie 81,818…% do 81,82% nie może ukrywać sygnatury podwójnego procentu.
+
+## 4. Przychód IP/NIE i poziom kontroli
 
 Dozwolone metody: `dokumentowa`, `czasowa_W`, `produktowa`, `z_interpretacji`, `custom`. Metoda niedokumentowa wymaga jawnego klucza 0–1, źródła i uzasadnienia. Brak dowodu kwalifikacji oznacza NIE. Ujemna faktura jest błędem. Różnice kursowe pozostają poza przychodem kwalifikowanym.
 
-Dla każdego miesiąca zachowaj:
+Kontrola alokacji działa na najniższym dostępnym niezależnym strumieniu:
 
-- kwotę całkowitą,
-- kwotę IP i NIE,
+1. konkretnej fakturze, gdy ma własną kontrolę i dowód;
+2. konkretnym projekcie/IP, gdy raport pracy rozdziela projekty;
+3. agregacie kwalifikujących się faktur miesiąca dopiero wtedy, gdy nie ma dokładniejszego podziału.
+
+Faktury jawnie NIE-IP są odseparowane przed zastosowaniem W i muszą pozostać w koszyku NIE. Nie wolno zsumować ich z fakturami kwalifikującymi się, a następnie zastosować jednego W do całej kwoty miesiąca. Suma kontrolowanych strumieni musi odpowiadać sumie kwalifikujących się faktur; brakujący lub nadmiarowy strumień aktywuje `STOP_09`.
+
+Dla każdego strumienia zachowaj:
+
+- identyfikator faktury/projektu,
+- kwotę całkowitą oraz IP i NIE,
 - metodę i wersję polityki,
 - dane wejściowe do W,
-- wynik W,
+- zapisane W i jego precyzję,
+- liczbę etapów zaokrąglania,
 - dowód podziału.
 
-`IP + NIE` musi równać się fakturze co do grosza. Algorytm odrzuca arkusz, w którym część miesięcy używa procentu dwukrotnie, a inne przypisują 100% przychodu bez jawnej zmiany polityki.
+`IP + NIE` musi zachować kwotę strumienia z uwzględnieniem jawnej koperty zaokrągleń. Algorytm odrzuca arkusz, w którym część strumieni używa procentu dwukrotnie, a inne przypisują 100% przychodu bez jawnej zmiany polityki.
 
 ## 5. Koszty dochodowe
 
@@ -110,8 +123,6 @@ MIX_NIE   = MIX - MIX_IP
 Koszt miesięczny jest `DEFERRED` do true-up. Klucz `0.0` jest wartością, nie brakiem danych.
 
 ### `przychodowa_w_dacie_kosztu`
-
-Każdy koszt wspólny otrzymuje klucz z miesiąca jego poniesienia:
 
 ```text
 klucz_miesiąca = przychód_IP_miesiąca / przychód_całkowity_miesiąca
@@ -196,8 +207,6 @@ Dochód działalności łączy się z `dochody_dodatkowe_skala`. Strata działal
 Preferowane wejście to lista pul z rokiem pierwszego wydatku, kwotą pozostałą i odwołaniem do dowodu. Najstarsze ważne pule są zużywane jako pierwsze. Kwota niewykorzystana może być przenoszona nie dłużej niż sześć lat liczonych od końca roku pierwszego wydatku; kwota wygasła jest jawnie raportowana. Łączna pula podatnika nie może przekroczyć 53 000 zł. Nie podawaj jednocześnie listy pul i jednej zbiorczej puli.
 
 ## 11. Uzgodnienie ewidencji, PIT/IP i zeznania
-
-Przed finalizacją porównaj osobno:
 
 ```text
 przychód_IP_ewidencja  == przychód_IP_zeznanie
