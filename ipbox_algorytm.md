@@ -7,17 +7,19 @@
 1. Każda liczba pochodzi z deterministycznego kodu Python.
 2. Brak danych, kursu, limitu, semantyki pola lub dowodu jest błędem albo REVIEW, nigdy automatycznym zerem.
 3. Oznaczaj źródło decyzji: `[PRZEPIS]`, `[DOWÓD]`, `[POLITYKA]`, `[HEURYSTYKA]`.
-4. Rozdziel cztery decyzje: kwalifikację przychodu, metodę podziału przychodu IP/NIE, alokację kosztów `MIX` oraz NEXUS.
+4. Rozdziel pięć decyzji: kwalifikację przychodu, metodę podziału przychodu IP/NIE, kwalifikację wydatku jako KUP, alokację kosztu `MIX` oraz NEXUS.
 5. `W` nie jest automatycznie kluczem `MIX`, NEXUS ani dowodem kwalifikacji IP.
-6. Interpretacja KIS lub inna udokumentowana polityka ma pierwszeństwo przed domyślną heurystyką, ale jej treść i faktyczne wdrożenie wymagają zgodności.
-7. Po aktywacji STOP status to `STOPPED`, a finalne liczby, klasyfikacje i rozliczenie są zerowane.
-8. Zeznanie musi uzgadniać się z ewidencją nie tylko sumą globalną, lecz także osobno w przychodach i kosztach IP/NIE.
-9. Testy i przykłady używają wyłącznie danych syntetycznych. Nie kopiuj danych podatnika, identyfikatorów, kontrahentów ani dokładnych rozliczeń do repozytorium.
-10. Provider LLM nie jest źródłem reguł. Adapter transportowy nie może osłabić lokalnej strict schema, parsera ani evaluatora.
+6. Interpretacja KIS lub inna udokumentowana polityka ma pierwszeństwo przed domyślną heurystyką, ale wymaga identyfikatora źródła i zgodnego wdrożenia.
+7. Wydatek `KUP: false` jest zawsze `WYKLUCZONE`, nawet jeżeli wcześniej oznaczono go jako `IP`, `NON` albo `MIX`.
+8. Źródłowa KPiR, kalkulacja i złożone zeznanie są trzema osobnymi artefaktami. Wyłączenie kosztu w kalkulatorze nie naprawia automatycznie błędnej KPiR ani PIT.
+9. Po aktywacji STOP status to `STOPPED`, a finalne liczby i klasyfikacje są zerowane. Informacyjny `source_ledger_audit` i bezpieczny `correction_preview` pozostają widoczne.
+10. Zeznanie musi uzgadniać się z ewidencją osobno dla przychodów i kosztów IP/NIE oraz dla użytych ulg, podatku i nadpłaty.
+11. Testy i przykłady używają wyłącznie danych syntetycznych. Nie kopiuj danych podatnika, identyfikatorów, kontrahentów, sygnatur ani dokładnych rozliczeń do repozytorium.
+12. Provider LLM nie jest źródłem reguł. Adapter transportowy nie może osłabić lokalnej strict schema, parsera ani evaluatora.
 
 ## 2. Dane i kwalifikacja
 
-Zbierz rok, formę opodatkowania, kwalifikowane IP, sposób komercjalizacji, umowy, raporty pracy, ewidencję B+R, faktury, KPiR, waluty i daty płatności, ZUS, zdrowotną, ulgi, straty, zaliczki, PIT/IP, zeznanie oraz KIS.
+Zbierz rok, formę opodatkowania, kwalifikowane IP, sposób komercjalizacji, umowy, raporty pracy, ewidencję B+R, faktury, KPiR, waluty i daty płatności, ZUS, zdrowotną, ulgi, straty, zaliczki, PIT/IP, zeznanie oraz dokumenty stanowiące źródło polityki.
 
 | Fakt | Kod |
 |---|---|
@@ -34,14 +36,15 @@ Zbierz rok, formę opodatkowania, kwalifikowane IP, sposób komercjalizacji, umo
 | `year_limit_exceeded` | `STOP_14` |
 | `health_deduction_mode_invalid_for_year` | `STOP_15` |
 | `unsupported_tax_year` | `STOP_16` |
+| `source_kpir_requires_correction` | `SOURCE_KPIR_REQUIRES_CORRECTION` |
 | `social_contributions_double_counted` | `ZUS_DOUBLE_DIP` |
 | `health_contribution_double_counted` | `HEALTH_DOUBLE_DIP` |
 
-Kod istnieje wtedy i tylko wtedy, gdy odpowiadający fakt jest `true`. Brak KIS sam w sobie nie jest STOP-em.
+Kod istnieje wtedy i tylko wtedy, gdy odpowiadający fakt jest `true`. Brak KIS sam w sobie nie jest STOP-em. Podanie `źródło: interpretacja_KIS` bez `źródło_ref` jest błędem kontraktu wejściowego, ponieważ algorytm nie może zgadywać właściwej interpretacji.
 
 ## 3. Współczynnik W — najpierw semantyka
 
-Nie wolno zgadywać, czy procent faktury i godziny NIE-IP opisują te same, rozłączne czy warunkowe części wynagrodzenia. Polityka `W.metoda` jest obowiązkowa, gdy oba pola są używane w rozliczeniu historycznym lub ich znaczenie nie jest oczywiste.
+Nie wolno zgadywać, czy procent faktury i godziny NIE-IP opisują te same, rozłączne czy warunkowe części wynagrodzenia. Polityka `W.metoda` jest obowiązkowa, gdy oba pola są używane lub ich znaczenie nie jest oczywiste.
 
 ### `conditional_product`
 
@@ -73,9 +76,9 @@ Audyt odróżnia błąd od prawidłowego wyniku powstałego po zaokrągleniu po�
 tolerancja_W = R × q / 200 + tolerancja_zaokrągleń_kwotowych
 ```
 
-Domyślne `q` to `0,01 pp`. Jeżeli arkusz przechowuje widoczne `W`, kontrola najpierw sprawdza, czy samo `W` mieści się w jego deklarowanej precyzji, a następnie odtwarza kwotę z tej zapisanej wartości. Stała tolerancja 0,02 zł nie może zastępować koperty wynikającej z precyzji procentu i wielkości przychodu.
+Domyślne `q` to `0,01 pp`. Jeżeli arkusz przechowuje widoczne `W`, kontrola najpierw sprawdza samo W, a następnie odtwarza kwotę z zapisanej wartości. Stała tolerancja 0,02 zł nie zastępuje koperty wynikającej z precyzji procentu i wielkości przychodu.
 
-Rozpoznawanie sygnatur — procent zastosowany raz, procent zastosowany dwukrotnie, warianty W, sam czas i pełny przychód — używa analogicznych przedziałów wynikających z precyzji wejścia. Zaokrąglenie 81,818…% do 81,82% nie może ukrywać sygnatury podwójnego procentu.
+Rozpoznawanie sygnatur — procent zastosowany raz, procent zastosowany dwukrotnie, warianty W, sam czas i pełny przychód — używa analogicznych przedziałów. Zaokrąglenie procentu nie może ukrywać `STOP_10` ani późniejszego `STOP_11`.
 
 ## 4. Przychód IP/NIE i poziom kontroli
 
@@ -87,30 +90,35 @@ Kontrola alokacji działa na najniższym dostępnym niezależnym strumieniu:
 2. konkretnym projekcie/IP, gdy raport pracy rozdziela projekty;
 3. agregacie kwalifikujących się faktur miesiąca dopiero wtedy, gdy nie ma dokładniejszego podziału.
 
-Faktury jawnie NIE-IP są odseparowane przed zastosowaniem W i muszą pozostać w koszyku NIE. Nie wolno zsumować ich z fakturami kwalifikującymi się, a następnie zastosować jednego W do całej kwoty miesiąca. Suma kontrolowanych strumieni musi odpowiadać sumie kwalifikujących się faktur; brakujący lub nadmiarowy strumień aktywuje `STOP_09`.
+Faktury jawnie NIE-IP są odseparowane przed zastosowaniem W i muszą pozostać w koszyku NIE. Suma kontrolowanych strumieni musi odpowiadać sumie faktur kwalifikujących się; brakujący lub nadmiarowy strumień aktywuje `STOP_09`.
 
-Dla każdego strumienia zachowaj:
+Dla każdego strumienia zachowaj identyfikator, kwotę całkowitą i podział IP/NIE, metodę i wersję polityki, dane wejściowe do W, zapisane W i jego precyzję, liczbę etapów zaokrąglania oraz dowód podziału.
 
-- identyfikator faktury/projektu,
-- kwotę całkowitą oraz IP i NIE,
-- metodę i wersję polityki,
-- dane wejściowe do W,
-- zapisane W i jego precyzję,
-- liczbę etapów zaokrąglania,
-- dowód podziału.
+## 5. KUP i źródłowa KPiR
 
-`IP + NIE` musi zachować kwotę strumienia z uwzględnieniem jawnej koperty zaokrągleń. Algorytm odrzuca arkusz, w którym część strumieni używa procentu dwukrotnie, a inne przypisują 100% przychodu bez jawnej zmiany polityki.
+Koszyk dochodowy jest ustalany dopiero po kwalifikacji KUP:
 
-## 5. Koszty dochodowe
-
-- `IP` — bezpośrednio i udokumentowanie przypisany;
-- `MIX` — wspólny lub pośredni;
-- `NON` — firmowy, ale nie-IP;
+- `IP` — KUP bezpośrednio i udokumentowanie przypisany do kwalifikowanego dochodu;
+- `MIX` — KUP wspólny lub pośredni;
+- `NON` — KUP działalności, lecz nie-IP;
 - `WYKLUCZONE` — prywatny, niededukowalny albo nieuwzględniany jednorazowo.
 
-IDE, chmura, serwer, repozytorium i sprzęt są domyślnie `MIX`, chyba że istnieje dowód wyłącznego użycia. Kara, mandat i koszt prywatny są `WYKLUCZONE`. Niesklasyfikowany zakup powyżej 10 000 zł jest wyłączony; wprowadź osobno prawidłowy odpis lub amortyzację.
+Jawne `KUP: false`, `kup: false` albo `deductible: false` ma pierwszeństwo przed opisem i wcześniejszym koszykiem. Taki wydatek otrzymuje `ip_amount=0`, `non_ip_amount=0`, `nexus_amount=0` i `WYKLUCZONE`.
+
+Jeżeli wydatek wykluczony został ujęty w źródłowej KPiR, raport ustawia:
+
+```text
+source_ledger_audit.status = REQUIRES_CORRECTION
+stop = SOURCE_KPIR_REQUIRES_CORRECTION
+```
+
+`source_ledger_audit` pokazuje kwotę zgłoszoną w KPiR, sumę surowych pozycji, sumę prawidłowych KUP, kwotę wykluczoną pozostającą w źródle i deltę korekty. Samo pominięcie kosztu w kalkulacji nie może zostać przedstawione jako wykonana korekta dokumentu źródłowego.
 
 ## 6. Alokacja MIX
+
+### Identyfikacja polityki
+
+Każda polityka przechowuje `metoda`, `źródło`, `źródło_ref`, uzasadnienie i `rounding_granularity`. Gdy źródłem jest interpretacja KIS, `źródło_ref` musi zostać dostarczone przez użytkownika lub dokument. Kod nie zawiera prywatnych sygnatur i nie dobiera ich heurystycznie.
 
 ### `przychodowa_roczna`
 
@@ -130,7 +138,16 @@ koszt_IP        = koszt_MIX × klucz_miesiąca
 koszt_NIE       = koszt_MIX - koszt_IP
 ```
 
-Mianownik miesiąca musi być dodatni. Każda pozycja przechowuje miesiąc, klucz, źródło, wynik IP/NIE i ślad dowodowy. Metoda ta nie jest synonimem rocznego true-up i nie może zostać po cichu zastąpiona `W`.
+Mianownik miesiąca musi być dodatni. Każda pozycja przechowuje miesiąc, klucz, źródło, wynik IP/NIE i ślad dowodowy. Metoda ta nie jest synonimem W i nie może zostać po cichu nazwana `czasowa_W` tylko dlatego, że wartości procentowe przypadkiem są równe.
+
+### Poziom zaokrąglania
+
+Polityka musi jawnie wskazać jeden wariant:
+
+- `per_cost_item` — każda pozycja jest mnożona przez klucz i zaokrąglana do grosza osobno;
+- `monthly_pool` — najpierw liczona i zaokrąglana jest miesięczna pula `sum(kosztów) × klucz`, a następnie jej grosze są rozdzielane pomiędzy pozycje metodą największych reszt.
+
+Przy `monthly_pool` suma `ip_amount` pozycji musi być dokładnie równa zaokrąglonej puli miesięcznej. `rounding_adjustment` pokazuje groszową różnicę względem niezależnego zaokrąglenia pozycji. Uzgodnienie porównuje źródło zgodnie z zadeklarowaną granularity; nie maskuje różnicy arbitralną tolerancją.
 
 ### Wiele IP
 
@@ -139,9 +156,9 @@ stage1 = MIX × przychód_software_IP / przychód_całkowity
 IP_i   = stage1 × przychód_IP_i / przychód_software_IP
 ```
 
-Oba mianowniki muszą być dodatnie. Podział zachowuje grosze. Pełne rozliczenie wielu IP wymaga osobnej ewidencji przychodów, kosztów, NEXUS, dochodów i strat per prawo.
+Oba mianowniki muszą być dodatnie. Podział zachowuje każdy grosz. Pełne rozliczenie wielu IP wymaga osobnej ewidencji przychodów, kosztów, NEXUS, dochodów i strat per prawo.
 
-## 7. NEXUS
+## 7. NEXUS — osobna warstwa dowodowa
 
 ```text
 NEXUS = min(1, ((A + B) × 1,3) / (A + B + C + D))
@@ -149,11 +166,14 @@ NEXUS = min(1, ((A + B) × 1,3) / (A + B + C + D))
 
 A — własne B+R; B — wyniki B+R od niepowiązanego; C — od powiązanego; D — nabycie IP.
 
-- `A=B=C=D=0` → NEXUS `0`;
+- KUP i NEXUS nie są tym samym testem. Koszt może obniżać dochód, lecz pozostać `poza_nexus`.
+- `A=B=C=D=0` daje NEXUS `0`.
 - mnożnik 1,3 obejmuje A i B;
-- `MIX` w A/B/C/D wymaga `nexus_source` i `nexus_amount`;
-- nie twórz A/B tylko dlatego, że istnieje przychód IP;
-- suma A/B/C/D/poza NEXUS musi zgadzać się co do grosza.
+- koszt kwalifikowany do A/B/C/D wymaga `nexus_evidence`;
+- `MIX` w A/B/C/D wymaga również jawnego `nexus_basis`: `explicit_amount` albo `allocated_ip_cost`;
+- `allocated_ip_cost` wiąże NEXUS z końcowym, po korekcie groszowej `ip_amount`;
+- brak dowodu nie tworzy A heurystycznie: pozycja trafia do `poza_nexus` i otrzymuje `NEXUS_EVIDENCE_MISSING`;
+- suma A/B/C/D/poza NEXUS musi zgadzać się co do grosza z kosztami wejściowymi.
 
 ## 8. Waluty
 
@@ -184,7 +204,7 @@ Skala:
 
 Jednoczesne pomniejszenie dochodu IP o ulgę B+R jest obsługiwane dopiero od 2022 r. Dodatnia `ulga_BR_IP` dla 2019–2021 aktywuje `STOP_13`.
 
-## 10. Kaskada podatkowa
+## 10. Kaskada podatkowa i ulgi
 
 ### B+R i IP Box
 
@@ -194,19 +214,19 @@ Nie używaj niejednoznacznego pola `ulga_BR`. Podaj `ulga_BR_IP`, `ulga_BR_NIE` 
 
 `strata_NIE_z_lat_poprzednich` pomniejsza wyłącznie dochód pozostałej działalności. Strata kwalifikowanego IP wymaga identyfikacji konkretnego prawa i osobnej ewidencji.
 
-### Podatek liniowy
+### Podatek liniowy i skala
 
-Obsługiwane są właściwe dla roku kwoty: strata NIE, ZUS społeczne, zdrowotna bez dubla, IKZE, B+R oraz termomodernizacja. Zwykłe darowizny, internet, rehabilitacja i dziecko są odrzucane. Dodatkowe dochody skali wymagają osobnego obliczenia zeznania skali.
-
-### Skala
-
-Dochód działalności łączy się z `dochody_dodatkowe_skala`. Strata działalności i `ulga_BR_NIE` nie mogą konsumować dochodu z pracy; wspólne odliczenia pomniejszają odpowiednią łączną podstawę. Darowizny mają limit 6%, internet 760 zł i wymagają zweryfikowanego dowodu.
+Obsługiwane są właściwe dla roku kwoty: strata NIE, ZUS społeczne, zdrowotna bez dubla, IKZE, B+R oraz termomodernizacja. Dodatkowe dochody skali wymagają osobnego obliczenia odpowiedniego zeznania.
 
 ### Termomodernizacja
 
-Preferowane wejście to lista pul z rokiem pierwszego wydatku, kwotą pozostałą i odwołaniem do dowodu. Najstarsze ważne pule są zużywane jako pierwsze. Kwota niewykorzystana może być przenoszona nie dłużej niż sześć lat liczonych od końca roku pierwszego wydatku; kwota wygasła jest jawnie raportowana. Łączna pula podatnika nie może przekroczyć 53 000 zł. Nie podawaj jednocześnie listy pul i jednej zbiorczej puli.
+Preferowane wejście to lista pul z rokiem pierwszego wydatku, kwotą pozostałą i odwołaniem do dowodu. Najstarsze ważne pule są zużywane jako pierwsze. Kwota niewykorzystana może być przenoszona nie dłużej niż sześć lat liczonych od końca roku pierwszego wydatku; kwota wygasła jest jawnie raportowana. Łączna pula podatnika nie może przekroczyć 53 000 zł.
 
-## 11. Uzgodnienie ewidencji, PIT/IP i zeznania
+Algorytm raportuje osobno `thermomodernization_used`, `termomodernization_carry_over` i `termomodernization_expired`. Nie wolno twierdzić, że podatek po korekcie pozostaje bez zmian wyłącznie dlatego, że istnieje niewykorzystana pula. Warunek jest spełniony dopiero wtedy, gdy poprawiona kwota odliczenia mieści się w puli i została uwzględniona w korekcie zeznania.
+
+## 11. Uzgodnienie KPiR, PIT/IP, PIT/B i ulg
+
+Porównaj osobno:
 
 ```text
 przychód_IP_ewidencja  == przychód_IP_zeznanie
@@ -215,28 +235,41 @@ koszt_IP_ewidencja     == koszt_IP_zeznanie
 koszt_NIE_ewidencja    == koszt_NIE_zeznanie
 ```
 
-Równość samych sum `IP+NIE` nie wystarcza. Przesunięcie między koszykami przy zachowaniu sumy aktywuje `STOP_12`. Korekta zeznania rozdziela:
+Jeżeli dane są dostępne, porównaj również:
 
-- pierwotny podatek i pierwotną nadpłatę,
-- poprawiony podatek i poprawioną nadpłatę,
-- kwotę zwrotu już wypłaconą,
-- dodatkowy zwrot albo kwotę do zwrotu/zaliczenia.
+```text
+termomodernizacja_użyta == termomodernizacja_w_zeznaniu
+podatek_łączny          == podatek_w_zeznaniu
+nadpłata_lub_dopłata    == rozliczenie_w_zeznaniu
+```
+
+Równość samych sum `IP+NIE` nie wystarcza. Przesunięcie między koszykami albo pozostawienie wydatku NON-KUP w kosztach aktywuje STOP. Różnica ulgi, podatku lub nadpłaty aktywuje `STOP_12` i odpowiedni kod diagnostyczny.
+
+`correction_preview` może zostać policzony mimo korekcyjnego STOP-u, jeżeli nie ma innego błędu blokującego matematykę. Zawiera:
+
+- czy KPiR wymaga korekty;
+- czy złożone zeznanie wymaga korekty;
+- czy trzeba zmienić wykorzystaną ulgę;
+- czy niezmieniony podatek jest prawdziwy tylko pod warunkiem aktualizacji ulg;
+- poprawiony podatek, nadpłatę, wykorzystanie i pozostałą pulę termomodernizacyjną.
+
+Preview nie jest finalnym wynikiem: finalne pola finansowe pozostają wyzerowane przy STOP.
 
 ## 12. TEST 1–9
 
 Python ustala:
 
-- `TEST_1` — bilans KPiR;
-- `TEST_2` — brak kosztów prywatnych;
+- `TEST_1` — bilans danych źródłowych;
+- `TEST_2` — brak kosztów prywatnych zadeklarowanych jako firmowe;
 - `TEST_3` — brak podwójnego ZUS/zdrowotnej;
 - `TEST_4` — nieujemne podstawy i carry-over;
 - `TEST_5` — zgodny podatek IP;
 - `TEST_6` — zgodny podatek łączny z historycznym odliczeniem zdrowotnym;
 - `TEST_7` — zgodna metoda MIX;
-- `TEST_8` — jawny NEXUS kwalifikowanego MIX;
+- `TEST_8` — jawny dowód i kwota NEXUS kwalifikowanego MIX;
 - `TEST_9` — opis projektu przy przychodzie.
 
-Dodatkowe strażniki alokacji, limitów rocznych i uzgodnienia zeznania aktywują STOP przed raportem. Model nie zmienia FAIL na PASS.
+Dodatkowe strażniki KPiR, alokacji, zaokrągleń, limitów rocznych i uzgodnienia zeznania aktywują STOP przed raportem. Model nie zmienia FAIL na PASS.
 
 ## 13. REVIEW
 
@@ -272,12 +305,12 @@ Model widzi wyłącznie tę kopertę. Nie widzi surowych danych podatkowych, naz
 
 Model:
 
-- nie oblicza podatku, W, NEXUS, ulg ani TEST 1–9;
+- nie oblicza podatku, W, KUP, NEXUS, ulg ani TEST 1–9;
 - nie ustala, czy kod jest STOP-em czy REVIEW;
 - nie przenosi, nie pomija, nie deduplikuje i nie dodaje kodów;
 - nie zmienia `status`;
 - nie używa Markdown fences ani pól dodatkowych.
 
-Lokalna `DECISION_JSON_SCHEMA`, parser i evaluator są źródłem prawdy dla każdego modelu. Adapter providera może wyłącznie zmienić reprezentację transportową, na przykład usunąć nieobsługiwany keyword ze swojej głębokiej kopii JSON Schema albo wymusić `json_object`. Nie może zmienić lokalnego zestawu dozwolonych kodów, reguł unikalności, rozdziału STOP/REVIEW ani oceny semantycznej.
+Lokalna `DECISION_JSON_SCHEMA`, parser i evaluator są źródłem prawdy dla każdego modelu. Adapter providera może wyłącznie zmienić reprezentację transportową. Nie może zmienić lokalnego zestawu dozwolonych kodów, reguł unikalności, rozdziału STOP/REVIEW ani oceny semantycznej.
 
 Aplikacja składa zweryfikowaną kopertę z deterministycznym raportem. Kaseta może powstać dopiero po pełnym schema i semantic PASS, z dokładnym modelem zwróconym i `finish_reason=stop`.
