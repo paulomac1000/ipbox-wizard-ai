@@ -171,9 +171,7 @@ def prepare_cost_date_policy(input_data: dict[str, Any], shares: dict[str, float
                 continue
             method = str(revenue_policy.get("metoda"))
             key = (
-                shares.get(month_id, 0.0)
-                if method == "czasowa_W"
-                else revenue_policy.get("klucz")
+                shares.get(month_id, 0.0) if method == "czasowa_W" else revenue_policy.get("klucz")
             )
             split = (
                 float(money(invoice.get("kwota_IP", amount))) if method == "dokumentowa" else None
