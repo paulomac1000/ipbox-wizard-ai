@@ -44,9 +44,7 @@ def validate_scenario(scenario: dict[str, Any]) -> None:
 def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
     validate_scenario(scenario)
     transformed, shares, method = prepare_scenario(scenario)
-    base = legacy.compute_reference(
-        legacy_safe_copy(transformed, for_validation=False)
-    )
+    base = legacy.compute_reference(legacy_safe_copy(transformed, for_validation=False))
     for row in base.get("monthly_W", []):
         month = str(row.get("miesiąc", ""))
         if method != "conditional_product" and month in shares:
@@ -95,9 +93,7 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
         return base
 
     reliefs = (
-        input_data.get("ulgi", {})
-        if isinstance(input_data.get("ulgi"), dict)
-        else {}
+        input_data.get("ulgi", {}) if isinstance(input_data.get("ulgi"), dict) else {}
     )
     tax = calculate_tax_for_year(
         int(input_data["rok"]),
@@ -105,18 +101,14 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
         ip_income=max(0.0, float(base["result"]["dochód_IP"])),
         nexus=float(base["result"]["nexus"]),
         tax_form=str(input_data["forma_opodatkowania"]),
-        previous_non_ip_business_losses=reliefs.get(
-            "strata_NIE_z_lat_poprzednich", 0
-        ),
+        previous_non_ip_business_losses=reliefs.get("strata_NIE_z_lat_poprzednich", 0),
         social_security_deduction=(
             0 if social_in_kpir else social.get("odliczenie_spoleczne_PIT", 0)
         ),
         health_income_deduction=(
             0 if health_in_kpir else annual_values["health_income"]
         ),
-        health_tax_credit=(
-            0 if health_in_kpir else annual_values["health_credit"]
-        ),
+        health_tax_credit=(0 if health_in_kpir else annual_values["health_credit"]),
         ikze=annual_values["ikze"],
         donations=reliefs.get("darowizny", 0),
         internet_tax_relief=reliefs.get("ulga_internet", 0),
@@ -168,8 +160,7 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
     )
     base["tests"]["TEST_5"] = (
         "PASS"
-        if tax["ip_tax"]
-        == tax_round(float(tax["ip_base_rounded"]) * 0.05)
+        if tax["ip_tax"] == tax_round(float(tax["ip_base_rounded"]) * 0.05)
         else "FAIL"
     )
     expected_total = tax_round(
@@ -177,8 +168,6 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
         + float(tax["ip_tax"])
         - float(tax["health_tax_credit_used"])
     )
-    base["tests"]["TEST_6"] = (
-        "PASS" if tax["total_tax"] == expected_total else "FAIL"
-    )
+    base["tests"]["TEST_6"] = "PASS" if tax["total_tax"] == expected_total else "FAIL"
     base["status"] = "FINAL"
     return base
