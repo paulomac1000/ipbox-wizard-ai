@@ -86,9 +86,7 @@ def test_monthly_pool_preserves_the_pool_target_and_distributes_cents() -> None:
 def test_explicit_non_kup_overrides_non_ip_and_requires_source_ledger_correction() -> None:
     scenario = {
         "input": {
-            "polityka_alokacji": {
-                "koszty_MIX": {"źródło": "użytkownik"}
-            },
+            "polityka_alokacji": {"koszty_MIX": {"źródło": "użytkownik"}},
             "podsumowanie_kpir": {"koszty": 400},
             "miesiace": [
                 {
@@ -133,31 +131,19 @@ def test_explicit_non_kup_overrides_non_ip_and_requires_source_ledger_correction
         "excluded_recorded_costs": 400.0,
         "correction_delta": 400.0,
     }
-    assert {"NON_DEDUCTIBLE_COST_EXCLUDED", "SOURCE_KPIR_REQUIRES_CORRECTION"} <= set(
-        warnings
-    )
+    assert {"NON_DEDUCTIBLE_COST_EXCLUDED", "SOURCE_KPIR_REQUIRES_CORRECTION"} <= set(warnings)
 
 
 def test_kis_policy_requires_a_case_specific_source_reference() -> None:
     with pytest.raises(ValueError, match="requires źródło_ref"):
-        validate_cost_policy(
-            {
-                "polityka_alokacji": {
-                    "koszty_MIX": {"źródło": "interpretacja_KIS"}
-                }
-            }
-        )
+        validate_cost_policy({"polityka_alokacji": {"koszty_MIX": {"źródło": "interpretacja_KIS"}}})
 
 
 def test_qualified_nexus_without_evidence_is_downgraded_outside_nexus() -> None:
     scenario = {
         "input": {
-            "polityka_alokacji": {
-                "koszty_MIX": {"źródło": "użytkownik"}
-            },
-            "miesiace": [
-                {"miesiac": "2025-01", "koszty": [{"kwota": 100}]}
-            ],
+            "polityka_alokacji": {"koszty_MIX": {"źródło": "użytkownik"}},
+            "miesiace": [{"miesiac": "2025-01", "koszty": [{"kwota": 100}]}],
         }
     }
     reference = _reference(_mix_classification("A", evidence=""))
