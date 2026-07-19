@@ -8,7 +8,7 @@ import yaml
 from tests.llm.oracle import compute_reference
 
 SCENARIO_DIR = Path(__file__).parents[1] / "llm" / "scenarios"
-NEW_SCENARIOS = tuple(range(46, 56))
+NEW_SCENARIOS = tuple(range(46, 58))
 
 
 def _load(number: int) -> dict:
@@ -80,3 +80,44 @@ def test_year_boundaries_and_rounded_disjoint_w() -> None:
     assert clean["stops_reviews"]["stops"] == []
     assert clean["monthly_W"] == [{"miesiąc": "2025-01", "wartość": 68.72}]
     assert clean["result"]["przychody_roczne"] == {"IP": 15874.32, "NIE": 9725.68}
+
+
+def test_private_non_kup_produces_source_and_return_correction_preview() -> None:
+    result = compute_reference(_load(56))
+    assert result["status"] == "STOPPED"
+    assert set(result["stops_reviews"]["stops"]) == {
+        "SOURCE_KPIR_REQUIRES_CORRECTION",
+        "STOP_12",
+    }
+    assert result["source_ledger_audit"] == {
+        "status": "REQUIRES_CORRECTION",
+        "reported_costs": 3400.0,
+        "raw_input_costs": 3400.0,
+        "deductible_costs": 3000.0,
+        "excluded_recorded_costs": 400.0,
+        "correction_delta": 400.0,
+    }
+    preview = result["correction_preview"]
+    assert preview["status"] == "AVAILABLE"
+    assert preview["source_kpir_correction_required"] is True
+    assert preview["return_correction_required"] is True
+    assert preview["relief_adjustment_required"] is True
+    assert preview["tax_unchanged_only_if_reliefs_updated"] is True
+    assert preview["corrected_total_tax"] == 900.0
+    assert preview["corrected_overpayment"] == 4100.0
+    assert preview["thermomodernization_used"] == 4000.0
+    assert preview["thermomodernization_carry_over"] == 1000.0
+
+
+def test_monthly_pool_rounding_preserves_cents_and_nexus_evidence() -> None:
+    result = compute_reference(_load(57))
+    assert result["status"] == "FINAL"
+    assert result["stops_reviews"]["stops"] == []
+    assert result["result"]["koszty_roczne"]["IP"] == 100.0
+    assert result["result"]["koszty_roczne"]["NIE"] == 200.03
+    assert result["result"]["nexus_koszty"]["A"] == 100.0
+    assert result["result"]["klucz_MIX"]["źródło_ref"] == "SYNTHETIC-KIS-REFERENCE"
+    assert result["result"]["klucz_MIX"]["rounding_granularity"] == "monthly_pool"
+    assert [item["ip_amount"] for item in result["classifications"]] == [33.34, 33.33, 33.33]
+    assert sum(item["rounding_adjustment"] for item in result["classifications"]) == 0.01
+    assert all(item["nexus_evidence"] for item in result["classifications"])
