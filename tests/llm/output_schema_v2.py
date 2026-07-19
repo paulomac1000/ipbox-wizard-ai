@@ -52,7 +52,7 @@ _mix["properties"]["rounding_granularity"] = {"enum": ["per_cost_item", "monthly
 _tax = _result["podatek"]
 for field in (
     "thermomodernization_used",
-    "thermomodernization_expired",
+    "termomodernization_expired",
     "health_tax_credit_used",
     "podstawa_zwykła",
     "dochód_IP_po_uldze_BR",
