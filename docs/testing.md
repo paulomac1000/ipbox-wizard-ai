@@ -2,15 +2,21 @@
 
 ## 1. Co testuje benchmark
 
-Python oblicza liczby, klasyfikacje, W, TEST 1–9 i atomowe `decision_facts`, a następnie składa kompletną autorytatywną kopertę `expected_decision`. Model nie mapuje już `{kind, code}` do kanałów; otrzymuje gotowe, rozdzielone `status`, `stops` i `reviews` i ma je skopiować bez zmian:
+Python oblicza liczby, klasyfikacje, W, TEST 1–9 i atomowe `decision_facts`, a następnie składa kompletną autorytatywną kopertę `expected_decision`. Model otrzymuje gotowe, rozdzielone `status`, `stops` i `reviews` i ma je skopiować bez zmian:
 
 ```json
 {"status":"FINAL","stops":[],"reviews":["REVIEW_09"]}
 ```
 
-Runner składa decyzję z raportem deterministycznym i waliduje całość. Benchmark mierzy zgodność instrukcji i integracji providera, nie umiejętność modelu do ponownego liczenia podatku.
+Runner składa decyzję z raportem deterministycznym i waliduje całość. Benchmark mierzy zgodność instrukcji oraz integracji providera, nie umiejętność modelu do ponownego liczenia podatku.
 
-Historyczne kasety pełnego raportu ujawniły wymyślone kursy NBP, automatyczne `JetBrains → IP`, niespójny NEXUS i TEST-y deklarowane przez model jako PASS. Późniejsza lista `active_rules` usunęła fałszywe fakty, ale nadal wymagała od modelu transformacji `{kind, code}` do dwóch tablic. MiniMax i wcześniej GPT-5 Nano przeniosły kod REVIEW do `stops`. Obecna koperta `expected_decision` usuwa tę zbędną decyzję, a schema rozróżnia dozwolone kody każdego kanału.
+Kolejne historyczne protokoły ujawniły trzy klasy problemów:
+
+1. pełny raport LLM powodował wymyślone kursy, klasyfikacje, NEXUS i TEST-y;
+2. widoczność nieaktywnych faktów powodowała dopisywanie nieaktywnych kodów;
+3. lista kodów z etykietami wymagała ponownej klasyfikacji do STOP/REVIEW i pozwoliła MiniMax przenieść `REVIEW_09` do `stops`.
+
+`expected_decision` usuwa wszystkie trzy zbędne odpowiedzialności modelu.
 
 ## 2. Bezpłatna bramka
 
@@ -31,12 +37,22 @@ python scripts/check_cassette_policy.py
 for script in scripts/*.sh dump-to-md.sh; do bash -n "$script"; done
 ```
 
-Stan referencyjny po audycie protokołu z 17 lipca 2026 r.:
+Stan referencyjny przed końcowym nagraniem:
 
-- 255 testów jednostkowych PASS;
-- coverage `python_helper` powyżej wymaganego progu 90% (dokładną wartość raportuje CI);
+- co najmniej 256 testów jednostkowych PASS;
+- coverage `python_helper` powyżej wymaganego progu 90%;
 - pełny suite: wszystkie bezpłatne testy PASS i 46 kontrolowanych skipów LLM;
-- pusty katalog kaset jest dozwolony, częściowa macierz nie jest.
+- pusty katalog kaset jest dozwolony lokalnie, ale nie spełnia merge gate.
+
+Standardowy workflow na Pythonie 3.13 dodatkowo uruchamia:
+
+```bash
+python scripts/benchmark_report.py
+unset OPENROUTER_API_KEY
+./scripts/verify_all_models.sh
+```
+
+Dlatego PR z pustą, częściową albo nieaktualną macierzą nie może mieć zielonej bramki wydania.
 
 ## 3. Testy semantyczne, które muszą pozostać
 
@@ -49,9 +65,12 @@ Szczególnie chronione regresje:
 - `straty_poprzednie` i `ulga_BR` są odrzucane jako niejednoznaczne;
 - ujemne faktury, odliczenia i zaliczki są odrzucane;
 - limity zdrowotnej/IKZE dla nieobsługiwanego roku są fail-closed;
-- STOP zeruje każde finalne pole;
+- STOP zeruje każde finalne pole i klasyfikacje;
 - multi-IP zachowuje grosze;
-- prompt zawiera wyłącznie autorytatywną kopertę `expected_decision`; fakty i nazwy predykatów nie mogą być widoczne, a schema odrzuca kod REVIEW w `stops` i kod STOP w `reviews`;
+- prompt zawiera wyłącznie `expected_decision`, bez faktów podatkowych i nazw predykatów;
+- schema odrzuca kod REVIEW w `stops`, kod STOP w `reviews` i duplikaty;
+- dokumentacja kontraktu nie może opisywać starszego protokołu;
+- provider adapter nie mutuje ani nie osłabia lokalnej strict schema;
 - playback nie wywołuje sieci i odrzuca `finish_reason` inny niż `stop`;
 - live run, playback i pre-commit odrzucają substytucję modelu;
 - pre-commit porównuje zapisane `parsed_response` z ponownym parsowaniem;
@@ -62,27 +81,27 @@ Szczególnie chronione regresje:
 - ewidencja i zeznanie uzgadniają się osobno w IP/NIE nawet przy równych sumach globalnych;
 - reguły roczne 2019–2026 obejmują IKZE, zdrowotną, skalę i granicę jednoczesnego B+R/IP Box.
 
-## 4. Dlaczego stare kasety są nieważne
+## 4. Fingerprint i unieważnienie
 
-Fingerprint obejmuje protokół decyzji, autorytatywną kopertę, system prompt, request, model, profil, schema i format kasety. Zmiana któregokolwiek elementu unieważnia nagranie. Kasety pełnego raportu, mapy `true/false`, listy `active_rules` oraz diagnostyczna macierz 317/322 są nieaktualne i muszą zostać nagrane od nowa.
+Fingerprint obejmuje wersję formatu, hash `ipbox_algorytm.md`, scenariusz oraz pełny request hash. Zmiana któregokolwiek elementu unieważnia nagranie. Nie kopiuj odpowiedzi, hashy, fingerprintów, manifestu ani `parsed_response` ze starszego kontraktu.
 
-Kasety starego pełnego raportu także nie są zgodne z obecną kopertą decyzji. Nie kopiuj ich odpowiedzi, hashy, manifestu ani parsed payloadu. Po obecnych zmianach należy nagrać **322 kasety: 7 modeli × 46 scenariuszy**.
+Macierz 322/322 nagrana na HEAD `be22ebb` udowodniła przenośność poprawionego requestu, ale końcowy audyt wykrył, że sekcja kontraktu w `ipbox_algorytm.md` nadal opisywała starszą listę reguł zamiast `expected_decision`. Ponieważ algorytm jest źródłem prawdy i częścią fingerprintu, po synchronizacji dokumentu trzeba nagrać wszystkie **322 kasety od nowa**. Nie jest dopuszczalne ręczne przepisanie fingerprintów.
 
-## 5. Modele bramkowe
+## 5. Modele i adaptery transportowe
 
-| Rodzina | Model OpenRouter | Rola w macierzy |
+Wykonywalna lista znajduje się wyłącznie w `tests/llm/models.py`.
+
+| Model | Transport | Powód wyjątku |
 |---|---|---|
-| Google Gemini | `google/gemini-3-flash-preview` | tańszy i starszy próg zamiast Gemini 3.5 |
-| Anthropic Claude | `anthropic/claude-haiku-4.5` | mały model Claude |
-| DeepSeek | `deepseek/deepseek-chat-v3.1` | otwarta rodzina DeepSeek V3 |
-| MiniMax | `minimax/minimax-m2.5` | niezależna rodzina MoE |
-| Moonshot Kimi | `moonshotai/kimi-k2.5` | niezależna rodzina Kimi |
-| Qwen | `qwen/qwen3.5-flash-02-23` | tani model Flash Qwen |
-| Mistral | `mistralai/ministral-3b-2512` | bardzo mały model 3B jako dolna granica |
+| `google/gemini-3-flash-preview` | `json_schema` | — |
+| `anthropic/claude-haiku-4.5` | `json_schema` bez `uniqueItems` w kopii transportowej | endpoint odrzuca keyword HTTP 400; lokalna schema nadal wymaga unikalności |
+| `deepseek/deepseek-chat-v3.1` | `json_schema` | — |
+| `minimax/minimax-m2.5` | `json_object` | routing DigitalOcean zwracał `content: null` dla `json_schema`; lokalna schema nadal jest pełna |
+| `moonshotai/kimi-k2.5` | `json_schema` | — |
+| `qwen/qwen3.5-flash-02-23` | `json_schema` | — |
+| `mistralai/ministral-3b-2512` | `json_schema` | — |
 
-Wykonywalna lista znajduje się wyłącznie w `tests/llm/models.py`; skrypty shell
-odczytują ją dynamicznie. Uzasadnienie i migawka cen znajdują się w
-[`model-diversity-benchmark.md`](model-diversity-benchmark.md).
+Adapter zmienia wyłącznie transport. Parser, `DECISION_JSON_SCHEMA`, output schema i evaluator są wspólne dla wszystkich modeli.
 
 ## 6. Nagranie
 
@@ -92,8 +111,11 @@ git pull --ff-only
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt -r requirements-test.txt
-export OPENROUTER_API_KEY='WKLEJ_KLUCZ'
 
+find tests/llm/vcr/cassettes -mindepth 1 -maxdepth 1 -type d -exec rm -rf {} +
+find tests/llm/vcr/cassettes -maxdepth 1 -type f ! -name '.gitkeep' -delete
+
+export OPENROUTER_API_KEY='WKLEJ_KLUCZ'
 ./scripts/record_all_models.sh --max-cost-usd 5
 ```
 
@@ -106,28 +128,18 @@ python scripts/record_model.py \
   --max-cost-usd 5
 ```
 
-Skrypt nie nadpisuje istniejącej kasety. Przy błędzie transportowym uruchom ponownie tylko po sprawdzeniu, że plik nie powstał. Odrzucenia trafiają do `/tmp/ipbox_llm_rejected/`, a wyniki do `/tmp/ipbox_llm_responses/`.
+Skrypt nie nadpisuje istniejącej kasety. Przy błędzie transportowym uruchom ponownie dopiero po sprawdzeniu, że plik nie powstał i przyczyna została sklasyfikowana. Odrzucenia trafiają do `/tmp/ipbox_llm_rejected/`, a wyniki do `/tmp/ipbox_llm_responses/`.
 
-Nie ma `--force`. Nieaktualny plik usuń dopiero po zidentyfikowaniu zmienionego elementu requestu. Nie ponawiaj błędu semantycznego aż do uzyskania „szczęśliwej” odpowiedzi — zachowaj odrzucenie w raporcie i zdiagnozuj przyczynę.
+Nie ma `--force`. Nie ponawiaj błędu semantycznego aż do uzyskania „szczęśliwej” odpowiedzi.
 
 ## 7. Playback offline
 
 ```bash
+python scripts/check_cassette_policy.py
+python scripts/vcr_precommit.py --all-models
+python scripts/benchmark_report.py
 unset OPENROUTER_API_KEY
 ./scripts/verify_all_models.sh
-python scripts/benchmark_report.py
-python scripts/vcr_precommit.py --all-models
-python scripts/check_cassette_policy.py
-```
-
-Dla pojedynczego modelu:
-
-```bash
-export LLM_PROVIDER=openrouter
-export LLM_MODEL=google/gemini-3-flash-preview
-export VCR_MODE=playback
-pytest tests/llm/test_scenarios.py --run-llm --vcr-mode=playback -v
-python scripts/vcr_precommit.py --model google/gemini-3-flash-preview
 ```
 
 Playback musi przejść przy nieustawionym sekrecie. Live request w tym trybie jest błędem krytycznym.
@@ -139,7 +151,7 @@ Model zalicza tylko przy 46/46, a cała macierz przy 322/322. Każda kaseta musi
 - mieć `finish_reason=stop`;
 - mieć `returned_model` identyczny z modelem żądanym;
 - zawierać czysty JSON bez pól dodatkowych, Markdown fences ani naprawiania parserem;
-- przejść strict schema decyzji;
+- przejść lokalną strict schema decyzji;
 - zwrócić dokładny zestaw STOP/REVIEW bez duplikatów;
 - po złożeniu przejść pełny schema i evaluator;
 - mieć zgodny request hash, fingerprint i ponowne parsowanie;
@@ -153,29 +165,16 @@ Przypisz przyczynę:
 
 1. scenariusz lub asercja;
 2. kalkulator/oracle;
-3. `decision_facts` albo budowa `active_rules`;
-4. schema/integracja providera;
-5. model mimo jednoznacznej instrukcji.
+3. budowa `expected_decision` lub schema;
+4. adapter/routing providera;
+5. format odpowiedzi modelu;
+6. model mimo jednoznacznej instrukcji.
 
 Najpierw dodaj test deterministyczny. Nie poszerzaj zakresu i nie usuwaj kodu tylko dlatego, że model go pomija.
 
-Minimalny ręczny przegląd:
+Minimalny ręczny przegląd obejmuje scenariusze 13, 17, 22, 23, 26, 31, 34, 38, 42, 44, 45 i 46–55. W scenariuszu 51 każdy model ma zwrócić dokładnie `status=STOPPED`, `stops=[STOP_12]`, `reviews=[REVIEW_09]`.
 
-- 13 — pełny podatek wspólnej skali;
-- 14 — tylko `STOP_01`;
-- 17 — tylko `REVIEW_02`, bez nieaktywnego `STOP_02`;
-- 18 — właściwy STOP przy zerowych godzinach;
-- 22 — NEXUS 0,65 dla B=5000 i C=5000;
-- 23 — strata wyłącznie NIE;
-- 24/25 — osobiste ulgi na skali;
-- 26 — B+R IP przed NEXUS;
-- 31 — `ZUS_DOUBLE_DIP` i TEST_3 FAIL;
-- 34 — zakup >10 000 zł wyłączony;
-- 38/42 — tylko `STOP_08`;
-- 44 — KIS MIX bez użycia W;
-- 45 — REVIEW 04/16/17 i alokacja 3000 + 5000.
-
-## 10. Commit kaset
+## 10. Commit i merge gate
 
 ```bash
 ./scripts/verify_all_models.sh
@@ -186,8 +185,4 @@ git status --short
 git diff --stat
 ```
 
-Repo dopuszcza brak kaset albo kompletną aktualną macierz 7 × 46. Nie commituj `/tmp`, raportów lokalnych ani częściowej macierzy.
-
-## 11. Workflow GitHub
-
-`Paid multi-model LLM benchmark` wymaga jawnego potwierdzenia kosztu. Artefakty nie są commitowane automatycznie. Po pobraniu skopiuj siedem katalogów do `tests/llm/vcr/cassettes/` i wykonaj sekcję 10.
+Nie commituj `/tmp`, raportów lokalnych ani częściowej macierzy. Po wypchnięciu kaset poczekaj na CI Python 3.11–3.13. Job 3.13 musi wykonać raport i pełny playback offline. Dopiero potem można oznaczyć PR jako ready.
