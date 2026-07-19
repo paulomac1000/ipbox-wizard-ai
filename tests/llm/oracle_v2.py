@@ -63,19 +63,12 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
     extra_facts, audit_codes = audit_facts(scenario, base, method)
     annual_facts, annual_values, violations = year_facts(scenario)
     facts = {**base.get("decision_facts", {}), **extra_facts, **annual_facts}
-    social = (
-        input_data.get("zus", {}) if isinstance(input_data.get("zus"), dict) else {}
-    )
+    social = input_data.get("zus", {}) if isinstance(input_data.get("zus"), dict) else {}
     health_in_kpir = bool(social.get("zdrowotna_w_KPiR", False))
     social_in_kpir = str(social.get("sposob", "brak")) == "w_KPiR"
-    if health_in_kpir and (
-        annual_values["health_income"] or annual_values["health_credit"]
-    ):
+    if health_in_kpir and (annual_values["health_income"] or annual_values["health_credit"]):
         facts["health_contribution_double_counted"] = True
-    if (
-        social_in_kpir
-        and number(social.get("odliczenie_spoleczne_PIT", 0), "zus.social") > 0
-    ):
+    if social_in_kpir and number(social.get("odliczenie_spoleczne_PIT", 0), "zus.social") > 0:
         facts["social_contributions_double_counted"] = True
 
     stops, reviews = derive_decision_codes(facts)
@@ -83,18 +76,14 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
     base["stops_reviews"]["stops"] = sorted(stops)
     base["stops_reviews"]["reviews"] = sorted(reviews)
     base["stops_reviews"]["warnings"] = sorted(
-        set(base["stops_reviews"].get("warnings", []))
-        | set(audit_codes)
-        | set(violations)
+        set(base["stops_reviews"].get("warnings", [])) | set(audit_codes) | set(violations)
     )
     if stops:
         base["status"] = "STOPPED"
         zero_after_stop(base)
         return base
 
-    reliefs = (
-        input_data.get("ulgi", {}) if isinstance(input_data.get("ulgi"), dict) else {}
-    )
+    reliefs = input_data.get("ulgi", {}) if isinstance(input_data.get("ulgi"), dict) else {}
     tax = calculate_tax_for_year(
         int(input_data["rok"]),
         non_ip_income=max(0.0, float(base["result"]["dochód_NIE"])),
@@ -105,9 +94,7 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
         social_security_deduction=(
             0 if social_in_kpir else social.get("odliczenie_spoleczne_PIT", 0)
         ),
-        health_income_deduction=(
-            0 if health_in_kpir else annual_values["health_income"]
-        ),
+        health_income_deduction=(0 if health_in_kpir else annual_values["health_income"]),
         health_tax_credit=(0 if health_in_kpir else annual_values["health_credit"]),
         ikze=annual_values["ikze"],
         donations=reliefs.get("darowizny", 0),
@@ -154,19 +141,14 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
     }
     base["tests"]["TEST_4"] = (
         "PASS"
-        if tax["non_ip_base_rounded"] >= 0
-        and tax["thermomodernization_carry_over"] >= 0
+        if tax["non_ip_base_rounded"] >= 0 and tax["thermomodernization_carry_over"] >= 0
         else "FAIL"
     )
     base["tests"]["TEST_5"] = (
-        "PASS"
-        if tax["ip_tax"] == tax_round(float(tax["ip_base_rounded"]) * 0.05)
-        else "FAIL"
+        "PASS" if tax["ip_tax"] == tax_round(float(tax["ip_base_rounded"]) * 0.05) else "FAIL"
     )
     expected_total = tax_round(
-        float(tax["non_ip_tax_final"])
-        + float(tax["ip_tax"])
-        - float(tax["health_tax_credit_used"])
+        float(tax["non_ip_tax_final"]) + float(tax["ip_tax"]) - float(tax["health_tax_credit_used"])
     )
     base["tests"]["TEST_6"] = "PASS" if tax["total_tax"] == expected_total else "FAIL"
     base["status"] = "FINAL"
