@@ -250,7 +250,9 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
     correction_related = bool(stops & CORRECTION_ONLY_STOPS)
     reconciliation_present = isinstance(input_data.get("uzgodnienie_zeznania"), Mapping)
     base["correction_preview"] = {
-        "status": "UNAVAILABLE" if tax is None else ("AVAILABLE" if correction_related else "NOT_NEEDED"),
+        "status": "UNAVAILABLE"
+        if tax is None
+        else ("AVAILABLE" if correction_related else "NOT_NEEDED"),
         "source_kpir_correction_required": facts["source_kpir_requires_correction"],
         "return_correction_required": bool(
             reconciliation_present
