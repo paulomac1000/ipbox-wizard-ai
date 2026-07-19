@@ -42,9 +42,7 @@ if "przychodowa_w_dacie_kosztu" not in _mix_method:
 for field in ("źródło_ref", "rounding_granularity"):
     if field not in _mix["required"]:
         _mix["required"].append(field)
-_mix["properties"]["źródło_ref"] = {
-    "anyOf": [{"type": "null"}, {"type": "string", "minLength": 1}]
-}
+_mix["properties"]["źródło_ref"] = {"anyOf": [{"type": "null"}, {"type": "string", "minLength": 1}]}
 _mix["properties"]["rounding_granularity"] = {"enum": ["per_cost_item", "monthly_pool"]}
 
 _tax = _result["podatek"]
@@ -73,22 +71,16 @@ _classification["properties"]["allocation_period"] = {
         {"type": "string", "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$"},
     ]
 }
-_classification["properties"]["rounding_granularity"] = {
-    "enum": ["per_cost_item", "monthly_pool"]
-}
+_classification["properties"]["rounding_granularity"] = {"enum": ["per_cost_item", "monthly_pool"]}
 _classification["properties"]["rounding_adjustment"] = deepcopy(legacy.MONEY)
 _classification["properties"]["nexus_evidence"] = {"type": "string"}
-_classification["properties"]["nexus_basis"] = {
-    "enum": ["explicit_amount", "allocated_ip_cost"]
-}
+_classification["properties"]["nexus_basis"] = {"enum": ["explicit_amount", "allocated_ip_cost"]}
 
 for field in ("source_ledger_audit", "correction_preview"):
     if field not in _report_root["required"]:
         _report_root["required"].append(field)
 
-_nullable_nonnegative_money = {
-    "anyOf": [{"type": "null"}, deepcopy(legacy.NONNEGATIVE_MONEY)]
-}
+_nullable_nonnegative_money = {"anyOf": [{"type": "null"}, deepcopy(legacy.NONNEGATIVE_MONEY)]}
 _nullable_money = {"anyOf": [{"type": "null"}, deepcopy(legacy.MONEY)]}
 _report_root["properties"]["source_ledger_audit"] = {
     "type": "object",
