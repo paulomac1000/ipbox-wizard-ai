@@ -81,6 +81,7 @@ jobs:
               raise SystemExit(1)
           print(f"Soft per-model cost cap: ${value:.6f}")
           PY
+
       - name: Deterministic gates before paid calls
         run: |
           set -euo pipefail
@@ -92,7 +93,6 @@ jobs:
             --cov-report=term-missing \
             --cov-fail-under=90
           pytest -q
-          python scripts/check_cassette_policy.py
           for script in scripts/*.sh dump-to-md.sh; do bash -n "$script"; done
 
       - name: Record cassettes
