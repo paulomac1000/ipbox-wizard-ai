@@ -19,6 +19,17 @@ class ModelProfile:
     response_format_type: str = "json_schema"
     strip_unique_items_for_transport: bool = False
 
+    def __post_init__(self) -> None:
+        if self.response_format_type not in {"json_schema", "json_object"}:
+            raise ValueError(
+                "response_format_type must be 'json_schema' or 'json_object', "
+                f"got {self.response_format_type!r}"
+            )
+        if self.strip_unique_items_for_transport and self.response_format_type != "json_schema":
+            raise ValueError(
+                "strip_unique_items_for_transport is valid only with json_schema transport"
+            )
+
 
 MODEL_PROFILES: dict[str, ModelProfile] = {
     "google/gemini-3-flash-preview": ModelProfile(
