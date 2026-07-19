@@ -71,6 +71,8 @@ def assemble_response(reference: dict[str, Any], decision: dict[str, Any]) -> di
         "classifications": deepcopy(reference["classifications"]),
         "monthly_W": deepcopy(reference["monthly_W"]),
         "tests": deepcopy(reference["tests"]),
+        "source_ledger_audit": deepcopy(reference["source_ledger_audit"]),
+        "correction_preview": deepcopy(reference["correction_preview"]),
         "stops_reviews": {
             "stops": sorted(decision["stops"]),
             "reviews": sorted(decision["reviews"]),
