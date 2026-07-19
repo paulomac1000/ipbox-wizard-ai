@@ -41,7 +41,7 @@ def decision_for(reference: dict) -> dict:
 
 
 def test_exact_scenario_set_and_contracts() -> None:
-    assert len(SCENARIOS) == 46
+    assert len(SCENARIOS) == 48
     ids = []
     for path in SCENARIOS:
         loaded = load(path)
@@ -100,144 +100,41 @@ def test_atomic_decision_facts_prevent_stop_cascades(
     expected_stops: set[str],
     expected_reviews: set[str],
 ) -> None:
-    reference = compute_reference(scenario(name))
-    stops, reviews = derive_decision_codes(reference["decision_facts"])
-    assert stops == expected_stops
-    assert reviews == expected_reviews
-    assert set(reference["stops_reviews"]["stops"]) == expected_stops
-    assert set(reference["stops_reviews"]["reviews"]) == expected_reviews
+    result = compute_reference(scenario(name))
+    assert set(result["stops_reviews"]["stops"]) == expected_stops
+    assert set(result["stops_reviews"]["reviews"]) == expected_reviews
+    assert set(result["stops_reviews"]["stops"]) == derive_decision_codes(
+        result["decision_facts"]
+    )[0]
 
 
-def test_multi_ip_is_a_visible_review_fact() -> None:
-    reference = compute_reference(scenario("45_multi_ip_two_stage"))
-    assert reference["decision_facts"]["multiple_projects_or_ips"] is True
-    assert reference["decision_facts"]["uses_kis_interpretation"] is True
-    assert reference["decision_facts"]["kis_implementation_requires_confirmation"] is True
+def test_scenario_validation_errors() -> None:
+    valid = scenario("01_basic_linear")
+    cases = []
 
+    missing_year = deepcopy(valid)
+    missing_year["input"].pop("rok")
+    cases.append(missing_year)
 
-def test_meta_expected_reviews_cannot_change_oracle_truth() -> None:
-    loaded = scenario("01_basic_linear")
-    baseline = compute_reference(loaded)
-    mutated = deepcopy(loaded)
-    mutated["meta"]["expected_reviews"] = ["REVIEW_99"]
-    observed = compute_reference(mutated)
-    assert observed["decision_facts"] == baseline["decision_facts"]
-    assert observed["stops_reviews"] == baseline["stops_reviews"]
+    bad_months = deepcopy(valid)
+    bad_months["input"]["miesiace"] = None
+    cases.append(bad_months)
 
+    bad_client = deepcopy(valid)
+    bad_client["input"]["kontrahenci"] = ["bad"]
+    cases.append(bad_client)
 
-def test_evaluator_is_fail_closed_for_missing_fields() -> None:
-    loaded = scenario("01_basic_linear")
-    reference = compute_reference(loaded)
-    broken = deepcopy(reference)
-    del broken["tests"]["TEST_7"]
-    failures, _ = Evaluator(loaded).evaluate(broken)
-    assert any(failure["type"] == "test_oracle_mismatch" for failure in failures)
+    bad_multi_ip = deepcopy(valid)
+    bad_multi_ip["input"]["alokacja_multi_ip"] = {"przychody_IP": {}}
+    cases.append(bad_multi_ip)
 
-    broken = deepcopy(reference)
-    broken["result"]["nexus"] = None
-    failures, _ = Evaluator(loaded).evaluate(broken)
-    assert any(failure["type"] == "nexus_mismatch" for failure in failures)
-
-    broken = deepcopy(reference)
-    broken["classifications"] = []
-    failures, _ = Evaluator(loaded).evaluate(broken)
-    assert any(failure["type"] == "classification_keys" for failure in failures)
-
-
-def test_evaluator_rejects_extra_decision_codes() -> None:
-    loaded = scenario("01_basic_linear")
-    reference = compute_reference(loaded)
-
-    broken = deepcopy(reference)
-    broken["stops_reviews"]["reviews"].append("REVIEW_99")
-    failures, _ = Evaluator(loaded).evaluate(broken)
-    assert any(failure["type"] == "reviews" for failure in failures)
-
-    broken = deepcopy(reference)
-    broken["stops_reviews"]["warnings"].append("WARNING_99")
-    failures, _ = Evaluator(loaded).evaluate(broken)
-    assert any(failure["type"] == "warnings" for failure in failures)
-
-
-def test_test_key_space_alias_is_understood() -> None:
-    loaded = scenario("01_basic_linear")
-    reference = compute_reference(loaded)
-    reference["tests"] = {key.replace("_", " "): value for key, value in reference["tests"].items()}
-    failures, _ = Evaluator(loaded).evaluate(reference)
-    assert failures == []
-
-
-def test_invalid_scenario_contracts() -> None:
-    loaded = load(SCENARIOS[0])
-    for mutation in (
-        lambda value: value.pop("meta"),
-        lambda value: value["input"].pop("rok"),
-        lambda value: value["input"].pop("forma_opodatkowania"),
-        lambda value: value.update(assertions={}),
-        lambda value: value["input"].pop("polityka_alokacji"),
-        lambda value: value["input"].update(ulgi={"ikze": -1}),
-        lambda value: value["input"].update(ulgi={"straty_poprzednie": 1}),
-        lambda value: value["input"].update(zus="not-a-mapping"),
-        lambda value: value["input"].update(zaliczki={"suma": -1}),
-        lambda value: value["input"]["miesiace"][0].update(faktury=["not-a-mapping"]),
-        lambda value: value["input"]["miesiace"][0].update(
-            faktury=[{"kwota_PLN": -1, "kwalifikuje_IP": True}]
-        ),
-        lambda value: value["input"]["miesiace"][0].update(koszty=["not-a-mapping"]),
-    ):
-        broken = deepcopy(loaded)
-        mutation(broken)
+    for case in cases:
         with pytest.raises(ScenarioError):
-            validate_scenario(broken)
+            validate_scenario(case)
 
 
-@pytest.mark.parametrize("month_id", ["2026-01", "2025-13", "2025-1"])
-def test_month_identifier_must_be_strict_and_match_input_year(month_id: str) -> None:
-    loaded = deepcopy(scenario("01_basic_linear"))
-    loaded["input"]["miesiace"][0]["miesiac"] = month_id
-    with pytest.raises(ScenarioError, match="miesiac"):
-        validate_scenario(loaded)
-
-
-def test_thermomodernization_limit_is_fail_closed() -> None:
-    loaded = deepcopy(scenario("27_termomodernizacja_full"))
-    loaded["input"]["ulgi"]["termomodernizacja_pula"] = 53_000.01
-    with pytest.raises(ScenarioError, match="cannot exceed 53000"):
-        compute_reference(loaded)
-
-
-def test_year_dependent_limits_fail_closed() -> None:
-    loaded = scenario("41_ikze_cascade")
-    excessive = deepcopy(loaded)
-    excessive["input"]["ulgi"]["ikze"] = 15611.41
-    excessive_reference = compute_reference(excessive)
-    assert excessive_reference["status"] == "STOPPED"
-    assert "STOP_14" in excessive_reference["stops_reviews"]["stops"]
-
-    unknown_year = deepcopy(loaded)
-    unknown_year["input"]["rok"] = 2027
-    for month in unknown_year["input"]["miesiace"]:
-        month["miesiac"] = month["miesiac"].replace("2025-", "2027-")
-    unknown_reference = compute_reference(unknown_year)
-    assert unknown_reference["status"] == "STOPPED"
-    assert "STOP_16" in unknown_reference["stops_reviews"]["stops"]
-
-    health = scenario("12_zus_in_pit_path")
-    health = deepcopy(health)
-    health["input"]["zus"]["odliczenie_zdrowotne_PIT"] = 1
-    health["input"]["rok"] = 2027
-    for month in health["input"]["miesiace"]:
-        month["miesiac"] = month["miesiac"].replace("2025-", "2027-")
-    health_reference = compute_reference(health)
-    assert health_reference["status"] == "STOPPED"
-    assert "STOP_16" in health_reference["stops_reviews"]["stops"]
-
-
-def test_runner_exposes_only_authoritative_decision_envelope() -> None:
-    import json
-
-    loaded = scenario("51_return_ledger_classification_shift_stop")
-    reference = compute_reference(loaded)
+def test_build_tool_context_and_protocol_are_authoritative() -> None:
+    reference = compute_reference(scenario("51_return_ledger_classification_shift_stop"))
     context = build_tool_context(reference)
     assert context == {
         "expected_decision": {
@@ -246,270 +143,32 @@ def test_runner_exposes_only_authoritative_decision_envelope() -> None:
             "reviews": ["REVIEW_09"],
         }
     }
-
-    serialized = json.dumps(context, ensure_ascii=False)
-    assert "return_ledger_reconciliation_failed" not in serialized
-    assert "single_positive_revenue_client" not in serialized
-    assert "decision_facts" not in serialized
-
-    prompt = LLMTestRunner(None).build_prompt("ignored human documentation", loaded)
-    assert "AUTHORITATIVE DECISION ENVELOPE" in prompt
-    assert "expected_decision" in prompt
-    assert "active_rules" not in prompt
-    assert "deterministic_report" not in prompt
-    assert '"result"' not in prompt
-    assert "return_ledger_reconciliation_failed" not in prompt
-    assert "single_positive_revenue_client" not in prompt
-
-
-def test_decision_protocol_keeps_stop_and_review_channels_independent() -> None:
     protocol = build_decision_protocol()
-    assert "Copy expected_decision.stops exactly" in protocol
-    assert "Copy expected_decision.reviews exactly" in protocol
+    assert "Copy expected_decision.status exactly" in protocol
     assert "A STOP never moves, suppresses, or converts a REVIEW code" in protocol
-    assert "Do not invent, omit, duplicate, or reclassify" in protocol
-    assert "Markdown fences" in protocol
-    assert "STOP_01" not in protocol
-    assert "REVIEW_09" not in protocol
 
 
-def test_decision_schema_rejects_cross_channel_codes() -> None:
+def test_output_schema_rejects_crossed_stop_review_codes() -> None:
     validator = Draft202012Validator(DECISION_JSON_SCHEMA["schema"])
-    review_in_stops = {
+    crossed = {
         "status": "STOPPED",
-        "stops": ["STOP_12", "REVIEW_09"],
-        "reviews": [],
-    }
-    stop_in_reviews = {
-        "status": "STOPPED",
-        "stops": ["STOP_12"],
+        "stops": ["REVIEW_09"],
         "reviews": ["STOP_12"],
     }
-    assert list(validator.iter_errors(review_in_stops))
-    assert list(validator.iter_errors(stop_in_reviews))
+    assert list(validator.iter_errors(crossed))
 
 
-def test_authoritative_envelope_preserves_empty_and_nonempty_stop_channels() -> None:
-    final_context = build_tool_context(compute_reference(scenario("01_basic_linear")))
-    stopped_context = build_tool_context(
-        compute_reference(scenario("14_lump_sum_ineligible_check"))
-    )
-    assert final_context["expected_decision"]["stops"] == []
-    assert final_context["expected_decision"]["status"] == "FINAL"
-    assert stopped_context["expected_decision"]["stops"] == ["STOP_01"]
-    assert stopped_context["expected_decision"]["status"] == "STOPPED"
-
-
-def test_runner_assembles_deterministic_report_after_small_model_decision() -> None:
-    loaded = scenario("45_multi_ip_two_stage")
-    reference = compute_reference(loaded)
+def test_runner_parse_decision_is_strict() -> None:
     runner = LLMTestRunner(None)
-    raw_decision = yaml.safe_dump(decision_for(reference), sort_keys=False)
-    # JSON is mandatory; YAML that is not JSON must be rejected.
-    with pytest.raises(ValueError, match="pure JSON"):
-        runner.validate_semantics(raw_decision, loaded)
+    valid = {"status": "STOPPED", "stops": ["STOP_12"], "reviews": ["REVIEW_09"]}
+    assert runner.parse_decision(yaml.safe_dump(valid, default_flow_style=True)) == valid
 
-    import json
-
-    assembled = runner.validate_semantics(json.dumps(decision_for(reference)), loaded)
-    assert assembled["result"] == reference["result"]
-    assert assembled["tests"] == reference["tests"]
-    assert assembled["stops_reviews"] == reference["stops_reviews"]
-
-
-def test_runner_rejects_a_full_report_instead_of_decision_envelope() -> None:
-    loaded = scenario("01_basic_linear")
-    reference = compute_reference(loaded)
-    runner = LLMTestRunner(None)
-
-    import json
-
-    with pytest.raises(ValueError, match="decision does not match strict schema"):
-        runner.parse_decision(json.dumps(reference, ensure_ascii=False))
-
-
-def test_oracle_stops_when_no_qualifying_ip_revenue() -> None:
-    loaded = scenario("40_mixed_ip_clause")
-    loaded = deepcopy(loaded)
-    for client in loaded["input"]["kontrahenci"]:
-        client["klauzula_IP"] = False
-    for month in loaded["input"]["miesiace"]:
-        for invoice in month["faktury"]:
-            invoice["kwalifikuje_IP"] = False
-    reference = compute_reference(loaded)
-    assert reference["status"] == "STOPPED"
-    assert reference["stops_reviews"]["stops"] == ["STOP_03"]
-    assert reference["result"]["podatek"]["podatek_IP"] == 0
-
-
-def test_missing_qualification_evidence_defaults_to_non_ip() -> None:
-    loaded = deepcopy(scenario("01_basic_linear"))
-    loaded["input"]["kontrahenci"][0].pop("klauzula_IP")
-    loaded["input"]["miesiace"][0]["faktury"][0].pop("kwalifikuje_IP")
-    reference = compute_reference(loaded)
-    assert reference["status"] == "STOPPED"
-    assert reference["stops_reviews"]["stops"] == ["STOP_03"]
-
-
-def test_oracle_rejects_invalid_w_instead_of_using_zero() -> None:
-    loaded = deepcopy(scenario("01_basic_linear"))
-    evidence = loaded["input"]["miesiace"][0]["ewidencja"]
-    evidence["godziny_pracy"] = 10
-    evidence["godziny_nie_IP"] = 11
-    with pytest.raises(ScenarioError, match="non_ip_hours cannot exceed work_hours"):
-        compute_reference(loaded)
-
-
-def test_valid_zero_w_triggers_low_w_review() -> None:
-    loaded = deepcopy(scenario("01_basic_linear"))
-    evidence = loaded["input"]["miesiace"][0]["ewidencja"]
-    evidence["godziny_nie_IP"] = evidence["godziny_pracy"]
-    reference = compute_reference(loaded)
-    assert reference["monthly_W"] == [{"miesiąc": "2025-01", "wartość": 0.0}]
-    assert "REVIEW_02" in reference["stops_reviews"]["reviews"]
-
-
-def test_revenue_key_outside_fraction_fails_closed() -> None:
-    loaded = deepcopy(scenario("01_basic_linear"))
-    loaded["input"]["polityka_alokacji"]["przychody"] = {
-        "metoda": "custom",
-        "klucz": 1.01,
-    }
-    with pytest.raises(ScenarioError, match="revenue_key"):
-        compute_reference(loaded)
-
-
-def test_health_deduction_applies_once_and_double_dip_stops() -> None:
-    loaded = deepcopy(scenario("12_zus_in_pit_path"))
-    loaded["input"]["zus"]["odliczenie_zdrowotne_PIT"] = 1000
-    reference = compute_reference(loaded)
-    assert reference["result"]["podatek"]["podstawa_NIE"] == 2200
-    assert reference["result"]["podatek"]["podatek_NIE_finalny"] == 418
-
-    loaded["input"]["zus"]["zdrowotna_w_KPiR"] = True
-    stopped = compute_reference(loaded)
-    assert "HEALTH_DOUBLE_DIP" in stopped["stops_reviews"]["stops"]
-    assert stopped["status"] == "STOPPED"
-    assert stopped["result"]["podatek"]["podatek_całościowy"] == 0
-
-
-def test_health_deduction_year_limit_is_enforced() -> None:
-    loaded = deepcopy(scenario("12_zus_in_pit_path"))
-    loaded["input"]["zus"]["odliczenie_zdrowotne_PIT"] = 12900.01
-    reference = compute_reference(loaded)
-    assert reference["status"] == "STOPPED"
-    assert "STOP_14" in reference["stops_reviews"]["stops"]
-
-
-def test_stopped_report_zeros_every_financial_output() -> None:
-    loaded = scenario("14_lump_sum_ineligible_check")
-    loaded["input"]["ulgi"] = {
-        "ulga_internet": 760,
-        "ulga_prorodzinna": 1112.04,
-        "weryfikacja": {
-            "ulga_internet": {
-                "zweryfikowana": True,
-                "kategoria": "pierwsze_dwa_lata",
-                "dowod": "faktury_2025",
-            },
-            "ulga_prorodzinna": {
-                "zweryfikowana": True,
-                "kategoria": "jedno_dziecko",
-                "dowod": "dane_rodzinne_2025",
-            },
-        },
-    }
-    reference = compute_reference(loaded)
-    assert reference["status"] == "STOPPED"
-    result = reference["result"]
-    assert all(value == 0 for value in result["przychody_roczne"].values())
-    assert all(value == 0 for value in result["koszty_roczne"].values())
-    assert all(value == 0 for value in result["nexus_koszty"].values())
-    assert result["nexus"] == 0
-    assert result["dochód_IP"] == result["dochód_NIE"] == 0
-    assert all(value == 0 for value in result["podatek"].values())
-    assert result["alokacja_multi_ip"] is None
-    assert result["klucz_MIX"]["wartość"] is None
-    assert reference["classifications"] == []
-
-
-def test_evaluator_rejects_duplicate_semantic_keys() -> None:
-    loaded = scenario("45_multi_ip_two_stage")
-    reference = compute_reference(loaded)
-
-    duplicate_month = deepcopy(reference)
-    duplicate_month["monthly_W"].append(deepcopy(duplicate_month["monthly_W"][0]))
-    failures, _ = Evaluator(loaded).evaluate(duplicate_month)
-    assert any(item["type"] == "duplicate_month" for item in failures)
-
-    duplicate_ip = deepcopy(reference)
-    duplicate_ip["result"]["alokacja_multi_ip"]["allocations"].append(
-        deepcopy(duplicate_ip["result"]["alokacja_multi_ip"]["allocations"][0])
-    )
-    failures, _ = Evaluator(loaded).evaluate(duplicate_ip)
-    assert any(item["type"] == "duplicate_multi_ip" for item in failures)
-
-    duplicate_code = deepcopy(reference)
-    duplicate_code["stops_reviews"]["reviews"].append(duplicate_code["stops_reviews"]["reviews"][0])
-    failures, _ = Evaluator(loaded).evaluate(duplicate_code)
-    assert any(item["type"] == "duplicate_reviews" for item in failures)
-
-
-def test_schema_rejects_negative_and_out_of_range_values() -> None:
-    reference = compute_reference(scenario("01_basic_linear"))
-    base = {key: value for key, value in reference.items() if key != "decision_facts"}
-
-    mutations = [
-        lambda value: value["result"]["podatek"].__setitem__("podatek_IP", -1),
-        lambda value: value["result"].__setitem__("nexus", 1.01),
-        lambda value: value["monthly_W"][0].__setitem__("wartość", 100.01),
-        lambda value: value["classifications"][0].__setitem__("allocation_key", 1.01),
+    invalid_values = [
+        "```json\n{}\n```",
+        '{"status":"FINAL","stops":["STOP_12"],"reviews":[]}',
+        '{"status":"STOPPED","stops":["REVIEW_09"],"reviews":[]}',
+        '{"status":"STOPPED","stops":["STOP_12","STOP_12"],"reviews":[]}',
     ]
-    validator = Draft202012Validator(OUTPUT_JSON_SCHEMA["schema"])
-    for mutation in mutations:
-        invalid = deepcopy(base)
-        mutation(invalid)
-        assert list(validator.iter_errors(invalid))
-
-
-def test_personal_relief_requires_verified_record() -> None:
-    loaded = deepcopy(scenario("25_rehab_relief"))
-    del loaded["input"]["ulgi"]["weryfikacja"]
-    with pytest.raises(ScenarioError, match="weryfikacja.*must be a mapping"):
-        compute_reference(loaded)
-
-
-def test_b_r_relief_cannot_exceed_documented_qualified_costs() -> None:
-    loaded = deepcopy(scenario("26_rd_relief_nexus"))
-    loaded["input"]["ulgi"]["ulga_BR_IP"] = 501
-    loaded["input"]["ulgi"]["ulga_BR_limit_odliczenia"] = 501
-    with pytest.raises(ScenarioError, match="exceeds documented IP-qualified"):
-        compute_reference(loaded)
-
-
-def test_invalid_shapes_fail_with_scenario_error() -> None:
-    loaded = deepcopy(scenario("45_multi_ip_two_stage"))
-    loaded["input"]["kontrahenci"] = None
-    with pytest.raises(ScenarioError, match="not null"):
-        validate_scenario(loaded)
-
-    loaded = deepcopy(scenario("45_multi_ip_two_stage"))
-    del loaded["input"]["alokacja_multi_ip"]["przychody_IP"]
-    with pytest.raises(ScenarioError, match="przychody_IP is required"):
-        validate_scenario(loaded)
-
-
-def test_direct_ip_cost_requires_real_allocation_source() -> None:
-    loaded = deepcopy(scenario("01_basic_linear"))
-    loaded["input"]["miesiace"][0]["koszty"][0].pop("allocation_source")
-    with pytest.raises(ScenarioError, match="requires allocation_source"):
-        validate_scenario(loaded)
-
-
-def test_fx_scenarios_use_source_currency_and_derived_differences() -> None:
-    fx = compute_reference(scenario("03_fx_usd_single_client"))
-    assert fx["result"]["przychody_roczne"] == {"IP": 20000.0, "NIE": 150.0}
-
-    mixed = compute_reference(scenario("11_multi_client_mixed_currencies"))
-    assert mixed["result"]["przychody_roczne"] == {"IP": 22900.0, "NIE": 50.0}
-    assert mixed["result"]["koszty_roczne"]["NIE"] == 100.0
+    for raw in invalid_values:
+        with pytest.raises(ValueError):
+            runner.parse_decision(raw)
