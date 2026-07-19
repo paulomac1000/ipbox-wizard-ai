@@ -1,0 +1,82 @@
+meta:
+  scenario_id: 53_historical_ikze_limit_exceeded_stop
+  scenario_name: Historyczny limit IKZE przekroczony o grosz
+  provider: openrouter
+  requested_model: minimax/minimax-m2.5
+  returned_model: minimax/minimax-m2.5
+  fingerprint: v3_5c2b2e73ff1701f1ec241234ada25e6ec5cf2fb3e7d92e105ec1038f3c16ab3f
+  request_hash: f3d49011cd775a58bd4eac1432a15ca83a1aad4ea0c76374dc910ab8eb5e1946
+  recorded_at: '2026-07-19T13:56:39.950619+00:00'
+  request_id: gen-1784469398-lgHr0fzgKjKscIIIuljV
+  finish_reason: stop
+  native_finish_reason: stop
+  system_fingerprint: vllm-0.21.0-tp4-bf80359e
+  prompt_tokens: 551
+  completion_tokens: 96
+  total_tokens: 647
+  cost: 0.00011945
+  recording_duration_seconds: 1.825
+  cassette_format_version: 4
+response: '{"status":"STOPPED","stops":["STOP_14"],"reviews":["REVIEW_09"]}'
+parsed_response:
+  status: STOPPED
+  result:
+    rok: 2019
+    przychody_roczne:
+      IP: 0.0
+      NIE: 0.0
+    koszty_roczne:
+      IP: 0.0
+      NIE: 0.0
+      MIX: 0.0
+      WYKLUCZONE: 0.0
+    nexus_koszty:
+      A: 0.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 0.0
+    nexus: 0.0
+    dochód_IP: 0.0
+    dochód_NIE: 0.0
+    klucz_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      wartość: null
+      status: NOT_APPLICABLE
+    alokacja_multi_ip: null
+    podatek:
+      podstawa_IP: 0
+      podstawa_NIE: 0
+      podatek_IP: 0
+      podatek_NIE_finalny: 0
+      podatek_całościowy: 0
+      nadpłata_lub_dopłata: 0.0
+      termomodernization_carry_over: 0.0
+      termomodernization_expired: 0.0
+      health_tax_credit_used: 0.0
+      ulga_BR_IP_wykorzystana: 0.0
+      ulga_BR_NIE_wykorzystana: 0.0
+      ulga_BR_carry_over: 0.0
+      dochód_dodatkowy_skala: 0.0
+  classifications: []
+  monthly_W:
+  - miesiąc: 2019-01
+    wartość: 90.0
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+    TEST_3: PASS
+    TEST_4: PASS
+    TEST_5: PASS
+    TEST_6: PASS
+    TEST_7: PASS
+    TEST_8: PASS
+    TEST_9: PASS
+  stops_reviews:
+    stops:
+    - STOP_14
+    reviews:
+    - REVIEW_09
+    warnings:
+    - IKZE_LIMIT_EXCEEDED

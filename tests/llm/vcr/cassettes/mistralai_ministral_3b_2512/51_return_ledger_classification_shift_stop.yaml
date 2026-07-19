@@ -1,0 +1,87 @@
+meta:
+  scenario_id: 51_return_ledger_classification_shift_stop
+  scenario_name: Zeznanie i ewidencja mają te same sumy, ale inny podział IP i NIE
+  provider: openrouter
+  requested_model: mistralai/ministral-3b-2512
+  returned_model: mistralai/ministral-3b-2512
+  fingerprint: v3_80caae5488738ce407177a55022e51df1a6ad5fa96ec9cb3bb2ddbaa5f1bbee4
+  request_hash: 362a35b00d8c155f8297a098871c97bad8c92697d3a3bd1a88e0545312843480
+  recorded_at: '2026-07-19T14:10:04.507370+00:00'
+  request_id: gen-1784470203-tshCCCnPhkX3vBO4asOI
+  finish_reason: stop
+  native_finish_reason: stop
+  system_fingerprint: null
+  prompt_tokens: 261
+  completion_tokens: 36
+  total_tokens: 297
+  cost: 4.455e-05
+  recording_duration_seconds: 0.915
+  cassette_format_version: 4
+response: "{\n  \"status\": \"STOPPED\",\n  \"stops\": [\"STOP_12\"],\n  \"reviews\": [\"REVIEW_09\"]\n}"
+parsed_response:
+  status: STOPPED
+  result:
+    rok: 2025
+    przychody_roczne:
+      IP: 0.0
+      NIE: 0.0
+    koszty_roczne:
+      IP: 0.0
+      NIE: 0.0
+      MIX: 0.0
+      WYKLUCZONE: 0.0
+    nexus_koszty:
+      A: 0.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 0.0
+    nexus: 0.0
+    dochód_IP: 0.0
+    dochód_NIE: 0.0
+    klucz_MIX:
+      metoda: przychodowa_roczna
+      źródło: użytkownik
+      wartość: null
+      status: NOT_APPLICABLE
+    alokacja_multi_ip: null
+    podatek:
+      podstawa_IP: 0
+      podstawa_NIE: 0
+      podatek_IP: 0
+      podatek_NIE_finalny: 0
+      podatek_całościowy: 0
+      nadpłata_lub_dopłata: 0.0
+      termomodernization_carry_over: 0.0
+      termomodernization_expired: 0.0
+      health_tax_credit_used: 0.0
+      ulga_BR_IP_wykorzystana: 0.0
+      ulga_BR_NIE_wykorzystana: 0.0
+      ulga_BR_carry_over: 0.0
+      dochód_dodatkowy_skala: 0.0
+  classifications: []
+  monthly_W:
+  - miesiąc: 2025-12
+    wartość: 80.0
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+    TEST_3: PASS
+    TEST_4: PASS
+    TEST_5: PASS
+    TEST_6: PASS
+    TEST_7: PASS
+    TEST_8: PASS
+    TEST_9: PASS
+  stops_reviews:
+    stops:
+    - STOP_12
+    reviews:
+    - REVIEW_09
+    warnings:
+    - RETURN_COST_CLASSIFICATION_SHIFT
+    - RETURN_IP_COST_MISMATCH
+    - RETURN_IP_REVENUE_MISMATCH
+    - RETURN_NON_IP_COST_MISMATCH
+    - RETURN_NON_IP_REVENUE_MISMATCH
+    - RETURN_REVENUE_CLASSIFICATION_SHIFT

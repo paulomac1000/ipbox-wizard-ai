@@ -1,0 +1,91 @@
+meta:
+  scenario_id: 46_historical_2019_health_credit
+  scenario_name: Rok 2019 — liniowy, IKZE i historyczne odliczenie zdrowotne od podatku
+  provider: openrouter
+  requested_model: qwen/qwen3.5-flash-02-23
+  returned_model: qwen/qwen3.5-flash-02-23
+  fingerprint: v3_03278d0879a29184837611043b40935448ae9cc0fd844e8d133b631c3846b5c0
+  request_hash: 6a7696d23cfc967dd2d7618604c003d58a43373f9564a1930ca82832e81326e2
+  recorded_at: '2026-07-19T14:07:33.767038+00:00'
+  request_id: gen-1784470048-R7KYOt79n4lClp1jofhQ
+  finish_reason: stop
+  native_finish_reason: stop
+  system_fingerprint: null
+  prompt_tokens: 246
+  completion_tokens: 682
+  total_tokens: 928
+  cost: 0.00019331
+  recording_duration_seconds: 5.421
+  cassette_format_version: 4
+response: '{"status":"FINAL","stops":[],"reviews":["REVIEW_09"]}'
+parsed_response:
+  status: FINAL
+  result:
+    rok: 2019
+    przychody_roczne:
+      IP: 8000.0
+      NIE: 2000.0
+    koszty_roczne:
+      IP: 100.0
+      NIE: 0.0
+      MIX: 0.0
+      WYKLUCZONE: 0.0
+    nexus_koszty:
+      A: 100.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 0.0
+    nexus: 1.0
+    dochód_IP: 7900.0
+    dochód_NIE: 2000.0
+    klucz_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      wartość: null
+      status: NOT_APPLICABLE
+    alokacja_multi_ip: null
+    podatek:
+      podstawa_IP: 7900
+      podstawa_NIE: 1000
+      podatek_IP: 395
+      podatek_NIE_finalny: 190
+      podatek_całościowy: 285
+      nadpłata_lub_dopłata: -285.0
+      termomodernization_carry_over: 0.0
+      termomodernization_expired: 0.0
+      health_tax_credit_used: 300.0
+      ulga_BR_IP_wykorzystana: 0.0
+      ulga_BR_NIE_wykorzystana: 0.0
+      ulga_BR_carry_over: 0.0
+      dochód_dodatkowy_skala: 0.0
+  classifications:
+  - opis: Dedykowane środowisko projektu
+    amount: 100.0
+    basket: IP
+    allocation_method: direct
+    allocation_source: syntetyczna-ewidencja-projektowa
+    allocation_key: 1.0
+    ip_amount: 100.0
+    non_ip_amount: 0.0
+    nexus_source: own_br
+    nexus_basket: A
+    nexus_amount: 100.0
+  monthly_W:
+  - miesiąc: 2019-01
+    wartość: 80.0
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+    TEST_3: PASS
+    TEST_4: PASS
+    TEST_5: PASS
+    TEST_6: PASS
+    TEST_7: PASS
+    TEST_8: PASS
+    TEST_9: PASS
+  stops_reviews:
+    stops: []
+    reviews:
+    - REVIEW_09
+    warnings: []

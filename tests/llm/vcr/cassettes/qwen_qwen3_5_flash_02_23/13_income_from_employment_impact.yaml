@@ -1,0 +1,91 @@
+meta:
+  scenario_id: 13_income_from_employment_impact
+  scenario_name: Dodatkowy dochód na skali
+  provider: openrouter
+  requested_model: qwen/qwen3.5-flash-02-23
+  returned_model: qwen/qwen3.5-flash-02-23
+  fingerprint: v3_6525d2fb32aa897ecab2631a4612c9778dfa71dbd81f0f731f9460e7114c2ef8
+  request_hash: 5e555e71b31368b95027830394acf99cf45566cd5bed955508ea9b05008756a5
+  recorded_at: '2026-07-19T14:03:05.921658+00:00'
+  request_id: gen-1784469778-QrHQN4ruwr73xszrdx0h
+  finish_reason: stop
+  native_finish_reason: stop
+  system_fingerprint: null
+  prompt_tokens: 246
+  completion_tokens: 928
+  total_tokens: 1174
+  cost: 0.00025727
+  recording_duration_seconds: 7.937
+  cassette_format_version: 4
+response: '{"status":"FINAL","stops":[],"reviews":["REVIEW_01"]}'
+parsed_response:
+  status: FINAL
+  result:
+    rok: 2025
+    przychody_roczne:
+      IP: 50000.0
+      NIE: 20000.0
+    koszty_roczne:
+      IP: 500.0
+      NIE: 0.0
+      MIX: 0.0
+      WYKLUCZONE: 0.0
+    nexus_koszty:
+      A: 500.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 0.0
+    nexus: 1.0
+    dochód_IP: 49500.0
+    dochód_NIE: 20000.0
+    klucz_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      wartość: null
+      status: NOT_APPLICABLE
+    alokacja_multi_ip: null
+    podatek:
+      podstawa_IP: 49500
+      podstawa_NIE: 120000
+      podatek_IP: 2475
+      podatek_NIE_finalny: 10800
+      podatek_całościowy: 13275
+      nadpłata_lub_dopłata: -13275.0
+      termomodernization_carry_over: 0.0
+      termomodernization_expired: 0.0
+      health_tax_credit_used: 0.0
+      ulga_BR_IP_wykorzystana: 0.0
+      ulga_BR_NIE_wykorzystana: 0.0
+      ulga_BR_carry_over: 0.0
+      dochód_dodatkowy_skala: 100000.0
+  classifications:
+  - opis: Licencja IDE
+    amount: 500.0
+    basket: IP
+    allocation_method: direct
+    allocation_source: ewidencja_kosztu_IP
+    allocation_key: 1.0
+    ip_amount: 500.0
+    non_ip_amount: 0.0
+    nexus_source: own_br
+    nexus_basket: A
+    nexus_amount: 500.0
+  monthly_W:
+  - miesiąc: 2025-01
+    wartość: 100.0
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+    TEST_3: PASS
+    TEST_4: PASS
+    TEST_5: PASS
+    TEST_6: PASS
+    TEST_7: PASS
+    TEST_8: PASS
+    TEST_9: PASS
+  stops_reviews:
+    stops: []
+    reviews:
+    - REVIEW_01
+    warnings: []

@@ -1,0 +1,91 @@
+meta:
+  scenario_id: 12_zus_in_pit_path
+  scenario_name: ZUS odliczany wyłącznie w PIT
+  provider: openrouter
+  requested_model: moonshotai/kimi-k2.5
+  returned_model: moonshotai/kimi-k2.5
+  fingerprint: v3_9da2257d63e1da26530d5828d839c62ba6ebf4cc5aa2a97c7d40c42694a9383b
+  request_hash: 3f5d37d7a4c21cb5f27ed027c446471fc3bf528cbd14ce15468e61c7e00fa042
+  recorded_at: '2026-07-19T13:57:27.961246+00:00'
+  request_id: gen-1784469438-DvazpUOtm0h2oOwcHFE2
+  finish_reason: stop
+  native_finish_reason: stop
+  system_fingerprint: null
+  prompt_tokens: 242
+  completion_tokens: 456
+  total_tokens: 698
+  cost: 0.0011349
+  recording_duration_seconds: 9.857
+  cassette_format_version: 4
+response: '{"reviews":["REVIEW_01"],"status":"FINAL","stops":[]}'
+parsed_response:
+  status: FINAL
+  result:
+    rok: 2025
+    przychody_roczne:
+      IP: 15000.0
+      NIE: 5000.0
+    koszty_roczne:
+      IP: 100.0
+      NIE: 0.0
+      MIX: 0.0
+      WYKLUCZONE: 0.0
+    nexus_koszty:
+      A: 100.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 0.0
+    nexus: 1.0
+    dochód_IP: 14900.0
+    dochód_NIE: 5000.0
+    klucz_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      wartość: null
+      status: NOT_APPLICABLE
+    alokacja_multi_ip: null
+    podatek:
+      podstawa_IP: 14900
+      podstawa_NIE: 3200
+      podatek_IP: 745
+      podatek_NIE_finalny: 608
+      podatek_całościowy: 1353
+      nadpłata_lub_dopłata: -1353.0
+      termomodernization_carry_over: 0.0
+      termomodernization_expired: 0.0
+      health_tax_credit_used: 0.0
+      ulga_BR_IP_wykorzystana: 0.0
+      ulga_BR_NIE_wykorzystana: 0.0
+      ulga_BR_carry_over: 0.0
+      dochód_dodatkowy_skala: 0.0
+  classifications:
+  - opis: Licencja IDE
+    amount: 100.0
+    basket: IP
+    allocation_method: direct
+    allocation_source: ewidencja_kosztu_IP
+    allocation_key: 1.0
+    ip_amount: 100.0
+    non_ip_amount: 0.0
+    nexus_source: own_br
+    nexus_basket: A
+    nexus_amount: 100.0
+  monthly_W:
+  - miesiąc: 2025-01
+    wartość: 100.0
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+    TEST_3: PASS
+    TEST_4: PASS
+    TEST_5: PASS
+    TEST_6: PASS
+    TEST_7: PASS
+    TEST_8: PASS
+    TEST_9: PASS
+  stops_reviews:
+    stops: []
+    reviews:
+    - REVIEW_01
+    warnings: []

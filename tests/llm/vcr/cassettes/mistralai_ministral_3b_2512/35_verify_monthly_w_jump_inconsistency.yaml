@@ -1,0 +1,84 @@
+meta:
+  scenario_id: 35_verify_monthly_w_jump_inconsistency
+  scenario_name: Skok W większy niż 30 punktów
+  provider: openrouter
+  requested_model: mistralai/ministral-3b-2512
+  returned_model: mistralai/ministral-3b-2512
+  fingerprint: v3_76605112dcf29f6ac19d0617ea4f952d202dc9a85b89c4d65843a5a00f49ef7a
+  request_hash: 681610e3680ffbbf8798e94f3310ff410110ec9e2898927ff7ff2c5350372e55
+  recorded_at: '2026-07-19T14:09:34.830282+00:00'
+  request_id: gen-1784470173-h02rd7XW5VZYszHRqcz0
+  finish_reason: stop
+  native_finish_reason: stop
+  system_fingerprint: null
+  prompt_tokens: 265
+  completion_tokens: 42
+  total_tokens: 307
+  cost: 4.605e-05
+  recording_duration_seconds: 1.114
+  cassette_format_version: 4
+response: "{\n  \"status\": \"FINAL\",\n  \"stops\": [],\n  \"reviews\": [\"REVIEW_02\", \"REVIEW_08\", \"REVIEW_09\"]\n}"
+parsed_response:
+  status: FINAL
+  result:
+    rok: 2025
+    przychody_roczne:
+      IP: 24000.0
+      NIE: 16000.0
+    koszty_roczne:
+      IP: 0.0
+      NIE: 0.0
+      MIX: 0.0
+      WYKLUCZONE: 0.0
+    nexus_koszty:
+      A: 0.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 0.0
+    nexus: 0.0
+    dochód_IP: 24000.0
+    dochód_NIE: 16000.0
+    klucz_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      wartość: null
+      status: NOT_APPLICABLE
+    alokacja_multi_ip: null
+    podatek:
+      podstawa_IP: 0
+      podstawa_NIE: 16000
+      podatek_IP: 0
+      podatek_NIE_finalny: 3040
+      podatek_całościowy: 3040
+      nadpłata_lub_dopłata: -3040.0
+      termomodernization_carry_over: 0.0
+      termomodernization_expired: 0.0
+      health_tax_credit_used: 0.0
+      ulga_BR_IP_wykorzystana: 0.0
+      ulga_BR_NIE_wykorzystana: 0.0
+      ulga_BR_carry_over: 0.0
+      dochód_dodatkowy_skala: 0.0
+  classifications: []
+  monthly_W:
+  - miesiąc: 2025-01
+    wartość: 90.0
+  - miesiąc: 2025-02
+    wartość: 30.0
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+    TEST_3: PASS
+    TEST_4: PASS
+    TEST_5: PASS
+    TEST_6: PASS
+    TEST_7: PASS
+    TEST_8: PASS
+    TEST_9: PASS
+  stops_reviews:
+    stops: []
+    reviews:
+    - REVIEW_02
+    - REVIEW_08
+    - REVIEW_09
+    warnings: []

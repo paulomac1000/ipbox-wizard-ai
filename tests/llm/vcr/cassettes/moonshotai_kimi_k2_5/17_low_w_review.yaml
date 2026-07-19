@@ -1,0 +1,92 @@
+meta:
+  scenario_id: 17_low_w_review
+  scenario_name: W poniżej 50 procent
+  provider: openrouter
+  requested_model: moonshotai/kimi-k2.5
+  returned_model: moonshotai/kimi-k2.5
+  fingerprint: v3_d52f8429a45f05c371db904f9adbdcdcb71c905ff87634497b70f152276fa026
+  request_hash: 1d36ae52f9f6d27c9a473ce19f6cfc69b1ec923627e74bc5a48e96def8ef1826
+  recorded_at: '2026-07-19T13:58:06.019243+00:00'
+  request_id: gen-1784469481-PkcMLkws4SRbqVgvB8CU
+  finish_reason: stop
+  native_finish_reason: stop
+  system_fingerprint: null
+  prompt_tokens: 247
+  completion_tokens: 174
+  total_tokens: 421
+  cost: 0.00042969
+  recording_duration_seconds: 4.112
+  cassette_format_version: 4
+response: '{"reviews":["REVIEW_02","REVIEW_09"],"status":"FINAL","stops":[]}'
+parsed_response:
+  status: FINAL
+  result:
+    rok: 2025
+    przychody_roczne:
+      IP: 8750.0
+      NIE: 11250.0
+    koszty_roczne:
+      IP: 131.25
+      NIE: 168.75
+      MIX: 300.0
+      WYKLUCZONE: 0.0
+    nexus_koszty:
+      A: 0.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 300.0
+    nexus: 0.0
+    dochód_IP: 8618.75
+    dochód_NIE: 11081.25
+    klucz_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      wartość: 0.4375
+      status: FINAL
+    alokacja_multi_ip: null
+    podatek:
+      podstawa_IP: 0
+      podstawa_NIE: 11081
+      podatek_IP: 0
+      podatek_NIE_finalny: 2105
+      podatek_całościowy: 2105
+      nadpłata_lub_dopłata: -2105.0
+      termomodernization_carry_over: 0.0
+      termomodernization_expired: 0.0
+      health_tax_credit_used: 0.0
+      ulga_BR_IP_wykorzystana: 0.0
+      ulga_BR_NIE_wykorzystana: 0.0
+      ulga_BR_carry_over: 0.0
+      dochód_dodatkowy_skala: 0.0
+  classifications:
+  - opis: Księgowość
+    amount: 300.0
+    basket: MIX
+    allocation_method: przychodowa_roczna
+    allocation_source: domyślna_wizard
+    allocation_key: 0.4375
+    ip_amount: 131.25
+    non_ip_amount: 168.75
+    nexus_source: outside_nexus
+    nexus_basket: poza_nexus
+    nexus_amount: 0.0
+  monthly_W:
+  - miesiąc: 2025-01
+    wartość: 43.75
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+    TEST_3: PASS
+    TEST_4: PASS
+    TEST_5: PASS
+    TEST_6: PASS
+    TEST_7: PASS
+    TEST_8: PASS
+    TEST_9: PASS
+  stops_reviews:
+    stops: []
+    reviews:
+    - REVIEW_02
+    - REVIEW_09
+    warnings: []

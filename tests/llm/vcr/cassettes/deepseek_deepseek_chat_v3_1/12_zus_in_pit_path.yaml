@@ -1,0 +1,91 @@
+meta:
+  scenario_id: 12_zus_in_pit_path
+  scenario_name: ZUS odliczany wyłącznie w PIT
+  provider: openrouter
+  requested_model: deepseek/deepseek-chat-v3.1
+  returned_model: deepseek/deepseek-chat-v3.1
+  fingerprint: v3_2ad54b44a06757c1493c5dd2d4b09c2acc24a0dbaca48ba3caec8d60b2035fe1
+  request_hash: 06b2b3c73d63110f322a0034e44cfa8f1f054b20bed428281f5512d850803d13
+  recorded_at: '2026-07-19T13:50:37.993888+00:00'
+  request_id: gen-1784469034-MaOLRTHIdLsc3lYbU749
+  finish_reason: stop
+  native_finish_reason: stop
+  system_fingerprint: null
+  prompt_tokens: 241
+  completion_tokens: 28
+  total_tokens: 269
+  cost: 9.307e-05
+  recording_duration_seconds: 3.238
+  cassette_format_version: 4
+response: "{\n    \"reviews\": [\"REVIEW_01\"],\n    \"status\": \"FINAL\",\n    \"stops\": []\n}"
+parsed_response:
+  status: FINAL
+  result:
+    rok: 2025
+    przychody_roczne:
+      IP: 15000.0
+      NIE: 5000.0
+    koszty_roczne:
+      IP: 100.0
+      NIE: 0.0
+      MIX: 0.0
+      WYKLUCZONE: 0.0
+    nexus_koszty:
+      A: 100.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 0.0
+    nexus: 1.0
+    dochód_IP: 14900.0
+    dochód_NIE: 5000.0
+    klucz_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      wartość: null
+      status: NOT_APPLICABLE
+    alokacja_multi_ip: null
+    podatek:
+      podstawa_IP: 14900
+      podstawa_NIE: 3200
+      podatek_IP: 745
+      podatek_NIE_finalny: 608
+      podatek_całościowy: 1353
+      nadpłata_lub_dopłata: -1353.0
+      termomodernization_carry_over: 0.0
+      termomodernization_expired: 0.0
+      health_tax_credit_used: 0.0
+      ulga_BR_IP_wykorzystana: 0.0
+      ulga_BR_NIE_wykorzystana: 0.0
+      ulga_BR_carry_over: 0.0
+      dochód_dodatkowy_skala: 0.0
+  classifications:
+  - opis: Licencja IDE
+    amount: 100.0
+    basket: IP
+    allocation_method: direct
+    allocation_source: ewidencja_kosztu_IP
+    allocation_key: 1.0
+    ip_amount: 100.0
+    non_ip_amount: 0.0
+    nexus_source: own_br
+    nexus_basket: A
+    nexus_amount: 100.0
+  monthly_W:
+  - miesiąc: 2025-01
+    wartość: 100.0
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+    TEST_3: PASS
+    TEST_4: PASS
+    TEST_5: PASS
+    TEST_6: PASS
+    TEST_7: PASS
+    TEST_8: PASS
+    TEST_9: PASS
+  stops_reviews:
+    stops: []
+    reviews:
+    - REVIEW_01
+    warnings: []

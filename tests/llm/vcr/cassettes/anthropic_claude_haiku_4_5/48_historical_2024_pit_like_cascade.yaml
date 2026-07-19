@@ -1,0 +1,91 @@
+meta:
+  scenario_id: 48_historical_2024_pit_like_cascade
+  scenario_name: Rok 2024 — kaskada ZUS, IKZE, termomodernizacja i IP Box
+  provider: openrouter
+  requested_model: anthropic/claude-haiku-4.5
+  returned_model: anthropic/claude-haiku-4.5
+  fingerprint: v3_1d0ed73a4581f9bb20fe350aaf6e3b54b0708fa28a6ab21b718b28c28669a8c5
+  request_hash: f173d621f0855ca77d0270123478339d5a3df2d63c72e227c830952579d2feee
+  recorded_at: '2026-07-19T13:49:55.757631+00:00'
+  request_id: gen-1784468994-4dpiXCYswtZlxil4D8bR
+  finish_reason: stop
+  native_finish_reason: end_turn
+  system_fingerprint: null
+  prompt_tokens: 699
+  completion_tokens: 22
+  total_tokens: 721
+  cost: 0.000809
+  recording_duration_seconds: 1.087
+  cassette_format_version: 4
+response: '{"status":"FINAL","stops":[],"reviews":["REVIEW_09"]}'
+parsed_response:
+  status: FINAL
+  result:
+    rok: 2024
+    przychody_roczne:
+      IP: 181000.0
+      NIE: 30000.0
+    koszty_roczne:
+      IP: 1000.0
+      NIE: 0.0
+      MIX: 0.0
+      WYKLUCZONE: 0.0
+    nexus_koszty:
+      A: 1000.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 0.0
+    nexus: 1.0
+    dochód_IP: 180000.0
+    dochód_NIE: 30000.0
+    klucz_MIX:
+      metoda: przychodowa_roczna
+      źródło: użytkownik
+      wartość: null
+      status: NOT_APPLICABLE
+    alokacja_multi_ip: null
+    podatek:
+      podstawa_IP: 180000
+      podstawa_NIE: 0
+      podatek_IP: 9000
+      podatek_NIE_finalny: 0
+      podatek_całościowy: 9000
+      nadpłata_lub_dopłata: 29000.0
+      termomodernization_carry_over: 9000.0
+      termomodernization_expired: 0.0
+      health_tax_credit_used: 0.0
+      ulga_BR_IP_wykorzystana: 0.0
+      ulga_BR_NIE_wykorzystana: 0.0
+      ulga_BR_carry_over: 0.0
+      dochód_dodatkowy_skala: 0.0
+  classifications:
+  - opis: Dedykowany koszt wytworzenia oprogramowania
+    amount: 1000.0
+    basket: IP
+    allocation_method: direct
+    allocation_source: syntetyczna-ewidencja-projektowa
+    allocation_key: 1.0
+    ip_amount: 1000.0
+    non_ip_amount: 0.0
+    nexus_source: own_br
+    nexus_basket: A
+    nexus_amount: 1000.0
+  monthly_W:
+  - miesiąc: 2024-12
+    wartość: 90.0
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+    TEST_3: PASS
+    TEST_4: PASS
+    TEST_5: PASS
+    TEST_6: PASS
+    TEST_7: PASS
+    TEST_8: PASS
+    TEST_9: PASS
+  stops_reviews:
+    stops: []
+    reviews:
+    - REVIEW_09
+    warnings: []

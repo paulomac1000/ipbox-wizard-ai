@@ -1,0 +1,82 @@
+meta:
+  scenario_id: 37_verify_invalid_tax_form_stop
+  scenario_name: Nieprawidłowa forma opodatkowania
+  provider: openrouter
+  requested_model: qwen/qwen3.5-flash-02-23
+  returned_model: qwen/qwen3.5-flash-02-23
+  fingerprint: v3_19d32a635fd68c548af516eb4ec72c2bd7bc29988052ff85e51d26bbb47068a2
+  request_hash: 817bcb45b1dce64523336d9616a895a72b5f3a52f93df1312cc28bfebbfd3fbc
+  recorded_at: '2026-07-19T14:06:18.227528+00:00'
+  request_id: gen-1784469970-IZH8b6LdTPUoUNuA7Mao
+  finish_reason: stop
+  native_finish_reason: stop
+  system_fingerprint: null
+  prompt_tokens: 257
+  completion_tokens: 991
+  total_tokens: 1248
+  cost: 0.000274365
+  recording_duration_seconds: 7.903
+  cassette_format_version: 4
+response: '{"status":"STOPPED","stops":["STOP_01"],"reviews":["REVIEW_01","REVIEW_09"]}'
+parsed_response:
+  status: STOPPED
+  result:
+    rok: 2025
+    przychody_roczne:
+      IP: 0.0
+      NIE: 0.0
+    koszty_roczne:
+      IP: 0.0
+      NIE: 0.0
+      MIX: 0.0
+      WYKLUCZONE: 0.0
+    nexus_koszty:
+      A: 0.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 0.0
+    nexus: 0.0
+    dochód_IP: 0.0
+    dochód_NIE: 0.0
+    klucz_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      wartość: null
+      status: NOT_APPLICABLE
+    alokacja_multi_ip: null
+    podatek:
+      podstawa_IP: 0
+      podstawa_NIE: 0
+      podatek_IP: 0
+      podatek_NIE_finalny: 0
+      podatek_całościowy: 0
+      nadpłata_lub_dopłata: 0.0
+      termomodernization_carry_over: 0.0
+      termomodernization_expired: 0.0
+      health_tax_credit_used: 0.0
+      ulga_BR_IP_wykorzystana: 0.0
+      ulga_BR_NIE_wykorzystana: 0.0
+      ulga_BR_carry_over: 0.0
+      dochód_dodatkowy_skala: 0.0
+  classifications: []
+  monthly_W:
+  - miesiąc: 2025-01
+    wartość: 100.0
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+    TEST_3: PASS
+    TEST_4: PASS
+    TEST_5: PASS
+    TEST_6: PASS
+    TEST_7: PASS
+    TEST_8: PASS
+    TEST_9: PASS
+  stops_reviews:
+    stops:
+    - STOP_01
+    reviews:
+    - REVIEW_01
+    - REVIEW_09
+    warnings: []

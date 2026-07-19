@@ -1,0 +1,92 @@
+meta:
+  scenario_id: 17_low_w_review
+  scenario_name: W poniżej 50 procent
+  provider: openrouter
+  requested_model: deepseek/deepseek-chat-v3.1
+  returned_model: deepseek/deepseek-chat-v3.1
+  fingerprint: v3_85140993e1ab8c658ad94a93b73c086d8d7ec880348e74f03b9d587154db16a3
+  request_hash: 416c3b6559642f70ac21ab3686312d4255a0b0ae4b65d6f0aa0e07daa23f0849
+  recorded_at: '2026-07-19T13:51:03.088806+00:00'
+  request_id: gen-1784469060-IItowPDzbkFin0viUI8k
+  finish_reason: stop
+  native_finish_reason: stop
+  system_fingerprint: null
+  prompt_tokens: 245
+  completion_tokens: 34
+  total_tokens: 279
+  cost: 7.003e-05
+  recording_duration_seconds: 2.806
+  cassette_format_version: 4
+response: "{\n  \"status\": \"FINAL\",\n  \"stops\": [],\n  \"reviews\": [\"REVIEW_02\", \"REVIEW_09\"]\n}"
+parsed_response:
+  status: FINAL
+  result:
+    rok: 2025
+    przychody_roczne:
+      IP: 8750.0
+      NIE: 11250.0
+    koszty_roczne:
+      IP: 131.25
+      NIE: 168.75
+      MIX: 300.0
+      WYKLUCZONE: 0.0
+    nexus_koszty:
+      A: 0.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 300.0
+    nexus: 0.0
+    dochód_IP: 8618.75
+    dochód_NIE: 11081.25
+    klucz_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      wartość: 0.4375
+      status: FINAL
+    alokacja_multi_ip: null
+    podatek:
+      podstawa_IP: 0
+      podstawa_NIE: 11081
+      podatek_IP: 0
+      podatek_NIE_finalny: 2105
+      podatek_całościowy: 2105
+      nadpłata_lub_dopłata: -2105.0
+      termomodernization_carry_over: 0.0
+      termomodernization_expired: 0.0
+      health_tax_credit_used: 0.0
+      ulga_BR_IP_wykorzystana: 0.0
+      ulga_BR_NIE_wykorzystana: 0.0
+      ulga_BR_carry_over: 0.0
+      dochód_dodatkowy_skala: 0.0
+  classifications:
+  - opis: Księgowość
+    amount: 300.0
+    basket: MIX
+    allocation_method: przychodowa_roczna
+    allocation_source: domyślna_wizard
+    allocation_key: 0.4375
+    ip_amount: 131.25
+    non_ip_amount: 168.75
+    nexus_source: outside_nexus
+    nexus_basket: poza_nexus
+    nexus_amount: 0.0
+  monthly_W:
+  - miesiąc: 2025-01
+    wartość: 43.75
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+    TEST_3: PASS
+    TEST_4: PASS
+    TEST_5: PASS
+    TEST_6: PASS
+    TEST_7: PASS
+    TEST_8: PASS
+    TEST_9: PASS
+  stops_reviews:
+    stops: []
+    reviews:
+    - REVIEW_02
+    - REVIEW_09
+    warnings: []

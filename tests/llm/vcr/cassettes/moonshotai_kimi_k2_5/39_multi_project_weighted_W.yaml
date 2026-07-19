@@ -1,0 +1,91 @@
+meta:
+  scenario_id: 39_multi_project_weighted_W
+  scenario_name: Ważona średnia W dla wielu projektów
+  provider: openrouter
+  requested_model: moonshotai/kimi-k2.5
+  returned_model: moonshotai/kimi-k2.5
+  fingerprint: v3_4bde3ab94f06cd7f7cc79a415b910a64eef3e1f8fde2c2e057ba7b90f57beda2
+  request_hash: 64aa8497c35d74f5272dbef001000d0836a8ec5bd9a862ccabf43a60758f03e1
+  recorded_at: '2026-07-19T14:00:25.323498+00:00'
+  request_id: gen-1784469620-C35qPhRY3z83JFDVHdda
+  finish_reason: stop
+  native_finish_reason: stop
+  system_fingerprint: null
+  prompt_tokens: 242
+  completion_tokens: 173
+  total_tokens: 415
+  cost: 0.00042519
+  recording_duration_seconds: 4.734
+  cassette_format_version: 4
+response: '{"reviews":["REVIEW_04"],"status":"FINAL","stops":[]}'
+parsed_response:
+  status: FINAL
+  result:
+    rok: 2025
+    przychody_roczne:
+      IP: 18500.0
+      NIE: 6500.0
+    koszty_roczne:
+      IP: 100.0
+      NIE: 0.0
+      MIX: 0.0
+      WYKLUCZONE: 0.0
+    nexus_koszty:
+      A: 100.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 0.0
+    nexus: 1.0
+    dochód_IP: 18400.0
+    dochód_NIE: 6500.0
+    klucz_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      wartość: null
+      status: NOT_APPLICABLE
+    alokacja_multi_ip: null
+    podatek:
+      podstawa_IP: 18400
+      podstawa_NIE: 6500
+      podatek_IP: 920
+      podatek_NIE_finalny: 1235
+      podatek_całościowy: 2155
+      nadpłata_lub_dopłata: -2155.0
+      termomodernization_carry_over: 0.0
+      termomodernization_expired: 0.0
+      health_tax_credit_used: 0.0
+      ulga_BR_IP_wykorzystana: 0.0
+      ulga_BR_NIE_wykorzystana: 0.0
+      ulga_BR_carry_over: 0.0
+      dochód_dodatkowy_skala: 0.0
+  classifications:
+  - opis: IDE
+    amount: 100.0
+    basket: IP
+    allocation_method: direct
+    allocation_source: ewidencja_kosztu_IP
+    allocation_key: 1.0
+    ip_amount: 100.0
+    non_ip_amount: 0.0
+    nexus_source: own_br
+    nexus_basket: A
+    nexus_amount: 100.0
+  monthly_W:
+  - miesiąc: 2025-01
+    wartość: 74.0
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+    TEST_3: PASS
+    TEST_4: PASS
+    TEST_5: PASS
+    TEST_6: PASS
+    TEST_7: PASS
+    TEST_8: PASS
+    TEST_9: PASS
+  stops_reviews:
+    stops: []
+    reviews:
+    - REVIEW_04
+    warnings: []

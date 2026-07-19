@@ -1,0 +1,326 @@
+manifest_format_version: 2
+model: mistralai/ministral-3b-2512
+generated_at: '2026-07-19T14:10:11.162658+00:00'
+entries:
+  01_basic_linear:
+    file: 01_basic_linear.yaml
+    fingerprint: v3_56be9db99eaa4e66d91ceaf81dadabacfe5d970f80da93f7d00277e2c5d79311
+    request_hash: 60a06f0b847a11cc4ead195f8e0cf45e3a413a68180d42e4a4317b6989b11458
+    recorded_at: '2026-07-19T14:08:48.912127+00:00'
+    returned_model: mistralai/ministral-3b-2512
+    cost: 4.215e-05
+  02_basic_scale_single_client:
+    file: 02_basic_scale_single_client.yaml
+    fingerprint: v3_cc1026df7920cf87f194aed3e8c15c15ac030e80272db95f4ba30c57bb900b5a
+    request_hash: b35cb122905ded4d20c7f95355c7f3f1b5ac440970d593f09fc1ce57cfcea2ff
+    recorded_at: '2026-07-19T14:08:50.506028+00:00'
+    returned_model: mistralai/ministral-3b-2512
+    cost: 4.41e-05
+  03_fx_usd_single_client:
+    file: 03_fx_usd_single_client.yaml
+    fingerprint: v3_a15132ad11b57d507d97c60eb64cbd246634b9f55d730a678dcd1f46dc235706
+    request_hash: b35cb122905ded4d20c7f95355c7f3f1b5ac440970d593f09fc1ce57cfcea2ff
+    recorded_at: '2026-07-19T14:08:51.950666+00:00'
+    returned_model: mistralai/ministral-3b-2512
+    cost: 4.41e-05
+  11_multi_client_mixed_currencies:
+    file: 11_multi_client_mixed_currencies.yaml
+    fingerprint: v3_3b936f7aeb86d67f70ffe72434076685fd5d1abcc78acebc0ed73d54e5082a3e
+    request_hash: 553e97232d16464952e3d7c493bdb9fabca2f6a1a19d7871ce6f88d10f584816
+    recorded_at: '2026-07-19T14:08:53.389295+00:00'
+    returned_model: mistralai/ministral-3b-2512
+    cost: 4.215e-05
+  12_zus_in_pit_path:
+    file: 12_zus_in_pit_path.yaml
+    fingerprint: v3_b80ea5e15309faa3ea534b1751b78883d42933b5fedbbd1e59d05a52c6be33bb
+    request_hash: 553e97232d16464952e3d7c493bdb9fabca2f6a1a19d7871ce6f88d10f584816
+    recorded_at: '2026-07-19T14:08:54.985506+00:00'
+    returned_model: mistralai/ministral-3b-2512
+    cost: 4.215e-05
+  13_income_from_employment_impact:
+    file: 13_income_from_employment_impact.yaml
+    fingerprint: v3_628d80e27f5de1855c8bd0380bfc0e3139572a03760b9ae640bc4c3148646465
+    request_hash: 553e97232d16464952e3d7c493bdb9fabca2f6a1a19d7871ce6f88d10f584816
+    recorded_at: '2026-07-19T14:08:56.586987+00:00'
+    returned_model: mistralai/ministral-3b-2512
+    cost: 4.215e-05
+  14_lump_sum_ineligible_check:
+    file: 14_lump_sum_ineligible_check.yaml
+    fingerprint: v3_470dbb064eb4bbb816288727734f8e74aadc8e65b2baa95dfeb8d3cc98adc944
+    request_hash: a971a8001f6f29ab864ec28c5aec1c7bb642f10b6d1d5325cfa002ced03be0c5
+    recorded_at: '2026-07-19T14:08:58.585907+00:00'
+    returned_model: mistralai/ministral-3b-2512
+    cost: 4.275e-05
+  15_vacation_sick_mix:
+    file: 15_vacation_sick_mix.yaml
+    fingerprint: v3_7b228edeee2314d447ba1820aca6e99587d50286ef8284a12fefb8ce2a1e7527
+    request_hash: 60a06f0b847a11cc4ead195f8e0cf45e3a413a68180d42e4a4317b6989b11458
+    recorded_at: '2026-07-19T14:08:59.871841+00:00'
+    returned_model: mistralai/ministral-3b-2512
+    cost: 4.215e-05
+  16_high_w_review:
+    file: 16_high_w_review.yaml
+    fingerprint: v3_e6ac8a06d62fc7fd542f06ab918844279365a9a47a05a6867b10981f7b2f8eeb
+    request_hash: b35cb122905ded4d20c7f95355c7f3f1b5ac440970d593f09fc1ce57cfcea2ff
+    recorded_at: '2026-07-19T14:09:02.763105+00:00'
+    returned_model: mistralai/ministral-3b-2512
+    cost: 4.41e-05
+  17_low_w_review:
+    file: 17_low_w_review.yaml
+    fingerprint: v3_c982e109453369bec701564b28f838fa0fa896e6c42687323440419392847f4c
+    request_hash: 807d183e7c645f677e0916d6247a72c959a068ecfc053f739c63f5665c703256
+    recorded_at: '2026-07-19T14:09:04.408663+00:00'
+    returned_model: mistralai/ministral-3b-2512
+    cost: 4.41e-05
+  18_logic_zero_work_hours:
+    file: 18_logic_zero_work_hours.yaml
+    fingerprint: v3_9ac4f92083c68c023750a9605d1d4c20c15aab237155bede3f458c333df9aae3
+    request_hash: 9f0fe8aa12d5eba6838431c501c3471577a0ae5cf334d5270e850262fe1c441b
+    recorded_at: '2026-07-19T14:09:05.881622+00:00'
+    returned_model: mistralai/ministral-3b-2512
+    cost: 4.455e-05
+  21_monthly_loss_impact:
+    file: 21_monthly_loss_impact.yaml
+    fingerprint: v3_805a46fc2a9076c0846de09d6847bac6928c7062b25e81d88cc3af371e13544a
+    request_hash: b35cb122905ded4d20c7f95355c7f3f1b5ac440970d593f09fc1ce57cfcea2ff
+    recorded_at: '2026-07-19T14:09:07.469401+00:00'
+    returned_model: mistralai/ministral-3b-2512
+    cost: 4.41e-05
+  22_related_parties_nexus_reduction:
+    file: 22_related_parties_nexus_reduction.yaml
+    fingerprint: v3_05705e5d6def2c04ba7fa6659c11c69cc6e2869847874453e0b38db8983cad90
+    request_hash: b35cb122905ded4d20c7f95355c7f3f1b5ac440970d593f09fc1ce57cfcea2ff
+    recorded_at: '2026-07-19T14:09:09.145400+00:00'
+    returned_model: mistralai/ministral-3b-2512
+    cost: 4.41e-05
+  23_loss_carry_forward:
+    file: 23_loss_carry_forward.yaml
+    fingerprint: v3_006ddb9e611c2c39ac7327308ca4f86d78c5d852e533b0886114c137074a9df4
+    request_hash: 45a72968f02e4055d960f406548b6be7d1771cdd13b7feeaa404f1e28a4d9b45
+    recorded_at: '2026-07-19T14:09:10.680795+00:00'
+    returned_model: mistralai/ministral-3b-2512
+    cost: 4.035e-05
+  24_donations_relief:
+    file: 24_donations_relief.yaml
+    fingerprint: v3_f9a832a377fa1d04091236eb7949c8b2662b43b1ee6c8ee7a4f59b131d81ac67
+    request_hash: 45a72968f02e4055d960f406548b6be7d1771cdd13b7feeaa404f1e28a4d9b45
+    recorded_at: '2026-07-19T14:09:12.109866+00:00'
+    returned_model: mistralai/ministral-3b-2512
+    cost: 4.035e-05
+  25_rehab_relief:
+    file: 25_rehab_relief.yaml
+    fingerprint: v3_2f511683850f5a065b48bf2be53e6979797913197d4913c9d5bc2907d600f399
+    request_hash: 45a72968f02e4055d960f406548b6be7d1771cdd13b7feeaa404f1e28a4d9b45
+    recorded_at: '2026-07-19T14:09:13.711691+00:00'
+    returned_model: mistralai/ministral-3b-2512
+    cost: 4.035e-05
+  26_rd_relief_nexus:
+    file: 26_rd_relief_nexus.yaml
+    fingerprint: v3_9522fec1105c66b8a1af8d0603899efa661abb354d3aa32a1b4cb673c83123dc
+    request_hash: 60a06f0b847a11cc4ead195f8e0cf45e3a413a68180d42e4a4317b6989b11458
+    recorded_at: '2026-07-19T14:09:16.593253+00:00'
+    returned_model: mistralai/ministral-3b-2512
+    cost: 4.215e-05
+  27_termomodernizacja_full:
+    file: 27_termomodernizacja_full.yaml
+    fingerprint: v3_66edfb185c9fbc35383e8a5b156024e164af87b34b404c176368feac8b3a7a26
+    request_hash: 60a06f0b847a11cc4ead195f8e0cf45e3a413a68180d42e4a4317b6989b11458
+    recorded_at: '2026-07-19T14:09:19.157518+00:00'
+    returned_model: mistralai/ministral-3b-2512
+    cost: 4.215e-05
+  28_edge_multiple_carry-overs:
+    file: 28_edge_multiple_carry-overs.yaml
+    fingerprint: v3_e0e4bd12bed6cf14bf34b078a803ff30732790142581c34eabfe41b7b9823949
+    request_hash: b35cb122905ded4d20c7f95355c7f3f1b5ac440970d593f09fc1ce57cfcea2ff
+    recorded_at: '2026-07-19T14:09:21.402310+00:00'
+    returned_model: mistralai/ministral-3b-2512
+    cost: 4.41e-05
+  29_edge_related_parties_nexus_0:
+    file: 29_edge_related_parties_nexus_0.yaml
+    fingerprint: v3_64dcfdf3b6e880a9dd9537f0324a24dfa4af0f82343d8ac1939423cd67027d61
+    request_hash: b35cb122905ded4d20c7f95355c7f3f1b5ac440970d593f09fc1ce57cfcea2ff
+    recorded_at: '2026-07-19T14:09:22.912934+00:00'
+    returned_model: mistralai/ministral-3b-2512
+    cost: 4.41e-05
+  30_edge_related_parties_nexus_mixed:
+    file: 30_edge_related_parties_nexus_mixed.yaml
+    fingerprint: v3_722fa3397b1bb892cdee68f9bda450743fae9dcd79b5d04cf17de33d20d1a20c
+    request_hash: b35cb122905ded4d20c7f95355c7f3f1b5ac440970d593f09fc1ce57cfcea2ff
+    recorded_at: '2026-07-19T14:09:25.947948+00:00'
+    returned_model: mistralai/ministral-3b-2512
+    cost: 4.41e-05
+  31_zus_double_dip_fail:
+    file: 31_zus_double_dip_fail.yaml
+    fingerprint: v3_a0e37668a4175f5325218a63834964701a56ee392f369ceae7b2b69222b8f58b
+    request_hash: 4aeaa81c5f33739bb79dcae6ceed9f388d5576551ce9ffcb457a7bd1d6a2029a
+    recorded_at: '2026-07-19T14:09:27.792796+00:00'
+    returned_model: mistralai/ministral-3b-2512
+    cost: 4.68e-05
+  32_private_costs_ip_fail:
+    file: 32_private_costs_ip_fail.yaml
+    fingerprint: v3_581ab11c21b5206b04f5980cfdc914b7c0191e2b734f68c76a10e05fd8c7d37c
+    request_hash: b35cb122905ded4d20c7f95355c7f3f1b5ac440970d593f09fc1ce57cfcea2ff
+    recorded_at: '2026-07-19T14:09:29.710858+00:00'
+    returned_model: mistralai/ministral-3b-2512
+    cost: 4.41e-05
+  33_kpir_balance_fail:
+    file: 33_kpir_balance_fail.yaml
+    fingerprint: v3_a14d0edf15ff11f648be97752ae8152e7c8932bbb4b4bf99ca11da5d5c064113
+    request_hash: b35cb122905ded4d20c7f95355c7f3f1b5ac440970d593f09fc1ce57cfcea2ff
+    recorded_at: '2026-07-19T14:09:31.309216+00:00'
+    returned_model: mistralai/ministral-3b-2512
+    cost: 4.41e-05
+  34_verify_fixed_asset_threshold_fail:
+    file: 34_verify_fixed_asset_threshold_fail.yaml
+    fingerprint: v3_c4369e911969798194c515ddf1bdc34e46e5516abaeee1cb50fe349cadc3163a
+    request_hash: b35cb122905ded4d20c7f95355c7f3f1b5ac440970d593f09fc1ce57cfcea2ff
+    recorded_at: '2026-07-19T14:09:33.007738+00:00'
+    returned_model: mistralai/ministral-3b-2512
+    cost: 4.41e-05
+  35_verify_monthly_w_jump_inconsistency:
+    file: 35_verify_monthly_w_jump_inconsistency.yaml
+    fingerprint: v3_76605112dcf29f6ac19d0617ea4f952d202dc9a85b89c4d65843a5a00f49ef7a
+    request_hash: 681610e3680ffbbf8798e94f3310ff410110ec9e2898927ff7ff2c5350372e55
+    recorded_at: '2026-07-19T14:09:34.830282+00:00'
+    returned_model: mistralai/ministral-3b-2512
+    cost: 4.605e-05
+  36_verify_negative_income_error:
+    file: 36_verify_negative_income_error.yaml
+    fingerprint: v3_2e8778d811bd590588aeb1e38813e0b27854dfcd355965b6f5bbea2e0ca047d8
+    request_hash: b35cb122905ded4d20c7f95355c7f3f1b5ac440970d593f09fc1ce57cfcea2ff
+    recorded_at: '2026-07-19T14:09:38.031200+00:00'
+    returned_model: mistralai/ministral-3b-2512
+    cost: 4.41e-05
+  37_verify_invalid_tax_form_stop:
+    file: 37_verify_invalid_tax_form_stop.yaml
+    fingerprint: v3_e5ddfd74f367d2fbf1aa2627f1113cd46256bbb3db579788528f78056b396f82
+    request_hash: a2378705043041209a1c1edd10ed390122dcc512c9ac11e33142d640ad3c4da5
+    recorded_at: '2026-07-19T14:09:40.587853+00:00'
+    returned_model: mistralai/ministral-3b-2512
+    cost: 4.65e-05
+  38_verify_missing_kpir_data:
+    file: 38_verify_missing_kpir_data.yaml
+    fingerprint: v3_f28c592f73c73d765277c92858a7f4c54fc7173c38101785e7a3ece386aea080
+    request_hash: fcd6a35a1d63a65a8110111e40347824b830f0190488b0f03670fc933a5d903b
+    recorded_at: '2026-07-19T14:09:42.023575+00:00'
+    returned_model: mistralai/ministral-3b-2512
+    cost: 4.455e-05
+  39_multi_project_weighted_W:
+    file: 39_multi_project_weighted_W.yaml
+    fingerprint: v3_99779b7bb21705c39049d393948e011a6c70e7c1aa3a7e24392fdcd25d2f677a
+    request_hash: b5c1e369a543a03ff9b204e4fdc1607e2d5af91d631df1b8636b1b4525e25c12
+    recorded_at: '2026-07-19T14:09:43.628399+00:00'
+    returned_model: mistralai/ministral-3b-2512
+    cost: 4.215e-05
+  40_mixed_ip_clause:
+    file: 40_mixed_ip_clause.yaml
+    fingerprint: v3_538686d39763c537ac104f01ad0dc84553cfd8f8aa92e646c460fcb5d626bf90
+    request_hash: 553e97232d16464952e3d7c493bdb9fabca2f6a1a19d7871ce6f88d10f584816
+    recorded_at: '2026-07-19T14:09:45.306223+00:00'
+    returned_model: mistralai/ministral-3b-2512
+    cost: 4.215e-05
+  41_ikze_cascade:
+    file: 41_ikze_cascade.yaml
+    fingerprint: v3_29daa6a386cac7428ed66c1a375a683e9bab5848e27407aff525395555785368
+    request_hash: 60a06f0b847a11cc4ead195f8e0cf45e3a413a68180d42e4a4317b6989b11458
+    recorded_at: '2026-07-19T14:09:47.069376+00:00'
+    returned_model: mistralai/ministral-3b-2512
+    cost: 4.215e-05
+  42_stop_08_no_documentation:
+    file: 42_stop_08_no_documentation.yaml
+    fingerprint: v3_4f9c7b1c8f00ae4a853a7a865d795ce08a6f23947435d8272471e277b1c09a5b
+    request_hash: fcd6a35a1d63a65a8110111e40347824b830f0190488b0f03670fc933a5d903b
+    recorded_at: '2026-07-19T14:09:48.911562+00:00'
+    returned_model: mistralai/ministral-3b-2512
+    cost: 4.455e-05
+  43_review_09_single_client_100pct:
+    file: 43_review_09_single_client_100pct.yaml
+    fingerprint: v3_4fd21ce40d310ee9a1e51b26ca5521a4fb99da39397879845297985a439594be
+    request_hash: b35cb122905ded4d20c7f95355c7f3f1b5ac440970d593f09fc1ce57cfcea2ff
+    recorded_at: '2026-07-19T14:09:50.272885+00:00'
+    returned_model: mistralai/ministral-3b-2512
+    cost: 4.41e-05
+  44_mix_revenue_key_kis:
+    file: 44_mix_revenue_key_kis.yaml
+    fingerprint: v3_f3c8f8fcb68de17753b9f33474d3cf8339615d70b2f0bb9d01e74b79c559724f
+    request_hash: 3fc9863c17d8b14eb7d485328f640877fa9e6ef95add6fc23715e6a5b9dce2a6
+    recorded_at: '2026-07-19T14:09:51.945794+00:00'
+    returned_model: mistralai/ministral-3b-2512
+    cost: 4.605e-05
+  45_multi_ip_two_stage:
+    file: 45_multi_ip_two_stage.yaml
+    fingerprint: v3_e3ed9c08a2b9296a48aef97cf858ad28334ebb64fe372e3e6c984e48e2da2192
+    request_hash: 397369758665962e8d90a80bb3d793c4aae422dc52f92b534623e3787cc51075
+    recorded_at: '2026-07-19T14:09:53.646986+00:00'
+    returned_model: mistralai/ministral-3b-2512
+    cost: 4.605e-05
+  46_historical_2019_health_credit:
+    file: 46_historical_2019_health_credit.yaml
+    fingerprint: v3_30e535a183d78c9208abac6ddd0f04cac524edcfc46cb5074f1d1052db9340bc
+    request_hash: 60a06f0b847a11cc4ead195f8e0cf45e3a413a68180d42e4a4317b6989b11458
+    recorded_at: '2026-07-19T14:09:55.223708+00:00'
+    returned_model: mistralai/ministral-3b-2512
+    cost: 4.215e-05
+  47_historical_2021_br_ipbox_stop:
+    file: 47_historical_2021_br_ipbox_stop.yaml
+    fingerprint: v3_f410cc98d6e787142429ae69a979751b3b44cdf2953d2f23059c40d6090ee981
+    request_hash: 5ee408c9569d0114b8a43014bdaa3769a95ec0a43f6f73ac83b136ed2091e663
+    recorded_at: '2026-07-19T14:09:56.665979+00:00'
+    returned_model: mistralai/ministral-3b-2512
+    cost: 4.455e-05
+  48_historical_2024_pit_like_cascade:
+    file: 48_historical_2024_pit_like_cascade.yaml
+    fingerprint: v3_a5f00b2582c0a139ed8e51627e53da2363cf07a7e98bd5730fe3929c6c3d36ba
+    request_hash: 60a06f0b847a11cc4ead195f8e0cf45e3a413a68180d42e4a4317b6989b11458
+    recorded_at: '2026-07-19T14:09:58.185351+00:00'
+    returned_model: mistralai/ministral-3b-2512
+    cost: 4.215e-05
+  49_double_invoice_percentage_stop:
+    file: 49_double_invoice_percentage_stop.yaml
+    fingerprint: v3_d3da0c39387f6f88811ba81627682a2cb52e0c559ee29b01f51873e142d96379
+    request_hash: 4b9bd0e43e45d0af8cf62d6e876fa1214a13dbbeeffe09aa03d5dcf02de8a559
+    recorded_at: '2026-07-19T14:09:59.559386+00:00'
+    returned_model: mistralai/ministral-3b-2512
+    cost: 4.65e-05
+  50_silent_allocation_method_switch_stop:
+    file: 50_silent_allocation_method_switch_stop.yaml
+    fingerprint: v3_601e8bbaaa959aad5a0ca7d714ccce739140651b22b8bc10a4b4e8adfcb1fc82
+    request_hash: 3c3fc2a0fde621593675901f5d7d3018197b78251cf1a63b72e0598034c0a4a6
+    recorded_at: '2026-07-19T14:10:02.854850+00:00'
+    returned_model: mistralai/ministral-3b-2512
+    cost: 4.845e-05
+  51_return_ledger_classification_shift_stop:
+    file: 51_return_ledger_classification_shift_stop.yaml
+    fingerprint: v3_80caae5488738ce407177a55022e51df1a6ad5fa96ec9cb3bb2ddbaa5f1bbee4
+    request_hash: 362a35b00d8c155f8297a098871c97bad8c92697d3a3bd1a88e0545312843480
+    recorded_at: '2026-07-19T14:10:04.507370+00:00'
+    returned_model: mistralai/ministral-3b-2512
+    cost: 4.455e-05
+  52_cost_date_revenue_mix_policy:
+    file: 52_cost_date_revenue_mix_policy.yaml
+    fingerprint: v3_360267abe00b7b0cd1f96fde072bf5663ed8a0d3220c8ae9ef053a96052fb1aa
+    request_hash: 3fc9863c17d8b14eb7d485328f640877fa9e6ef95add6fc23715e6a5b9dce2a6
+    recorded_at: '2026-07-19T14:10:06.352122+00:00'
+    returned_model: mistralai/ministral-3b-2512
+    cost: 4.605e-05
+  53_historical_ikze_limit_exceeded_stop:
+    file: 53_historical_ikze_limit_exceeded_stop.yaml
+    fingerprint: v3_c056848c7d0d9f35376c0b47153246e436f45baa16e87370ad6c5bf62f0a96fc
+    request_hash: af88e426e2271b87936abe35d1c95865fe9c4e89bd4f1e70bcd202694e30373c
+    recorded_at: '2026-07-19T14:10:08.029848+00:00'
+    returned_model: mistralai/ministral-3b-2512
+    cost: 4.455e-05
+  54_pre_ipbox_year_stop:
+    file: 54_pre_ipbox_year_stop.yaml
+    fingerprint: v3_8717e38477ddfc2cac8e3e83b9be6025fd842e7431cec23403e8c0cdd7c32166
+    request_hash: f77911b60898feca2e999d70587ecc91e6a769a627c5ea6fbebf931cfe74a132
+    recorded_at: '2026-07-19T14:10:09.472407+00:00'
+    returned_model: mistralai/ministral-3b-2512
+    cost: 4.455e-05
+  55_disjoint_w_semantics_clean:
+    file: 55_disjoint_w_semantics_clean.yaml
+    fingerprint: v3_b84670550bdff257e31246bec26ae92a287809d53cb7917c60207a30016b4ae2
+    request_hash: 60a06f0b847a11cc4ead195f8e0cf45e3a413a68180d42e4a4317b6989b11458
+    recorded_at: '2026-07-19T14:10:11.158177+00:00'
+    returned_model: mistralai/ministral-3b-2512
+    cost: 4.215e-05
