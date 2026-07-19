@@ -153,19 +153,25 @@ def _reconcile_tax_fields(
         "overpayment",
     )
     relief_adjustment_required = False
-    if claimed_thermo is not None and abs(
-        number(claimed_thermo, "uzgodnienie.termomodernizacja")
-        - float(tax["thermomodernization_used"])
-    ) > 0.01:
+    if (
+        claimed_thermo is not None
+        and abs(
+            number(claimed_thermo, "uzgodnienie.termomodernizacja")
+            - float(tax["thermomodernization_used"])
+        )
+        > 0.01
+    ):
         warnings.append("RETURN_THERMOMODERNIZATION_MISMATCH")
         relief_adjustment_required = True
-    if claimed_total_tax is not None and abs(
-        number(claimed_total_tax, "uzgodnienie.total_tax") - float(tax["total_tax"])
-    ) > 0.01:
+    if (
+        claimed_total_tax is not None
+        and abs(number(claimed_total_tax, "uzgodnienie.total_tax") - float(tax["total_tax"])) > 0.01
+    ):
         warnings.append("RETURN_TOTAL_TAX_MISMATCH")
-    if claimed_overpayment is not None and abs(
-        number(claimed_overpayment, "uzgodnienie.overpayment") - signed_settlement
-    ) > 0.01:
+    if (
+        claimed_overpayment is not None
+        and abs(number(claimed_overpayment, "uzgodnienie.overpayment") - signed_settlement) > 0.01
+    ):
         warnings.append("RETURN_OVERPAYMENT_MISMATCH")
     tax_unchanged_only_if_reliefs_updated = bool(
         relief_adjustment_required
@@ -244,11 +250,7 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
     correction_related = bool(stops & CORRECTION_ONLY_STOPS)
     reconciliation_present = isinstance(input_data.get("uzgodnienie_zeznania"), Mapping)
     base["correction_preview"] = {
-        "status": (
-            "UNAVAILABLE"
-            if tax is None
-            else ("AVAILABLE" if correction_related else "NOT_NEEDED")
-        ),
+        "status": "UNAVAILABLE" if tax is None else ("AVAILABLE" if correction_related else "NOT_NEEDED"),
         "source_kpir_correction_required": facts["source_kpir_requires_correction"],
         "return_correction_required": bool(
             reconciliation_present
@@ -292,9 +294,7 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
         "PASS" if tax["ip_tax"] == tax_round(float(tax["ip_base_rounded"]) * 0.05) else "FAIL"
     )
     expected_total = tax_round(
-        float(tax["non_ip_tax_final"])
-        + float(tax["ip_tax"])
-        - float(tax["health_tax_credit_used"])
+        float(tax["non_ip_tax_final"]) + float(tax["ip_tax"]) - float(tax["health_tax_credit_used"])
     )
     base["tests"]["TEST_6"] = "PASS" if tax["total_tax"] == expected_total else "FAIL"
     base["status"] = "FINAL"
