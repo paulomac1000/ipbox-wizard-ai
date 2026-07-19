@@ -29,7 +29,7 @@
 - Uzgodnienie ewidencji i zeznania osobno dla przychodów i kosztów IP/NIE, także gdy sumy globalne są identyczne.
 - Rocznikowe pule termomodernizacji z kontrolą limitu 53 000 zł, kolejnością wykorzystania i wygaśnięciem po sześciu latach.
 - Rozliczenie korekty odróżniające poprawioną nadpłatę od zwrotu już wypłaconego.
-- Syntetyczne scenariusze LLM/VCR `46`–`57` odtwarzające klasy błędów znalezionych w rozliczeniach rzeczywistych bez kopiowania danych podatnika.
+- Syntetyczne scenariusze LLM/VCR `46`–`55` odtwarzające klasy błędów znalezionych w rozliczeniach rzeczywistych bez kopiowania danych podatnika.
 - Test blokujący oczywiste identyfikatory osobowe w nowych scenariuszach regresyjnych.
 - Dokumentację historycznych źródeł, regresji rzeczywistych oraz brief pełnej odbudowy kaset.
 
