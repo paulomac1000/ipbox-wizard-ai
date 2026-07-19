@@ -1,326 +1,326 @@
 manifest_format_version: 2
 model: google/gemini-3-flash-preview
-generated_at: '2026-07-19T20:59:21.288654+00:00'
+generated_at: '2026-07-19T22:39:13.640572+00:00'
 entries:
   01_basic_linear:
     file: 01_basic_linear.yaml
-    fingerprint: v3_851f5a504b12703c7cb74ae2decbd7fb5851ed306a81072858c299666c09783a
-    request_hash: d227a546fd7a5a114def683cfe6d0848866d3a15e63b7c9b7346a6fc6626ccf4
-    recorded_at: '2026-07-19T20:57:44.801041+00:00'
+    fingerprint: v3_1708503a282e36fdfd3a1eb26dbff04badb67bdcfcb4ae8d5ed9a43a6ed16c37
+    request_hash: e8486bfd018e55acf03b2f61e4ab2030d0e926cbfd1319f97969b95ddb379ef6
+    recorded_at: '2026-07-19T22:37:45.635528+00:00'
     returned_model: google/gemini-3-flash-preview
-    cost: 0.0003325
+    cost: 0.0003655
   02_basic_scale_single_client:
     file: 02_basic_scale_single_client.yaml
-    fingerprint: v3_fe14dfcf019e6366e5b6c4f8b55a4a25c6a6d9ebce6995f513f6f46b7669104a
-    request_hash: 370a89e340ce88b3b3af9cd87c5009e9ba8c3223fa927732ca38dfa82728d6c3
-    recorded_at: '2026-07-19T20:57:46.743599+00:00'
+    fingerprint: v3_e97fa26f7ce1ba76d2e50a8bbbeda97e691682a372e7ed7f8c124c9828a7393a
+    request_hash: 5ea897439a8df64866139d37df8cbbd064a4272825ce7514a5e18e388df33b5f
+    recorded_at: '2026-07-19T22:37:47.420935+00:00'
     returned_model: google/gemini-3-flash-preview
-    cost: 0.000338
+    cost: 0.000341
   03_fx_usd_single_client:
     file: 03_fx_usd_single_client.yaml
-    fingerprint: v3_1e9636255d34e8f6c38caf49a38d3309069ed3a56a7fb2c2d4d4f620703c72b2
-    request_hash: 370a89e340ce88b3b3af9cd87c5009e9ba8c3223fa927732ca38dfa82728d6c3
-    recorded_at: '2026-07-19T20:57:48.651028+00:00'
+    fingerprint: v3_b8b4599bcf1d80192715c46b4802961cda236e11ecadd743bf2b9b0996094614
+    request_hash: 5ea897439a8df64866139d37df8cbbd064a4272825ce7514a5e18e388df33b5f
+    recorded_at: '2026-07-19T22:37:49.205583+00:00'
     returned_model: google/gemini-3-flash-preview
-    cost: 0.000338
+    cost: 0.000341
   11_multi_client_mixed_currencies:
     file: 11_multi_client_mixed_currencies.yaml
-    fingerprint: v3_674136f7e8827a49fdd82be1397cfa7d3fb781c922606dfc6de3e3fbd3bff6e2
-    request_hash: e5abf6614a61e27948e9c5cd03f5131298c5b36b5c540399c9616f58382ef299
-    recorded_at: '2026-07-19T20:57:50.568418+00:00'
+    fingerprint: v3_a7a8ddaae45ca6c25a02dae430ab606c1a829d72256492162d3b023e58a5148f
+    request_hash: 41595c53635455b535bc015f100fc55120afbb898620af0597e57771d82167de
+    recorded_at: '2026-07-19T22:37:51.090566+00:00'
     returned_model: google/gemini-3-flash-preview
-    cost: 0.0003205
+    cost: 0.0003235
   12_zus_in_pit_path:
     file: 12_zus_in_pit_path.yaml
-    fingerprint: v3_59df94dc1e9cdbc60a65ba2b6a4a084abd31f721e5a4bf19d0466ba5fccc8646
-    request_hash: e5abf6614a61e27948e9c5cd03f5131298c5b36b5c540399c9616f58382ef299
-    recorded_at: '2026-07-19T20:57:52.454425+00:00'
+    fingerprint: v3_905acf4974677ff88107f68079b7a642767b008ec375a9d0e439433eeefb7e33
+    request_hash: 41595c53635455b535bc015f100fc55120afbb898620af0597e57771d82167de
+    recorded_at: '2026-07-19T22:37:52.844199+00:00'
     returned_model: google/gemini-3-flash-preview
-    cost: 0.0003205
+    cost: 0.0003655
   13_income_from_employment_impact:
     file: 13_income_from_employment_impact.yaml
-    fingerprint: v3_996cfa5d6368be2e4cab51c3199df670d9c0aa48d25ca970017f2ec13cc3758e
-    request_hash: e5abf6614a61e27948e9c5cd03f5131298c5b36b5c540399c9616f58382ef299
-    recorded_at: '2026-07-19T20:57:54.365228+00:00'
+    fingerprint: v3_5e30366d8e2dfedf3d9e48d8df792b1021c39c97fb0693c2c09b486c849900af
+    request_hash: 41595c53635455b535bc015f100fc55120afbb898620af0597e57771d82167de
+    recorded_at: '2026-07-19T22:37:54.616589+00:00'
     returned_model: google/gemini-3-flash-preview
-    cost: 0.0003625
+    cost: 0.0003235
   14_lump_sum_ineligible_check:
     file: 14_lump_sum_ineligible_check.yaml
-    fingerprint: v3_af02b1eacac7c83f468786dbd6e4559e6f89c5332861a94444e5dfb225e3c6c4
-    request_hash: 2b80f51f78ea3fd5948df1cdb4b14c6ea84d0eb0fca69d2557a8c438eda9cfbb
-    recorded_at: '2026-07-19T20:57:56.180985+00:00'
+    fingerprint: v3_c57478ff73d989861db14f910fecea931670a781ff53a53c2245d7af18543c71
+    request_hash: 8cbfcaf398285f257de6c7daf29b045899da23297a19309921d320dbf68776f8
+    recorded_at: '2026-07-19T22:37:56.262847+00:00'
     returned_model: google/gemini-3-flash-preview
-    cost: 0.000324
+    cost: 0.000327
   15_vacation_sick_mix:
     file: 15_vacation_sick_mix.yaml
-    fingerprint: v3_8300ee750e5b6476eca366f712d2d35d7e3bd21e2e3edd2e8e0d915f086ac0a6
-    request_hash: d227a546fd7a5a114def683cfe6d0848866d3a15e63b7c9b7346a6fc6626ccf4
-    recorded_at: '2026-07-19T20:57:57.994867+00:00'
+    fingerprint: v3_a60efb9ca96d000460be173b1ccb02dacbcd95e0d084ececadb5b7e5401b2fb0
+    request_hash: e8486bfd018e55acf03b2f61e4ab2030d0e926cbfd1319f97969b95ddb379ef6
+    recorded_at: '2026-07-19T22:37:58.072596+00:00'
     returned_model: google/gemini-3-flash-preview
-    cost: 0.0003205
+    cost: 0.0003235
   16_high_w_review:
     file: 16_high_w_review.yaml
-    fingerprint: v3_d21f9ec3d714566af56c728994024c971d049c7885c4206fa8e52b721426ad1c
-    request_hash: 370a89e340ce88b3b3af9cd87c5009e9ba8c3223fa927732ca38dfa82728d6c3
-    recorded_at: '2026-07-19T20:58:00.091195+00:00'
+    fingerprint: v3_18c43f11adda60e72d620a6dbd7e54b6b1692d3bc48337675b1167dbe2cdfcc7
+    request_hash: 5ea897439a8df64866139d37df8cbbd064a4272825ce7514a5e18e388df33b5f
+    recorded_at: '2026-07-19T22:37:59.900050+00:00'
     returned_model: google/gemini-3-flash-preview
-    cost: 0.000386
+    cost: 0.000341
   17_low_w_review:
     file: 17_low_w_review.yaml
-    fingerprint: v3_2bf4a46a45dfc3ef617875bc6c8d64bb8b6be478629e12e868622873a31691e6
-    request_hash: 6895d6bfe8ee437a40610f2248f59ff790a2bc72629ba56e8793e9e4645abe10
-    recorded_at: '2026-07-19T20:58:02.115698+00:00'
+    fingerprint: v3_9c73e04686168f4afed62be7896f74c710ca47dbb11e5bf246358bbb65883f1f
+    request_hash: d4ae872de3204d35b6186f08906ef3ae92f8b6e1b30cc668751caab07d33af19
+    recorded_at: '2026-07-19T22:38:01.728718+00:00'
     returned_model: google/gemini-3-flash-preview
-    cost: 0.000338
+    cost: 0.000341
   18_logic_zero_work_hours:
     file: 18_logic_zero_work_hours.yaml
-    fingerprint: v3_27efbaff8ecf7eaa55339605880148e0cbc038eb886889d55201bc656bd11e07
-    request_hash: 60e714b4c6d2a641ba9bc85e7d3dc1202556531a7ca6f7c67a5ec97aa6e78e15
-    recorded_at: '2026-07-19T20:58:04.449522+00:00'
+    fingerprint: v3_2d45de58367ce750e1b87278b308545d6598265bfe8e89d8cea02688453c5f14
+    request_hash: 20da8908ef354896ce2425806486fffc25a1e5e743bb43314abb6956f58ffc55
+    recorded_at: '2026-07-19T22:38:03.553800+00:00'
     returned_model: google/gemini-3-flash-preview
-    cost: 0.000338
+    cost: 0.000341
   21_monthly_loss_impact:
     file: 21_monthly_loss_impact.yaml
-    fingerprint: v3_5deb7a3cc99d84e863d3180b4c3e7d957631754760ad38feb9e602a2e332ee95
-    request_hash: 370a89e340ce88b3b3af9cd87c5009e9ba8c3223fa927732ca38dfa82728d6c3
-    recorded_at: '2026-07-19T20:58:06.319170+00:00'
+    fingerprint: v3_b1507a343f914a10bb9e8f5e7441d0b4d907d0983f49d8941afe59195cdfcbd0
+    request_hash: 5ea897439a8df64866139d37df8cbbd064a4272825ce7514a5e18e388df33b5f
+    recorded_at: '2026-07-19T22:38:05.349384+00:00'
     returned_model: google/gemini-3-flash-preview
-    cost: 0.000338
+    cost: 0.000341
   22_related_parties_nexus_reduction:
     file: 22_related_parties_nexus_reduction.yaml
-    fingerprint: v3_a0e1817ec5c46dcf8e7770c6b5a7c1c7b5b2699889b48dc283bbbb7edf2cea63
-    request_hash: 370a89e340ce88b3b3af9cd87c5009e9ba8c3223fa927732ca38dfa82728d6c3
-    recorded_at: '2026-07-19T20:58:08.394636+00:00'
+    fingerprint: v3_eb2a251f9f490c3e4c160ea9955091bad33bad60cecbd9222a779526bd2ca385
+    request_hash: 5ea897439a8df64866139d37df8cbbd064a4272825ce7514a5e18e388df33b5f
+    recorded_at: '2026-07-19T22:38:07.342465+00:00'
     returned_model: google/gemini-3-flash-preview
-    cost: 0.000338
+    cost: 0.000341
   23_loss_carry_forward:
     file: 23_loss_carry_forward.yaml
-    fingerprint: v3_5fed6022d64c78e037226a2e1b1665113f4a64398ccb52e0fa2c0d09fdeae73d
-    request_hash: 1398f060ebe3e3284defe4032edfe5b5df7270daebab02ac4f1e592ed261acfb
-    recorded_at: '2026-07-19T20:58:10.381266+00:00'
+    fingerprint: v3_e342145f0c489e75fc90f74857fffb91a7b6cf241ba9c26c1cc02c458a320b9f
+    request_hash: 58a0f106bc157259f94f95d4b3cf34305fca29f6589e689bab6b68cd88025809
+    recorded_at: '2026-07-19T22:38:09.141968+00:00'
     returned_model: google/gemini-3-flash-preview
-    cost: 0.0003335
+    cost: 0.0003215
   24_donations_relief:
     file: 24_donations_relief.yaml
-    fingerprint: v3_eef833269e749a0908cbc8cf9861a0d813458a137176240e03f43258c8228e2b
-    request_hash: 1398f060ebe3e3284defe4032edfe5b5df7270daebab02ac4f1e592ed261acfb
-    recorded_at: '2026-07-19T20:58:12.308588+00:00'
+    fingerprint: v3_8df62be42bbd4f180486916db21bf4a01d09bd8311b2f4caf10a184a021875ba
+    request_hash: 58a0f106bc157259f94f95d4b3cf34305fca29f6589e689bab6b68cd88025809
+    recorded_at: '2026-07-19T22:38:10.987850+00:00'
     returned_model: google/gemini-3-flash-preview
-    cost: 0.0003065
+    cost: 0.0003095
   25_rehab_relief:
     file: 25_rehab_relief.yaml
-    fingerprint: v3_5dcb4c62ef3c9dda806606b6551ce50f92cf3e7af0ef080c0f4eb93216fa9853
-    request_hash: 1398f060ebe3e3284defe4032edfe5b5df7270daebab02ac4f1e592ed261acfb
-    recorded_at: '2026-07-19T20:58:14.239993+00:00'
+    fingerprint: v3_c5245115673e2e215b634da2f6c515a0ae91fc3f067d184966c20237420bc6b3
+    request_hash: 58a0f106bc157259f94f95d4b3cf34305fca29f6589e689bab6b68cd88025809
+    recorded_at: '2026-07-19T22:38:12.836548+00:00'
     returned_model: google/gemini-3-flash-preview
-    cost: 0.0003335
+    cost: 0.0003455
   26_rd_relief_nexus:
     file: 26_rd_relief_nexus.yaml
-    fingerprint: v3_f8ce4d1b77867b13aebb378c4390eb18127ca26e6c260fff32ac865364aff99d
-    request_hash: d227a546fd7a5a114def683cfe6d0848866d3a15e63b7c9b7346a6fc6626ccf4
-    recorded_at: '2026-07-19T20:58:15.996648+00:00'
+    fingerprint: v3_d320cff086d0c309b21d87cf18eabe94e8513d3a275d8384c2ae37c139a13bdf
+    request_hash: e8486bfd018e55acf03b2f61e4ab2030d0e926cbfd1319f97969b95ddb379ef6
+    recorded_at: '2026-07-19T22:38:14.577372+00:00'
     returned_model: google/gemini-3-flash-preview
-    cost: 0.0003205
+    cost: 0.0003235
   27_termomodernizacja_full:
     file: 27_termomodernizacja_full.yaml
-    fingerprint: v3_afa1dc55fe4a83d14b54de9e86e6cadbf5efe9bbd14e9b9615e39761a3e458d6
-    request_hash: d227a546fd7a5a114def683cfe6d0848866d3a15e63b7c9b7346a6fc6626ccf4
-    recorded_at: '2026-07-19T20:58:18.506456+00:00'
+    fingerprint: v3_0e044643a8357b324398367df8c481bf7fa6ad61e04f07523af2a0e19c3ed833
+    request_hash: e8486bfd018e55acf03b2f61e4ab2030d0e926cbfd1319f97969b95ddb379ef6
+    recorded_at: '2026-07-19T22:38:16.558227+00:00'
     returned_model: google/gemini-3-flash-preview
-    cost: 0.0003625
+    cost: 0.0003355
   28_edge_multiple_carry-overs:
     file: 28_edge_multiple_carry-overs.yaml
-    fingerprint: v3_985f7272c5fdd554d5704697b4b573dbfd494bb0df41a1dc6decee6b2256b4f9
-    request_hash: 370a89e340ce88b3b3af9cd87c5009e9ba8c3223fa927732ca38dfa82728d6c3
-    recorded_at: '2026-07-19T20:58:20.351351+00:00'
+    fingerprint: v3_a5bd117f05cee6c8266f6f0407110ab90c37c31bb0e6267c2718d72f95f85bd4
+    request_hash: 5ea897439a8df64866139d37df8cbbd064a4272825ce7514a5e18e388df33b5f
+    recorded_at: '2026-07-19T22:38:18.443361+00:00'
     returned_model: google/gemini-3-flash-preview
-    cost: 0.000338
+    cost: 0.000341
   29_edge_related_parties_nexus_0:
     file: 29_edge_related_parties_nexus_0.yaml
-    fingerprint: v3_de42c20dceb9e382c4c3589cc3abab99a76a8acbc85c09205242da7150c382c7
-    request_hash: 370a89e340ce88b3b3af9cd87c5009e9ba8c3223fa927732ca38dfa82728d6c3
-    recorded_at: '2026-07-19T20:58:22.319739+00:00'
+    fingerprint: v3_b10e59149fc58bb28254c61484feff4314f3dfb5b6467fd01cdc7825eb9e07e6
+    request_hash: 5ea897439a8df64866139d37df8cbbd064a4272825ce7514a5e18e388df33b5f
+    recorded_at: '2026-07-19T22:38:20.415612+00:00'
     returned_model: google/gemini-3-flash-preview
-    cost: 0.000386
+    cost: 0.000341
   30_edge_related_parties_nexus_mixed:
     file: 30_edge_related_parties_nexus_mixed.yaml
-    fingerprint: v3_1f53fc73ed74c210f8049a9a5e74e2be1cb5048c2c3a31fe703707ea2b8f0d34
-    request_hash: 370a89e340ce88b3b3af9cd87c5009e9ba8c3223fa927732ca38dfa82728d6c3
-    recorded_at: '2026-07-19T20:58:24.241968+00:00'
+    fingerprint: v3_82ab498eaccc3abae56c4fc75a3d4cd93b73f8cd1081e1bf4a4542cdc3e0e504
+    request_hash: 5ea897439a8df64866139d37df8cbbd064a4272825ce7514a5e18e388df33b5f
+    recorded_at: '2026-07-19T22:38:22.577639+00:00'
     returned_model: google/gemini-3-flash-preview
-    cost: 0.000338
+    cost: 0.000341
   31_zus_double_dip_fail:
     file: 31_zus_double_dip_fail.yaml
-    fingerprint: v3_90ef067359f7468e5690146d56010083d24a34811ae6b3fba7fbfaffe90f3085
-    request_hash: ad393c84a51343fc44aa9ea6841806a2ac87bd44543e82b492f4b5c0f70af62c
-    recorded_at: '2026-07-19T20:58:26.395065+00:00'
+    fingerprint: v3_d6a041b434571399a07469410d05260cce80791bcf40105011e7570d566f4717
+    request_hash: 1421a2689e5437f9b032788ad07e922a6a4b0c74211a7ec142ad30a370d5adc1
+    recorded_at: '2026-07-19T22:38:24.628806+00:00'
     returned_model: google/gemini-3-flash-preview
-    cost: 0.000384
+    cost: 0.000369
   32_private_costs_ip_fail:
     file: 32_private_costs_ip_fail.yaml
-    fingerprint: v3_09f20854fc1ab4aa50fc1709be099fd88e6e6437dcf8fb36bf9ecc5fb696a7f7
-    request_hash: 83629d4b00780e9d31af23b8c881b13f21fe1889e659ca7ef8f8b27af73cc588
-    recorded_at: '2026-07-19T20:58:28.277052+00:00'
+    fingerprint: v3_0d0f0ee83bff1854eb4c9131251f33786e5d767b92eb56636b3947f730dcf449
+    request_hash: f4bbcec76af741cf3f38ebf51d2cf43f7c389b74105ba3f823352fe473bc7159
+    recorded_at: '2026-07-19T22:38:26.763905+00:00'
     returned_model: google/gemini-3-flash-preview
-    cost: 0.0003765
+    cost: 0.0003795
   33_kpir_balance_fail:
     file: 33_kpir_balance_fail.yaml
-    fingerprint: v3_7825702b4f976b4d2b7fb382358e176135df40d6f26d8f76584a57fbc0affdb6
-    request_hash: 370a89e340ce88b3b3af9cd87c5009e9ba8c3223fa927732ca38dfa82728d6c3
-    recorded_at: '2026-07-19T20:58:30.368450+00:00'
+    fingerprint: v3_4edc3b2ad39084f950d2ddd52c7430cb8b6d5f5cca21e878a41d6f2405f03c01
+    request_hash: 5ea897439a8df64866139d37df8cbbd064a4272825ce7514a5e18e388df33b5f
+    recorded_at: '2026-07-19T22:38:28.584337+00:00'
     returned_model: google/gemini-3-flash-preview
-    cost: 0.000338
+    cost: 0.000341
   34_verify_fixed_asset_threshold_fail:
     file: 34_verify_fixed_asset_threshold_fail.yaml
-    fingerprint: v3_2315e0a6cf34973a58abd3061fb90cf653defc4cde4b0185ab38e48975e87782
-    request_hash: 370a89e340ce88b3b3af9cd87c5009e9ba8c3223fa927732ca38dfa82728d6c3
-    recorded_at: '2026-07-19T20:58:32.218289+00:00'
+    fingerprint: v3_1ecbb803dfdf529285f2a7dff67ae1e7f111ce9c6f825d4d7e3cc1dd5164221c
+    request_hash: 5ea897439a8df64866139d37df8cbbd064a4272825ce7514a5e18e388df33b5f
+    recorded_at: '2026-07-19T22:38:30.518480+00:00'
     returned_model: google/gemini-3-flash-preview
-    cost: 0.000338
+    cost: 0.000341
   35_verify_monthly_w_jump_inconsistency:
     file: 35_verify_monthly_w_jump_inconsistency.yaml
-    fingerprint: v3_bd36797a00f09d7ede745015ef4e78b63e9e64c2d0ddec4cfc44acb071d41b2a
-    request_hash: 61407104959b6ac4dc504a8f08555a0d34478a3ade9b1df3d8e3bbb5e860516a
-    recorded_at: '2026-07-19T20:58:34.177870+00:00'
+    fingerprint: v3_0b72683493e4361ca947a862f951a1b56a62020e93d5c422349a93f2bace9bdb
+    request_hash: 4a0e324e5a6d749db626621999a7ecf8d532fb11be03e96b5d202b2a466d1879
+    recorded_at: '2026-07-19T22:38:32.618705+00:00'
     returned_model: google/gemini-3-flash-preview
-    cost: 0.0003555
+    cost: 0.0003585
   36_verify_negative_income_error:
     file: 36_verify_negative_income_error.yaml
-    fingerprint: v3_1e912fe51b52f69a31c4b9cc56788a3fcf2e8950b779628db346930b9de4c9d8
-    request_hash: 370a89e340ce88b3b3af9cd87c5009e9ba8c3223fa927732ca38dfa82728d6c3
-    recorded_at: '2026-07-19T20:58:36.096495+00:00'
+    fingerprint: v3_ded0580eca3f1576f25d8b3e79fcbd4c823aadda5c833e1594ee7483b05353cd
+    request_hash: 5ea897439a8df64866139d37df8cbbd064a4272825ce7514a5e18e388df33b5f
+    recorded_at: '2026-07-19T22:38:34.576365+00:00'
     returned_model: google/gemini-3-flash-preview
-    cost: 0.000338
+    cost: 0.000341
   37_verify_invalid_tax_form_stop:
     file: 37_verify_invalid_tax_form_stop.yaml
-    fingerprint: v3_d42d87578a248914f3d160c489063d99530e1d5fdbdcf4e2aeffea435d9b4f48
-    request_hash: 2b461d12f44c94ad4c8ce56ceccb2a8d1b96dbd5dca8a2cb58eca9bfeda53295
-    recorded_at: '2026-07-19T20:58:38.405432+00:00'
+    fingerprint: v3_7d289f7b1365b1053e93ebf9587d5420d39c9b8230362368efbaf99d48caeb5a
+    request_hash: ed31eb3763757aea56e93865524b13c98e245e1c25d6fbcb123a39f3d5c40e13
+    recorded_at: '2026-07-19T22:38:36.674554+00:00'
     returned_model: google/gemini-3-flash-preview
-    cost: 0.0003555
+    cost: 0.0003585
   38_verify_missing_kpir_data:
     file: 38_verify_missing_kpir_data.yaml
-    fingerprint: v3_efb0fb8c88fa572eaf2f7fd736d630f87f6e08489a5103653b2499db58bce4ab
-    request_hash: 2151ab1fc71f6726f81cba6f213886654c2baa07a3db124e5499ff8bbe627cb6
-    recorded_at: '2026-07-19T20:58:40.814960+00:00'
+    fingerprint: v3_a41ceacab2b8216ca425b59974bf81cc1df7a113ee4ede87db284817421ab82e
+    request_hash: 564b9d54e850ea6b1dd35ef1130dfe7107542b190f7d0ed3ce5d5651ad66eec3
+    recorded_at: '2026-07-19T22:38:38.682333+00:00'
     returned_model: google/gemini-3-flash-preview
-    cost: 0.000338
+    cost: 0.000398
   39_multi_project_weighted_W:
     file: 39_multi_project_weighted_W.yaml
-    fingerprint: v3_c8068fbc1e12c025e12c4cb2a41ba3a53b472b6ea68f42b0b037060916386871
-    request_hash: cbc5fb8b3776a46ef94dfe3df9c7b3c6737bcb34fe8ef0d6928328db3039528e
-    recorded_at: '2026-07-19T20:58:42.674428+00:00'
+    fingerprint: v3_5e226e842af45b7a1b18fb1b335583a6be28197b10de69a78ec47d541843995f
+    request_hash: e665fb11e9a5523c14c51e014e9c3078927457c2ba5cd298fccfa90e88df79d4
+    recorded_at: '2026-07-19T22:38:40.672502+00:00'
     returned_model: google/gemini-3-flash-preview
-    cost: 0.0003205
+    cost: 0.0003235
   40_mixed_ip_clause:
     file: 40_mixed_ip_clause.yaml
-    fingerprint: v3_ee99d5affb2388683ce7f48147736400ba404fb3264802d7a87b44df586f3cd8
-    request_hash: e5abf6614a61e27948e9c5cd03f5131298c5b36b5c540399c9616f58382ef299
-    recorded_at: '2026-07-19T20:58:46.122647+00:00'
+    fingerprint: v3_e8c3ec3514909ad4549ffde73d729a7dc22fb91bd2dcb2542a967321570b54a8
+    request_hash: 41595c53635455b535bc015f100fc55120afbb898620af0597e57771d82167de
+    recorded_at: '2026-07-19T22:38:42.643734+00:00'
     returned_model: google/gemini-3-flash-preview
-    cost: 0.0003205
+    cost: 0.0003235
   41_ikze_cascade:
     file: 41_ikze_cascade.yaml
-    fingerprint: v3_0075267e375c3a5744001ee10b2b9ae5d5f759cb019253f72816a57befd6721f
-    request_hash: d227a546fd7a5a114def683cfe6d0848866d3a15e63b7c9b7346a6fc6626ccf4
-    recorded_at: '2026-07-19T20:58:47.861216+00:00'
+    fingerprint: v3_736dee9adfc2cf3eb6fe8e7a7942cb1eeda828d2a83c7168925e38c249a69ce9
+    request_hash: e8486bfd018e55acf03b2f61e4ab2030d0e926cbfd1319f97969b95ddb379ef6
+    recorded_at: '2026-07-19T22:38:44.759142+00:00'
     returned_model: google/gemini-3-flash-preview
-    cost: 0.0003205
+    cost: 0.0003655
   42_stop_08_no_documentation:
     file: 42_stop_08_no_documentation.yaml
-    fingerprint: v3_d48f5d4499f44f425a595e87ccdcf10a3ddffadb70737668569445609ecbe8e8
-    request_hash: 2151ab1fc71f6726f81cba6f213886654c2baa07a3db124e5499ff8bbe627cb6
-    recorded_at: '2026-07-19T20:58:49.869704+00:00'
+    fingerprint: v3_6f1880f8a04ca36aafde9e911fba5beeff19969951527822bfe34097bfbcf3e1
+    request_hash: 564b9d54e850ea6b1dd35ef1130dfe7107542b190f7d0ed3ce5d5651ad66eec3
+    recorded_at: '2026-07-19T22:38:46.732897+00:00'
     returned_model: google/gemini-3-flash-preview
-    cost: 0.000338
+    cost: 0.000356
   43_review_09_single_client_100pct:
     file: 43_review_09_single_client_100pct.yaml
-    fingerprint: v3_30c024153f230d2fe75af17022cd88d6c86070af4896048c7b09cd39e255e7a2
-    request_hash: 370a89e340ce88b3b3af9cd87c5009e9ba8c3223fa927732ca38dfa82728d6c3
-    recorded_at: '2026-07-19T20:58:52.029454+00:00'
+    fingerprint: v3_46a539cd8203d1d17d49c4fdf8e606089d87c4ac51dcd33958eb5e703f130e21
+    request_hash: 5ea897439a8df64866139d37df8cbbd064a4272825ce7514a5e18e388df33b5f
+    recorded_at: '2026-07-19T22:38:48.646632+00:00'
     returned_model: google/gemini-3-flash-preview
-    cost: 0.000338
+    cost: 0.000389
   44_mix_revenue_key_kis:
     file: 44_mix_revenue_key_kis.yaml
-    fingerprint: v3_5693455f5c343b0133495ba302ffb3268716d3e29d2d6aa15e316401c2a579d5
-    request_hash: 93cafd7fb187d12931891b75142ab00f4b0c086a1ac673dea738643cfbe8be16
-    recorded_at: '2026-07-19T20:58:54.185475+00:00'
+    fingerprint: v3_0cc991a0a6043a307377cac170455edaa3bc9b9af3468c06906906b7a5ed0708
+    request_hash: 3ef4eaa1a1b51bbea446429feeb75c664d96419ce341c32c62f8b678c33b6b4d
+    recorded_at: '2026-07-19T22:38:50.896084+00:00'
     returned_model: google/gemini-3-flash-preview
-    cost: 0.0003555
+    cost: 0.0003585
   45_multi_ip_two_stage:
     file: 45_multi_ip_two_stage.yaml
-    fingerprint: v3_cb134ca2770f493811f71a2a8e7c71fb86150e7950a7d360a05b7fb5f2c5fe28
-    request_hash: 4c7bbef19cc6e0352aed3593edbd4e2a12036edf368e025ddd9f2d5455383fba
-    recorded_at: '2026-07-19T20:58:56.260260+00:00'
+    fingerprint: v3_0f54c6aaa1f4c06ecf409ed25c73a6336ba768624fc0368f38ea1976078ab5b2
+    request_hash: c443dbdc4956322697fbdde2c8f476ead56d8f0bc0a841a74e2a26e82bbd53a8
+    recorded_at: '2026-07-19T22:38:53.110476+00:00'
     returned_model: google/gemini-3-flash-preview
-    cost: 0.0003555
+    cost: 0.0004125
   46_historical_2019_health_credit:
     file: 46_historical_2019_health_credit.yaml
-    fingerprint: v3_cfb464e8bb2b67bc2a43dd94b1b76df8f7a2de07333306ef6d673722dff299dd
-    request_hash: d227a546fd7a5a114def683cfe6d0848866d3a15e63b7c9b7346a6fc6626ccf4
-    recorded_at: '2026-07-19T20:58:58.426979+00:00'
+    fingerprint: v3_c8b5354751b212f211ca3b621c4bc07905ac95fec7069219e96b82138ef1f03f
+    request_hash: e8486bfd018e55acf03b2f61e4ab2030d0e926cbfd1319f97969b95ddb379ef6
+    recorded_at: '2026-07-19T22:38:54.948971+00:00'
     returned_model: google/gemini-3-flash-preview
-    cost: 0.0003625
+    cost: 0.0003235
   47_historical_2021_br_ipbox_stop:
     file: 47_historical_2021_br_ipbox_stop.yaml
-    fingerprint: v3_2492fce5383b6a5ba52a7c1955b2f798815f99ac325adf07d5084837b66b8c0f
-    request_hash: ef3d132537adadb059737faf362bdafdba27b43b33f4a9f3778243fb7a72af4d
-    recorded_at: '2026-07-19T20:59:01.005645+00:00'
+    fingerprint: v3_3e9000ebab21657ccfbaba227d0d14a5fbb129f9a416d69d335ec27d88842f13
+    request_hash: af9f126bb47c3954cc98db0aefe70e0b9248226f354b76be306e63191244fd4e
+    recorded_at: '2026-07-19T22:38:57.052077+00:00'
     returned_model: google/gemini-3-flash-preview
-    cost: 0.000338
+    cost: 0.000341
   48_historical_2024_pit_like_cascade:
     file: 48_historical_2024_pit_like_cascade.yaml
-    fingerprint: v3_567775261e986c96bd322889ce760b18ebdcd092af95343eb919dc6f88d25761
-    request_hash: d227a546fd7a5a114def683cfe6d0848866d3a15e63b7c9b7346a6fc6626ccf4
-    recorded_at: '2026-07-19T20:59:03.040498+00:00'
+    fingerprint: v3_b800779a664a1cc23fc07d7dc89ea6eecabf7faa41a763ee1d475bfc8f631c2a
+    request_hash: e8486bfd018e55acf03b2f61e4ab2030d0e926cbfd1319f97969b95ddb379ef6
+    recorded_at: '2026-07-19T22:38:58.959291+00:00'
     returned_model: google/gemini-3-flash-preview
-    cost: 0.0003205
+    cost: 0.0003235
   49_double_invoice_percentage_stop:
     file: 49_double_invoice_percentage_stop.yaml
-    fingerprint: v3_4de97f22ebf393483cfed6151b4a2e0fd55f7bd68023a073cda89f1c0735a623
-    request_hash: 898437f8678c0feee26af2ed8650cc41fe88acfd8f10fc7c9b91653f1f10284f
-    recorded_at: '2026-07-19T20:59:04.986548+00:00'
+    fingerprint: v3_80018d300f90129e4253c190ea65cd8ecd5ae8ae5c06913844433609dbc61206
+    request_hash: 7c2351b612f196e35f165081700d4f2ec438ed2273dab6d68b0d3119cbfe3456
+    recorded_at: '2026-07-19T22:39:00.974922+00:00'
     returned_model: google/gemini-3-flash-preview
-    cost: 0.0003555
+    cost: 0.0003585
   50_silent_allocation_method_switch_stop:
     file: 50_silent_allocation_method_switch_stop.yaml
-    fingerprint: v3_704dbfc9c6d714e54c2e3805b7e2cd1b54cdc572e32b53d0abab508a62feb409
-    request_hash: 8613e62c9b688844df5a8475dd68863c1927b7ff032a8e38db7fcfc8c1b0e4f8
-    recorded_at: '2026-07-19T20:59:10.991296+00:00'
+    fingerprint: v3_4287f395b1e62c8e4a66dc4a3f68d319061c14e8e84ffbc29e84498eb9283a52
+    request_hash: 01f99f022fb40052ead822c811a00b4e3e2506d07fe25d1253b6819fc9e42a49
+    recorded_at: '2026-07-19T22:39:02.890940+00:00'
     returned_model: google/gemini-3-flash-preview
-    cost: 0.000373
+    cost: 0.000376
   51_return_ledger_classification_shift_stop:
     file: 51_return_ledger_classification_shift_stop.yaml
-    fingerprint: v3_0b509ee6ecfc1d3f9507894ba40cede9e653ce7072cd1a93423c5f13945c75b2
-    request_hash: fb7da4861f6a9557b124b6c0f268d575a1b627445d21a2277a2411aeb2cb004f
-    recorded_at: '2026-07-19T20:59:12.883145+00:00'
+    fingerprint: v3_e68a9a43eadda5dda225d18e98ef350ccb0bc37ad33e0f0842765a43f16cc847
+    request_hash: 30d85cbf7c8ba6a07d6b3da2bb7706762f4b8425a0d15f805274f7c482717981
+    recorded_at: '2026-07-19T22:39:04.634192+00:00'
     returned_model: google/gemini-3-flash-preview
-    cost: 0.000338
+    cost: 0.000341
   52_cost_date_revenue_mix_policy:
     file: 52_cost_date_revenue_mix_policy.yaml
-    fingerprint: v3_50553e10a6c108a521cd01b2187596bdf3c65f08bddf4f7f87368225c1b1a7ea
-    request_hash: 93cafd7fb187d12931891b75142ab00f4b0c086a1ac673dea738643cfbe8be16
-    recorded_at: '2026-07-19T20:59:15.404658+00:00'
+    fingerprint: v3_ee8609e4adb90d9e78ecf191d592907548320c0fa677d8c0a5c4ab8c07007781
+    request_hash: 3ef4eaa1a1b51bbea446429feeb75c664d96419ce341c32c62f8b678c33b6b4d
+    recorded_at: '2026-07-19T22:39:07.261009+00:00'
     returned_model: google/gemini-3-flash-preview
-    cost: 0.0003555
+    cost: 0.0003585
   53_historical_ikze_limit_exceeded_stop:
     file: 53_historical_ikze_limit_exceeded_stop.yaml
-    fingerprint: v3_52fae0f6e72041174b1d41f09a76cc061ded006b6d854bf10315e27c361c9910
-    request_hash: a3f531f160a55a317ac97eb701d844c324af399bc49a93a11548c6ee867936a4
-    recorded_at: '2026-07-19T20:59:17.522790+00:00'
+    fingerprint: v3_6b0b17ca7b46f54bb591ccfd2d919de296381908a2e5018992ba9f2c48fdf743
+    request_hash: 29155f81a2f107d824fd6813789470f242ec0dd7fee3e6761c9fbadf4b08be4c
+    recorded_at: '2026-07-19T22:39:09.699385+00:00'
     returned_model: google/gemini-3-flash-preview
-    cost: 0.000338
+    cost: 0.000398
   54_pre_ipbox_year_stop:
     file: 54_pre_ipbox_year_stop.yaml
-    fingerprint: v3_fbaa8fa6fa834eae502544ce3870c72035d6dea7d0c82b90dd9eb052e939e9a1
-    request_hash: 2a9293103bfeb1468d908f3e89f20907360c78dee6fcaa866962cd884dcfc373
-    recorded_at: '2026-07-19T20:59:19.377428+00:00'
+    fingerprint: v3_2ab7bb5d231efc65e34379d5df7ee52a4284da4d37e98ac23a65d703e3eda353
+    request_hash: 7d2d33d0de0563c380f234c264283399d8d75b30292a09f25bad70726fe8ef55
+    recorded_at: '2026-07-19T22:39:11.725854+00:00'
     returned_model: google/gemini-3-flash-preview
-    cost: 0.000338
+    cost: 0.000341
   55_disjoint_w_semantics_clean:
     file: 55_disjoint_w_semantics_clean.yaml
-    fingerprint: v3_02b1287507fba084e4f356438c8cc799af6df7461960c5308a9d98fd8ac01329
-    request_hash: 1398f060ebe3e3284defe4032edfe5b5df7270daebab02ac4f1e592ed261acfb
-    recorded_at: '2026-07-19T20:59:21.282514+00:00'
+    fingerprint: v3_44b3d3ea024a9e7c377aed964d5389da70b767d485a9bb3ebf5620b3624ec85d
+    request_hash: 58a0f106bc157259f94f95d4b3cf34305fca29f6589e689bab6b68cd88025809
+    recorded_at: '2026-07-19T22:39:13.634447+00:00'
     returned_model: google/gemini-3-flash-preview
-    cost: 0.0003065
+    cost: 0.0003095

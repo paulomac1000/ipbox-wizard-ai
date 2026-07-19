@@ -4,18 +4,18 @@ meta:
   provider: openrouter
   requested_model: minimax/minimax-m2.5
   returned_model: minimax/minimax-m2.5
-  fingerprint: v3_89895b1d2f53bb4972a4bed1245eae7ef57544d59e55b0f9d5208ca225f61855
-  request_hash: 74cc34e57cf6a08d7571170493af3b9ce86bb117dd20aced7442ccdbe9eed5c5
-  recorded_at: '2026-07-19T21:05:38.197855+00:00'
-  request_id: gen-1784495136-dtSakZorqYODn4R2qVuE
+  fingerprint: v3_29c00f2608df9ff098e615eed294029c94e41dfae11a931f67727b1cf992f2d2
+  request_hash: 64fce4d4e6acaee75f9490ad3fb850a35823398765c187d2690d0a426258d35c
+  recorded_at: '2026-07-19T22:45:50.771935+00:00'
+  request_id: gen-1784501147-qgd1a35u2FTs2GJJFCby
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
-  prompt_tokens: 565
-  completion_tokens: 91
-  total_tokens: 656
-  cost: 0.000116625
-  recording_duration_seconds: 1.635
+  prompt_tokens: 656
+  completion_tokens: 94
+  total_tokens: 750
+  cost: 0.000162075
+  recording_duration_seconds: 3.504
   cassette_format_version: 4
 response: '{"status":"FINAL","stops":[],"reviews":["REVIEW_01","REVIEW_09"]}'
 parsed_response:
@@ -49,11 +49,15 @@ parsed_response:
     alokacja_multi_ip: null
     podatek:
       podstawa_IP: 8931
-      podstawa_NIE: 0
+      podstawa_NIE: 17569
+      podstawa_zwykła: 17569
+      dochód_IP_po_uldze_BR: 26500.0
+      dochód_IP_kwalifikowany: 8931.48
+      dochód_IP_poza_preferencją: 17568.52
       podatek_IP: 447
-      podatek_NIE_finalny: 0
-      podatek_całościowy: 447
-      nadpłata_lub_dopłata: -447.0
+      podatek_NIE_finalny: 3338
+      podatek_całościowy: 3785
+      nadpłata_lub_dopłata: -3785.0
       thermomodernization_used: 0.0
       termomodernization_carry_over: 0.0
       termomodernization_expired: 0.0
@@ -155,8 +159,8 @@ parsed_response:
     return_correction_required: false
     relief_adjustment_required: false
     tax_unchanged_only_if_reliefs_updated: false
-    corrected_total_tax: 447.0
-    corrected_overpayment: -447.0
+    corrected_total_tax: 3785.0
+    corrected_overpayment: -3785.0
     thermomodernization_used: 0.0
     thermomodernization_carry_over: 0.0
   stops_reviews:

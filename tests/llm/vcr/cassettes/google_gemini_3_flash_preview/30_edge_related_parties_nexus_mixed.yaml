@@ -4,18 +4,18 @@ meta:
   provider: openrouter
   requested_model: google/gemini-3-flash-preview
   returned_model: google/gemini-3-flash-preview
-  fingerprint: v3_1f53fc73ed74c210f8049a9a5e74e2be1cb5048c2c3a31fe703707ea2b8f0d34
-  request_hash: 370a89e340ce88b3b3af9cd87c5009e9ba8c3223fa927732ca38dfa82728d6c3
-  recorded_at: '2026-07-19T20:58:24.241968+00:00'
-  request_id: gen-1784494703-NFJ1l4E1A7ij7yi7wdrm
+  fingerprint: v3_82ab498eaccc3abae56c4fc75a3d4cd93b73f8cd1081e1bf4a4542cdc3e0e504
+  request_hash: 5ea897439a8df64866139d37df8cbbd064a4272825ce7514a5e18e388df33b5f
+  recorded_at: '2026-07-19T22:38:22.577639+00:00'
+  request_id: gen-1784500701-y2HQIqLbq3LslnyXmprq
   finish_reason: stop
   native_finish_reason: STOP
   system_fingerprint: null
-  prompt_tokens: 556
+  prompt_tokens: 562
   completion_tokens: 20
-  total_tokens: 576
-  cost: 0.000338
-  recording_duration_seconds: 1.173
+  total_tokens: 582
+  cost: 0.000341
+  recording_duration_seconds: 1.438
   cassette_format_version: 4
 response: '{"status":"FINAL","stops":[],"reviews":["REVIEW_01","REVIEW_09"]}'
 parsed_response:
@@ -49,11 +49,15 @@ parsed_response:
     alokacja_multi_ip: null
     podatek:
       podstawa_IP: 8931
-      podstawa_NIE: 0
+      podstawa_NIE: 17569
+      podstawa_zwykła: 17569
+      dochód_IP_po_uldze_BR: 26500.0
+      dochód_IP_kwalifikowany: 8931.48
+      dochód_IP_poza_preferencją: 17568.52
       podatek_IP: 447
-      podatek_NIE_finalny: 0
-      podatek_całościowy: 447
-      nadpłata_lub_dopłata: -447.0
+      podatek_NIE_finalny: 3338
+      podatek_całościowy: 3785
+      nadpłata_lub_dopłata: -3785.0
       thermomodernization_used: 0.0
       termomodernization_carry_over: 0.0
       termomodernization_expired: 0.0
@@ -155,8 +159,8 @@ parsed_response:
     return_correction_required: false
     relief_adjustment_required: false
     tax_unchanged_only_if_reliefs_updated: false
-    corrected_total_tax: 447.0
-    corrected_overpayment: -447.0
+    corrected_total_tax: 3785.0
+    corrected_overpayment: -3785.0
     thermomodernization_used: 0.0
     thermomodernization_carry_over: 0.0
   stops_reviews:

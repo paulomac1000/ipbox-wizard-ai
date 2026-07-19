@@ -4,10 +4,10 @@ meta:
   provider: openrouter
   requested_model: mistralai/ministral-3b-2512
   returned_model: mistralai/ministral-3b-2512
-  fingerprint: v3_2b411496ad7dc20e5b8eda37d8b72bddc0b1e4220349b0a77f8d5ba965cf3ca2
-  request_hash: ea424ca1adac3bae3c87436ade214a5de268814a5ebd295466b70048c29e6c1b
-  recorded_at: '2026-07-19T21:17:34.024976+00:00'
-  request_id: gen-1784495853-DrHNk5UUyF1H20r9pJWd
+  fingerprint: v3_2fb39609273047df339d1283b3c454ee0aef43fcd6f4db47931a7cef59b9df6c
+  request_hash: 706b9f5475d68674fc3ae38e9f50d33382193cd5665682f83f49ce355e1ac8c6
+  recorded_at: '2026-07-19T23:13:25.068030+00:00'
+  request_id: gen-1784502803-2UsBjKHUvesc4ZUUcUTB
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
@@ -15,7 +15,7 @@ meta:
   completion_tokens: 36
   total_tokens: 297
   cost: 4.455e-05
-  recording_duration_seconds: 0.683
+  recording_duration_seconds: 1.93
   cassette_format_version: 4
 response: "{\n  \"status\": \"STOPPED\",\n  \"stops\": [\"STOP_13\"],\n  \"reviews\": [\"REVIEW_09\"]\n}"
 parsed_response:
@@ -50,6 +50,10 @@ parsed_response:
     podatek:
       podstawa_IP: 0
       podstawa_NIE: 0
+      podstawa_zwykła: 0
+      dochód_IP_po_uldze_BR: 0.0
+      dochód_IP_kwalifikowany: 0.0
+      dochód_IP_poza_preferencją: 0.0
       podatek_IP: 0
       podatek_NIE_finalny: 0
       podatek_całościowy: 0

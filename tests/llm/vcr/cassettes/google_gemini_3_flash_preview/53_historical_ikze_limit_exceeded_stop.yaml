@@ -4,20 +4,36 @@ meta:
   provider: openrouter
   requested_model: google/gemini-3-flash-preview
   returned_model: google/gemini-3-flash-preview
-  fingerprint: v3_52fae0f6e72041174b1d41f09a76cc061ded006b6d854bf10315e27c361c9910
-  request_hash: a3f531f160a55a317ac97eb701d844c324af399bc49a93a11548c6ee867936a4
-  recorded_at: '2026-07-19T20:59:17.522790+00:00'
-  request_id: gen-1784494756-w71kyC1WAC7YF1Owq3rd
+  fingerprint: v3_6b0b17ca7b46f54bb591ccfd2d919de296381908a2e5018992ba9f2c48fdf743
+  request_hash: 29155f81a2f107d824fd6813789470f242ec0dd7fee3e6761c9fbadf4b08be4c
+  recorded_at: '2026-07-19T22:39:09.699385+00:00'
+  request_id: gen-1784500748-Dx2iOqrj1YkuMLm2aBAu
   finish_reason: stop
   native_finish_reason: STOP
   system_fingerprint: null
-  prompt_tokens: 556
-  completion_tokens: 20
-  total_tokens: 576
-  cost: 0.000338
-  recording_duration_seconds: 1.357
+  prompt_tokens: 562
+  completion_tokens: 39
+  total_tokens: 601
+  cost: 0.000398
+  recording_duration_seconds: 1.678
   cassette_format_version: 4
-response: '{"status":"STOPPED","stops":["STOP_14"],"reviews":["REVIEW_09"]}'
+response: '{
+
+  "status": "STOPPED",
+
+  "stops": [
+
+  "STOP_14"
+
+  ],
+
+  "reviews": [
+
+  "REVIEW_09"
+
+  ]
+
+  }'
 parsed_response:
   status: STOPPED
   result:
@@ -50,6 +66,10 @@ parsed_response:
     podatek:
       podstawa_IP: 0
       podstawa_NIE: 0
+      podstawa_zwykła: 0
+      dochód_IP_po_uldze_BR: 0.0
+      dochód_IP_kwalifikowany: 0.0
+      dochód_IP_poza_preferencją: 0.0
       podatek_IP: 0
       podatek_NIE_finalny: 0
       podatek_całościowy: 0

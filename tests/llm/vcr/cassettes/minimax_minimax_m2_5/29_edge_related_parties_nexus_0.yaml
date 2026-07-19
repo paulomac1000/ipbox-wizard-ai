@@ -4,18 +4,18 @@ meta:
   provider: openrouter
   requested_model: minimax/minimax-m2.5
   returned_model: minimax/minimax-m2.5
-  fingerprint: v3_1cf81e662e6deb4075106f5d4007630bc3f3d3d914dbdfca3daf5e7059ff8baa
-  request_hash: 74cc34e57cf6a08d7571170493af3b9ce86bb117dd20aced7442ccdbe9eed5c5
-  recorded_at: '2026-07-19T21:05:35.752803+00:00'
-  request_id: gen-1784495133-DUArUiqoATjSbgsp9jSB
+  fingerprint: v3_a3b3a33351031db3d49a1c28285b7712229b2196dfb338a268b6d0ea178182ca
+  request_hash: 64fce4d4e6acaee75f9490ad3fb850a35823398765c187d2690d0a426258d35c
+  recorded_at: '2026-07-19T22:45:46.562405+00:00'
+  request_id: gen-1784501142-9TE1dzGkN7jfClDJjwDk
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
-  prompt_tokens: 565
-  completion_tokens: 96
-  total_tokens: 661
-  cost: 0.000121125
-  recording_duration_seconds: 2.039
+  prompt_tokens: 656
+  completion_tokens: 94
+  total_tokens: 750
+  cost: 0.000162075
+  recording_duration_seconds: 3.699
   cassette_format_version: 4
 response: '{"status":"FINAL","stops":[],"reviews":["REVIEW_01","REVIEW_09"]}'
 parsed_response:
@@ -49,11 +49,15 @@ parsed_response:
     alokacja_multi_ip: null
     podatek:
       podstawa_IP: 0
-      podstawa_NIE: 0
+      podstawa_NIE: 5000
+      podstawa_zwykła: 5000
+      dochód_IP_po_uldze_BR: 5000.0
+      dochód_IP_kwalifikowany: 0.0
+      dochód_IP_poza_preferencją: 5000.0
       podatek_IP: 0
-      podatek_NIE_finalny: 0
-      podatek_całościowy: 0
-      nadpłata_lub_dopłata: -0.0
+      podatek_NIE_finalny: 950
+      podatek_całościowy: 950
+      nadpłata_lub_dopłata: -950.0
       thermomodernization_used: 0.0
       termomodernization_carry_over: 0.0
       termomodernization_expired: 0.0
@@ -105,8 +109,8 @@ parsed_response:
     return_correction_required: false
     relief_adjustment_required: false
     tax_unchanged_only_if_reliefs_updated: false
-    corrected_total_tax: 0.0
-    corrected_overpayment: -0.0
+    corrected_total_tax: 950.0
+    corrected_overpayment: -950.0
     thermomodernization_used: 0.0
     thermomodernization_carry_over: 0.0
   stops_reviews:

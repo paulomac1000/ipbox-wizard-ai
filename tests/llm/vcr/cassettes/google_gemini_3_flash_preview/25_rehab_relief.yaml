@@ -4,28 +4,20 @@ meta:
   provider: openrouter
   requested_model: google/gemini-3-flash-preview
   returned_model: google/gemini-3-flash-preview
-  fingerprint: v3_5dcb4c62ef3c9dda806606b6551ce50f92cf3e7af0ef080c0f4eb93216fa9853
-  request_hash: 1398f060ebe3e3284defe4032edfe5b5df7270daebab02ac4f1e592ed261acfb
-  recorded_at: '2026-07-19T20:58:14.239993+00:00'
-  request_id: gen-1784494693-8kdqe3utyVPNzXlErZUb
+  fingerprint: v3_c5245115673e2e215b634da2f6c515a0ae91fc3f067d184966c20237420bc6b3
+  request_hash: 58a0f106bc157259f94f95d4b3cf34305fca29f6589e689bab6b68cd88025809
+  recorded_at: '2026-07-19T22:38:12.836548+00:00'
+  request_id: gen-1784500691-8A6KHJSOlnT5SuXaSbSj
   finish_reason: stop
   native_finish_reason: STOP
   system_fingerprint: null
-  prompt_tokens: 547
-  completion_tokens: 20
-  total_tokens: 567
-  cost: 0.0003335
-  recording_duration_seconds: 1.181
+  prompt_tokens: 553
+  completion_tokens: 23
+  total_tokens: 576
+  cost: 0.0003455
+  recording_duration_seconds: 1.144
   cassette_format_version: 4
-response: '{
-
-  "status": "FINAL",
-
-  "stops": [],
-
-  "reviews": []
-
-  }'
+response: "{\n  \"status\": \"FINAL\",\n  \"stops\": [],\n  \"reviews\": []\n}"
 parsed_response:
   status: FINAL
   result:
@@ -58,6 +50,10 @@ parsed_response:
     podatek:
       podstawa_IP: 17911
       podstawa_NIE: 41000
+      podstawa_zwykła: 41000
+      dochód_IP_po_uldze_BR: 17911.0
+      dochód_IP_kwalifikowany: 17911.0
+      dochód_IP_poza_preferencją: 0.0
       podatek_IP: 896
       podatek_NIE_finalny: 1320
       podatek_całościowy: 2216

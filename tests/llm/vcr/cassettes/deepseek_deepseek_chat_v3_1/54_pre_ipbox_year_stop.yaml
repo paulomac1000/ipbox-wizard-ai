@@ -4,20 +4,20 @@ meta:
   provider: openrouter
   requested_model: deepseek/deepseek-chat-v3.1
   returned_model: deepseek/deepseek-chat-v3.1
-  fingerprint: v3_94128d0b13cec949005ee9938e66a5562b1298e931fa9c0b0c076e35b3862aaf
-  request_hash: d3565de2829de11905b1e1c4a2f10335390fdd7a2e28dad6e79fa3ccb019f44a
-  recorded_at: '2026-07-19T21:04:24.425117+00:00'
-  request_id: gen-1784495061-7szNuJATBYLCrKu2bi7N
+  fingerprint: v3_7a978c44e0df7244e1b093f94f2417e68af332a3bc045d8c3af7f699929a9db4
+  request_hash: 93639245268099b1222bcd353d3644be80dca5f4bfd4d3de1b34c80f2ca7ff84
+  recorded_at: '2026-07-19T22:44:04.082808+00:00'
+  request_id: gen-1784501041-fd5NYej7k2EE2NR5BYiJ
   finish_reason: stop
   native_finish_reason: stop
-  system_fingerprint: null
-  prompt_tokens: 247
-  completion_tokens: 35
-  total_tokens: 282
-  cost: 6.944e-05
-  recording_duration_seconds: 3.341
+  system_fingerprint: fastcoe
+  prompt_tokens: 672
+  completion_tokens: 30
+  total_tokens: 702
+  cost: 0.0004542
+  recording_duration_seconds: 2.732
   cassette_format_version: 4
-response: "{\n  \"status\": \"STOPPED\",\n  \"stops\": [\"STOP_16\"],\n  \"reviews\": [\"REVIEW_09\"]\n}"
+response: '{"status": "STOPPED", "stops": ["STOP_16"], "reviews": ["REVIEW_09"]}'
 parsed_response:
   status: STOPPED
   result:
@@ -50,6 +50,10 @@ parsed_response:
     podatek:
       podstawa_IP: 0
       podstawa_NIE: 0
+      podstawa_zwykła: 0
+      dochód_IP_po_uldze_BR: 0.0
+      dochód_IP_kwalifikowany: 0.0
+      dochód_IP_poza_preferencją: 0.0
       podatek_IP: 0
       podatek_NIE_finalny: 0
       podatek_całościowy: 0

@@ -4,18 +4,18 @@ meta:
   provider: openrouter
   requested_model: minimax/minimax-m2.5
   returned_model: minimax/minimax-m2.5
-  fingerprint: v3_5699c62e3fc48b8825a412e5c95f0e547de5f587205343880017f76434f16ec7
-  request_hash: daf1010d6b9f8dcafee5dd7f31538f31caf29c41529a6bd45e64cc1b3fc10a39
-  recorded_at: '2026-07-19T21:05:54.552916+00:00'
-  request_id: gen-1784495151-O2ev68yJPq92WSQ7YnUy
+  fingerprint: v3_6e536629cf5bf585aec6c76025cd6881dc8c2dca0e9b07269483f769d40ca0d6
+  request_hash: 9862cc8315d99e83fcec641a91f380746fec44e61cf8572cbbc286da12573d5c
+  recorded_at: '2026-07-19T22:46:11.200054+00:00'
+  request_id: gen-1784501166-Fg9Drnwpg3vRwP3hBrfL
   finish_reason: stop
   native_finish_reason: stop
-  system_fingerprint: null
-  prompt_tokens: 568
-  completion_tokens: 248
-  total_tokens: 816
-  cost: 0.00034839
-  recording_duration_seconds: 3.524
+  system_fingerprint: vllm-0.21.0-tp4-bf80359e
+  prompt_tokens: 577
+  completion_tokens: 105
+  total_tokens: 682
+  cost: 0.00018105
+  recording_duration_seconds: 4.257
   cassette_format_version: 4
 response: '{"status":"FINAL","stops":[],"reviews":["REVIEW_02","REVIEW_08","REVIEW_09"]}'
 parsed_response:
@@ -49,11 +49,15 @@ parsed_response:
     alokacja_multi_ip: null
     podatek:
       podstawa_IP: 0
-      podstawa_NIE: 16000
+      podstawa_NIE: 40000
+      podstawa_zwykła: 40000
+      dochód_IP_po_uldze_BR: 24000.0
+      dochód_IP_kwalifikowany: 0.0
+      dochód_IP_poza_preferencją: 24000.0
       podatek_IP: 0
-      podatek_NIE_finalny: 3040
-      podatek_całościowy: 3040
-      nadpłata_lub_dopłata: -3040.0
+      podatek_NIE_finalny: 7600
+      podatek_całościowy: 7600
+      nadpłata_lub_dopłata: -7600.0
       thermomodernization_used: 0.0
       termomodernization_carry_over: 0.0
       termomodernization_expired: 0.0
@@ -91,8 +95,8 @@ parsed_response:
     return_correction_required: false
     relief_adjustment_required: false
     tax_unchanged_only_if_reliefs_updated: false
-    corrected_total_tax: 3040.0
-    corrected_overpayment: -3040.0
+    corrected_total_tax: 7600.0
+    corrected_overpayment: -7600.0
     thermomodernization_used: 0.0
     thermomodernization_carry_over: 0.0
   stops_reviews:

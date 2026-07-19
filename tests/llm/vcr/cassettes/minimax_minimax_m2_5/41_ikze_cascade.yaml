@@ -4,18 +4,18 @@ meta:
   provider: openrouter
   requested_model: minimax/minimax-m2.5
   returned_model: minimax/minimax-m2.5
-  fingerprint: v3_623f74f359397777a1e7317218ca928a9f2f8c15aeab51529b769cf1f61f77c1
-  request_hash: 55b346e7371b25259dd7df94967eb096afd0a4f9695c740563bdb270d78830ea
-  recorded_at: '2026-07-19T21:06:10.982057+00:00'
-  request_id: gen-1784495169-6RVhrX8xJFSAUxE26ZCD
+  fingerprint: v3_ac4fbe873cb5bef6ce128a3a956a5105c75fcac70e7860a0b5b24852c688b92a
+  request_hash: 9c69c8cc393ce2d69f3adf463f4b886805285498f8115ecf8b15ed65d8db07fa
+  recorded_at: '2026-07-19T22:46:36.167971+00:00'
+  request_id: gen-1784501193-x1i248nAYjlTnfGmIuVW
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
-  prompt_tokens: 558
-  completion_tokens: 86
-  total_tokens: 644
-  cost: 0.00015099
-  recording_duration_seconds: 1.673
+  prompt_tokens: 651
+  completion_tokens: 83
+  total_tokens: 734
+  cost: 0.0001485
+  recording_duration_seconds: 2.71
   cassette_format_version: 4
 response: '{"status":"FINAL","stops":[],"reviews":["REVIEW_09"]}'
 parsed_response:
@@ -50,6 +50,10 @@ parsed_response:
     podatek:
       podstawa_IP: 20200
       podstawa_NIE: 1700
+      podstawa_zwykła: 1700
+      dochód_IP_po_uldze_BR: 20200.0
+      dochód_IP_kwalifikowany: 20200.0
+      dochód_IP_poza_preferencją: 0.0
       podatek_IP: 1010
       podatek_NIE_finalny: 323
       podatek_całościowy: 1333

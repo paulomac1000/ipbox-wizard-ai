@@ -4,18 +4,18 @@ meta:
   provider: openrouter
   requested_model: minimax/minimax-m2.5
   returned_model: minimax/minimax-m2.5
-  fingerprint: v3_55bcd9db16ebc88fe19e8ddf99858f6bfba6ec5d5f0e67c9a7489670b8fad271
-  request_hash: c713a6a6321f8f63b1417adae09e42685a2553a5e1fce7d4a69be74398e3fe02
-  recorded_at: '2026-07-19T21:06:38.039768+00:00'
-  request_id: gen-1784495194-RzIMqsOFsDQmII8Qr8b9
+  fingerprint: v3_92e29d3605ea47de65b708faaccf76fc7d61683d351f539f8de38ecab8ecdebe
+  request_hash: 0dab63faae90f7e985c0a1259dc3155a356d9ae5447f5a15527bf3777725251c
+  recorded_at: '2026-07-19T22:47:02.787429+00:00'
+  request_id: gen-1784501221-MD0Cx1ZWdwFVEoAlOZX7
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
-  prompt_tokens: 651
-  completion_tokens: 94
-  total_tokens: 745
-  cost: 0.000184045
-  recording_duration_seconds: 3.271
+  prompt_tokens: 575
+  completion_tokens: 105
+  total_tokens: 680
+  cost: 0.0002985
+  recording_duration_seconds: 1.887
   cassette_format_version: 4
 response: '{"status":"STOPPED","stops":["STOP_09","STOP_10"],"reviews":["REVIEW_09"]}'
 parsed_response:
@@ -50,6 +50,10 @@ parsed_response:
     podatek:
       podstawa_IP: 0
       podstawa_NIE: 0
+      podstawa_zwykła: 0
+      dochód_IP_po_uldze_BR: 0.0
+      dochód_IP_kwalifikowany: 0.0
+      dochód_IP_poza_preferencją: 0.0
       podatek_IP: 0
       podatek_NIE_finalny: 0
       podatek_całościowy: 0

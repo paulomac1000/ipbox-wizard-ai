@@ -4,20 +4,20 @@ meta:
   provider: openrouter
   requested_model: deepseek/deepseek-chat-v3.1
   returned_model: deepseek/deepseek-chat-v3.1
-  fingerprint: v3_2339b62678ee90e36b53d2d0d9aaab3eeb4e22e5d1ae1bc8dc7ee8bf26f469bd
-  request_hash: 8addc7e9a7d2b24b6e0cbd93312996797a2533d766f690a0fd40fb054bf3ee5a
-  recorded_at: '2026-07-19T21:02:38.409807+00:00'
-  request_id: gen-1784494954-rsmiX1Mat64wGVrSjR85
+  fingerprint: v3_6040be908942ab7a7e376dfeba6649da29b6a2bab50c11d7505a527f45c1f38f
+  request_hash: 0b1daaa7eb7ca41745f92d83fe47938a5b69ca1d39d8f9c85b2c347568c86597
+  recorded_at: '2026-07-19T22:42:19.947883+00:00'
+  request_id: gen-1784500937-t8q9tuWek6Dsy9XZPyzx
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
-  prompt_tokens: 245
-  completion_tokens: 30
-  total_tokens: 275
-  cost: 6.047e-05
-  recording_duration_seconds: 4.216
+  prompt_tokens: 613
+  completion_tokens: 27
+  total_tokens: 640
+  cost: 0.00012339
+  recording_duration_seconds: 2.388
   cassette_format_version: 4
-response: '{"status": "FINAL", "stops": [], "reviews": ["REVIEW_01", "REVIEW_09"]}'
+response: '{"status":"FINAL","stops":[],"reviews":["REVIEW_01","REVIEW_09"]}'
 parsed_response:
   status: FINAL
   result:
@@ -50,6 +50,10 @@ parsed_response:
     podatek:
       podstawa_IP: 29800
       podstawa_NIE: 0
+      podstawa_zwykła: 0
+      dochód_IP_po_uldze_BR: 29800.0
+      dochód_IP_kwalifikowany: 29800.0
+      dochód_IP_poza_preferencją: 0.0
       podatek_IP: 1490
       podatek_NIE_finalny: 0
       podatek_całościowy: 1490

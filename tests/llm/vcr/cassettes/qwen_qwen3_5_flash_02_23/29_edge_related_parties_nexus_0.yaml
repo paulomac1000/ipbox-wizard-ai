@@ -4,10 +4,10 @@ meta:
   provider: openrouter
   requested_model: qwen/qwen3.5-flash-02-23
   returned_model: qwen/qwen3.5-flash-02-23
-  fingerprint: v3_5393b9f17e25efc9d8fdf6dcb53ea2a08d9da658b4cb657ed300c73961d9775f
-  request_hash: f0d374de64688937b80560e8255dd6bc77112f9fea67e3729480cc0e7331d033
-  recorded_at: '2026-07-19T21:13:47.197185+00:00'
-  request_id: gen-1784495623-cSGMDtjHvyKvFMbuJLf9
+  fingerprint: v3_a610353352f83ac42fbdf9cedf16dc8cd06620143fcc0c17eb9addc3df29407e
+  request_hash: b98f92f096b9f8461dfcc57d8e3378d547ee66dc5c4a1e491135a82fe03a7fb4
+  recorded_at: '2026-07-19T23:05:32.004681+00:00'
+  request_id: gen-1784502328-CojBehG9sknRrTbNvV3l
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
@@ -15,7 +15,7 @@ meta:
   completion_tokens: 714
   total_tokens: 966
   cost: 0.00020202
-  recording_duration_seconds: 3.566
+  recording_duration_seconds: 3.586
   cassette_format_version: 4
 response: '{"status":"FINAL","stops":[],"reviews":["REVIEW_01","REVIEW_09"]}'
 parsed_response:
@@ -49,11 +49,15 @@ parsed_response:
     alokacja_multi_ip: null
     podatek:
       podstawa_IP: 0
-      podstawa_NIE: 0
+      podstawa_NIE: 5000
+      podstawa_zwykła: 5000
+      dochód_IP_po_uldze_BR: 5000.0
+      dochód_IP_kwalifikowany: 0.0
+      dochód_IP_poza_preferencją: 5000.0
       podatek_IP: 0
-      podatek_NIE_finalny: 0
-      podatek_całościowy: 0
-      nadpłata_lub_dopłata: -0.0
+      podatek_NIE_finalny: 950
+      podatek_całościowy: 950
+      nadpłata_lub_dopłata: -950.0
       thermomodernization_used: 0.0
       termomodernization_carry_over: 0.0
       termomodernization_expired: 0.0
@@ -105,8 +109,8 @@ parsed_response:
     return_correction_required: false
     relief_adjustment_required: false
     tax_unchanged_only_if_reliefs_updated: false
-    corrected_total_tax: 0.0
-    corrected_overpayment: -0.0
+    corrected_total_tax: 950.0
+    corrected_overpayment: -950.0
     thermomodernization_used: 0.0
     thermomodernization_carry_over: 0.0
   stops_reviews:

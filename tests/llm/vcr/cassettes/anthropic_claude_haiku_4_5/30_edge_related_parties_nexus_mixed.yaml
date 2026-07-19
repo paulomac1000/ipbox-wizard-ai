@@ -4,18 +4,18 @@ meta:
   provider: openrouter
   requested_model: anthropic/claude-haiku-4.5
   returned_model: anthropic/claude-haiku-4.5
-  fingerprint: v3_ee7ff496e8c246cc87f4eec6f9bce38866d3c1c3726de0509dc1e9e49a68e16a
-  request_hash: 33fb19195094137d3686944c29c5c69d6a949db4d5eca706aee2fdede7fdfb59
-  recorded_at: '2026-07-19T21:00:14.337537+00:00'
-  request_id: gen-1784494812-mk2kfbwF0EMRMFxCkZrP
+  fingerprint: v3_238d825b95f459792813537d35fa434afb47852d79e7c00fe985f2cb5cf622a3
+  request_hash: d10cb800c7e4f8adb468e66e6ff2df158ce98f8bd37113f2347251b46c864683
+  recorded_at: '2026-07-19T22:40:02.651871+00:00'
+  request_id: gen-1784500800-IhNLnkAwF3hQnxEKjtC2
   finish_reason: stop
   native_finish_reason: end_turn
   system_fingerprint: null
-  prompt_tokens: 720
+  prompt_tokens: 728
   completion_tokens: 27
-  total_tokens: 747
-  cost: 0.000855
-  recording_duration_seconds: 1.856
+  total_tokens: 755
+  cost: 0.000863
+  recording_duration_seconds: 2.063
   cassette_format_version: 4
 response: '{"status":"FINAL","stops":[],"reviews":["REVIEW_01","REVIEW_09"]}'
 parsed_response:
@@ -49,11 +49,15 @@ parsed_response:
     alokacja_multi_ip: null
     podatek:
       podstawa_IP: 8931
-      podstawa_NIE: 0
+      podstawa_NIE: 17569
+      podstawa_zwykła: 17569
+      dochód_IP_po_uldze_BR: 26500.0
+      dochód_IP_kwalifikowany: 8931.48
+      dochód_IP_poza_preferencją: 17568.52
       podatek_IP: 447
-      podatek_NIE_finalny: 0
-      podatek_całościowy: 447
-      nadpłata_lub_dopłata: -447.0
+      podatek_NIE_finalny: 3338
+      podatek_całościowy: 3785
+      nadpłata_lub_dopłata: -3785.0
       thermomodernization_used: 0.0
       termomodernization_carry_over: 0.0
       termomodernization_expired: 0.0
@@ -155,8 +159,8 @@ parsed_response:
     return_correction_required: false
     relief_adjustment_required: false
     tax_unchanged_only_if_reliefs_updated: false
-    corrected_total_tax: 447.0
-    corrected_overpayment: -447.0
+    corrected_total_tax: 3785.0
+    corrected_overpayment: -3785.0
     thermomodernization_used: 0.0
     thermomodernization_carry_over: 0.0
   stops_reviews:

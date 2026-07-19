@@ -4,10 +4,10 @@ meta:
   provider: openrouter
   requested_model: mistralai/ministral-3b-2512
   returned_model: mistralai/ministral-3b-2512
-  fingerprint: v3_371f54530f900089cb830ce55242259997dc896f2733af53630b600095ef9ff7
-  request_hash: 5d5e17d355ca59d64ac985ec807294d39986d914937454aedf97d85baff51459
-  recorded_at: '2026-07-19T21:16:50.985082+00:00'
-  request_id: gen-1784495810-IWlnWpeS6JscpgzMUa4S
+  fingerprint: v3_0e90a15521e152a17fb179253dbfbd0eaf1a369caf5b3aabcb7c0f14ddf4ca5c
+  request_hash: c131ac66796a5acee84b33203f94bfe09477e6ad7a6636772cc22a99dc909fae
+  recorded_at: '2026-07-19T23:12:19.704039+00:00'
+  request_id: gen-1784502735-xrfMg4VX5Qakh5qd9JCt
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
@@ -15,7 +15,7 @@ meta:
   completion_tokens: 28
   total_tokens: 281
   cost: 4.215e-05
-  recording_duration_seconds: 0.419
+  recording_duration_seconds: 4.495
   cassette_format_version: 4
 response: "{\n  \"status\": \"FINAL\",\n  \"stops\": [],\n  \"reviews\": [\"REVIEW_09\"]\n}"
 parsed_response:
@@ -49,11 +49,15 @@ parsed_response:
     alokacja_multi_ip: null
     podatek:
       podstawa_IP: 0
-      podstawa_NIE: 970
+      podstawa_NIE: 9700
+      podstawa_zwykła: 9700
+      dochód_IP_po_uldze_BR: 8730.0
+      dochód_IP_kwalifikowany: 0.0
+      dochód_IP_poza_preferencją: 8730.0
       podatek_IP: 0
-      podatek_NIE_finalny: 184
-      podatek_całościowy: 184
-      nadpłata_lub_dopłata: -184.0
+      podatek_NIE_finalny: 1843
+      podatek_całościowy: 1843
+      nadpłata_lub_dopłata: -1843.0
       thermomodernization_used: 0.0
       termomodernization_carry_over: 0.0
       termomodernization_expired: 0.0
@@ -105,8 +109,8 @@ parsed_response:
     return_correction_required: false
     relief_adjustment_required: false
     tax_unchanged_only_if_reliefs_updated: false
-    corrected_total_tax: 184.0
-    corrected_overpayment: -184.0
+    corrected_total_tax: 1843.0
+    corrected_overpayment: -1843.0
     thermomodernization_used: 0.0
     thermomodernization_carry_over: 0.0
   stops_reviews:

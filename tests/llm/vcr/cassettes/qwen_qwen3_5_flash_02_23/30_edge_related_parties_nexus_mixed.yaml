@@ -4,18 +4,18 @@ meta:
   provider: openrouter
   requested_model: qwen/qwen3.5-flash-02-23
   returned_model: qwen/qwen3.5-flash-02-23
-  fingerprint: v3_2c49fdbe49cc1920150d9faa92e7e0978faf51d2a61688e2d68c9b6635e338cc
-  request_hash: f0d374de64688937b80560e8255dd6bc77112f9fea67e3729480cc0e7331d033
-  recorded_at: '2026-07-19T21:13:53.479918+00:00'
-  request_id: gen-1784495628-mIq8zf7uTiEyQEXGdmhU
+  fingerprint: v3_180f99c92e24357e98ce996063e71379d2b5dbd65c538a48cdef060692f0d786
+  request_hash: b98f92f096b9f8461dfcc57d8e3378d547ee66dc5c4a1e491135a82fe03a7fb4
+  recorded_at: '2026-07-19T23:05:39.704710+00:00'
+  request_id: gen-1784502332-2atyZSqcborfYdqvOKG2
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
   prompt_tokens: 252
-  completion_tokens: 878
-  total_tokens: 1130
-  cost: 0.00024466
-  recording_duration_seconds: 5.525
+  completion_tokens: 934
+  total_tokens: 1186
+  cost: 0.00025922
+  recording_duration_seconds: 6.979
   cassette_format_version: 4
 response: '{"status":"FINAL","stops":[],"reviews":["REVIEW_01","REVIEW_09"]}'
 parsed_response:
@@ -49,11 +49,15 @@ parsed_response:
     alokacja_multi_ip: null
     podatek:
       podstawa_IP: 8931
-      podstawa_NIE: 0
+      podstawa_NIE: 17569
+      podstawa_zwykła: 17569
+      dochód_IP_po_uldze_BR: 26500.0
+      dochód_IP_kwalifikowany: 8931.48
+      dochód_IP_poza_preferencją: 17568.52
       podatek_IP: 447
-      podatek_NIE_finalny: 0
-      podatek_całościowy: 447
-      nadpłata_lub_dopłata: -447.0
+      podatek_NIE_finalny: 3338
+      podatek_całościowy: 3785
+      nadpłata_lub_dopłata: -3785.0
       thermomodernization_used: 0.0
       termomodernization_carry_over: 0.0
       termomodernization_expired: 0.0
@@ -155,8 +159,8 @@ parsed_response:
     return_correction_required: false
     relief_adjustment_required: false
     tax_unchanged_only_if_reliefs_updated: false
-    corrected_total_tax: 447.0
-    corrected_overpayment: -447.0
+    corrected_total_tax: 3785.0
+    corrected_overpayment: -3785.0
     thermomodernization_used: 0.0
     thermomodernization_carry_over: 0.0
   stops_reviews:

@@ -4,18 +4,18 @@ meta:
   provider: openrouter
   requested_model: anthropic/claude-haiku-4.5
   returned_model: anthropic/claude-haiku-4.5
-  fingerprint: v3_fec39f82c63ac70e7c2c56088d33cc48a42cdefb63b66fdfde3876bd9507a609
-  request_hash: 1e8859303eda99292d377bf3c94d736efc7e773bc38054ed2deb665e7126a8d4
-  recorded_at: '2026-07-19T20:59:24.174807+00:00'
-  request_id: gen-1784494762-k8IKy5YHRvgWSaPltaA5
+  fingerprint: v3_e21f8abea1a83a4dfed5887ccc4da646f1d33199a7d5d545e0a8e5049f6e29d4
+  request_hash: e7a745f3a3ff6607fa9b8243f85a32ad714383f9e0cc6433c8207683cdd86ba9
+  recorded_at: '2026-07-19T22:39:16.240897+00:00'
+  request_id: gen-1784500754-kTA6BTugcFeeQeQUqmao
   finish_reason: stop
   native_finish_reason: end_turn
   system_fingerprint: null
-  prompt_tokens: 715
+  prompt_tokens: 723
   completion_tokens: 22
-  total_tokens: 737
-  cost: 0.000825
-  recording_duration_seconds: 2.011
+  total_tokens: 745
+  cost: 0.000833
+  recording_duration_seconds: 1.75
   cassette_format_version: 4
 response: '{"status":"FINAL","stops":[],"reviews":["REVIEW_09"]}'
 parsed_response:
@@ -50,6 +50,10 @@ parsed_response:
     podatek:
       podstawa_IP: 22420
       podstawa_NIE: 2372
+      podstawa_zwykła: 2372
+      dochód_IP_po_uldze_BR: 22420.47
+      dochód_IP_kwalifikowany: 22420.47
+      dochód_IP_poza_preferencją: 0.0
       podatek_IP: 1121
       podatek_NIE_finalny: 451
       podatek_całościowy: 1572

@@ -4,18 +4,18 @@ meta:
   provider: openrouter
   requested_model: google/gemini-3-flash-preview
   returned_model: google/gemini-3-flash-preview
-  fingerprint: v3_fbaa8fa6fa834eae502544ce3870c72035d6dea7d0c82b90dd9eb052e939e9a1
-  request_hash: 2a9293103bfeb1468d908f3e89f20907360c78dee6fcaa866962cd884dcfc373
-  recorded_at: '2026-07-19T20:59:19.377428+00:00'
-  request_id: gen-1784494758-zlLCS0Ms0YoTxRfdZVJc
+  fingerprint: v3_2ab7bb5d231efc65e34379d5df7ee52a4284da4d37e98ac23a65d703e3eda353
+  request_hash: 7d2d33d0de0563c380f234c264283399d8d75b30292a09f25bad70726fe8ef55
+  recorded_at: '2026-07-19T22:39:11.725854+00:00'
+  request_id: gen-1784500750-kqOILDa44yWgbTTLQfsP
   finish_reason: stop
   native_finish_reason: STOP
   system_fingerprint: null
-  prompt_tokens: 556
+  prompt_tokens: 562
   completion_tokens: 20
-  total_tokens: 576
-  cost: 0.000338
-  recording_duration_seconds: 1.077
+  total_tokens: 582
+  cost: 0.000341
+  recording_duration_seconds: 1.268
   cassette_format_version: 4
 response: '{"status":"STOPPED","stops":["STOP_16"],"reviews":["REVIEW_09"]}'
 parsed_response:
@@ -50,6 +50,10 @@ parsed_response:
     podatek:
       podstawa_IP: 0
       podstawa_NIE: 0
+      podstawa_zwykła: 0
+      dochód_IP_po_uldze_BR: 0.0
+      dochód_IP_kwalifikowany: 0.0
+      dochód_IP_poza_preferencją: 0.0
       podatek_IP: 0
       podatek_NIE_finalny: 0
       podatek_całościowy: 0

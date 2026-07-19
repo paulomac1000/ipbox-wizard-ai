@@ -4,18 +4,18 @@ meta:
   provider: openrouter
   requested_model: qwen/qwen3.5-flash-02-23
   returned_model: qwen/qwen3.5-flash-02-23
-  fingerprint: v3_311cae07d72dc7c0a6828691d66c06d5fce74ba9333113103bef9fac1edfdfc8
-  request_hash: 21e20ad190ff5e5fc1b3b97ebc7635187ec01ddcdbca173ff347fe6e0b5ef0b3
-  recorded_at: '2026-07-19T21:12:15.396790+00:00'
-  request_id: gen-1784495532-WvtagmlxODsX4iJS3BE5
+  fingerprint: v3_dae3a4025f5ae201b169e2b3c9b99dd166fc6ecf43b5b92a6798302f5bc95ff5
+  request_hash: e3f178e4b5c1fc7a9429ea1d5d33da4dc4459826a65860224059a25ab1c69c09
+  recorded_at: '2026-07-19T23:00:18.602868+00:00'
+  request_id: gen-1784502013-bNbQt6M8kE53f6RW2rds
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
   prompt_tokens: 246
-  completion_tokens: 617
-  total_tokens: 863
-  cost: 0.00017641
-  recording_duration_seconds: 3.467
+  completion_tokens: 625
+  total_tokens: 871
+  cost: 0.00017849
+  recording_duration_seconds: 5.293
   cassette_format_version: 4
 response: '{"status":"FINAL","stops":[],"reviews":["REVIEW_09"]}'
 parsed_response:
@@ -50,6 +50,10 @@ parsed_response:
     podatek:
       podstawa_IP: 22420
       podstawa_NIE: 2372
+      podstawa_zwykła: 2372
+      dochód_IP_po_uldze_BR: 22420.47
+      dochód_IP_kwalifikowany: 22420.47
+      dochód_IP_poza_preferencją: 0.0
       podatek_IP: 1121
       podatek_NIE_finalny: 451
       podatek_całościowy: 1572

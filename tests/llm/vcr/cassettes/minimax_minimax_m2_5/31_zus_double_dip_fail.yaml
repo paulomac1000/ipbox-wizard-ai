@@ -4,18 +4,18 @@ meta:
   provider: openrouter
   requested_model: minimax/minimax-m2.5
   returned_model: minimax/minimax-m2.5
-  fingerprint: v3_d1fe8df7df3b7108db3e5d208a651ac34ec38adb65682e3d926992a2767d1ee8
-  request_hash: e6e373f57b9c8368f4e09600a6216efb342f6b0e07a80a703a493fbb220c630a
-  recorded_at: '2026-07-19T21:05:40.204696+00:00'
-  request_id: gen-1784495139-2wvIkRcaOHqI7LNpcYSP
+  fingerprint: v3_4f24a59ccf89ad01aa18cc3ced2bad8f3ac068990f500387d4bda88eb514b740
+  request_hash: 6114439946bc13ab580652b061f42dc98e8220ea6bcb2ad498cdda2d81e11cb8
+  recorded_at: '2026-07-19T22:45:55.386305+00:00'
+  request_id: gen-1784501151-yHi1dXQia0oWPhrc8Ois
   finish_reason: stop
   native_finish_reason: stop
-  system_fingerprint: vllm-0.21.0-tp4-bf80359e
-  prompt_tokens: 570
-  completion_tokens: 100
-  total_tokens: 670
-  cost: 0.0001243
-  recording_duration_seconds: 1.234
+  system_fingerprint: null
+  prompt_tokens: 575
+  completion_tokens: 249
+  total_tokens: 824
+  cost: 0.00035169
+  recording_duration_seconds: 3.898
   cassette_format_version: 4
 response: '{"status":"STOPPED","stops":["ZUS_DOUBLE_DIP"],"reviews":["REVIEW_01","REVIEW_09"]}'
 parsed_response:
@@ -50,6 +50,10 @@ parsed_response:
     podatek:
       podstawa_IP: 0
       podstawa_NIE: 0
+      podstawa_zwykła: 0
+      dochód_IP_po_uldze_BR: 0.0
+      dochód_IP_kwalifikowany: 0.0
+      dochód_IP_poza_preferencją: 0.0
       podatek_IP: 0
       podatek_NIE_finalny: 0
       podatek_całościowy: 0

@@ -8,8 +8,9 @@ an explicit IP/NON/MIX label cannot override a known non-deductible character.
 from __future__ import annotations
 
 import re
+from collections.abc import Mapping
 from copy import deepcopy
-from typing import Any, Mapping
+from typing import Any
 
 from .ipbox_calculator import EXCLUDED_PATTERNS, PRIVATE_KEYWORDS
 

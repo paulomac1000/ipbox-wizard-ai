@@ -4,20 +4,20 @@ meta:
   provider: openrouter
   requested_model: google/gemini-3-flash-preview
   returned_model: google/gemini-3-flash-preview
-  fingerprint: v3_90ef067359f7468e5690146d56010083d24a34811ae6b3fba7fbfaffe90f3085
-  request_hash: ad393c84a51343fc44aa9ea6841806a2ac87bd44543e82b492f4b5c0f70af62c
-  recorded_at: '2026-07-19T20:58:26.395065+00:00'
-  request_id: gen-1784494705-AIR0Cz5LSDKbcK19ilAn
+  fingerprint: v3_d6a041b434571399a07469410d05260cce80791bcf40105011e7570d566f4717
+  request_hash: 1421a2689e5437f9b032788ad07e922a6a4b0c74211a7ec142ad30a370d5adc1
+  recorded_at: '2026-07-19T22:38:24.628806+00:00'
+  request_id: gen-1784500703-bPHWfmvNlgnCSZpyDPZA
   finish_reason: stop
   native_finish_reason: STOP
   system_fingerprint: null
-  prompt_tokens: 564
-  completion_tokens: 34
+  prompt_tokens: 570
+  completion_tokens: 28
   total_tokens: 598
-  cost: 0.000384
-  recording_duration_seconds: 1.417
+  cost: 0.000369
+  recording_duration_seconds: 1.314
   cassette_format_version: 4
-response: '{"status": "STOPPED", "stops": ["ZUS_DOUBLE_DIP"], "reviews": ["REVIEW_01", "REVIEW_09"]}'
+response: '{"status":"STOPPED","stops":["ZUS_DOUBLE_DIP"],"reviews":["REVIEW_01","REVIEW_09"]}'
 parsed_response:
   status: STOPPED
   result:
@@ -50,6 +50,10 @@ parsed_response:
     podatek:
       podstawa_IP: 0
       podstawa_NIE: 0
+      podstawa_zwykła: 0
+      dochód_IP_po_uldze_BR: 0.0
+      dochód_IP_kwalifikowany: 0.0
+      dochód_IP_poza_preferencją: 0.0
       podatek_IP: 0
       podatek_NIE_finalny: 0
       podatek_całościowy: 0

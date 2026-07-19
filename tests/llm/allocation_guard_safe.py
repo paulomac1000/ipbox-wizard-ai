@@ -56,9 +56,9 @@ def _month_has_auditable_evidence(month: dict[str, Any]) -> bool:
 
     evidence = month_evidence(month)
     projects = evidence.get("projekty") if isinstance(evidence, dict) else None
-    if isinstance(projects, list) and any(_stream_has_evidence(project) for project in projects):
-        return True
-    return False
+    return bool(
+        isinstance(projects, list) and any(_stream_has_evidence(project) for project in projects)
+    )
 
 
 def audit_facts(

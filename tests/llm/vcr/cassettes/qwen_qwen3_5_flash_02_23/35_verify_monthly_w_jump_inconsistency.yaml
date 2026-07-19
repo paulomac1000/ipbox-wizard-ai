@@ -4,18 +4,18 @@ meta:
   provider: openrouter
   requested_model: qwen/qwen3.5-flash-02-23
   returned_model: qwen/qwen3.5-flash-02-23
-  fingerprint: v3_4e850b3dabcd2080a942b7ca22f0b39208922b62b9345c78890f518d38d4f918
-  request_hash: f683b2597068349dd3385f25e8a8ca05fea1a8ac832f14a286a02832f7ed0a91
-  recorded_at: '2026-07-19T21:14:22.883783+00:00'
-  request_id: gen-1784495658-CFbw7sIpOtNcyeaAXl0t
+  fingerprint: v3_5c5aae51bff8083c68abe2d577a60546360f157c62b3454b9f705205e2fbfa07
+  request_hash: 766c7632bbdba741411e61ce62891e3b3237b98d54a80ead9655f72d4be13ab2
+  recorded_at: '2026-07-19T23:06:15.547657+00:00'
+  request_id: gen-1784502367-eXNMDkmnTgL4GKnyapnV
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
   prompt_tokens: 258
-  completion_tokens: 865
-  total_tokens: 1123
-  cost: 0.00024167
-  recording_duration_seconds: 4.403
+  completion_tokens: 1295
+  total_tokens: 1553
+  cost: 0.00035347
+  recording_duration_seconds: 7.812
   cassette_format_version: 4
 response: '{"status":"FINAL","stops":[],"reviews":["REVIEW_02","REVIEW_08","REVIEW_09"]}'
 parsed_response:
@@ -49,11 +49,15 @@ parsed_response:
     alokacja_multi_ip: null
     podatek:
       podstawa_IP: 0
-      podstawa_NIE: 16000
+      podstawa_NIE: 40000
+      podstawa_zwykła: 40000
+      dochód_IP_po_uldze_BR: 24000.0
+      dochód_IP_kwalifikowany: 0.0
+      dochód_IP_poza_preferencją: 24000.0
       podatek_IP: 0
-      podatek_NIE_finalny: 3040
-      podatek_całościowy: 3040
-      nadpłata_lub_dopłata: -3040.0
+      podatek_NIE_finalny: 7600
+      podatek_całościowy: 7600
+      nadpłata_lub_dopłata: -7600.0
       thermomodernization_used: 0.0
       termomodernization_carry_over: 0.0
       termomodernization_expired: 0.0
@@ -91,8 +95,8 @@ parsed_response:
     return_correction_required: false
     relief_adjustment_required: false
     tax_unchanged_only_if_reliefs_updated: false
-    corrected_total_tax: 3040.0
-    corrected_overpayment: -3040.0
+    corrected_total_tax: 7600.0
+    corrected_overpayment: -7600.0
     thermomodernization_used: 0.0
     thermomodernization_carry_over: 0.0
   stops_reviews:

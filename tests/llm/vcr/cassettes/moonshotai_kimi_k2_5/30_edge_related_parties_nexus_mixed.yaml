@@ -4,18 +4,18 @@ meta:
   provider: openrouter
   requested_model: moonshotai/kimi-k2.5
   returned_model: moonshotai/kimi-k2.5
-  fingerprint: v3_2170afd12b3aa22676c92b3a820c0dd11090c844fd3055000fa4408c2fd764a7
-  request_hash: 4d1b06ce7711ece33cbb9e7a1ce5587b504105ee8c9937225ce18f8f7f15fa03
-  recorded_at: '2026-07-19T21:09:25.227014+00:00'
-  request_id: gen-1784495362-TkhEAUvvq5h0F5QRVebm
+  fingerprint: v3_da1db0c5cfbc72cafb37adc41ea7a3e09f092667d29b375b99e01b0b9b2345fa
+  request_hash: 28237faaa82e9ff45b5c2eeaadac8c2e5f0452b5d7df78c1e717361c5fe7145f
+  recorded_at: '2026-07-19T22:56:29.897909+00:00'
+  request_id: gen-1784501784-9QZdW6uMF0LbrcOI0MoM
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
   prompt_tokens: 247
-  completion_tokens: 142
-  total_tokens: 389
-  cost: 0.00035769
-  recording_duration_seconds: 3.146
+  completion_tokens: 135
+  total_tokens: 382
+  cost: 0.00034194
+  recording_duration_seconds: 5.706
   cassette_format_version: 4
 response: '{"reviews":["REVIEW_01","REVIEW_09"],"status":"FINAL","stops":[]}'
 parsed_response:
@@ -49,11 +49,15 @@ parsed_response:
     alokacja_multi_ip: null
     podatek:
       podstawa_IP: 8931
-      podstawa_NIE: 0
+      podstawa_NIE: 17569
+      podstawa_zwykła: 17569
+      dochód_IP_po_uldze_BR: 26500.0
+      dochód_IP_kwalifikowany: 8931.48
+      dochód_IP_poza_preferencją: 17568.52
       podatek_IP: 447
-      podatek_NIE_finalny: 0
-      podatek_całościowy: 447
-      nadpłata_lub_dopłata: -447.0
+      podatek_NIE_finalny: 3338
+      podatek_całościowy: 3785
+      nadpłata_lub_dopłata: -3785.0
       thermomodernization_used: 0.0
       termomodernization_carry_over: 0.0
       termomodernization_expired: 0.0
@@ -155,8 +159,8 @@ parsed_response:
     return_correction_required: false
     relief_adjustment_required: false
     tax_unchanged_only_if_reliefs_updated: false
-    corrected_total_tax: 447.0
-    corrected_overpayment: -447.0
+    corrected_total_tax: 3785.0
+    corrected_overpayment: -3785.0
     thermomodernization_used: 0.0
     thermomodernization_carry_over: 0.0
   stops_reviews:

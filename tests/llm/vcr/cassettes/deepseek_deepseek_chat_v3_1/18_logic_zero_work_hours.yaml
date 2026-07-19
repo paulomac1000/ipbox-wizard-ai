@@ -4,18 +4,18 @@ meta:
   provider: openrouter
   requested_model: deepseek/deepseek-chat-v3.1
   returned_model: deepseek/deepseek-chat-v3.1
-  fingerprint: v3_80ca168cac3922de74201e3c707c86484f489c81dbe9a65b5d6e1b761a043b43
-  request_hash: c3afb93b377980a4419744fe8edf6685e7145f39278fb26a6938946e9621d2ba
-  recorded_at: '2026-07-19T21:02:03.116509+00:00'
-  request_id: gen-1784494921-VbTSOLVUS5u2bsEhoFzm
+  fingerprint: v3_2135f9554497120ac70bd75ddefe1a62f4eadca9635363472a2cbf934ea1f279
+  request_hash: d8e7df5db9336551de5518021b8d18121d62974c169b0d9d06c467ff7158a9fb
+  recorded_at: '2026-07-19T22:41:54.529137+00:00'
+  request_id: gen-1784500910-1WC0BlCLyzdmnkVzqIbc
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
   prompt_tokens: 248
   completion_tokens: 35
   total_tokens: 283
-  cost: 0.0002083
-  recording_duration_seconds: 1.567
+  cost: 0.00010196
+  recording_duration_seconds: 4.284
   cassette_format_version: 4
 response: "{\n  \"reviews\": [\"REVIEW_09\"],\n  \"status\": \"STOPPED\",\n  \"stops\": [\"STOP_04\"]\n}"
 parsed_response:
@@ -50,6 +50,10 @@ parsed_response:
     podatek:
       podstawa_IP: 0
       podstawa_NIE: 0
+      podstawa_zwykła: 0
+      dochód_IP_po_uldze_BR: 0.0
+      dochód_IP_kwalifikowany: 0.0
+      dochód_IP_poza_preferencją: 0.0
       podatek_IP: 0
       podatek_NIE_finalny: 0
       podatek_całościowy: 0

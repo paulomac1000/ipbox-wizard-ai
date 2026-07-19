@@ -4,21 +4,20 @@ meta:
   provider: openrouter
   requested_model: deepseek/deepseek-chat-v3.1
   returned_model: deepseek/deepseek-chat-v3.1
-  fingerprint: v3_7a42ee5fb603df966a2761c86c91f6f1634a4066c4f27c79ef55e30f7891e6c3
-  request_hash: 18233d1cdf43e798ba3f77f987f4a0b44c180fdd91ae4e98c7478824376e0095
-  recorded_at: '2026-07-19T21:02:53.305105+00:00'
-  request_id: gen-1784494969-AfetawHqrVBaxYmDAidf
+  fingerprint: v3_4908f33058a080a24027a81c5f69458502a2c6a62d020fd4ccaf6d413c0f6a9b
+  request_hash: bf25a24e61d7ce9db4f2894596fe7979cc1350fb50adfeaa6f689bdea1605710
+  recorded_at: '2026-07-19T22:42:29.824472+00:00'
+  request_id: gen-1784500947-x08ElhqKEI3uu2uRyR0N
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
-  prompt_tokens: 256
-  completion_tokens: 43
-  total_tokens: 299
-  cost: 0.00011212
-  recording_duration_seconds: 4.192
+  prompt_tokens: 623
+  completion_tokens: 37
+  total_tokens: 660
+  cost: 0.00013609
+  recording_duration_seconds: 2.751
   cassette_format_version: 4
-response: "{\n  \"reviews\": [\"REVIEW_01\", \"REVIEW_09\"],\n  \"status\": \"STOPPED\",\n  \"stops\": [\"ZUS_DOUBLE_DIP\"\
-  ]\n}"
+response: '{"status":"STOPPED","stops":["ZUS_DOUBLE_DIP"],"reviews":["REVIEW_01","REVIEW_09"]}'
 parsed_response:
   status: STOPPED
   result:
@@ -51,6 +50,10 @@ parsed_response:
     podatek:
       podstawa_IP: 0
       podstawa_NIE: 0
+      podstawa_zwykła: 0
+      dochód_IP_po_uldze_BR: 0.0
+      dochód_IP_kwalifikowany: 0.0
+      dochód_IP_poza_preferencją: 0.0
       podatek_IP: 0
       podatek_NIE_finalny: 0
       podatek_całościowy: 0

@@ -4,18 +4,18 @@ meta:
   provider: openrouter
   requested_model: qwen/qwen3.5-flash-02-23
   returned_model: qwen/qwen3.5-flash-02-23
-  fingerprint: v3_b096c0b9e65b05cbded10cff021f2f1978abdd364ed44c3d20dfdc7076fd44de
-  request_hash: dce56e8fb941a654b0fa441c66de8dd43833502cf9ce64aeb6adc52521461eb8
-  recorded_at: '2026-07-19T21:16:11.846812+00:00'
-  request_id: gen-1784495766-S51RqQGeP8w6z8eYTfkI
+  fingerprint: v3_a5248213fcafb7794406bda49ace8852c9aa710bb17db0322704d8372790bf13
+  request_hash: 56c3d17f31e9db5f449129e82dd9522d7c83e64a50f192cc987deb48b7317bc9
+  recorded_at: '2026-07-19T23:11:38.592811+00:00'
+  request_id: gen-1784502691-nYxw2RXSGh1ydYSGzLLW
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
   prompt_tokens: 251
-  completion_tokens: 899
-  total_tokens: 1150
-  cost: 0.000250055
-  recording_duration_seconds: 5.228
+  completion_tokens: 1430
+  total_tokens: 1681
+  cost: 0.000388115
+  recording_duration_seconds: 6.83
   cassette_format_version: 4
 response: '{"status":"STOPPED","stops":["STOP_12"],"reviews":["REVIEW_09"]}'
 parsed_response:
@@ -50,6 +50,10 @@ parsed_response:
     podatek:
       podstawa_IP: 0
       podstawa_NIE: 0
+      podstawa_zwykła: 0
+      dochód_IP_po_uldze_BR: 0.0
+      dochód_IP_kwalifikowany: 0.0
+      dochód_IP_poza_preferencją: 0.0
       podatek_IP: 0
       podatek_NIE_finalny: 0
       podatek_całościowy: 0

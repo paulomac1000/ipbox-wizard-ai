@@ -4,20 +4,20 @@ meta:
   provider: openrouter
   requested_model: deepseek/deepseek-chat-v3.1
   returned_model: deepseek/deepseek-chat-v3.1
-  fingerprint: v3_b6e0b1f9b16bfaaf1002a1c96bc783b84b07d4a794cb42d754a82eaf298509b0
-  request_hash: 434fcf4d50c6b77c5cb02acf2d714828a55b14527bee390ad3f64217ac575f55
-  recorded_at: '2026-07-19T21:02:00.802511+00:00'
-  request_id: gen-1784494916-GJEBhJLosiL3CywM8R3G
+  fingerprint: v3_934bd686956873b8290b08b1eaa779c0473ac4da061d23b4ae226df0bb1f8c47
+  request_hash: b07f11d463d657b256cd575623351672b2c0746d3c4c536df0ad0a5aedf8ed22
+  recorded_at: '2026-07-19T22:41:49.552229+00:00'
+  request_id: gen-1784500905-UxmutP9Fh5LMEaVgD0oq
   finish_reason: stop
   native_finish_reason: stop
-  system_fingerprint: fastcoe
-  prompt_tokens: 663
-  completion_tokens: 29
-  total_tokens: 692
-  cost: 0.0004471
-  recording_duration_seconds: 4.377
+  system_fingerprint: null
+  prompt_tokens: 613
+  completion_tokens: 27
+  total_tokens: 640
+  cost: 0.00013203
+  recording_duration_seconds: 3.762
   cassette_format_version: 4
-response: '{"status": "FINAL", "stops": [], "reviews": ["REVIEW_02", "REVIEW_09"]}'
+response: '{"status":"FINAL","stops":[],"reviews":["REVIEW_02","REVIEW_09"]}'
 parsed_response:
   status: FINAL
   result:
@@ -49,11 +49,15 @@ parsed_response:
     alokacja_multi_ip: null
     podatek:
       podstawa_IP: 0
-      podstawa_NIE: 11081
+      podstawa_NIE: 19700
+      podstawa_zwykła: 19700
+      dochód_IP_po_uldze_BR: 8618.75
+      dochód_IP_kwalifikowany: 0.0
+      dochód_IP_poza_preferencją: 8618.75
       podatek_IP: 0
-      podatek_NIE_finalny: 2105
-      podatek_całościowy: 2105
-      nadpłata_lub_dopłata: -2105.0
+      podatek_NIE_finalny: 3743
+      podatek_całościowy: 3743
+      nadpłata_lub_dopłata: -3743.0
       thermomodernization_used: 0.0
       termomodernization_carry_over: 0.0
       termomodernization_expired: 0.0
@@ -105,8 +109,8 @@ parsed_response:
     return_correction_required: false
     relief_adjustment_required: false
     tax_unchanged_only_if_reliefs_updated: false
-    corrected_total_tax: 2105.0
-    corrected_overpayment: -2105.0
+    corrected_total_tax: 3743.0
+    corrected_overpayment: -3743.0
     thermomodernization_used: 0.0
     thermomodernization_carry_over: 0.0
   stops_reviews:

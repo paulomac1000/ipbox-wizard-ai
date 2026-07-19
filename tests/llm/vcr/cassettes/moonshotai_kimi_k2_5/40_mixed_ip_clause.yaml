@@ -4,20 +4,20 @@ meta:
   provider: openrouter
   requested_model: moonshotai/kimi-k2.5
   returned_model: moonshotai/kimi-k2.5
-  fingerprint: v3_88d3fa322fba8401d1f7692436bdbe3f12f5eebe9b1ede61adc0dcf8d5b69897
-  request_hash: 00fd999e6348038c88081df5461e41cf496635eabd563f10b7645fca87a7ccc7
-  recorded_at: '2026-07-19T21:10:27.433538+00:00'
-  request_id: gen-1784495422-vHV5cMb6NIzitr4NbQk5
+  fingerprint: v3_333139866907445a0a8be86094f1ac2fa7547c89b2d5cf6e34cc1ca4a8e7e2e9
+  request_hash: 2fa1f6c91037e5155c96d44c308db24f950e6442be2a3e06a97aa0e4ebb36e80
+  recorded_at: '2026-07-19T22:57:50.915440+00:00'
+  request_id: gen-1784501866-gd28CZQvLOvSe1FBU7tm
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
   prompt_tokens: 242
-  completion_tokens: 316
-  total_tokens: 558
-  cost: 0.0007376
-  recording_duration_seconds: 5.241
+  completion_tokens: 175
+  total_tokens: 417
+  cost: 0.00042969
+  recording_duration_seconds: 4.488
   cassette_format_version: 4
-response: '{"status":"FINAL","stops":[],"reviews":["REVIEW_01"]}'
+response: '{"reviews":["REVIEW_01"],"status":"FINAL","stops":[]}'
 parsed_response:
   status: FINAL
   result:
@@ -50,6 +50,10 @@ parsed_response:
     podatek:
       podstawa_IP: 31900
       podstawa_NIE: 8000
+      podstawa_zwykła: 8000
+      dochód_IP_po_uldze_BR: 31900.0
+      dochód_IP_kwalifikowany: 31900.0
+      dochód_IP_poza_preferencją: 0.0
       podatek_IP: 1595
       podatek_NIE_finalny: 1520
       podatek_całościowy: 3115
