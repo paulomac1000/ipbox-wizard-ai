@@ -79,9 +79,7 @@ def validate_cost_policy(input_data: Mapping[str, Any]) -> tuple[str, str | None
         return "per_cost_item", None
     granularity = str(mix.get("rounding_granularity", "per_cost_item"))
     if granularity not in ROUNDING_GRANULARITIES:
-        raise ValueError(
-            "koszty_MIX.rounding_granularity must be per_cost_item or monthly_pool"
-        )
+        raise ValueError("koszty_MIX.rounding_granularity must be per_cost_item or monthly_pool")
     source = str(mix.get("źródło", ""))
     source_reference_raw = _first(mix, "źródło_ref", "source_reference", "sygnatura")
     source_reference = (
@@ -196,11 +194,7 @@ def _source_ledger_audit(
     reported_raw = summary.get("koszty") if isinstance(summary, Mapping) else None
     reported = money(reported_raw) if reported_raw is not None else None
     inferred_included = Decimal("0")
-    if (
-        reported is not None
-        and excluded_total > 0
-        and abs(reported - raw_costs) <= Decimal("1.00")
-    ):
+    if reported is not None and excluded_total > 0 and abs(reported - raw_costs) <= Decimal("1.00"):
         inferred_included = excluded_total
     excluded_recorded = max(explicitly_included, inferred_included)
 
