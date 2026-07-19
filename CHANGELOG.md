@@ -14,6 +14,10 @@
 - Test zgodności dokumentacji kontraktu z wykonywalnym protokołem `expected_decision`.
 - Regresje dla wzoru NEXUS podwyższającego A+B.
 - Jawny podział ulgi B+R na część IP i NIE wraz z odliczeniem IP przed NEXUS.
+- Jawny podział dochodu IP na `dochód_IP_kwalifikowany` i `dochód_IP_poza_preferencją`.
+- Pole `podstawa_zwykła`, które obejmuje dochód NIE oraz część dochodu IP nieobjętą preferencją.
+- `REVIEW_18` dla kosztu deklarowanego jako NEXUS bez wystarczającego dowodu.
+- Regresje dla NEXUS `0`, NEXUS częściowego, zwykłego opodatkowania reszty i niejednoznacznej semantyki W.
 - Pełne połączenie działalności na skali z `dochody_dodatkowe_skala`.
 - Wersjonowane reguły każdego roku istnienia IP Box: 2019–2026.
 - Historyczne limity IKZE przedsiębiorcy dla 2019–2026.
@@ -45,6 +49,11 @@
 
 - Rozdzielono przychód, koszty `MIX` i NEXUS zgodnie z issue #1.
 - Poprawiono NEXUS z `(A×1,3+B)` na `((A+B)×1,3)`.
+- Część dochodu IP niewchodząca do preferencji po zastosowaniu NEXUS jest opodatkowana zwykłą stawką zamiast znikać z podstawy.
+- `NEXUS = 0` nie prowadzi już do zerowego podatku od całego dochodu IP.
+- Brak jawnej metody W jest odrzucany, gdy jednocześnie aktywne są godziny NIE-IP i procent faktury różny od 100%.
+- Brak dowodu NEXUS nie jest już cichym `false`: daje `REVIEW_18`, a nieudowodniona część dochodu trafia do zwykłego opodatkowania.
+- Usunięto martwą, starszą implementację kaskady podatkowej; historyczna ścieżka importu deleguje do jednego kanonicznego kalkulatora.
 - Nieudokumentowane IDE, chmura, sprzęt i repozytoria nie są automatycznie kosztami IP.
 - Niesklasyfikowany zakup powyżej 10 000 zł jest wyłączany do udokumentowania odpisu.
 - Jawne `KUP: false` zawsze usuwa wydatek z kosztów IP i NIE zamiast przenosić go do `NON`.
@@ -93,7 +102,8 @@
 - Roczna metoda przychodowa odracza `MIX` do finalnego true-up.
 - Polityka W musi opisywać znaczenie procentu faktury względem godzin NIE-IP, zamiast zakładać jeden wzór dla wszystkich umów.
 - Polityka z interpretacji KIS wymaga identyfikatora źródła, jest oznaczana do przeglądu, a jej faktyczne wdrożenie jest porównywane z ewidencją.
-- `strata_NIE_z_lat_poprzednich` dotyczy wyłącznie pozostałej działalności; straty IP wymagają ewidencji per prawo.
+- `strata_NIE_z_lat_poprzednich` pomniejsza zwykły dochód działalności, który obejmuje również część IP poza preferencją.
+- Pole zgodnościowe `podstawa_NIE` oznacza całą podstawę zwykłej stawki, nie wyłącznie przychody oznaczone jako NIE-IP.
 - Działalność liniowa z dodatkowymi dochodami skali wymaga osobnej kaskady dla osobnego zeznania.
 - Kalkulator multi-IP wspiera podział wspólnych kosztów, ale nie udaje pełnej ewidencji PIT/IP per IP.
 - Każda zmiana autorytatywnego algorytmu, scenariusza, requestu, profilu modelu lub schema unieważnia odpowiednie fingerprinty i wymaga ponownego nagrania.
