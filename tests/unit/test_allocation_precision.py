@@ -46,7 +46,9 @@ def test_dynamic_tolerance_accepts_rounded_w_when_only_precision_is_known() -> N
     assert findings == []
 
 
-def test_rounded_visible_percentage_still_detects_squared_signature_and_switch() -> None:
+def test_rounded_visible_percentage_still_detects_squared_signature_and_switch() -> (
+    None
+):
     found = _codes(
         [
             {
