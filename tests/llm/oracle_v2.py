@@ -179,8 +179,7 @@ def _reconcile_tax_fields(
         relief_adjustment_required = True
     if (
         claimed_total_tax is not None
-        and abs(number(claimed_total_tax, "uzgodnienie.total_tax") - float(tax["total_tax"]))
-        > 0.01
+        and abs(number(claimed_total_tax, "uzgodnienie.total_tax") - float(tax["total_tax"])) > 0.01
     ):
         warnings.append("RETURN_TOTAL_TAX_MISMATCH")
     if (
