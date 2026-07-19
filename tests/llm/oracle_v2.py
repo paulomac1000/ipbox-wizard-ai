@@ -3,15 +3,23 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
+from decimal import Decimal
 from typing import Any
 
 from python_helper import calculate_tax_for_year
 from python_helper.cost_audit import apply_cost_audit, validate_cost_policy
-from python_helper.ipbox_calculator import calculate_overpayment, tax_round
+from python_helper.cost_normalization import normalize_known_non_deductible_costs
+from python_helper.ipbox_calculator import calculate_overpayment, money, tax_round
 
 from . import oracle as legacy
 from .allocation_guard import audit_facts
-from .oracle_adapter import legacy_safe_copy, number, prepare_scenario
+from .oracle_adapter import (
+    invoice_amount,
+    legacy_safe_copy,
+    month_invoices,
+    number,
+    prepare_scenario,
+)
 from .oracle_guards import (
     REVIEW_FACT_TO_CODE,
     STOP_FACT_TO_CODE,
@@ -171,7 +179,8 @@ def _reconcile_tax_fields(
         relief_adjustment_required = True
     if (
         claimed_total_tax is not None
-        and abs(number(claimed_total_tax, "uzgodnienie.total_tax") - float(tax["total_tax"])) > 0.01
+        and abs(number(claimed_total_tax, "uzgodnienie.total_tax") - float(tax["total_tax"]))
+        > 0.01
     ):
         warnings.append("RETURN_TOTAL_TAX_MISMATCH")
     if (
@@ -188,7 +197,33 @@ def _reconcile_tax_fields(
     return warnings, relief_adjustment_required, tax_unchanged_only_if_reliefs_updated
 
 
+def _recompute_kpir_balance_test(input_data: Mapping[str, Any]) -> str | None:
+    """Reconcile KPiR totals including both signs of FX exchange differences."""
+    summary = input_data.get("podsumowanie_kpir")
+    if not isinstance(summary, Mapping):
+        return None
+    revenue = Decimal("0")
+    costs = Decimal("0")
+    for month in input_data.get("miesiace", []) or []:
+        if not isinstance(month, dict):
+            continue
+        for invoice in month_invoices(month):
+            revenue += money(invoice_amount(invoice))
+            fx_difference = legacy._invoice_fx_difference(invoice)
+            if fx_difference > 0:
+                revenue += fx_difference
+            elif fx_difference < 0:
+                costs += -fx_difference
+        for cost in month.get("koszty", []) or []:
+            if isinstance(cost, Mapping):
+                costs += money(number(cost.get("kwota", 0), "cost.kwota"))
+    revenue_matches = abs(revenue - money(summary.get("przychody", 0))) <= Decimal("1.00")
+    costs_match = abs(costs - money(summary.get("koszty", 0))) <= Decimal("1.00")
+    return "PASS" if revenue_matches and costs_match else "FAIL"
+
+
 def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
+    scenario = normalize_known_non_deductible_costs(scenario)
     validate_scenario(scenario)
     transformed, shares, method = prepare_scenario(scenario)
     base = legacy.compute_reference(legacy_safe_copy(transformed, for_validation=False))
@@ -212,6 +247,9 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
     except ValueError as exc:
         raise ScenarioError(str(exc)) from exc
     base["source_ledger_audit"] = source_ledger_audit
+    kpir_test = _recompute_kpir_balance_test(input_data)
+    if kpir_test is not None:
+        base["tests"]["TEST_1"] = kpir_test
 
     extra_facts, audit_codes = audit_facts(scenario, base, method)
     annual_facts, annual_values, violations = year_facts(scenario)
