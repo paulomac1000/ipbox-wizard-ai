@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import copy
 import json
 from copy import deepcopy
 from pathlib import Path
@@ -49,7 +48,7 @@ def build_tool_context(reference: dict[str, Any]) -> dict[str, Any]:
 
 
 def build_decision_protocol() -> str:
-    """Render the provider-neutral copy protocol for already-active rules."""
+    """Render the provider-neutral copy protocol for the authoritative envelope."""
     return "\n".join(
         [
             "DECISION PROTOCOL:",
@@ -106,15 +105,22 @@ class LLMTestRunner:
         )
 
     @staticmethod
+    def _remove_schema_keyword(value: Any, keyword: str) -> None:
+        """Remove one unsupported JSON Schema keyword recursively in a transport copy."""
+        if isinstance(value, dict):
+            value.pop(keyword, None)
+            for nested in value.values():
+                LLMTestRunner._remove_schema_keyword(nested, keyword)
+        elif isinstance(value, list):
+            for nested in value:
+                LLMTestRunner._remove_schema_keyword(nested, keyword)
+
+    @staticmethod
     def _transport_schema(strip_unique: bool) -> dict[str, Any]:
-        """Return DECISION_JSON_SCHEMA, optionally stripping uniqueItems for provider compat."""
-        schema: dict[str, Any] = DECISION_JSON_SCHEMA
+        """Build a provider-compatible copy without weakening local validation."""
+        schema: dict[str, Any] = deepcopy(DECISION_JSON_SCHEMA)
         if strip_unique:
-            schema = copy.deepcopy(DECISION_JSON_SCHEMA)
-            _props = schema.get("schema", schema).get("properties", {})
-            for _key, _val in _props.items():
-                if isinstance(_val, dict) and _val.get("type") == "array":
-                    _val.pop("uniqueItems", None)
+            LLMTestRunner._remove_schema_keyword(schema, "uniqueItems")
         return schema
 
     def request_spec(self, prompt: str, config: VCRConfig) -> LLMRequestSpec:
@@ -126,10 +132,12 @@ class LLMTestRunner:
                 + "\n\nOczekiwany strict JSON Schema:\n"
                 + json.dumps(DECISION_JSON_SCHEMA["schema"], ensure_ascii=False, indent=2)
             )
-        else:
+        elif profile.response_format_type == "json_schema":
             transport = self._transport_schema(profile.strip_unique_items_for_transport)
             response_format = {"type": "json_schema", "json_schema": transport}
             system_prompt = SYSTEM_PROMPT
+        else:  # ModelProfile already rejects this; keep the runner fail-closed as well.
+            raise ValueError(f"unsupported response_format_type={profile.response_format_type!r}")
         return LLMRequestSpec(
             provider=config.provider,
             model=config.model,
@@ -241,25 +249,25 @@ class LLMTestRunner:
         response: LLMResponse,
         parsed: dict[str, Any],
     ) -> None:
-        directory = RESPONSE_ROOT / model_slug
-        directory.mkdir(parents=True, exist_ok=True)
-        (directory / f"{scenario_id}.json").write_text(
-            json.dumps(
-                {
-                    "response": parsed,
-                    "metadata": {
-                        "request_id": response.request_id,
-                        "requested_model": response.requested_model,
-                        "returned_model": response.returned_model,
-                        "finish_reason": response.finish_reason,
-                        "prompt_tokens": response.prompt_tokens,
-                        "completion_tokens": response.completion_tokens,
-                        "total_tokens": response.total_tokens,
-                        "cost": response.cost,
-                    },
-                },
-                ensure_ascii=False,
-                indent=2,
-            ),
+        output_dir = RESPONSE_ROOT / model_slug
+        output_dir.mkdir(parents=True, exist_ok=True)
+        payload = {
+            "raw_response": response.content,
+            "parsed_response": parsed,
+            "metadata": {
+                "request_id": response.request_id,
+                "requested_model": response.requested_model,
+                "returned_model": response.returned_model,
+                "finish_reason": response.finish_reason,
+                "native_finish_reason": response.native_finish_reason,
+                "system_fingerprint": response.system_fingerprint,
+                "prompt_tokens": response.prompt_tokens,
+                "completion_tokens": response.completion_tokens,
+                "total_tokens": response.total_tokens,
+                "cost": response.cost,
+            },
+        }
+        (output_dir / f"{scenario_id}.json").write_text(
+            json.dumps(payload, ensure_ascii=False, indent=2),
             encoding="utf-8",
         )
