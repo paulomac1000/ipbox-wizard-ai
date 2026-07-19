@@ -15,6 +15,7 @@ input:
     koszty_MIX:
       metoda: przychodowa_roczna
       źródło: interpretacja_KIS
+      źródło_ref: SYNTHETIC-KIS-REFERENCE
       uzasadnienie: Jawna polityka testowa; przychody, MIX i NEXUS są rozdzielone.
   zus:
     sposob: brak
