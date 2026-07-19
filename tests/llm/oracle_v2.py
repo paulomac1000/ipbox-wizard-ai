@@ -171,8 +171,7 @@ def _reconcile_tax_fields(
         relief_adjustment_required = True
     if (
         claimed_total_tax is not None
-        and abs(number(claimed_total_tax, "uzgodnienie.total_tax") - float(tax["total_tax"]))
-        > 0.01
+        and abs(number(claimed_total_tax, "uzgodnienie.total_tax") - float(tax["total_tax"])) > 0.01
     ):
         warnings.append("RETURN_TOTAL_TAX_MISMATCH")
     if (
@@ -304,9 +303,7 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
         "PASS" if tax["ip_tax"] == tax_round(float(tax["ip_base_rounded"]) * 0.05) else "FAIL"
     )
     expected_total = tax_round(
-        float(tax["non_ip_tax_final"])
-        + float(tax["ip_tax"])
-        - float(tax["health_tax_credit_used"])
+        float(tax["non_ip_tax_final"]) + float(tax["ip_tax"]) - float(tax["health_tax_credit_used"])
     )
     base["tests"]["TEST_6"] = "PASS" if tax["total_tax"] == expected_total else "FAIL"
     base["status"] = "FINAL"
