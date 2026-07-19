@@ -1,0 +1,64 @@
+meta:
+  id: 57_monthly_pool_rounding_and_nexus_evidence
+  name: Miesięczna pula zaokrągleń i dowody NEXUS
+  description: Syntetyczna regresja zachowująca grosze na poziomie miesięcznej puli i wymagająca dowodu dla każdego kosztu NEXUS.
+  tags: [regression, rounding, nexus, synthetic]
+  priority: P0
+input:
+  rok: 2025
+  forma_opodatkowania: liniowy_19%
+  polityka_alokacji:
+    policy_id: synthetic-monthly-pool
+    przychody:
+      metoda: dokumentowa
+    koszty_MIX:
+      metoda: przychodowa_w_dacie_kosztu
+      źródło: interpretacja_KIS
+      źródło_ref: SYNTHETIC-KIS-REFERENCE
+      rounding_granularity: monthly_pool
+      uzasadnienie: Syntetyczna polityka rozdzielająca miesięczną pulę metodą największych reszt.
+  zus:
+    sposob: brak
+  kontrahenci:
+  - nazwa: ClientA
+    klauzula_IP: true
+  miesiace:
+  - miesiac: 2025-06
+    faktury:
+    - kwota_PLN: 10000
+      kwota_IP: 3333
+      kontrahent: ClientA
+      kwalifikuje_IP: true
+    ewidencja:
+      godziny_pracy: 160
+      godziny_nie_IP: 40
+      procent_faktury_IP: 100
+    koszty:
+    - opis: Wspólny koszt A
+      kwota: 100.01
+      kategoria: MIX
+      nexus_source: own_br
+      nexus_amount: 33.33
+      nexus_evidence: SYNTHETIC-NEXUS-EVIDENCE-A
+      nexus_basis: allocated_ip_cost
+    - opis: Wspólny koszt B
+      kwota: 100.01
+      kategoria: MIX
+      nexus_source: own_br
+      nexus_amount: 33.33
+      nexus_evidence: SYNTHETIC-NEXUS-EVIDENCE-B
+      nexus_basis: allocated_ip_cost
+    - opis: Wspólny koszt C
+      kwota: 100.01
+      kategoria: MIX
+      nexus_source: own_br
+      nexus_amount: 33.33
+      nexus_evidence: SYNTHETIC-NEXUS-EVIDENCE-C
+      nexus_basis: allocated_ip_cost
+    opis_projektu: Rozwój syntetycznego kwalifikowanego programu komputerowego.
+assertions:
+  stops: []
+  klucz_MIX_metoda: przychodowa_w_dacie_kosztu
+  klucz_MIX_źródło: interpretacja_KIS
+  testy_pass: [TEST_4, TEST_5, TEST_6, TEST_7, TEST_8, TEST_9]
+  review_obecne: [REVIEW_16, REVIEW_17]
