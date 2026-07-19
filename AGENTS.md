@@ -36,6 +36,8 @@ Sprzeczność między źródłami jest błędem. Nie wybieraj wygodniejszej wers
 - Python buduje pełną autorytatywną kopertę `expected_decision`; model kopiuje bez zmian wyłącznie `status`, `stops`, `reviews`;
 - parser nie naprawia Markdown ani innych odchyleń od czystego JSON;
 - fakty podatkowe i nazwy predykatów nie mogą pojawić się w promptcie modelu; kanały STOP i REVIEW są rozdzielone także w JSON Schema;
+- provider-specific transport nie może osłabić lokalnej strict schema ani evaluatora;
+- `json_object` jest dopuszczalny wyłącznie jako jawny adapter modelu i nadal wymaga pełnej lokalnej walidacji;
 - `returned_model` musi być identyczny z modelem żądanym podczas live runu, playbacku i pre-commit;
 - playback nigdy nie wykonuje live requestu;
 - playback i pre-commit odrzucają `finish_reason` inny niż `stop`;
@@ -51,7 +53,7 @@ Sprzeczność między źródłami jest błędem. Nie wybieraj wygodniejszej wers
 - używać niejednoznacznych pól `ulga_BR` albo `straty_poprzednie`;
 - włączać płatnych requestów do standardowego CI;
 - nadpisywać poprawnych kaset;
-- deklarować gotowości bez 322/322 i playbacku offline.
+- deklarować gotowości bez 322/322, raportu kompletności i playbacku offline.
 
 ## Bramka jakości
 
@@ -62,10 +64,13 @@ python -m compileall -q python_helper tests scripts
 pytest tests/unit --cov=python_helper --cov-report=term-missing --cov-fail-under=90
 pytest -q
 python scripts/check_cassette_policy.py
+python scripts/benchmark_report.py
+unset OPENROUTER_API_KEY
+./scripts/verify_all_models.sh
 for script in scripts/*.sh dump-to-md.sh; do bash -n "$script"; done
 ```
 
-Stan bazowy po rozszerzeniu regresji: co najmniej 255 testów jednostkowych, coverage powyżej wymaganych 90% i 46 kontrolowanych skipów LLM. Dokładne wartości raportuje CI.
+Stan bazowy: co najmniej 256 testów jednostkowych, coverage powyżej wymaganych 90% i 46 scenariuszy LLM. CI na Pythonie 3.13 wymaga kompletnej aktualnej macierzy i wykonuje playback bez sekretu.
 
 ## Nagrywanie
 
