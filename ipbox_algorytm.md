@@ -13,6 +13,7 @@
 7. Po aktywacji STOP status to `STOPPED`, a finalne liczby, klasyfikacje i rozliczenie są zerowane.
 8. Zeznanie musi uzgadniać się z ewidencją nie tylko sumą globalną, lecz także osobno w przychodach i kosztach IP/NIE.
 9. Testy i przykłady używają wyłącznie danych syntetycznych. Nie kopiuj danych podatnika, identyfikatorów, kontrahentów ani dokładnych rozliczeń do repozytorium.
+10. Provider LLM nie jest źródłem reguł. Adapter transportowy nie może osłabić lokalnej strict schema, parsera ani evaluatora.
 
 ## 2. Dane i kwalifikacja
 
@@ -242,10 +243,32 @@ Dodatkowe strażniki alokacji, limitów rocznych i uzgodnienia zeznania aktywuj�
 
 ## 14. Kontrakt modelu
 
-Python wyznacza liczby, klasyfikacje, TEST-y i pełne `decision_facts`. Runner usuwa fakty `false` i tworzy wyłącznie prawdziwe `active_rules`. Model nie widzi surowych danych podatkowych ani nieaktywnych reguł. Zwraca czysty JSON:
+Python i oracle wyznaczają liczby, klasyfikacje, TEST-y, pełne `decision_facts` oraz finalną autorytatywną kopertę:
+
+```json
+{
+  "expected_decision": {
+    "status": "FINAL",
+    "stops": [],
+    "reviews": ["REVIEW_09"]
+  }
+}
+```
+
+Model widzi wyłącznie tę kopertę. Nie widzi surowych danych podatkowych, nazw predykatów ani faktów `true/false`. Jego jedynym zadaniem jest zwrócenie czystego JSON z dokładną kopią trzech pól:
 
 ```json
 {"status":"FINAL","stops":[],"reviews":["REVIEW_09"]}
 ```
 
-Aplikacja składa i waliduje raport. Model kopiuje każdy aktywny kod do właściwej listy, nie dodaje kodów nieobecnych w `active_rules` i nie wykonuje obliczeń podatkowych.
+Model:
+
+- nie oblicza podatku, W, NEXUS, ulg ani TEST 1–9;
+- nie ustala, czy kod jest STOP-em czy REVIEW;
+- nie przenosi, nie pomija, nie deduplikuje i nie dodaje kodów;
+- nie zmienia `status`;
+- nie używa Markdown fences ani pól dodatkowych.
+
+Lokalna `DECISION_JSON_SCHEMA`, parser i evaluator są źródłem prawdy dla każdego modelu. Adapter providera może wyłącznie zmienić reprezentację transportową, na przykład usunąć nieobsługiwany keyword ze swojej głębokiej kopii JSON Schema albo wymusić `json_object`. Nie może zmienić lokalnego zestawu dozwolonych kodów, reguł unikalności, rozdziału STOP/REVIEW ani oceny semantycznej.
+
+Aplikacja składa zweryfikowaną kopertę z deterministycznym raportem. Kaseta może powstać dopiero po pełnym schema i semantic PASS, z dokładnym modelem zwróconym i `finish_reason=stop`.
