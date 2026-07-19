@@ -44,9 +44,7 @@ def calculate_tax_for_year(
     rd_relief_ip: float = 0,
     rd_relief_limit: float = 0,
     thermomodernization_pool: float = 0,
-    thermomodernization_lots: (
-        Iterable[ThermomodernizationLot | Mapping[str, Any]] | None
-    ) = None,
+    thermomodernization_lots: (Iterable[ThermomodernizationLot | Mapping[str, Any]] | None) = None,
     child_tax_credit: float = 0,
     extra_income_scale: float = 0,
 ) -> dict[str, Any]:
