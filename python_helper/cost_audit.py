@@ -194,13 +194,13 @@ def _source_ledger_audit(
     reported_raw = summary.get("koszty") if isinstance(summary, Mapping) else None
     reported = money(reported_raw) if reported_raw is not None else None
     inferred_included = Decimal("0")
-    if reported is not None and excluded_total > 0 and abs(reported - raw_costs) <= Decimal("1.00"):
+    if reported is not None and excluded_total > 0 and abs(reported - raw_costs) <= MONEY:
         inferred_included = excluded_total
     excluded_recorded = max(explicitly_included, inferred_included)
 
     if excluded_recorded > 0:
         status = "REQUIRES_CORRECTION"
-    elif reported is not None and abs(reported - deductible_costs) > Decimal("0.01"):
+    elif reported is not None and abs(reported - deductible_costs) > MONEY:
         status = "MISMATCH"
     elif reported is not None or explicit_status_seen:
         status = "OK"
