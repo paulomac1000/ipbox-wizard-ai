@@ -1,8 +1,8 @@
 meta:
   id: 50_silent_allocation_method_switch_stop
   name: Niejawna zmiana metody alokacji w trakcie roku
-  description: Łączy podwójny procent w części roku z przypisaniem 100 procent przychodu mimo części NIE-IP.
-  tags: [regression, allocation, fail-closed]
+  description: Łączy podwójny zaokrąglony procent w części roku z przypisaniem 100 procent przychodu mimo części NIE-IP.
+  tags: [regression, allocation, rounding, fail-closed, synthetic]
   priority: P0
 input:
   rok: 2025
@@ -25,16 +25,17 @@ input:
   miesiace:
     - miesiac: 2025-01
       faktury:
-        - kwota_PLN: 10000
+        - kwota_PLN: 23100
           kontrahent: ClientA
           kwalifikuje_IP: true
       ewidencja:
-        godziny_pracy: 160
-        godziny_nie_IP: 16
-        procent_faktury_IP: 80
+        godziny_pracy: 168
+        godziny_nie_IP: 22
+        procent_faktury_IP: 81.82
+        invoice_percentage_precision_pp: 0.01
       kontrola_alokacji:
-        przychod_IP: 6400
-        przychod_NIE: 3600
+        przychod_IP: 15463.64
+        przychod_NIE: 7636.36
       koszty:
         - opis: Dedykowany koszt projektu A
           kwota: 100
@@ -44,15 +45,15 @@ input:
       opis_projektu: Rozwój kwalifikowanego programu komputerowego.
     - miesiac: 2025-02
       faktury:
-        - kwota_PLN: 10000
+        - kwota_PLN: 23100
           kontrahent: ClientA
           kwalifikuje_IP: true
       ewidencja:
-        godziny_pracy: 160
-        godziny_nie_IP: 16
+        godziny_pracy: 168
+        godziny_nie_IP: 22
         procent_faktury_IP: 100
       kontrola_alokacji:
-        przychod_IP: 10000
+        przychod_IP: 23100
         przychod_NIE: 0
       koszty: []
       opis_projektu: Rozwój kwalifikowanego programu komputerowego.
