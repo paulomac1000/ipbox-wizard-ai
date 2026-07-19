@@ -142,17 +142,11 @@ def _explicit_stream_rows(
     streams = _first(declared, "alokacje", "strumienie", "streams")
     if not isinstance(streams, list):
         return []
-    projects = (
-        evidence.get("projekty", [])
-        if isinstance(evidence.get("projekty"), list)
-        else []
-    )
+    projects = evidence.get("projekty", []) if isinstance(evidence.get("projekty"), list) else []
     rows: list[dict[str, Any]] = []
     for index, raw in enumerate(streams):
         if not isinstance(raw, dict):
-            raise ScenarioError(
-                f"kontrola_alokacji.alokacje[{index}] must be a mapping"
-            )
+            raise ScenarioError(f"kontrola_alokacji.alokacje[{index}] must be a mapping")
         stream = dict(raw)
         default_evidence = dict(evidence)
         total_raw = _first(stream, "total_revenue", "przychod", "kwota")
@@ -162,9 +156,7 @@ def _explicit_stream_rows(
             try:
                 invoice = invoices[int(invoice_index)]
             except (ValueError, IndexError) as exc:
-                raise ScenarioError(
-                    f"invalid invoice_index in allocation stream {index}"
-                ) from exc
+                raise ScenarioError(f"invalid invoice_index in allocation stream {index}") from exc
             if total_raw is None:
                 total_raw = invoice_amount(invoice)
             invoice_evidence = invoice.get("ewidencja")
@@ -174,29 +166,21 @@ def _explicit_stream_rows(
             try:
                 project = projects[int(project_index)]
             except (ValueError, IndexError) as exc:
-                raise ScenarioError(
-                    f"invalid project_index in allocation stream {index}"
-                ) from exc
+                raise ScenarioError(f"invalid project_index in allocation stream {index}") from exc
             if not isinstance(project, dict):
-                raise ScenarioError(
-                    f"project_index {project_index} does not reference a mapping"
-                )
+                raise ScenarioError(f"project_index {project_index} does not reference a mapping")
             if total_raw is None:
                 total_raw = _first(project, "przychod", "total_revenue", "kwota")
             default_evidence.update(
                 {
-                    "godziny_pracy": _first(
-                        project, "godziny_pracy", "godziny", default=0
-                    ),
+                    "godziny_pracy": _first(project, "godziny_pracy", "godziny", default=0),
                     "godziny_nie_IP": project.get("godziny_nie_IP", 0),
                     "procent_faktury_IP": project.get(
                         "procent_faktury_IP", evidence.get("procent_faktury_IP", 100)
                     ),
                 }
             )
-            stream.setdefault(
-                "stream_id", str(project.get("nazwa", f"project-{project_index}"))
-            )
+            stream.setdefault("stream_id", str(project.get("nazwa", f"project-{project_index}")))
         if total_raw is None:
             raise ScenarioError(
                 f"allocation stream {index} requires total_revenue, invoice_index or project_index"
@@ -294,9 +278,7 @@ def audit_facts(
     rows: list[dict[str, Any]] = []
     findings: list[AllocationFinding] = []
     for month in input_data.get("miesiace", []) or []:
-        if not isinstance(month, dict) or not isinstance(
-            month.get("kontrola_alokacji"), dict
-        ):
+        if not isinstance(month, dict) or not isinstance(month.get("kontrola_alokacji"), dict):
             continue
         declared = month["kontrola_alokacji"]
         invoices = month_invoices(month)
@@ -309,9 +291,7 @@ def audit_facts(
             month_rows = _project_level_rows(month, evidence, method)
         if month_rows:
             eligible_total = sum(
-                invoice_amount(invoice)
-                for invoice in invoices
-                if _invoice_is_ip(invoice, clients)
+                invoice_amount(invoice) for invoice in invoices if _invoice_is_ip(invoice, clients)
             )
             controlled_total = sum(float(row["total_revenue"]) for row in month_rows)
             if abs(controlled_total - eligible_total) > 0.02:
@@ -329,12 +309,8 @@ def audit_facts(
             continue
 
         total = sum((invoice_amount(invoice) for invoice in invoices), 0.0)
-        eligible_invoices = [
-            invoice for invoice in invoices if _invoice_is_ip(invoice, clients)
-        ]
-        eligible_total = sum(
-            (invoice_amount(invoice) for invoice in eligible_invoices), 0.0
-        )
+        eligible_invoices = [invoice for invoice in invoices if _invoice_is_ip(invoice, clients)]
+        eligible_total = sum((invoice_amount(invoice) for invoice in eligible_invoices), 0.0)
         known_non_ip = total - eligible_total
         ip = number(declared.get("przychod_IP"), "kontrola.przychod_IP")
         reported_non_total = number(
@@ -383,16 +359,12 @@ def audit_facts(
             "non_ip_cost": result["result"]["koszty_roczne"]["NIE"],
         }
         tax_return = {
-            "ip_revenue": reconciliation.get(
-                "przychod_IP", reconciliation.get("ip_revenue", 0)
-            ),
+            "ip_revenue": reconciliation.get("przychod_IP", reconciliation.get("ip_revenue", 0)),
             "non_ip_revenue": reconciliation.get(
                 "przychod_NIE", reconciliation.get("non_ip_revenue", 0)
             ),
             "ip_cost": reconciliation.get("koszt_IP", reconciliation.get("ip_cost", 0)),
-            "non_ip_cost": reconciliation.get(
-                "koszt_NIE", reconciliation.get("non_ip_cost", 0)
-            ),
+            "non_ip_cost": reconciliation.get("koszt_NIE", reconciliation.get("non_ip_cost", 0)),
         }
         findings.extend(reconcile_return_to_ledger(ledger, tax_return))
     codes = {finding.code for finding in findings}
@@ -408,12 +380,8 @@ def audit_facts(
                 "AUDIT_STREAM_TOTAL_MISMATCH",
             }
         ),
-        "invoice_percentage_double_applied": "INVOICE_PERCENTAGE_DOUBLE_APPLIED"
-        in codes,
-        "allocation_method_changed_without_evidence": "ALLOCATION_METHOD_SWITCH"
-        in codes,
-        "return_ledger_reconciliation_failed": any(
-            code.startswith("RETURN_") for code in codes
-        ),
+        "invoice_percentage_double_applied": "INVOICE_PERCENTAGE_DOUBLE_APPLIED" in codes,
+        "allocation_method_changed_without_evidence": "ALLOCATION_METHOD_SWITCH" in codes,
+        "return_ledger_reconciliation_failed": any(code.startswith("RETURN_") for code in codes),
     }
     return facts, sorted(codes)
