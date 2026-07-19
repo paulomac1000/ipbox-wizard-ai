@@ -4,21 +4,20 @@ meta:
   provider: openrouter
   requested_model: google/gemini-3-flash-preview
   returned_model: google/gemini-3-flash-preview
-  fingerprint: v3_65dd51b7854ac8c5585660a5b1e29e76aca9053d683e4881ee32089e88b8ddcf
-  request_hash: 5a580d837d6cb519d0be723de29d40fdf1d405c14264e64f0d0b98cc34413f99
-  recorded_at: '2026-07-19T17:24:24.729649+00:00'
-  request_id: gen-1784481863-frTbBJDoGs9MA5WEX263
+  fingerprint: v3_2492fce5383b6a5ba52a7c1955b2f798815f99ac325adf07d5084837b66b8c0f
+  request_hash: ef3d132537adadb059737faf362bdafdba27b43b33f4a9f3778243fb7a72af4d
+  recorded_at: '2026-07-19T20:59:01.005645+00:00'
+  request_id: gen-1784494739-FoFC0bQ7LmDemxMv1pjx
   finish_reason: stop
   native_finish_reason: STOP
   system_fingerprint: null
-  prompt_tokens: 544
-  completion_tokens: 46
-  total_tokens: 590
-  cost: 0.00041
-  recording_duration_seconds: 1.647
+  prompt_tokens: 556
+  completion_tokens: 20
+  total_tokens: 576
+  cost: 0.000338
+  recording_duration_seconds: 1.799
   cassette_format_version: 4
-response: "{\n  \"status\": \"STOPPED\",\n  \"stops\": [\n    \"STOP_13\"\n  ],\n  \"reviews\": [\n    \"REVIEW_09\"\n  ]\n\
-  }"
+response: '{"status":"STOPPED","stops":["STOP_13"],"reviews":["REVIEW_09"]}'
 parsed_response:
   status: STOPPED
   result:
@@ -45,6 +44,8 @@ parsed_response:
       źródło: domyślna_wizard
       wartość: null
       status: NOT_APPLICABLE
+      źródło_ref: null
+      rounding_granularity: per_cost_item
     alokacja_multi_ip: null
     podatek:
       podstawa_IP: 0
@@ -53,6 +54,7 @@ parsed_response:
       podatek_NIE_finalny: 0
       podatek_całościowy: 0
       nadpłata_lub_dopłata: 0.0
+      thermomodernization_used: 0.0
       termomodernization_carry_over: 0.0
       termomodernization_expired: 0.0
       health_tax_credit_used: 0.0
@@ -74,6 +76,23 @@ parsed_response:
     TEST_7: PASS
     TEST_8: PASS
     TEST_9: PASS
+  source_ledger_audit:
+    status: NOT_PROVIDED
+    reported_costs: null
+    raw_input_costs: 500.0
+    deductible_costs: 500.0
+    excluded_recorded_costs: 0.0
+    correction_delta: 0.0
+  correction_preview:
+    status: UNAVAILABLE
+    source_kpir_correction_required: false
+    return_correction_required: false
+    relief_adjustment_required: false
+    tax_unchanged_only_if_reliefs_updated: false
+    corrected_total_tax: null
+    corrected_overpayment: null
+    thermomodernization_used: null
+    thermomodernization_carry_over: null
   stops_reviews:
     stops:
     - STOP_13

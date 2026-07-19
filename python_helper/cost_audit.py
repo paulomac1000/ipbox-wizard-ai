@@ -12,8 +12,9 @@ It never infers a taxpayer-specific interpretation identifier or evidence.
 from __future__ import annotations
 
 from collections import defaultdict
+from collections.abc import Mapping
 from decimal import ROUND_DOWN, ROUND_HALF_UP, Decimal
-from typing import Any, Mapping
+from typing import Any
 
 MONEY = Decimal("0.01")
 QUALIFIED_NEXUS_BASKETS = {"A", "B", "C", "D"}

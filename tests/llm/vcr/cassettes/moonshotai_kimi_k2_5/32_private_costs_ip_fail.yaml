@@ -1,49 +1,51 @@
 meta:
   scenario_id: 32_private_costs_ip_fail
-  scenario_name: Koszt prywatny zadeklarowany jako firmowy
+  scenario_name: Prywatny wydatek ujęty w źródłowej KPiR i zeznaniu
   provider: openrouter
   requested_model: moonshotai/kimi-k2.5
   returned_model: moonshotai/kimi-k2.5
-  fingerprint: v3_69f8ee0bb59cfdbcc2660a2d9db06b9db9ec8025acb5036d0803ea5bfe883aad
-  request_hash: 890f838fcf0e0e5239e30fbe58d4f72a68b8b3e79b52dad7574fcf0b31e4716d
-  recorded_at: '2026-07-19T17:48:05.058042+00:00'
-  request_id: gen-1784483278-tgcTiTobny3aH7KS0r6n
+  fingerprint: v3_10affef963144ac844633843293202e7b198cc8b81c467319ee7a45e73978681
+  request_hash: 5bd9483bcd6b5dc141fff4f2a9e0bcca899e53c1591f23ccc368458c2b68f441
+  recorded_at: '2026-07-19T21:09:38.522214+00:00'
+  request_id: gen-1784495372-n8D229NxU6SKETNYQw81
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
-  prompt_tokens: 247
-  completion_tokens: 202
-  total_tokens: 449
-  cost: 0.00056565
-  recording_duration_seconds: 7.012
+  prompt_tokens: 254
+  completion_tokens: 300
+  total_tokens: 554
+  cost: 0.00071634
+  recording_duration_seconds: 5.623
   cassette_format_version: 4
-response: '{"reviews":["REVIEW_01","REVIEW_09"],"status":"FINAL","stops":[]}'
+response: '{"reviews":["REVIEW_09"],"status":"STOPPED","stops":["SOURCE_KPIR_REQUIRES_CORRECTION","STOP_12"]}'
 parsed_response:
-  status: FINAL
+  status: STOPPED
   result:
     rok: 2025
     przychody_roczne:
-      IP: 10000.0
+      IP: 0.0
       NIE: 0.0
     koszty_roczne:
       IP: 0.0
       NIE: 0.0
       MIX: 0.0
-      WYKLUCZONE: 100.0
+      WYKLUCZONE: 0.0
     nexus_koszty:
       A: 0.0
       B: 0.0
       C: 0.0
       D: 0.0
-      poza_nexus: 100.0
+      poza_nexus: 0.0
     nexus: 0.0
-    dochód_IP: 10000.0
+    dochód_IP: 0.0
     dochód_NIE: 0.0
     klucz_MIX:
       metoda: przychodowa_roczna
-      źródło: domyślna_wizard
+      źródło: użytkownik
       wartość: null
       status: NOT_APPLICABLE
+      źródło_ref: null
+      rounding_granularity: per_cost_item
     alokacja_multi_ip: null
     podatek:
       podstawa_IP: 0
@@ -51,7 +53,8 @@ parsed_response:
       podatek_IP: 0
       podatek_NIE_finalny: 0
       podatek_całościowy: 0
-      nadpłata_lub_dopłata: -0.0
+      nadpłata_lub_dopłata: 0.0
+      thermomodernization_used: 0.0
       termomodernization_carry_over: 0.0
       termomodernization_expired: 0.0
       health_tax_credit_used: 0.0
@@ -59,21 +62,10 @@ parsed_response:
       ulga_BR_NIE_wykorzystana: 0.0
       ulga_BR_carry_over: 0.0
       dochód_dodatkowy_skala: 0.0
-  classifications:
-  - opis: Kawa do domu
-    amount: 100.0
-    basket: WYKLUCZONE
-    allocation_method: excluded
-    allocation_source: ''
-    allocation_key: null
-    ip_amount: 0.0
-    non_ip_amount: 0.0
-    nexus_source: outside_nexus
-    nexus_basket: poza_nexus
-    nexus_amount: 0.0
+  classifications: []
   monthly_W:
-  - miesiąc: 2025-01
-    wartość: 100.0
+  - miesiąc: 2025-12
+    wartość: 75.0
   tests:
     TEST_1: PASS
     TEST_2: FAIL
@@ -84,9 +76,32 @@ parsed_response:
     TEST_7: PASS
     TEST_8: PASS
     TEST_9: PASS
+  source_ledger_audit:
+    status: REQUIRES_CORRECTION
+    reported_costs: 3400.0
+    raw_input_costs: 3400.0
+    deductible_costs: 3000.0
+    excluded_recorded_costs: 400.0
+    correction_delta: 400.0
+  correction_preview:
+    status: AVAILABLE
+    source_kpir_correction_required: true
+    return_correction_required: true
+    relief_adjustment_required: true
+    tax_unchanged_only_if_reliefs_updated: true
+    corrected_total_tax: 900.0
+    corrected_overpayment: 4100.0
+    thermomodernization_used: 4000.0
+    thermomodernization_carry_over: 1000.0
   stops_reviews:
-    stops: []
+    stops:
+    - SOURCE_KPIR_REQUIRES_CORRECTION
+    - STOP_12
     reviews:
-    - REVIEW_01
     - REVIEW_09
-    warnings: []
+    warnings:
+    - NON_DEDUCTIBLE_COST_EXCLUDED
+    - RETURN_NON_IP_COST_MISMATCH
+    - RETURN_THERMOMODERNIZATION_MISMATCH
+    - RETURN_TOTAL_COST_MISMATCH
+    - SOURCE_KPIR_REQUIRES_CORRECTION

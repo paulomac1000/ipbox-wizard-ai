@@ -4,10 +4,10 @@ meta:
   provider: openrouter
   requested_model: mistralai/ministral-3b-2512
   returned_model: mistralai/ministral-3b-2512
-  fingerprint: v3_126c022a01c9fd63afebae02fae08d6c994dc9b049c694038e63bc3492dc57d5
-  request_hash: 807d183e7c645f677e0916d6247a72c959a068ecfc053f739c63f5665c703256
-  recorded_at: '2026-07-19T18:17:55.706491+00:00'
-  request_id: gen-1784485075-LGEngSMkyVv4ZZIh1RvK
+  fingerprint: v3_b96588f8ac012c279b556671d458eeb2deb523f274a0e708cf49b8c9b1bc4482
+  request_hash: 36a7de8041e978fbb1693381fb54f06f1021adcc3f0ecd37dafdb5750279473c
+  recorded_at: '2026-07-19T21:16:53.944787+00:00'
+  request_id: gen-1784495813-CYhs7qZSWCG0Kqiy45xt
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
@@ -15,7 +15,7 @@ meta:
   completion_tokens: 35
   total_tokens: 294
   cost: 4.41e-05
-  recording_duration_seconds: 0.555
+  recording_duration_seconds: 0.798
   cassette_format_version: 4
 response: "{\n  \"status\": \"FINAL\",\n  \"stops\": [],\n  \"reviews\": [\"REVIEW_02\", \"REVIEW_09\"]\n}"
 parsed_response:
@@ -44,6 +44,8 @@ parsed_response:
       źródło: domyślna_wizard
       wartość: 0.4375
       status: FINAL
+      źródło_ref: null
+      rounding_granularity: per_cost_item
     alokacja_multi_ip: null
     podatek:
       podstawa_IP: 0
@@ -52,6 +54,7 @@ parsed_response:
       podatek_NIE_finalny: 2105
       podatek_całościowy: 2105
       nadpłata_lub_dopłata: -2105.0
+      thermomodernization_used: 0.0
       termomodernization_carry_over: 0.0
       termomodernization_expired: 0.0
       health_tax_credit_used: 0.0
@@ -71,6 +74,11 @@ parsed_response:
     nexus_source: outside_nexus
     nexus_basket: poza_nexus
     nexus_amount: 0.0
+    allocation_period: 2025-01
+    rounding_granularity: per_cost_item
+    rounding_adjustment: 0.0
+    nexus_evidence: ''
+    nexus_basis: explicit_amount
   monthly_W:
   - miesiąc: 2025-01
     wartość: 43.75
@@ -84,6 +92,23 @@ parsed_response:
     TEST_7: PASS
     TEST_8: PASS
     TEST_9: PASS
+  source_ledger_audit:
+    status: NOT_PROVIDED
+    reported_costs: null
+    raw_input_costs: 300.0
+    deductible_costs: 300.0
+    excluded_recorded_costs: 0.0
+    correction_delta: 0.0
+  correction_preview:
+    status: NOT_NEEDED
+    source_kpir_correction_required: false
+    return_correction_required: false
+    relief_adjustment_required: false
+    tax_unchanged_only_if_reliefs_updated: false
+    corrected_total_tax: 2105.0
+    corrected_overpayment: -2105.0
+    thermomodernization_used: 0.0
+    thermomodernization_carry_over: 0.0
   stops_reviews:
     stops: []
     reviews:

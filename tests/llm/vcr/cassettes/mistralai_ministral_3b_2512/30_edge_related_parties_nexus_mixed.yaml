@@ -4,10 +4,10 @@ meta:
   provider: openrouter
   requested_model: mistralai/ministral-3b-2512
   returned_model: mistralai/ministral-3b-2512
-  fingerprint: v3_4669c2a0439320088ae16aa6eb72e8bb0aa4407ce5d4d10579a08c8aca1d7d0d
-  request_hash: b35cb122905ded4d20c7f95355c7f3f1b5ac440970d593f09fc1ce57cfcea2ff
-  recorded_at: '2026-07-19T18:18:14.590403+00:00'
-  request_id: gen-1784485093-14NitktdZIiD5AYImDZ4
+  fingerprint: v3_b98395ea83797d306af3da011e0805abb2be7ed81eff382bfb8e445b29cdff66
+  request_hash: 8b0284a51334c540300751d0122509c31d9c8193001ad5586961efb107c8084e
+  recorded_at: '2026-07-19T21:17:09.069054+00:00'
+  request_id: gen-1784495828-ABFIUXtRDa5d7LA3woRH
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
@@ -15,7 +15,7 @@ meta:
   completion_tokens: 35
   total_tokens: 294
   cost: 4.41e-05
-  recording_duration_seconds: 0.821
+  recording_duration_seconds: 0.573
   cassette_format_version: 4
 response: "{\n  \"status\": \"FINAL\",\n  \"stops\": [],\n  \"reviews\": [\"REVIEW_01\", \"REVIEW_09\"]\n}"
 parsed_response:
@@ -44,6 +44,8 @@ parsed_response:
       źródło: domyślna_wizard
       wartość: null
       status: NOT_APPLICABLE
+      źródło_ref: null
+      rounding_granularity: per_cost_item
     alokacja_multi_ip: null
     podatek:
       podstawa_IP: 8931
@@ -52,6 +54,7 @@ parsed_response:
       podatek_NIE_finalny: 0
       podatek_całościowy: 447
       nadpłata_lub_dopłata: -447.0
+      thermomodernization_used: 0.0
       termomodernization_carry_over: 0.0
       termomodernization_expired: 0.0
       health_tax_credit_used: 0.0
@@ -71,6 +74,11 @@ parsed_response:
     nexus_source: own_br
     nexus_basket: A
     nexus_amount: 3000.0
+    allocation_period: 2025-01
+    rounding_granularity: per_cost_item
+    rounding_adjustment: 0.0
+    nexus_evidence: ewidencja_kosztu_IP
+    nexus_basis: explicit_amount
   - opis: Usługi CodeSis
     amount: 5000.0
     basket: IP
@@ -82,6 +90,11 @@ parsed_response:
     nexus_source: related_br_contractor
     nexus_basket: C
     nexus_amount: 5000.0
+    allocation_period: 2025-01
+    rounding_granularity: per_cost_item
+    rounding_adjustment: 0.0
+    nexus_evidence: ewidencja_kosztu_IP
+    nexus_basis: explicit_amount
   - opis: Licencja JetBrains
     amount: 500.0
     basket: IP
@@ -93,6 +106,11 @@ parsed_response:
     nexus_source: own_br
     nexus_basket: A
     nexus_amount: 500.0
+    allocation_period: 2025-02
+    rounding_granularity: per_cost_item
+    rounding_adjustment: 0.0
+    nexus_evidence: ewidencja_kosztu_IP
+    nexus_basis: explicit_amount
   - opis: Usługi CodeSis 2
     amount: 5000.0
     basket: IP
@@ -104,6 +122,11 @@ parsed_response:
     nexus_source: related_br_contractor
     nexus_basket: C
     nexus_amount: 5000.0
+    allocation_period: 2025-02
+    rounding_granularity: per_cost_item
+    rounding_adjustment: 0.0
+    nexus_evidence: ewidencja_kosztu_IP
+    nexus_basis: explicit_amount
   monthly_W:
   - miesiąc: 2025-01
     wartość: 100.0
@@ -119,6 +142,23 @@ parsed_response:
     TEST_7: PASS
     TEST_8: PASS
     TEST_9: PASS
+  source_ledger_audit:
+    status: NOT_PROVIDED
+    reported_costs: null
+    raw_input_costs: 13500.0
+    deductible_costs: 13500.0
+    excluded_recorded_costs: 0.0
+    correction_delta: 0.0
+  correction_preview:
+    status: NOT_NEEDED
+    source_kpir_correction_required: false
+    return_correction_required: false
+    relief_adjustment_required: false
+    tax_unchanged_only_if_reliefs_updated: false
+    corrected_total_tax: 447.0
+    corrected_overpayment: -447.0
+    thermomodernization_used: 0.0
+    thermomodernization_carry_over: 0.0
   stops_reviews:
     stops: []
     reviews:

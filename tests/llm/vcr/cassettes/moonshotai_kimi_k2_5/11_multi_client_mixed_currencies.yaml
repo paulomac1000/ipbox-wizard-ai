@@ -4,20 +4,20 @@ meta:
   provider: openrouter
   requested_model: moonshotai/kimi-k2.5
   returned_model: moonshotai/kimi-k2.5
-  fingerprint: v3_f83ada65c2ae76f6b00743595cb6d3e4bbc8ed9b4a0162883d8f53d87a635973
-  request_hash: 3f5d37d7a4c21cb5f27ed027c446471fc3bf528cbd14ce15468e61c7e00fa042
-  recorded_at: '2026-07-19T17:33:54.447169+00:00'
-  request_id: gen-1784482423-1i0Jbs6h68OTJfBv6s17
+  fingerprint: v3_1f3f1f3ede897c1373b328736f7a5d4ec7f60ac659b61116d4c832a086f4faf8
+  request_hash: 00fd999e6348038c88081df5461e41cf496635eabd563f10b7645fca87a7ccc7
+  recorded_at: '2026-07-19T21:07:37.681026+00:00'
+  request_id: gen-1784495236-L8KjHewr0jevu5oOtxPk
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
   prompt_tokens: 242
-  completion_tokens: 163
-  total_tokens: 405
-  cost: 0.00047565
-  recording_duration_seconds: 11.573
+  completion_tokens: 236
+  total_tokens: 478
+  cost: 0.0005776
+  recording_duration_seconds: 21.277
   cassette_format_version: 4
-response: '{"reviews":["REVIEW_01"],"status":"FINAL","stops":[]}'
+response: '{"status":"FINAL","stops":[],"reviews":["REVIEW_01"]}'
 parsed_response:
   status: FINAL
   result:
@@ -44,6 +44,8 @@ parsed_response:
       źródło: domyślna_wizard
       wartość: null
       status: NOT_APPLICABLE
+      źródło_ref: null
+      rounding_granularity: per_cost_item
     alokacja_multi_ip: null
     podatek:
       podstawa_IP: 22600
@@ -52,6 +54,7 @@ parsed_response:
       podatek_NIE_finalny: 0
       podatek_całościowy: 1130
       nadpłata_lub_dopłata: -1130.0
+      thermomodernization_used: 0.0
       termomodernization_carry_over: 0.0
       termomodernization_expired: 0.0
       health_tax_credit_used: 0.0
@@ -71,6 +74,11 @@ parsed_response:
     nexus_source: own_br
     nexus_basket: A
     nexus_amount: 300.0
+    allocation_period: 2025-01
+    rounding_granularity: per_cost_item
+    rounding_adjustment: 0.0
+    nexus_evidence: ewidencja_kosztu_IP
+    nexus_basis: explicit_amount
   - opis: Ujemna różnica kursowa
     amount: 100.0
     basket: NON
@@ -82,6 +90,11 @@ parsed_response:
     nexus_source: outside_nexus
     nexus_basket: poza_nexus
     nexus_amount: 0.0
+    allocation_period: null
+    rounding_granularity: per_cost_item
+    rounding_adjustment: 0.0
+    nexus_evidence: ''
+    nexus_basis: explicit_amount
   monthly_W:
   - miesiąc: 2025-01
     wartość: 100.0
@@ -95,6 +108,23 @@ parsed_response:
     TEST_7: PASS
     TEST_8: PASS
     TEST_9: PASS
+  source_ledger_audit:
+    status: NOT_PROVIDED
+    reported_costs: null
+    raw_input_costs: 300.0
+    deductible_costs: 300.0
+    excluded_recorded_costs: 0.0
+    correction_delta: 0.0
+  correction_preview:
+    status: NOT_NEEDED
+    source_kpir_correction_required: false
+    return_correction_required: false
+    relief_adjustment_required: false
+    tax_unchanged_only_if_reliefs_updated: false
+    corrected_total_tax: 1130.0
+    corrected_overpayment: -1130.0
+    thermomodernization_used: 0.0
+    thermomodernization_carry_over: 0.0
   stops_reviews:
     stops: []
     reviews:

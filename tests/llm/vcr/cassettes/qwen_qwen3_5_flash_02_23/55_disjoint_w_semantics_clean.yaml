@@ -4,18 +4,18 @@ meta:
   provider: openrouter
   requested_model: qwen/qwen3.5-flash-02-23
   returned_model: qwen/qwen3.5-flash-02-23
-  fingerprint: v3_ff463035c1f34aa540ffad4c828e5d8109cd73d7373f489ee76350794d4cca66
-  request_hash: 6d15268532c6d37b7cfa6e5cf87c9b95f10a438ac7edd76521368a74f3645155
-  recorded_at: '2026-07-19T18:17:41.620681+00:00'
-  request_id: gen-1784485057-QGuIKFzkW0xAsjVfsDsV
+  fingerprint: v3_6724da4a2794ab45e6966b7ecb06d581ef62fb5764ee3e56aa5624666a636f8c
+  request_hash: 616ec66157709f9cd94c47bb14e2013de996c038ede40e9fdb0c9db6949cf33d
+  recorded_at: '2026-07-19T21:16:38.165052+00:00'
+  request_id: gen-1784495794-F40n9yc5l4VaQjWAqN0k
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
   prompt_tokens: 241
-  completion_tokens: 679
-  total_tokens: 920
-  cost: 0.000192205
-  recording_duration_seconds: 3.938
+  completion_tokens: 661
+  total_tokens: 902
+  cost: 0.000187525
+  recording_duration_seconds: 4.218
   cassette_format_version: 4
 response: '{"status":"FINAL","stops":[],"reviews":[]}'
 parsed_response:
@@ -44,6 +44,8 @@ parsed_response:
       źródło: użytkownik
       wartość: null
       status: NOT_APPLICABLE
+      źródło_ref: null
+      rounding_granularity: per_cost_item
     alokacja_multi_ip: null
     podatek:
       podstawa_IP: 15774
@@ -52,6 +54,7 @@ parsed_response:
       podatek_NIE_finalny: 1848
       podatek_całościowy: 2637
       nadpłata_lub_dopłata: -2637.0
+      thermomodernization_used: 0.0
       termomodernization_carry_over: 0.0
       termomodernization_expired: 0.0
       health_tax_credit_used: 0.0
@@ -71,6 +74,11 @@ parsed_response:
     nexus_source: own_br
     nexus_basket: A
     nexus_amount: 100.0
+    allocation_period: 2025-01
+    rounding_granularity: per_cost_item
+    rounding_adjustment: 0.0
+    nexus_evidence: syntetyczna-ewidencja-projektowa
+    nexus_basis: explicit_amount
   monthly_W:
   - miesiąc: 2025-01
     wartość: 68.72
@@ -84,6 +92,23 @@ parsed_response:
     TEST_7: PASS
     TEST_8: PASS
     TEST_9: PASS
+  source_ledger_audit:
+    status: NOT_PROVIDED
+    reported_costs: null
+    raw_input_costs: 100.0
+    deductible_costs: 100.0
+    excluded_recorded_costs: 0.0
+    correction_delta: 0.0
+  correction_preview:
+    status: NOT_NEEDED
+    source_kpir_correction_required: false
+    return_correction_required: false
+    relief_adjustment_required: false
+    tax_unchanged_only_if_reliefs_updated: false
+    corrected_total_tax: 2637.0
+    corrected_overpayment: -2637.0
+    thermomodernization_used: 0.0
+    thermomodernization_carry_over: 0.0
   stops_reviews:
     stops: []
     reviews: []

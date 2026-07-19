@@ -4,18 +4,18 @@ meta:
   provider: openrouter
   requested_model: minimax/minimax-m2.5
   returned_model: minimax/minimax-m2.5
-  fingerprint: v3_2ee2d272ad75d74864eddcba938727a054f1e55efd57e44b61d606ea03b02c1a
-  request_hash: b38161b77f71a9df672471094b5b80771abf6405521547ae7a2d67b52eb074b0
-  recorded_at: '2026-07-19T17:30:15.478025+00:00'
-  request_id: gen-1784482214-JSMQvKktwbjWguiEYM8M
+  fingerprint: v3_c0d5071604f1b53e204d03b9cacd1d24b69fc010a78d7a799cdaaf7c96dd66d6
+  request_hash: 55b346e7371b25259dd7df94967eb096afd0a4f9695c740563bdb270d78830ea
+  recorded_at: '2026-07-19T21:04:33.440930+00:00'
+  request_id: gen-1784495072-jEwjPG8N1GVHcCVTpNUv
   finish_reason: stop
   native_finish_reason: stop
-  system_fingerprint: null
-  prompt_tokens: 547
-  completion_tokens: 174
-  total_tokens: 721
-  cost: 0.0003729
-  recording_duration_seconds: 1.469
+  system_fingerprint: vllm-0.21.0-tp4-bf80359e
+  prompt_tokens: 560
+  completion_tokens: 138
+  total_tokens: 698
+  cost: 0.0002082
+  recording_duration_seconds: 1.452
   cassette_format_version: 4
 response: '{"status":"FINAL","stops":[],"reviews":["REVIEW_09"]}'
 parsed_response:
@@ -44,6 +44,8 @@ parsed_response:
       źródło: domyślna_wizard
       wartość: 0.9048
       status: FINAL
+      źródło_ref: null
+      rounding_granularity: per_cost_item
     alokacja_multi_ip: null
     podatek:
       podstawa_IP: 22420
@@ -52,6 +54,7 @@ parsed_response:
       podatek_NIE_finalny: 451
       podatek_całościowy: 1572
       nadpłata_lub_dopłata: -1572.0
+      thermomodernization_used: 0.0
       termomodernization_carry_over: 0.0
       termomodernization_expired: 0.0
       health_tax_credit_used: 0.0
@@ -71,6 +74,11 @@ parsed_response:
     nexus_source: own_br
     nexus_basket: A
     nexus_amount: 119.0
+    allocation_period: 2025-01
+    rounding_granularity: per_cost_item
+    rounding_adjustment: 0.0
+    nexus_evidence: ewidencja_kosztu_IP
+    nexus_basis: explicit_amount
   - opis: Internet firmowy
     amount: 89.0
     basket: MIX
@@ -82,6 +90,11 @@ parsed_response:
     nexus_source: outside_nexus
     nexus_basket: poza_nexus
     nexus_amount: 0.0
+    allocation_period: 2025-01
+    rounding_granularity: per_cost_item
+    rounding_adjustment: 0.0
+    nexus_evidence: ''
+    nexus_basis: explicit_amount
   monthly_W:
   - miesiąc: 2025-01
     wartość: 90.48
@@ -95,6 +108,23 @@ parsed_response:
     TEST_7: PASS
     TEST_8: PASS
     TEST_9: PASS
+  source_ledger_audit:
+    status: NOT_PROVIDED
+    reported_costs: null
+    raw_input_costs: 208.0
+    deductible_costs: 208.0
+    excluded_recorded_costs: 0.0
+    correction_delta: 0.0
+  correction_preview:
+    status: NOT_NEEDED
+    source_kpir_correction_required: false
+    return_correction_required: false
+    relief_adjustment_required: false
+    tax_unchanged_only_if_reliefs_updated: false
+    corrected_total_tax: 1572.0
+    corrected_overpayment: -1572.0
+    thermomodernization_used: 0.0
+    thermomodernization_carry_over: 0.0
   stops_reviews:
     stops: []
     reviews:

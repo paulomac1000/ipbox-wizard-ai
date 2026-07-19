@@ -4,18 +4,18 @@ meta:
   provider: openrouter
   requested_model: anthropic/claude-haiku-4.5
   returned_model: anthropic/claude-haiku-4.5
-  fingerprint: v3_7cfd0d9f8bf86bbc1cfc4c7d02e3d07975209ede7aadab70dd71a6e25dd29283
-  request_hash: 761b86c6041f4fe117c0ef9e8ba59bf48ca0bfc11d469609b098f03b96f30e12
-  recorded_at: '2026-07-19T17:25:22.548242+00:00'
-  request_id: gen-1784481920-tJscBplLcsKHO8dLkyAQ
+  fingerprint: v3_5978fc2578f0898cf1e86d7bb5d3ddc3e4fd8ec3608158f58e566fab485f70a4
+  request_hash: 33fb19195094137d3686944c29c5c69d6a949db4d5eca706aee2fdede7fdfb59
+  recorded_at: '2026-07-19T21:00:09.153325+00:00'
+  request_id: gen-1784494806-PO31UZmSJubpN6586efW
   finish_reason: stop
   native_finish_reason: end_turn
   system_fingerprint: null
-  prompt_tokens: 704
+  prompt_tokens: 720
   completion_tokens: 27
-  total_tokens: 731
-  cost: 0.000839
-  recording_duration_seconds: 2.114
+  total_tokens: 747
+  cost: 0.000855
+  recording_duration_seconds: 2.705
   cassette_format_version: 4
 response: '{"status":"FINAL","stops":[],"reviews":["REVIEW_01","REVIEW_09"]}'
 parsed_response:
@@ -44,6 +44,8 @@ parsed_response:
       źródło: domyślna_wizard
       wartość: null
       status: NOT_APPLICABLE
+      źródło_ref: null
+      rounding_granularity: per_cost_item
     alokacja_multi_ip: null
     podatek:
       podstawa_IP: 29800
@@ -52,6 +54,7 @@ parsed_response:
       podatek_NIE_finalny: 0
       podatek_całościowy: 1490
       nadpłata_lub_dopłata: -1490.0
+      thermomodernization_used: 0.0
       termomodernization_carry_over: 15000.0
       termomodernization_expired: 0.0
       health_tax_credit_used: 0.0
@@ -71,6 +74,11 @@ parsed_response:
     nexus_source: own_br
     nexus_basket: A
     nexus_amount: 100.0
+    allocation_period: 2025-01
+    rounding_granularity: per_cost_item
+    rounding_adjustment: 0.0
+    nexus_evidence: ewidencja_kosztu_IP
+    nexus_basis: explicit_amount
   - opis: IDE support
     amount: 100.0
     basket: IP
@@ -82,6 +90,11 @@ parsed_response:
     nexus_source: own_br
     nexus_basket: A
     nexus_amount: 100.0
+    allocation_period: 2025-02
+    rounding_granularity: per_cost_item
+    rounding_adjustment: 0.0
+    nexus_evidence: ewidencja_kosztu_IP
+    nexus_basis: explicit_amount
   monthly_W:
   - miesiąc: 2025-01
     wartość: 100.0
@@ -97,6 +110,23 @@ parsed_response:
     TEST_7: PASS
     TEST_8: PASS
     TEST_9: PASS
+  source_ledger_audit:
+    status: NOT_PROVIDED
+    reported_costs: null
+    raw_input_costs: 200.0
+    deductible_costs: 200.0
+    excluded_recorded_costs: 0.0
+    correction_delta: 0.0
+  correction_preview:
+    status: NOT_NEEDED
+    source_kpir_correction_required: false
+    return_correction_required: false
+    relief_adjustment_required: false
+    tax_unchanged_only_if_reliefs_updated: false
+    corrected_total_tax: 1490.0
+    corrected_overpayment: -1490.0
+    thermomodernization_used: 0.0
+    thermomodernization_carry_over: 15000.0
   stops_reviews:
     stops: []
     reviews:

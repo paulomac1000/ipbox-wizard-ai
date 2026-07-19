@@ -1,49 +1,52 @@
 meta:
   scenario_id: 32_private_costs_ip_fail
-  scenario_name: Koszt prywatny zadeklarowany jako firmowy
+  scenario_name: Prywatny wydatek ujęty w źródłowej KPiR i zeznaniu
   provider: openrouter
   requested_model: mistralai/ministral-3b-2512
   returned_model: mistralai/ministral-3b-2512
-  fingerprint: v3_cebbd8de1f0e3379c262d1abaa1c3bebdc5e922dad25a82a4add7decdc132eb2
-  request_hash: b35cb122905ded4d20c7f95355c7f3f1b5ac440970d593f09fc1ce57cfcea2ff
-  recorded_at: '2026-07-19T18:18:18.752278+00:00'
-  request_id: gen-1784485097-q4PoCZGqNGiShBzggjEn
+  fingerprint: v3_12d2806110656e4998981fa2139707f256eb04d1781d7bc36c6eadb5f9b220f3
+  request_hash: c145578f1be64f0f2b80cc2ec3d83f2b982b19dabb5deac25a67e3e785d7adf5
+  recorded_at: '2026-07-19T21:17:11.865717+00:00'
+  request_id: gen-1784495831-Uf7hXOsyZf4awdwOYrmg
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
-  prompt_tokens: 259
-  completion_tokens: 35
-  total_tokens: 294
-  cost: 4.41e-05
-  recording_duration_seconds: 1.297
+  prompt_tokens: 273
+  completion_tokens: 49
+  total_tokens: 322
+  cost: 4.83e-05
+  recording_duration_seconds: 0.641
   cassette_format_version: 4
-response: "{\n  \"status\": \"FINAL\",\n  \"stops\": [],\n  \"reviews\": [\"REVIEW_01\", \"REVIEW_09\"]\n}"
+response: "{\n  \"status\": \"STOPPED\",\n  \"stops\": [\"SOURCE_KPIR_REQUIRES_CORRECTION\", \"STOP_12\"],\n  \"reviews\"\
+  : [\"REVIEW_09\"]\n}"
 parsed_response:
-  status: FINAL
+  status: STOPPED
   result:
     rok: 2025
     przychody_roczne:
-      IP: 10000.0
+      IP: 0.0
       NIE: 0.0
     koszty_roczne:
       IP: 0.0
       NIE: 0.0
       MIX: 0.0
-      WYKLUCZONE: 100.0
+      WYKLUCZONE: 0.0
     nexus_koszty:
       A: 0.0
       B: 0.0
       C: 0.0
       D: 0.0
-      poza_nexus: 100.0
+      poza_nexus: 0.0
     nexus: 0.0
-    dochód_IP: 10000.0
+    dochód_IP: 0.0
     dochód_NIE: 0.0
     klucz_MIX:
       metoda: przychodowa_roczna
-      źródło: domyślna_wizard
+      źródło: użytkownik
       wartość: null
       status: NOT_APPLICABLE
+      źródło_ref: null
+      rounding_granularity: per_cost_item
     alokacja_multi_ip: null
     podatek:
       podstawa_IP: 0
@@ -51,7 +54,8 @@ parsed_response:
       podatek_IP: 0
       podatek_NIE_finalny: 0
       podatek_całościowy: 0
-      nadpłata_lub_dopłata: -0.0
+      nadpłata_lub_dopłata: 0.0
+      thermomodernization_used: 0.0
       termomodernization_carry_over: 0.0
       termomodernization_expired: 0.0
       health_tax_credit_used: 0.0
@@ -59,21 +63,10 @@ parsed_response:
       ulga_BR_NIE_wykorzystana: 0.0
       ulga_BR_carry_over: 0.0
       dochód_dodatkowy_skala: 0.0
-  classifications:
-  - opis: Kawa do domu
-    amount: 100.0
-    basket: WYKLUCZONE
-    allocation_method: excluded
-    allocation_source: ''
-    allocation_key: null
-    ip_amount: 0.0
-    non_ip_amount: 0.0
-    nexus_source: outside_nexus
-    nexus_basket: poza_nexus
-    nexus_amount: 0.0
+  classifications: []
   monthly_W:
-  - miesiąc: 2025-01
-    wartość: 100.0
+  - miesiąc: 2025-12
+    wartość: 75.0
   tests:
     TEST_1: PASS
     TEST_2: FAIL
@@ -84,9 +77,32 @@ parsed_response:
     TEST_7: PASS
     TEST_8: PASS
     TEST_9: PASS
+  source_ledger_audit:
+    status: REQUIRES_CORRECTION
+    reported_costs: 3400.0
+    raw_input_costs: 3400.0
+    deductible_costs: 3000.0
+    excluded_recorded_costs: 400.0
+    correction_delta: 400.0
+  correction_preview:
+    status: AVAILABLE
+    source_kpir_correction_required: true
+    return_correction_required: true
+    relief_adjustment_required: true
+    tax_unchanged_only_if_reliefs_updated: true
+    corrected_total_tax: 900.0
+    corrected_overpayment: 4100.0
+    thermomodernization_used: 4000.0
+    thermomodernization_carry_over: 1000.0
   stops_reviews:
-    stops: []
+    stops:
+    - SOURCE_KPIR_REQUIRES_CORRECTION
+    - STOP_12
     reviews:
-    - REVIEW_01
     - REVIEW_09
-    warnings: []
+    warnings:
+    - NON_DEDUCTIBLE_COST_EXCLUDED
+    - RETURN_NON_IP_COST_MISMATCH
+    - RETURN_THERMOMODERNIZATION_MISMATCH
+    - RETURN_TOTAL_COST_MISMATCH
+    - SOURCE_KPIR_REQUIRES_CORRECTION

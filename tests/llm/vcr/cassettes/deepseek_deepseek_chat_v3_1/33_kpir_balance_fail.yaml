@@ -4,10 +4,10 @@ meta:
   provider: openrouter
   requested_model: deepseek/deepseek-chat-v3.1
   returned_model: deepseek/deepseek-chat-v3.1
-  fingerprint: v3_b9f95b2d5beedf14ca782bab924e472f60659f1e767c9a870a648951ac806962
-  request_hash: 0df55823def61dd3a14211d3e79fab78f6e6a511aa9ff91cb27863e685a4d5be
-  recorded_at: '2026-07-19T17:28:33.846373+00:00'
-  request_id: gen-1784482109-TuyNibLf6bKjkNqyKOjg
+  fingerprint: v3_61d59bb6fef21fc94053bd54c449d9fe107a91295e11773503e616f368948674
+  request_hash: 8addc7e9a7d2b24b6e0cbd93312996797a2533d766f690a0fd40fb054bf3ee5a
+  recorded_at: '2026-07-19T21:03:03.424383+00:00'
+  request_id: gen-1784494978-5jrMlB0yW95gAuvZXFii
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
@@ -15,7 +15,7 @@ meta:
   completion_tokens: 34
   total_tokens: 279
   cost: 6.427e-05
-  recording_duration_seconds: 4.648
+  recording_duration_seconds: 5.003
   cassette_format_version: 4
 response: "{\n  \"status\": \"FINAL\",\n  \"stops\": [],\n  \"reviews\": [\"REVIEW_01\", \"REVIEW_09\"]\n}"
 parsed_response:
@@ -44,6 +44,8 @@ parsed_response:
       źródło: domyślna_wizard
       wartość: null
       status: NOT_APPLICABLE
+      źródło_ref: null
+      rounding_granularity: per_cost_item
     alokacja_multi_ip: null
     podatek:
       podstawa_IP: 0
@@ -52,6 +54,7 @@ parsed_response:
       podatek_NIE_finalny: 0
       podatek_całościowy: 0
       nadpłata_lub_dopłata: -0.0
+      thermomodernization_used: 0.0
       termomodernization_carry_over: 0.0
       termomodernization_expired: 0.0
       health_tax_credit_used: 0.0
@@ -73,9 +76,27 @@ parsed_response:
     TEST_7: PASS
     TEST_8: PASS
     TEST_9: PASS
+  source_ledger_audit:
+    status: MISMATCH
+    reported_costs: 50000.0
+    raw_input_costs: 0.0
+    deductible_costs: 0.0
+    excluded_recorded_costs: 0.0
+    correction_delta: 50000.0
+  correction_preview:
+    status: NOT_NEEDED
+    source_kpir_correction_required: false
+    return_correction_required: false
+    relief_adjustment_required: false
+    tax_unchanged_only_if_reliefs_updated: false
+    corrected_total_tax: 0.0
+    corrected_overpayment: -0.0
+    thermomodernization_used: 0.0
+    thermomodernization_carry_over: 0.0
   stops_reviews:
     stops: []
     reviews:
     - REVIEW_01
     - REVIEW_09
-    warnings: []
+    warnings:
+    - SOURCE_KPIR_TOTAL_MISMATCH

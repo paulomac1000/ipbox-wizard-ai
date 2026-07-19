@@ -4,20 +4,20 @@ meta:
   provider: openrouter
   requested_model: deepseek/deepseek-chat-v3.1
   returned_model: deepseek/deepseek-chat-v3.1
-  fingerprint: v3_14b7cd811ef03701aadc1e9ba85957a51e954a86e4c3323f5fbe88b9daff105c
-  request_hash: 14a326a2c2cddd4cd050dca27561e950139edd05c3de3db70583ba621afdde87
-  recorded_at: '2026-07-19T17:30:06.768954+00:00'
-  request_id: gen-1784482202-gGMIdbYwODi3tbv9YNPn
+  fingerprint: v3_11374b9926cbef2dd788cc81c22ac7f167ca26ff3275ab2568d8d1745dd96db5
+  request_hash: 691bf9f3dbe3a6333b4f987faef1ab6d1da027a83961b6cfb6214706a52ad230
+  recorded_at: '2026-07-19T21:04:20.301437+00:00'
+  request_id: gen-1784495057-ZZMqeI4crq6BfAbiUN5N
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
   prompt_tokens: 247
-  completion_tokens: 31
-  total_tokens: 278
-  cost: 6.564e-05
-  recording_duration_seconds: 4.161
+  completion_tokens: 35
+  total_tokens: 282
+  cost: 6.944e-05
+  recording_duration_seconds: 3.243
   cassette_format_version: 4
-response: '{"status": "STOPPED", "stops": ["STOP_14"], "reviews": ["REVIEW_09"]}'
+response: "{\n  \"status\": \"STOPPED\",\n  \"stops\": [\"STOP_14\"],\n  \"reviews\": [\"REVIEW_09\"]\n}"
 parsed_response:
   status: STOPPED
   result:
@@ -44,6 +44,8 @@ parsed_response:
       źródło: domyślna_wizard
       wartość: null
       status: NOT_APPLICABLE
+      źródło_ref: null
+      rounding_granularity: per_cost_item
     alokacja_multi_ip: null
     podatek:
       podstawa_IP: 0
@@ -52,6 +54,7 @@ parsed_response:
       podatek_NIE_finalny: 0
       podatek_całościowy: 0
       nadpłata_lub_dopłata: 0.0
+      thermomodernization_used: 0.0
       termomodernization_carry_over: 0.0
       termomodernization_expired: 0.0
       health_tax_credit_used: 0.0
@@ -73,6 +76,23 @@ parsed_response:
     TEST_7: PASS
     TEST_8: PASS
     TEST_9: PASS
+  source_ledger_audit:
+    status: NOT_PROVIDED
+    reported_costs: null
+    raw_input_costs: 100.0
+    deductible_costs: 100.0
+    excluded_recorded_costs: 0.0
+    correction_delta: 0.0
+  correction_preview:
+    status: UNAVAILABLE
+    source_kpir_correction_required: false
+    return_correction_required: false
+    relief_adjustment_required: false
+    tax_unchanged_only_if_reliefs_updated: false
+    corrected_total_tax: null
+    corrected_overpayment: null
+    thermomodernization_used: null
+    thermomodernization_carry_over: null
   stops_reviews:
     stops:
     - STOP_14

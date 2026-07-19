@@ -4,10 +4,10 @@ meta:
   provider: openrouter
   requested_model: qwen/qwen3.5-flash-02-23
   returned_model: qwen/qwen3.5-flash-02-23
-  fingerprint: v3_a7556abe41b0c5c2fee51250d7383cf778025f38b04d75fa45948c538c27cb41
-  request_hash: 6a7696d23cfc967dd2d7618604c003d58a43373f9564a1930ca82832e81326e2
-  recorded_at: '2026-07-19T17:51:55.124631+00:00'
-  request_id: gen-1784483511-uVWadsrq0EcdBYnNZRg9
+  fingerprint: v3_311cae07d72dc7c0a6828691d66c06d5fce74ba9333113103bef9fac1edfdfc8
+  request_hash: 21e20ad190ff5e5fc1b3b97ebc7635187ec01ddcdbca173ff347fe6e0b5ef0b3
+  recorded_at: '2026-07-19T21:12:15.396790+00:00'
+  request_id: gen-1784495532-WvtagmlxODsX4iJS3BE5
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
@@ -15,7 +15,7 @@ meta:
   completion_tokens: 617
   total_tokens: 863
   cost: 0.00017641
-  recording_duration_seconds: 3.376
+  recording_duration_seconds: 3.467
   cassette_format_version: 4
 response: '{"status":"FINAL","stops":[],"reviews":["REVIEW_09"]}'
 parsed_response:
@@ -44,6 +44,8 @@ parsed_response:
       źródło: domyślna_wizard
       wartość: 0.9048
       status: FINAL
+      źródło_ref: null
+      rounding_granularity: per_cost_item
     alokacja_multi_ip: null
     podatek:
       podstawa_IP: 22420
@@ -52,6 +54,7 @@ parsed_response:
       podatek_NIE_finalny: 451
       podatek_całościowy: 1572
       nadpłata_lub_dopłata: -1572.0
+      thermomodernization_used: 0.0
       termomodernization_carry_over: 0.0
       termomodernization_expired: 0.0
       health_tax_credit_used: 0.0
@@ -71,6 +74,11 @@ parsed_response:
     nexus_source: own_br
     nexus_basket: A
     nexus_amount: 119.0
+    allocation_period: 2025-01
+    rounding_granularity: per_cost_item
+    rounding_adjustment: 0.0
+    nexus_evidence: ewidencja_kosztu_IP
+    nexus_basis: explicit_amount
   - opis: Internet firmowy
     amount: 89.0
     basket: MIX
@@ -82,6 +90,11 @@ parsed_response:
     nexus_source: outside_nexus
     nexus_basket: poza_nexus
     nexus_amount: 0.0
+    allocation_period: 2025-01
+    rounding_granularity: per_cost_item
+    rounding_adjustment: 0.0
+    nexus_evidence: ''
+    nexus_basis: explicit_amount
   monthly_W:
   - miesiąc: 2025-01
     wartość: 90.48
@@ -95,6 +108,23 @@ parsed_response:
     TEST_7: PASS
     TEST_8: PASS
     TEST_9: PASS
+  source_ledger_audit:
+    status: NOT_PROVIDED
+    reported_costs: null
+    raw_input_costs: 208.0
+    deductible_costs: 208.0
+    excluded_recorded_costs: 0.0
+    correction_delta: 0.0
+  correction_preview:
+    status: NOT_NEEDED
+    source_kpir_correction_required: false
+    return_correction_required: false
+    relief_adjustment_required: false
+    tax_unchanged_only_if_reliefs_updated: false
+    corrected_total_tax: 1572.0
+    corrected_overpayment: -1572.0
+    thermomodernization_used: 0.0
+    thermomodernization_carry_over: 0.0
   stops_reviews:
     stops: []
     reviews:

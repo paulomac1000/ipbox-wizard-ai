@@ -4,20 +4,20 @@ meta:
   provider: openrouter
   requested_model: google/gemini-3-flash-preview
   returned_model: google/gemini-3-flash-preview
-  fingerprint: v3_81b797321eed39112f21bc0b6799fb49f887a483b42ccb37fbd9f095ccfc7633
-  request_hash: 920484641f2551bed6dcab3372e5cbb297dd76aa3458dc6c4e924c2c67ede87b
-  recorded_at: '2026-07-19T17:23:10.630087+00:00'
-  request_id: gen-1784481789-kRSaxhgVHlxEQRskGrDr
+  fingerprint: v3_851f5a504b12703c7cb74ae2decbd7fb5851ed306a81072858c299666c09783a
+  request_hash: d227a546fd7a5a114def683cfe6d0848866d3a15e63b7c9b7346a6fc6626ccf4
+  recorded_at: '2026-07-19T20:57:44.801041+00:00'
+  request_id: gen-1784494663-ASSwT0oKuoz2Zohbkern
   finish_reason: stop
   native_finish_reason: STOP
   system_fingerprint: null
-  prompt_tokens: 539
-  completion_tokens: 15
-  total_tokens: 554
-  cost: 0.0003145
-  recording_duration_seconds: 1.34
+  prompt_tokens: 551
+  completion_tokens: 19
+  total_tokens: 570
+  cost: 0.0003325
+  recording_duration_seconds: 1.441
   cassette_format_version: 4
-response: '{"status":"FINAL","stops":[],"reviews":["REVIEW_09"]}'
+response: '{"status": "FINAL", "stops": [], "reviews": ["REVIEW_09"]}'
 parsed_response:
   status: FINAL
   result:
@@ -44,6 +44,8 @@ parsed_response:
       źródło: domyślna_wizard
       wartość: 0.9048
       status: FINAL
+      źródło_ref: null
+      rounding_granularity: per_cost_item
     alokacja_multi_ip: null
     podatek:
       podstawa_IP: 22420
@@ -52,6 +54,7 @@ parsed_response:
       podatek_NIE_finalny: 451
       podatek_całościowy: 1572
       nadpłata_lub_dopłata: -1572.0
+      thermomodernization_used: 0.0
       termomodernization_carry_over: 0.0
       termomodernization_expired: 0.0
       health_tax_credit_used: 0.0
@@ -71,6 +74,11 @@ parsed_response:
     nexus_source: own_br
     nexus_basket: A
     nexus_amount: 119.0
+    allocation_period: 2025-01
+    rounding_granularity: per_cost_item
+    rounding_adjustment: 0.0
+    nexus_evidence: ewidencja_kosztu_IP
+    nexus_basis: explicit_amount
   - opis: Internet firmowy
     amount: 89.0
     basket: MIX
@@ -82,6 +90,11 @@ parsed_response:
     nexus_source: outside_nexus
     nexus_basket: poza_nexus
     nexus_amount: 0.0
+    allocation_period: 2025-01
+    rounding_granularity: per_cost_item
+    rounding_adjustment: 0.0
+    nexus_evidence: ''
+    nexus_basis: explicit_amount
   monthly_W:
   - miesiąc: 2025-01
     wartość: 90.48
@@ -95,6 +108,23 @@ parsed_response:
     TEST_7: PASS
     TEST_8: PASS
     TEST_9: PASS
+  source_ledger_audit:
+    status: NOT_PROVIDED
+    reported_costs: null
+    raw_input_costs: 208.0
+    deductible_costs: 208.0
+    excluded_recorded_costs: 0.0
+    correction_delta: 0.0
+  correction_preview:
+    status: NOT_NEEDED
+    source_kpir_correction_required: false
+    return_correction_required: false
+    relief_adjustment_required: false
+    tax_unchanged_only_if_reliefs_updated: false
+    corrected_total_tax: 1572.0
+    corrected_overpayment: -1572.0
+    thermomodernization_used: 0.0
+    thermomodernization_carry_over: 0.0
   stops_reviews:
     stops: []
     reviews:

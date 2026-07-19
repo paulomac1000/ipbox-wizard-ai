@@ -4,20 +4,20 @@ meta:
   provider: openrouter
   requested_model: deepseek/deepseek-chat-v3.1
   returned_model: deepseek/deepseek-chat-v3.1
-  fingerprint: v3_c0c8de546a62bdc1a265ab7de1527e5c3608f5e26e9d37080a214185a88e8079
-  request_hash: 63c75e0a8f0b05efa5c2c92e26f5350ac9fa816931980449ba40f258ba3cab28
-  recorded_at: '2026-07-19T17:29:53.340786+00:00'
-  request_id: gen-1784482191-0uhmF5HgeqLAqtnLqVaO
+  fingerprint: v3_775661c0522b16041108f236b6a937a941c32791c545960e7dd51c5d10cb19be
+  request_hash: a65cab7f179285a7aae0054d6dd2f045695ee0787a72c8fcdec2612f4e6d670e
+  recorded_at: '2026-07-19T21:04:09.277174+00:00'
+  request_id: gen-1784495046-ANvKQq3SBChnivCi9Ujp
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
-  prompt_tokens: 258
-  completion_tokens: 48
-  total_tokens: 306
-  cost: 0.0002364
-  recording_duration_seconds: 1.595
+  prompt_tokens: 257
+  completion_tokens: 47
+  total_tokens: 304
+  cost: 8.334e-05
+  recording_duration_seconds: 3.006
   cassette_format_version: 4
-response: "{\n  \"reviews\": [\"REVIEW_09\"],\n  \"status\": \"STOPPED\",\n  \"stops\": [\"STOP_09\", \"STOP_10\", \"STOP_11\"\
+response: "{\n  \"status\": \"STOPPED\",\n  \"stops\": [\"STOP_09\", \"STOP_10\", \"STOP_11\"],\n  \"reviews\": [\"REVIEW_09\"\
   ]\n}"
 parsed_response:
   status: STOPPED
@@ -45,6 +45,8 @@ parsed_response:
       źródło: domyślna_wizard
       wartość: null
       status: NOT_APPLICABLE
+      źródło_ref: null
+      rounding_granularity: per_cost_item
     alokacja_multi_ip: null
     podatek:
       podstawa_IP: 0
@@ -53,6 +55,7 @@ parsed_response:
       podatek_NIE_finalny: 0
       podatek_całościowy: 0
       nadpłata_lub_dopłata: 0.0
+      thermomodernization_used: 0.0
       termomodernization_carry_over: 0.0
       termomodernization_expired: 0.0
       health_tax_credit_used: 0.0
@@ -76,6 +79,23 @@ parsed_response:
     TEST_7: PASS
     TEST_8: PASS
     TEST_9: PASS
+  source_ledger_audit:
+    status: NOT_PROVIDED
+    reported_costs: null
+    raw_input_costs: 100.0
+    deductible_costs: 100.0
+    excluded_recorded_costs: 0.0
+    correction_delta: 0.0
+  correction_preview:
+    status: UNAVAILABLE
+    source_kpir_correction_required: false
+    return_correction_required: false
+    relief_adjustment_required: false
+    tax_unchanged_only_if_reliefs_updated: false
+    corrected_total_tax: null
+    corrected_overpayment: null
+    thermomodernization_used: null
+    thermomodernization_carry_over: null
   stops_reviews:
     stops:
     - STOP_09

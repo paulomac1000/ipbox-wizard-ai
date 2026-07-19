@@ -4,20 +4,20 @@ meta:
   provider: openrouter
   requested_model: deepseek/deepseek-chat-v3.1
   returned_model: deepseek/deepseek-chat-v3.1
-  fingerprint: v3_019740e308e3422c7b03cba55926a2a8e0c24fc00440fb66b9af44b97ff296e5
-  request_hash: 0df55823def61dd3a14211d3e79fab78f6e6a511aa9ff91cb27863e685a4d5be
-  recorded_at: '2026-07-19T17:26:41.919546+00:00'
-  request_id: gen-1784481998-83HkVssMzdEKSM4DCYlz
+  fingerprint: v3_7b23db4987b70ef21ec47b7fbd7f22c17811ac62d9628685ce58c5b051f132c4
+  request_hash: 8addc7e9a7d2b24b6e0cbd93312996797a2533d766f690a0fd40fb054bf3ee5a
+  recorded_at: '2026-07-19T21:01:32.090403+00:00'
+  request_id: gen-1784494889-qEiweFb7d6Yvp9dSFnlQ
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
-  prompt_tokens: 245
-  completion_tokens: 30
-  total_tokens: 275
-  cost: 6.047e-05
-  recording_duration_seconds: 3.79
+  prompt_tokens: 608
+  completion_tokens: 34
+  total_tokens: 642
+  cost: 0.00013768
+  recording_duration_seconds: 2.685
   cassette_format_version: 4
-response: '{"status": "FINAL", "stops": [], "reviews": ["REVIEW_01", "REVIEW_09"]}'
+response: "{\n    \"status\": \"FINAL\",\n    \"stops\": [],\n    \"reviews\": [\"REVIEW_01\", \"REVIEW_09\"]\n}"
 parsed_response:
   status: FINAL
   result:
@@ -44,6 +44,8 @@ parsed_response:
       źródło: domyślna_wizard
       wartość: null
       status: NOT_APPLICABLE
+      źródło_ref: null
+      rounding_granularity: per_cost_item
     alokacja_multi_ip: null
     podatek:
       podstawa_IP: 19500
@@ -52,6 +54,7 @@ parsed_response:
       podatek_NIE_finalny: 29
       podatek_całościowy: 1004
       nadpłata_lub_dopłata: -1004.0
+      thermomodernization_used: 0.0
       termomodernization_carry_over: 0.0
       termomodernization_expired: 0.0
       health_tax_credit_used: 0.0
@@ -71,6 +74,11 @@ parsed_response:
     nexus_source: own_br
     nexus_basket: A
     nexus_amount: 500.0
+    allocation_period: 2025-01
+    rounding_granularity: per_cost_item
+    rounding_adjustment: 0.0
+    nexus_evidence: ewidencja_kosztu_IP
+    nexus_basis: explicit_amount
   monthly_W:
   - miesiąc: 2025-01
     wartość: 100.0
@@ -84,6 +92,23 @@ parsed_response:
     TEST_7: PASS
     TEST_8: PASS
     TEST_9: PASS
+  source_ledger_audit:
+    status: NOT_PROVIDED
+    reported_costs: null
+    raw_input_costs: 500.0
+    deductible_costs: 500.0
+    excluded_recorded_costs: 0.0
+    correction_delta: 0.0
+  correction_preview:
+    status: NOT_NEEDED
+    source_kpir_correction_required: false
+    return_correction_required: false
+    relief_adjustment_required: false
+    tax_unchanged_only_if_reliefs_updated: false
+    corrected_total_tax: 1004.0
+    corrected_overpayment: -1004.0
+    thermomodernization_used: 0.0
+    thermomodernization_carry_over: 0.0
   stops_reviews:
     stops: []
     reviews:

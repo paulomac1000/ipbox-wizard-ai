@@ -4,18 +4,18 @@ meta:
   provider: openrouter
   requested_model: google/gemini-3-flash-preview
   returned_model: google/gemini-3-flash-preview
-  fingerprint: v3_45904abd1c9e5c98f1e87b7a365729cbd6fd0e6941a91fb0f45c7ba554b42172
-  request_hash: 93b1484e84018f1d7b9d0c78acbf4ff46b61915b3907c37cd88502c1ee754c2b
-  recorded_at: '2026-07-19T17:24:02.694220+00:00'
-  request_id: gen-1784481841-Acyz71eVFxTKcGsvjbdQ
+  fingerprint: v3_1e912fe51b52f69a31c4b9cc56788a3fcf2e8950b779628db346930b9de4c9d8
+  request_hash: 370a89e340ce88b3b3af9cd87c5009e9ba8c3223fa927732ca38dfa82728d6c3
+  recorded_at: '2026-07-19T20:58:36.096495+00:00'
+  request_id: gen-1784494714-viYxUxOt9THYcdMH2zlu
   finish_reason: stop
   native_finish_reason: STOP
   system_fingerprint: null
-  prompt_tokens: 544
+  prompt_tokens: 556
   completion_tokens: 20
-  total_tokens: 564
-  cost: 0.000332
-  recording_duration_seconds: 1.188
+  total_tokens: 576
+  cost: 0.000338
+  recording_duration_seconds: 1.177
   cassette_format_version: 4
 response: '{"status":"FINAL","stops":[],"reviews":["REVIEW_01","REVIEW_09"]}'
 parsed_response:
@@ -44,6 +44,8 @@ parsed_response:
       źródło: domyślna_wizard
       wartość: null
       status: NOT_APPLICABLE
+      źródło_ref: null
+      rounding_granularity: per_cost_item
     alokacja_multi_ip: null
     podatek:
       podstawa_IP: 0
@@ -52,6 +54,7 @@ parsed_response:
       podatek_NIE_finalny: 0
       podatek_całościowy: 0
       nadpłata_lub_dopłata: -0.0
+      thermomodernization_used: 0.0
       termomodernization_carry_over: 0.0
       termomodernization_expired: 0.0
       health_tax_credit_used: 0.0
@@ -71,6 +74,11 @@ parsed_response:
     nexus_source: own_br
     nexus_basket: A
     nexus_amount: 2500.0
+    allocation_period: 2025-01
+    rounding_granularity: per_cost_item
+    rounding_adjustment: 0.0
+    nexus_evidence: ewidencja_kosztu_IP
+    nexus_basis: explicit_amount
   - opis: Licencja ML
     amount: 1800.0
     basket: IP
@@ -82,6 +90,11 @@ parsed_response:
     nexus_source: own_br
     nexus_basket: A
     nexus_amount: 1800.0
+    allocation_period: 2025-01
+    rounding_granularity: per_cost_item
+    rounding_adjustment: 0.0
+    nexus_evidence: ewidencja_kosztu_IP
+    nexus_basis: explicit_amount
   - opis: Serwer GPU B+R 2
     amount: 2500.0
     basket: IP
@@ -93,6 +106,11 @@ parsed_response:
     nexus_source: own_br
     nexus_basket: A
     nexus_amount: 2500.0
+    allocation_period: 2025-02
+    rounding_granularity: per_cost_item
+    rounding_adjustment: 0.0
+    nexus_evidence: ewidencja_kosztu_IP
+    nexus_basis: explicit_amount
   - opis: Usługi cloud B+R
     amount: 2000.0
     basket: IP
@@ -104,6 +122,11 @@ parsed_response:
     nexus_source: own_br
     nexus_basket: A
     nexus_amount: 2000.0
+    allocation_period: 2025-02
+    rounding_granularity: per_cost_item
+    rounding_adjustment: 0.0
+    nexus_evidence: ewidencja_kosztu_IP
+    nexus_basis: explicit_amount
   monthly_W:
   - miesiąc: 2025-01
     wartość: 100.0
@@ -119,6 +142,23 @@ parsed_response:
     TEST_7: PASS
     TEST_8: PASS
     TEST_9: PASS
+  source_ledger_audit:
+    status: NOT_PROVIDED
+    reported_costs: null
+    raw_input_costs: 8800.0
+    deductible_costs: 8800.0
+    excluded_recorded_costs: 0.0
+    correction_delta: 0.0
+  correction_preview:
+    status: NOT_NEEDED
+    source_kpir_correction_required: false
+    return_correction_required: false
+    relief_adjustment_required: false
+    tax_unchanged_only_if_reliefs_updated: false
+    corrected_total_tax: 0.0
+    corrected_overpayment: -0.0
+    thermomodernization_used: 0.0
+    thermomodernization_carry_over: 0.0
   stops_reviews:
     stops: []
     reviews:

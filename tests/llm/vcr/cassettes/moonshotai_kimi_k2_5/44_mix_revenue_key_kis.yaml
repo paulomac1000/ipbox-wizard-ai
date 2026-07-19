@@ -4,18 +4,18 @@ meta:
   provider: openrouter
   requested_model: moonshotai/kimi-k2.5
   returned_model: moonshotai/kimi-k2.5
-  fingerprint: v3_67b75719ad25c02db97eca3268331226e23b9d72afb32c9ca010247d57df3419
-  request_hash: f77f128615dd400073da8d1ec7c537152318ab7282c2ab0dba10602eafef826c
-  recorded_at: '2026-07-19T17:49:39.527966+00:00'
-  request_id: gen-1784483371-42mSeSiaF3FHqg886ulS
+  fingerprint: v3_faf68175f5b42e34bbc940c02f8bad81b91e2704a37631b8d4e1389dbe6cc2ad
+  request_hash: a0b969b6caa05db37ed8ca5475dc74da40bd4917ee5a46e940a940437705a91d
+  recorded_at: '2026-07-19T21:10:55.282742+00:00'
+  request_id: gen-1784495450-JBXOsXr1cx9mepZeEwrD
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
   prompt_tokens: 252
-  completion_tokens: 212
-  total_tokens: 464
-  cost: 0.00051744
-  recording_duration_seconds: 8.013
+  completion_tokens: 155
+  total_tokens: 407
+  cost: 0.00038919
+  recording_duration_seconds: 4.427
   cassette_format_version: 4
 response: '{"reviews":["REVIEW_09","REVIEW_16","REVIEW_17"],"status":"FINAL","stops":[]}'
 parsed_response:
@@ -44,6 +44,8 @@ parsed_response:
       źródło: interpretacja_KIS
       wartość: 0.9
       status: FINAL
+      źródło_ref: SYNTHETIC-KIS-REFERENCE
+      rounding_granularity: per_cost_item
     alokacja_multi_ip: null
     podatek:
       podstawa_IP: 8450
@@ -52,6 +54,7 @@ parsed_response:
       podatek_NIE_finalny: 181
       podatek_całościowy: 604
       nadpłata_lub_dopłata: -604.0
+      thermomodernization_used: 0.0
       termomodernization_carry_over: 0.0
       termomodernization_expired: 0.0
       health_tax_credit_used: 0.0
@@ -71,6 +74,11 @@ parsed_response:
     nexus_source: outside_nexus
     nexus_basket: poza_nexus
     nexus_amount: 0.0
+    allocation_period: 2025-01
+    rounding_granularity: per_cost_item
+    rounding_adjustment: 0.0
+    nexus_evidence: ''
+    nexus_basis: explicit_amount
   - opis: Licencja JetBrains
     amount: 100.0
     basket: IP
@@ -82,6 +90,11 @@ parsed_response:
     nexus_source: own_br
     nexus_basket: A
     nexus_amount: 100.0
+    allocation_period: 2025-01
+    rounding_granularity: per_cost_item
+    rounding_adjustment: 0.0
+    nexus_evidence: ewidencja_kosztu_IP
+    nexus_basis: explicit_amount
   monthly_W:
   - miesiąc: 2025-01
     wartość: 87.5
@@ -95,6 +108,23 @@ parsed_response:
     TEST_7: PASS
     TEST_8: PASS
     TEST_9: PASS
+  source_ledger_audit:
+    status: NOT_PROVIDED
+    reported_costs: null
+    raw_input_costs: 600.0
+    deductible_costs: 600.0
+    excluded_recorded_costs: 0.0
+    correction_delta: 0.0
+  correction_preview:
+    status: NOT_NEEDED
+    source_kpir_correction_required: false
+    return_correction_required: false
+    relief_adjustment_required: false
+    tax_unchanged_only_if_reliefs_updated: false
+    corrected_total_tax: 604.0
+    corrected_overpayment: -604.0
+    thermomodernization_used: 0.0
+    thermomodernization_carry_over: 0.0
   stops_reviews:
     stops: []
     reviews:

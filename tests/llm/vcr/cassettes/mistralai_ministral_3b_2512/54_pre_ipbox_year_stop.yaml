@@ -4,10 +4,10 @@ meta:
   provider: openrouter
   requested_model: mistralai/ministral-3b-2512
   returned_model: mistralai/ministral-3b-2512
-  fingerprint: v3_a8e4f1a30a708fb09099ccc9766427b6f063532db16f6a6d2a6d78e8ddf2100e
-  request_hash: f77911b60898feca2e999d70587ecc91e6a769a627c5ea6fbebf931cfe74a132
-  recorded_at: '2026-07-19T18:18:54.591911+00:00'
-  request_id: gen-1784485133-97JxDXuznk7Ja65502mu
+  fingerprint: v3_2aed7149598a2f990766c844e1cadbaf711220bac42d6ad77eede16cd81127b8
+  request_hash: c70338f4cd585804a0cd72440521405637be575eab75b1b734fe6ec0760ca9d1
+  recorded_at: '2026-07-19T21:17:45.064153+00:00'
+  request_id: gen-1784495864-U8uEMQZzAwvqsLlSbrTj
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
@@ -15,7 +15,7 @@ meta:
   completion_tokens: 36
   total_tokens: 297
   cost: 4.455e-05
-  recording_duration_seconds: 0.847
+  recording_duration_seconds: 0.689
   cassette_format_version: 4
 response: "{\n  \"status\": \"STOPPED\",\n  \"stops\": [\"STOP_16\"],\n  \"reviews\": [\"REVIEW_09\"]\n}"
 parsed_response:
@@ -44,6 +44,8 @@ parsed_response:
       źródło: domyślna_wizard
       wartość: null
       status: NOT_APPLICABLE
+      źródło_ref: null
+      rounding_granularity: per_cost_item
     alokacja_multi_ip: null
     podatek:
       podstawa_IP: 0
@@ -52,6 +54,7 @@ parsed_response:
       podatek_NIE_finalny: 0
       podatek_całościowy: 0
       nadpłata_lub_dopłata: 0.0
+      thermomodernization_used: 0.0
       termomodernization_carry_over: 0.0
       termomodernization_expired: 0.0
       health_tax_credit_used: 0.0
@@ -73,6 +76,23 @@ parsed_response:
     TEST_7: PASS
     TEST_8: PASS
     TEST_9: PASS
+  source_ledger_audit:
+    status: NOT_PROVIDED
+    reported_costs: null
+    raw_input_costs: 100.0
+    deductible_costs: 100.0
+    excluded_recorded_costs: 0.0
+    correction_delta: 0.0
+  correction_preview:
+    status: UNAVAILABLE
+    source_kpir_correction_required: false
+    return_correction_required: false
+    relief_adjustment_required: false
+    tax_unchanged_only_if_reliefs_updated: false
+    corrected_total_tax: null
+    corrected_overpayment: null
+    thermomodernization_used: null
+    thermomodernization_carry_over: null
   stops_reviews:
     stops:
     - STOP_16

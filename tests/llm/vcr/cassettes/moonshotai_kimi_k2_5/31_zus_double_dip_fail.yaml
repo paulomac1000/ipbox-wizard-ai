@@ -4,18 +4,18 @@ meta:
   provider: openrouter
   requested_model: moonshotai/kimi-k2.5
   returned_model: moonshotai/kimi-k2.5
-  fingerprint: v3_fce7108506a9d72f77ab384a361065766f6944578ac59b956e72ca484c76b830
-  request_hash: 09e91e8c1fcb3106c521a9f58c39eff01a5e1e2b9d1274bcb5a0afc4ca18c16e
-  recorded_at: '2026-07-19T17:47:57.280228+00:00'
-  request_id: gen-1784483268-RsoFFpjmcwmnbmekW1TW
+  fingerprint: v3_54c6f5b673660cd722bc3a1793e5c9821214f78daf28a59b018f4de6639078fb
+  request_hash: d5816ca736668e846be592d48c2a6279a6d135f63f860e3ca335bb88b26ff71b
+  recorded_at: '2026-07-19T21:09:32.154044+00:00'
+  request_id: gen-1784495366-71tYH2svsY8VcxYqVpfe
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
   prompt_tokens: 251
-  completion_tokens: 251
-  total_tokens: 502
-  cost: 0.00060474
-  recording_duration_seconds: 8.484
+  completion_tokens: 343
+  total_tokens: 594
+  cost: 0.0008847
+  recording_duration_seconds: 6.182
   cassette_format_version: 4
 response: '{"reviews":["REVIEW_01","REVIEW_09"],"status":"STOPPED","stops":["ZUS_DOUBLE_DIP"]}'
 parsed_response:
@@ -44,6 +44,8 @@ parsed_response:
       źródło: domyślna_wizard
       wartość: null
       status: NOT_APPLICABLE
+      źródło_ref: null
+      rounding_granularity: per_cost_item
     alokacja_multi_ip: null
     podatek:
       podstawa_IP: 0
@@ -52,6 +54,7 @@ parsed_response:
       podatek_NIE_finalny: 0
       podatek_całościowy: 0
       nadpłata_lub_dopłata: 0.0
+      thermomodernization_used: 0.0
       termomodernization_carry_over: 0.0
       termomodernization_expired: 0.0
       health_tax_credit_used: 0.0
@@ -73,6 +76,23 @@ parsed_response:
     TEST_7: PASS
     TEST_8: PASS
     TEST_9: PASS
+  source_ledger_audit:
+    status: NOT_PROVIDED
+    reported_costs: null
+    raw_input_costs: 0.0
+    deductible_costs: 0.0
+    excluded_recorded_costs: 0.0
+    correction_delta: 0.0
+  correction_preview:
+    status: UNAVAILABLE
+    source_kpir_correction_required: false
+    return_correction_required: false
+    relief_adjustment_required: false
+    tax_unchanged_only_if_reliefs_updated: false
+    corrected_total_tax: null
+    corrected_overpayment: null
+    thermomodernization_used: null
+    thermomodernization_carry_over: null
   stops_reviews:
     stops:
     - ZUS_DOUBLE_DIP

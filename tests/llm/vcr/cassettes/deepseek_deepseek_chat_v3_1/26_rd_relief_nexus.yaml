@@ -4,20 +4,20 @@ meta:
   provider: openrouter
   requested_model: deepseek/deepseek-chat-v3.1
   returned_model: deepseek/deepseek-chat-v3.1
-  fingerprint: v3_eb99042f906e456b55178cd2af72877af8c56757de3ed8c845eefdb34b5079c5
-  request_hash: 7a2bf8713a36a0b776b040b9dc84345c192ae5d32c243b60325bd96bb66cffd8
-  recorded_at: '2026-07-19T17:28:03.312703+00:00'
-  request_id: gen-1784482075-lB73kmzeP71R4RkXx0su
+  fingerprint: v3_29607591eb6c843541530d8da8292d8f7d42402a899fa296a783514249345ae6
+  request_hash: 2e0394e08e3ca27d3258b4373ee39b00bf96d6f712e4e37820c6d51640759ec2
+  recorded_at: '2026-07-19T21:02:29.581870+00:00'
+  request_id: gen-1784494946-0zftONC6ckRPErU4oRgL
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
   prompt_tokens: 240
-  completion_tokens: 24
-  total_tokens: 264
-  cost: 5.928e-05
-  recording_duration_seconds: 7.693
+  completion_tokens: 28
+  total_tokens: 268
+  cost: 6.308e-05
+  recording_duration_seconds: 2.644
   cassette_format_version: 4
-response: '{"status": "FINAL", "stops": [], "reviews": ["REVIEW_09"]}'
+response: "{\n  \"status\": \"FINAL\",\n  \"stops\": [],\n  \"reviews\": [\"REVIEW_09\"]\n}"
 parsed_response:
   status: FINAL
   result:
@@ -44,6 +44,8 @@ parsed_response:
       źródło: domyślna_wizard
       wartość: null
       status: NOT_APPLICABLE
+      źródło_ref: null
+      rounding_granularity: per_cost_item
     alokacja_multi_ip: null
     podatek:
       podstawa_IP: 16911
@@ -52,6 +54,7 @@ parsed_response:
       podatek_NIE_finalny: 380
       podatek_całościowy: 1226
       nadpłata_lub_dopłata: -1226.0
+      thermomodernization_used: 0.0
       termomodernization_carry_over: 0.0
       termomodernization_expired: 0.0
       health_tax_credit_used: 0.0
@@ -71,6 +74,11 @@ parsed_response:
     nexus_source: own_br
     nexus_basket: A
     nexus_amount: 89.0
+    allocation_period: 2025-01
+    rounding_granularity: per_cost_item
+    rounding_adjustment: 0.0
+    nexus_evidence: ewidencja_kosztu_IP
+    nexus_basis: explicit_amount
   - opis: Koszt objęty odrębną ulgą B+R
     amount: 500.0
     basket: IP
@@ -82,6 +90,11 @@ parsed_response:
     nexus_source: own_br
     nexus_basket: A
     nexus_amount: 500.0
+    allocation_period: 2025-01
+    rounding_granularity: per_cost_item
+    rounding_adjustment: 0.0
+    nexus_evidence: ewidencja_kosztow_kwalifikowanych_BR_2025_01
+    nexus_basis: explicit_amount
   monthly_W:
   - miesiąc: 2025-01
     wartość: 90.0
@@ -95,6 +108,23 @@ parsed_response:
     TEST_7: PASS
     TEST_8: PASS
     TEST_9: PASS
+  source_ledger_audit:
+    status: NOT_PROVIDED
+    reported_costs: null
+    raw_input_costs: 589.0
+    deductible_costs: 589.0
+    excluded_recorded_costs: 0.0
+    correction_delta: 0.0
+  correction_preview:
+    status: NOT_NEEDED
+    source_kpir_correction_required: false
+    return_correction_required: false
+    relief_adjustment_required: false
+    tax_unchanged_only_if_reliefs_updated: false
+    corrected_total_tax: 1226.0
+    corrected_overpayment: -1226.0
+    thermomodernization_used: 0.0
+    thermomodernization_carry_over: 0.0
   stops_reviews:
     stops: []
     reviews:

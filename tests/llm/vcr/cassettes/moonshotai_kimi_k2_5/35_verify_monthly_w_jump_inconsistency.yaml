@@ -4,20 +4,20 @@ meta:
   provider: openrouter
   requested_model: moonshotai/kimi-k2.5
   returned_model: moonshotai/kimi-k2.5
-  fingerprint: v3_46f6738d13103f838d715b83a543b24d73e0a47c3d98f019571d76d62948096e
-  request_hash: dcb0b782ce021b6421a714c9e38a571f6a31bcc921bb129abbe9877c5e04bab8
-  recorded_at: '2026-07-19T17:48:32.923587+00:00'
-  request_id: gen-1784483304-g93e7KlJfvITOjnXli7x
+  fingerprint: v3_893e340ffcd7f77311e8da2b75f886930a2c6b3269e135f4ae20db13a0302988
+  request_hash: b6eca436df511624ea7d5c2bff174e552adad670ae806ed225be5556226caece
+  recorded_at: '2026-07-19T21:09:55.069173+00:00'
+  request_id: gen-1784495391-Oxl6lnt0qpG24zBT154P
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
   prompt_tokens: 252
-  completion_tokens: 164
-  total_tokens: 416
-  cost: 0.00040944
-  recording_duration_seconds: 8.057
+  completion_tokens: 241
+  total_tokens: 493
+  cost: 0.00059222
+  recording_duration_seconds: 3.473
   cassette_format_version: 4
-response: '{"reviews":["REVIEW_02","REVIEW_08","REVIEW_09"],"status":"FINAL","stops":[]}'
+response: '{"status":"FINAL","stops":[],"reviews":["REVIEW_02","REVIEW_08","REVIEW_09"]}'
 parsed_response:
   status: FINAL
   result:
@@ -44,6 +44,8 @@ parsed_response:
       źródło: domyślna_wizard
       wartość: null
       status: NOT_APPLICABLE
+      źródło_ref: null
+      rounding_granularity: per_cost_item
     alokacja_multi_ip: null
     podatek:
       podstawa_IP: 0
@@ -52,6 +54,7 @@ parsed_response:
       podatek_NIE_finalny: 3040
       podatek_całościowy: 3040
       nadpłata_lub_dopłata: -3040.0
+      thermomodernization_used: 0.0
       termomodernization_carry_over: 0.0
       termomodernization_expired: 0.0
       health_tax_credit_used: 0.0
@@ -75,6 +78,23 @@ parsed_response:
     TEST_7: PASS
     TEST_8: PASS
     TEST_9: PASS
+  source_ledger_audit:
+    status: NOT_PROVIDED
+    reported_costs: null
+    raw_input_costs: 0.0
+    deductible_costs: 0.0
+    excluded_recorded_costs: 0.0
+    correction_delta: 0.0
+  correction_preview:
+    status: NOT_NEEDED
+    source_kpir_correction_required: false
+    return_correction_required: false
+    relief_adjustment_required: false
+    tax_unchanged_only_if_reliefs_updated: false
+    corrected_total_tax: 3040.0
+    corrected_overpayment: -3040.0
+    thermomodernization_used: 0.0
+    thermomodernization_carry_over: 0.0
   stops_reviews:
     stops: []
     reviews:

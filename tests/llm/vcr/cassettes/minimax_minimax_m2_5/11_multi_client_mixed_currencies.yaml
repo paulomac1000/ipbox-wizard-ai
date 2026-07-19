@@ -4,20 +4,20 @@ meta:
   provider: openrouter
   requested_model: minimax/minimax-m2.5
   returned_model: minimax/minimax-m2.5
-  fingerprint: v3_8c418982282d59f708b48fc859773058193b6aa3d8545dafe10dc184bc723fba
-  request_hash: 770532cc64fdf981c4ff8ce042b3d795c7731f819cd5ff9ce4768c99d6e89e7e
-  recorded_at: '2026-07-19T17:30:25.327448+00:00'
-  request_id: gen-1784482224-Y1U7LuuR1yz9BPSNtzRo
+  fingerprint: v3_eaea58c68f33560c239f3edb3089cab1f41ee82eed77637a551ba7916a78eb11
+  request_hash: 76eee3a62f5174df6580bf29cca694dc6b3bf97a8e76cff5e2dc4c4260d2e21d
+  recorded_at: '2026-07-19T21:04:43.296271+00:00'
+  request_id: gen-1784495080-nq6b1ngfCJyYs9ekjrUf
   finish_reason: stop
   native_finish_reason: stop
-  system_fingerprint: vllm-0.21.0-tp4-bf80359e
-  prompt_tokens: 547
-  completion_tokens: 84
-  total_tokens: 631
-  cost: 0.00015765
-  recording_duration_seconds: 1.109
+  system_fingerprint: null
+  prompt_tokens: 558
+  completion_tokens: 154
+  total_tokens: 712
+  cost: 0.00023259
+  recording_duration_seconds: 2.697
   cassette_format_version: 4
-response: '{"status":"FINAL","stops":[],"reviews":["REVIEW_01"]}'
+response: '{"status": "FINAL", "stops": [], "reviews": ["REVIEW_01"]}'
 parsed_response:
   status: FINAL
   result:
@@ -44,6 +44,8 @@ parsed_response:
       źródło: domyślna_wizard
       wartość: null
       status: NOT_APPLICABLE
+      źródło_ref: null
+      rounding_granularity: per_cost_item
     alokacja_multi_ip: null
     podatek:
       podstawa_IP: 22600
@@ -52,6 +54,7 @@ parsed_response:
       podatek_NIE_finalny: 0
       podatek_całościowy: 1130
       nadpłata_lub_dopłata: -1130.0
+      thermomodernization_used: 0.0
       termomodernization_carry_over: 0.0
       termomodernization_expired: 0.0
       health_tax_credit_used: 0.0
@@ -71,6 +74,11 @@ parsed_response:
     nexus_source: own_br
     nexus_basket: A
     nexus_amount: 300.0
+    allocation_period: 2025-01
+    rounding_granularity: per_cost_item
+    rounding_adjustment: 0.0
+    nexus_evidence: ewidencja_kosztu_IP
+    nexus_basis: explicit_amount
   - opis: Ujemna różnica kursowa
     amount: 100.0
     basket: NON
@@ -82,6 +90,11 @@ parsed_response:
     nexus_source: outside_nexus
     nexus_basket: poza_nexus
     nexus_amount: 0.0
+    allocation_period: null
+    rounding_granularity: per_cost_item
+    rounding_adjustment: 0.0
+    nexus_evidence: ''
+    nexus_basis: explicit_amount
   monthly_W:
   - miesiąc: 2025-01
     wartość: 100.0
@@ -95,6 +108,23 @@ parsed_response:
     TEST_7: PASS
     TEST_8: PASS
     TEST_9: PASS
+  source_ledger_audit:
+    status: NOT_PROVIDED
+    reported_costs: null
+    raw_input_costs: 300.0
+    deductible_costs: 300.0
+    excluded_recorded_costs: 0.0
+    correction_delta: 0.0
+  correction_preview:
+    status: NOT_NEEDED
+    source_kpir_correction_required: false
+    return_correction_required: false
+    relief_adjustment_required: false
+    tax_unchanged_only_if_reliefs_updated: false
+    corrected_total_tax: 1130.0
+    corrected_overpayment: -1130.0
+    thermomodernization_used: 0.0
+    thermomodernization_carry_over: 0.0
   stops_reviews:
     stops: []
     reviews:

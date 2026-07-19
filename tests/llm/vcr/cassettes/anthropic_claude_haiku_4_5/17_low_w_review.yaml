@@ -4,18 +4,18 @@ meta:
   provider: openrouter
   requested_model: anthropic/claude-haiku-4.5
   returned_model: anthropic/claude-haiku-4.5
-  fingerprint: v3_8a717404c1fd177ea87c95fb9825d34d59f34f1e6b858cdf7adb4e4ed7412c5b
-  request_hash: 3a5038ef709310e27f02a44d4607dbc9bab77f688917032b53325f012a01102e
-  recorded_at: '2026-07-19T17:25:03.625569+00:00'
-  request_id: gen-1784481902-v3zDnTmvH7YRGAtn7nQp
+  fingerprint: v3_74dbf877b10007b84e0c1f3a31242ab31725b9386ad4b8a1599f51e0a4c165a2
+  request_hash: 06f05ae8d4f7edce9e511c0ccb19391bc232ae37a165e4ee9394bb6d44c97e5a
+  recorded_at: '2026-07-19T20:59:47.179069+00:00'
+  request_id: gen-1784494784-cAPexI315NwijDzsPPdf
   finish_reason: stop
   native_finish_reason: end_turn
   system_fingerprint: null
-  prompt_tokens: 704
+  prompt_tokens: 720
   completion_tokens: 27
-  total_tokens: 731
-  cost: 0.000839
-  recording_duration_seconds: 1.377
+  total_tokens: 747
+  cost: 0.000855
+  recording_duration_seconds: 2.491
   cassette_format_version: 4
 response: '{"status":"FINAL","stops":[],"reviews":["REVIEW_02","REVIEW_09"]}'
 parsed_response:
@@ -44,6 +44,8 @@ parsed_response:
       źródło: domyślna_wizard
       wartość: 0.4375
       status: FINAL
+      źródło_ref: null
+      rounding_granularity: per_cost_item
     alokacja_multi_ip: null
     podatek:
       podstawa_IP: 0
@@ -52,6 +54,7 @@ parsed_response:
       podatek_NIE_finalny: 2105
       podatek_całościowy: 2105
       nadpłata_lub_dopłata: -2105.0
+      thermomodernization_used: 0.0
       termomodernization_carry_over: 0.0
       termomodernization_expired: 0.0
       health_tax_credit_used: 0.0
@@ -71,6 +74,11 @@ parsed_response:
     nexus_source: outside_nexus
     nexus_basket: poza_nexus
     nexus_amount: 0.0
+    allocation_period: 2025-01
+    rounding_granularity: per_cost_item
+    rounding_adjustment: 0.0
+    nexus_evidence: ''
+    nexus_basis: explicit_amount
   monthly_W:
   - miesiąc: 2025-01
     wartość: 43.75
@@ -84,6 +92,23 @@ parsed_response:
     TEST_7: PASS
     TEST_8: PASS
     TEST_9: PASS
+  source_ledger_audit:
+    status: NOT_PROVIDED
+    reported_costs: null
+    raw_input_costs: 300.0
+    deductible_costs: 300.0
+    excluded_recorded_costs: 0.0
+    correction_delta: 0.0
+  correction_preview:
+    status: NOT_NEEDED
+    source_kpir_correction_required: false
+    return_correction_required: false
+    relief_adjustment_required: false
+    tax_unchanged_only_if_reliefs_updated: false
+    corrected_total_tax: 2105.0
+    corrected_overpayment: -2105.0
+    thermomodernization_used: 0.0
+    thermomodernization_carry_over: 0.0
   stops_reviews:
     stops: []
     reviews:

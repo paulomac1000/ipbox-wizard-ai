@@ -4,18 +4,18 @@ meta:
   provider: openrouter
   requested_model: google/gemini-3-flash-preview
   returned_model: google/gemini-3-flash-preview
-  fingerprint: v3_66df4f5665bd336162ea9dc5cf18efa9bbaf8f2dcc003dca6a1b541d43b1ca1c
-  request_hash: 9984825b3e8f48e2297874045f86cfa7ccd4249e6a8950891de9710fc50c7c05
-  recorded_at: '2026-07-19T17:24:20.369727+00:00'
-  request_id: gen-1784481858-ryplaWcyzwMM7Y7464Uw
+  fingerprint: v3_cb134ca2770f493811f71a2a8e7c71fb86150e7950a7d360a05b7fb5f2c5fe28
+  request_hash: 4c7bbef19cc6e0352aed3593edbd4e2a12036edf368e025ddd9f2d5455383fba
+  recorded_at: '2026-07-19T20:58:56.260260+00:00'
+  request_id: gen-1784494734-NlNYckgLwfbX0pYfj1dU
   finish_reason: stop
   native_finish_reason: STOP
   system_fingerprint: null
-  prompt_tokens: 549
+  prompt_tokens: 561
   completion_tokens: 25
-  total_tokens: 574
-  cost: 0.0003495
-  recording_duration_seconds: 1.446
+  total_tokens: 586
+  cost: 0.0003555
+  recording_duration_seconds: 1.305
   cassette_format_version: 4
 response: '{"status":"FINAL","stops":[],"reviews":["REVIEW_04","REVIEW_16","REVIEW_17"]}'
 parsed_response:
@@ -44,6 +44,8 @@ parsed_response:
       źródło: interpretacja_KIS
       wartość: 0.8
       status: FINAL
+      źródło_ref: SYNTHETIC-KIS-REFERENCE
+      rounding_granularity: per_cost_item
     alokacja_multi_ip:
       stage1_software_share: 8000.0
       stage1_non_software_share: 2000.0
@@ -59,6 +61,7 @@ parsed_response:
       podatek_NIE_finalny: 3420
       podatek_całościowy: 3420
       nadpłata_lub_dopłata: -3420.0
+      thermomodernization_used: 0.0
       termomodernization_carry_over: 0.0
       termomodernization_expired: 0.0
       health_tax_credit_used: 0.0
@@ -78,6 +81,11 @@ parsed_response:
     nexus_source: outside_nexus
     nexus_basket: poza_nexus
     nexus_amount: 0.0
+    allocation_period: 2025-01
+    rounding_granularity: per_cost_item
+    rounding_adjustment: 0.0
+    nexus_evidence: ''
+    nexus_basis: explicit_amount
   monthly_W:
   - miesiąc: 2025-01
     wartość: 87.5
@@ -91,6 +99,23 @@ parsed_response:
     TEST_7: PASS
     TEST_8: PASS
     TEST_9: PASS
+  source_ledger_audit:
+    status: NOT_PROVIDED
+    reported_costs: null
+    raw_input_costs: 10000.0
+    deductible_costs: 10000.0
+    excluded_recorded_costs: 0.0
+    correction_delta: 0.0
+  correction_preview:
+    status: NOT_NEEDED
+    source_kpir_correction_required: false
+    return_correction_required: false
+    relief_adjustment_required: false
+    tax_unchanged_only_if_reliefs_updated: false
+    corrected_total_tax: 3420.0
+    corrected_overpayment: -3420.0
+    thermomodernization_used: 0.0
+    thermomodernization_carry_over: 0.0
   stops_reviews:
     stops: []
     reviews:

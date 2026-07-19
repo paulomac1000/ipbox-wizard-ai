@@ -4,18 +4,18 @@ meta:
   provider: openrouter
   requested_model: moonshotai/kimi-k2.5
   returned_model: moonshotai/kimi-k2.5
-  fingerprint: v3_d20f225ce2c9994d28b575c612159b7218db596838d936feeec97b20063e2c5b
-  request_hash: 890f838fcf0e0e5239e30fbe58d4f72a68b8b3e79b52dad7574fcf0b31e4716d
-  recorded_at: '2026-07-19T17:40:36.869165+00:00'
-  request_id: gen-1784482825-zDVsAcPuJCn0QCVjKhHu
+  fingerprint: v3_823403ee34f6bad1d737c1738b60fb32e2e0a85335fa9400dad63d7408201171
+  request_hash: 4d1b06ce7711ece33cbb9e7a1ce5587b504105ee8c9937225ce18f8f7f15fa03
+  recorded_at: '2026-07-19T21:08:41.144973+00:00'
+  request_id: gen-1784495316-33S07RByjJBMdMYCVlXL
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
   prompt_tokens: 247
-  completion_tokens: 393
-  total_tokens: 640
-  cost: 0.00092244
-  recording_duration_seconds: 11.393
+  completion_tokens: 211
+  total_tokens: 458
+  cost: 0.00051294
+  recording_duration_seconds: 4.458
   cassette_format_version: 4
 response: '{"reviews":["REVIEW_01","REVIEW_09"],"status":"FINAL","stops":[]}'
 parsed_response:
@@ -44,6 +44,8 @@ parsed_response:
       źródło: domyślna_wizard
       wartość: 1.0
       status: FINAL
+      źródło_ref: null
+      rounding_granularity: per_cost_item
     alokacja_multi_ip: null
     podatek:
       podstawa_IP: 14900
@@ -52,6 +54,7 @@ parsed_response:
       podatek_NIE_finalny: 0
       podatek_całościowy: 745
       nadpłata_lub_dopłata: -745.0
+      thermomodernization_used: 0.0
       termomodernization_carry_over: 0.0
       termomodernization_expired: 0.0
       health_tax_credit_used: 0.0
@@ -71,6 +74,11 @@ parsed_response:
     nexus_source: outside_nexus
     nexus_basket: poza_nexus
     nexus_amount: 0.0
+    allocation_period: 2025-01
+    rounding_granularity: per_cost_item
+    rounding_adjustment: 0.0
+    nexus_evidence: ''
+    nexus_basis: explicit_amount
   - opis: IDE
     amount: 100.0
     basket: IP
@@ -82,6 +90,11 @@ parsed_response:
     nexus_source: own_br
     nexus_basket: A
     nexus_amount: 100.0
+    allocation_period: 2025-02
+    rounding_granularity: per_cost_item
+    rounding_adjustment: 0.0
+    nexus_evidence: ewidencja_kosztu_IP
+    nexus_basis: explicit_amount
   monthly_W:
   - miesiąc: 2025-01
     wartość: 100.0
@@ -97,6 +110,23 @@ parsed_response:
     TEST_7: PASS
     TEST_8: PASS
     TEST_9: PASS
+  source_ledger_audit:
+    status: NOT_PROVIDED
+    reported_costs: null
+    raw_input_costs: 5100.0
+    deductible_costs: 5100.0
+    excluded_recorded_costs: 0.0
+    correction_delta: 0.0
+  correction_preview:
+    status: NOT_NEEDED
+    source_kpir_correction_required: false
+    return_correction_required: false
+    relief_adjustment_required: false
+    tax_unchanged_only_if_reliefs_updated: false
+    corrected_total_tax: 745.0
+    corrected_overpayment: -745.0
+    thermomodernization_used: 0.0
+    thermomodernization_carry_over: 0.0
   stops_reviews:
     stops: []
     reviews:

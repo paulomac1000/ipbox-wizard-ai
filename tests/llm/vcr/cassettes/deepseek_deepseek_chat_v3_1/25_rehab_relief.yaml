@@ -4,20 +4,20 @@ meta:
   provider: openrouter
   requested_model: deepseek/deepseek-chat-v3.1
   returned_model: deepseek/deepseek-chat-v3.1
-  fingerprint: v3_0e488b7174dbf6faebe7f5d7c905130c3182355893b610ae27e580008d3cf994
-  request_hash: 0b0feeb6d00024e9b4e7139984f34becfa37fb65550e831e80a95469816a467c
-  recorded_at: '2026-07-19T17:27:54.875811+00:00'
-  request_id: gen-1784482071-1wM3LhCn5Qk1n8kBstkp
+  fingerprint: v3_8dc041e70dd2cad76358121cff8afcf1531d4c6b89754287073a6d12243ee1dc
+  request_hash: 6a73afdb05d1e497422868abd3b345ec1f78052fd1e7475183a49e876f92c961
+  recorded_at: '2026-07-19T21:02:26.203129+00:00'
+  request_id: gen-1784494943-APsBZ79mm4JcyEPjU8vq
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
   prompt_tokens: 235
-  completion_tokens: 19
-  total_tokens: 254
-  cost: 4.872e-05
-  recording_duration_seconds: 2.983
+  completion_tokens: 23
+  total_tokens: 258
+  cost: 5.756e-05
+  recording_duration_seconds: 2.925
   cassette_format_version: 4
-response: '{"status": "FINAL", "stops": [], "reviews": []}'
+response: "{\n  \"status\": \"FINAL\",\n  \"stops\": [],\n  \"reviews\": []\n}"
 parsed_response:
   status: FINAL
   result:
@@ -44,6 +44,8 @@ parsed_response:
       źródło: domyślna_wizard
       wartość: null
       status: NOT_APPLICABLE
+      źródło_ref: null
+      rounding_granularity: per_cost_item
     alokacja_multi_ip: null
     podatek:
       podstawa_IP: 17911
@@ -52,6 +54,7 @@ parsed_response:
       podatek_NIE_finalny: 1320
       podatek_całościowy: 2216
       nadpłata_lub_dopłata: -2216.0
+      thermomodernization_used: 0.0
       termomodernization_carry_over: 0.0
       termomodernization_expired: 0.0
       health_tax_credit_used: 0.0
@@ -71,6 +74,11 @@ parsed_response:
     nexus_source: own_br
     nexus_basket: A
     nexus_amount: 89.0
+    allocation_period: 2025-01
+    rounding_granularity: per_cost_item
+    rounding_adjustment: 0.0
+    nexus_evidence: ewidencja_kosztu_IP
+    nexus_basis: explicit_amount
   monthly_W:
   - miesiąc: 2025-01
     wartość: 90.0
@@ -84,6 +92,23 @@ parsed_response:
     TEST_7: PASS
     TEST_8: PASS
     TEST_9: PASS
+  source_ledger_audit:
+    status: NOT_PROVIDED
+    reported_costs: null
+    raw_input_costs: 89.0
+    deductible_costs: 89.0
+    excluded_recorded_costs: 0.0
+    correction_delta: 0.0
+  correction_preview:
+    status: NOT_NEEDED
+    source_kpir_correction_required: false
+    return_correction_required: false
+    relief_adjustment_required: false
+    tax_unchanged_only_if_reliefs_updated: false
+    corrected_total_tax: 2216.0
+    corrected_overpayment: -2216.0
+    thermomodernization_used: 0.0
+    thermomodernization_carry_over: 0.0
   stops_reviews:
     stops: []
     reviews: []

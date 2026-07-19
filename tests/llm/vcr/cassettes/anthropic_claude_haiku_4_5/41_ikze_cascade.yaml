@@ -4,18 +4,18 @@ meta:
   provider: openrouter
   requested_model: anthropic/claude-haiku-4.5
   returned_model: anthropic/claude-haiku-4.5
-  fingerprint: v3_06c1e36a54ddbda50839523b3575b8946e1b29435a56b3063a771e77f33b3aee
-  request_hash: f173d621f0855ca77d0270123478339d5a3df2d63c72e227c830952579d2feee
-  recorded_at: '2026-07-19T17:25:49.948983+00:00'
-  request_id: gen-1784481948-Fk4jLGl6hptyhCB9Hpdk
+  fingerprint: v3_669a1c7a400028940214df12470983e1ff9ab9f62e1861a625a4c5ca2bdb201c
+  request_hash: 1e8859303eda99292d377bf3c94d736efc7e773bc38054ed2deb665e7126a8d4
+  recorded_at: '2026-07-19T21:00:42.099414+00:00'
+  request_id: gen-1784494840-I8yqI406VKQPeHHwm2Wd
   finish_reason: stop
   native_finish_reason: end_turn
   system_fingerprint: null
-  prompt_tokens: 699
+  prompt_tokens: 715
   completion_tokens: 22
-  total_tokens: 721
-  cost: 0.000809
-  recording_duration_seconds: 1.227
+  total_tokens: 737
+  cost: 0.000825
+  recording_duration_seconds: 1.484
   cassette_format_version: 4
 response: '{"status":"FINAL","stops":[],"reviews":["REVIEW_09"]}'
 parsed_response:
@@ -44,6 +44,8 @@ parsed_response:
       źródło: domyślna_wizard
       wartość: 0.7
       status: FINAL
+      źródło_ref: null
+      rounding_granularity: per_cost_item
     alokacja_multi_ip: null
     podatek:
       podstawa_IP: 20200
@@ -52,6 +54,7 @@ parsed_response:
       podatek_NIE_finalny: 323
       podatek_całościowy: 1333
       nadpłata_lub_dopłata: -1333.0
+      thermomodernization_used: 0.0
       termomodernization_carry_over: 0.0
       termomodernization_expired: 0.0
       health_tax_credit_used: 0.0
@@ -71,6 +74,11 @@ parsed_response:
     nexus_source: own_br
     nexus_basket: A
     nexus_amount: 100.0
+    allocation_period: 2025-01
+    rounding_granularity: per_cost_item
+    rounding_adjustment: 0.0
+    nexus_evidence: ewidencja_kosztu_IP
+    nexus_basis: explicit_amount
   - opis: Księgowość
     amount: 500.0
     basket: MIX
@@ -82,6 +90,11 @@ parsed_response:
     nexus_source: outside_nexus
     nexus_basket: poza_nexus
     nexus_amount: 0.0
+    allocation_period: 2025-01
+    rounding_granularity: per_cost_item
+    rounding_adjustment: 0.0
+    nexus_evidence: ''
+    nexus_basis: explicit_amount
   - opis: Hosting
     amount: 500.0
     basket: MIX
@@ -93,6 +106,11 @@ parsed_response:
     nexus_source: outside_nexus
     nexus_basket: poza_nexus
     nexus_amount: 0.0
+    allocation_period: 2025-02
+    rounding_granularity: per_cost_item
+    rounding_adjustment: 0.0
+    nexus_evidence: ''
+    nexus_basis: explicit_amount
   monthly_W:
   - miesiąc: 2025-01
     wartość: 70.0
@@ -108,6 +126,23 @@ parsed_response:
     TEST_7: PASS
     TEST_8: PASS
     TEST_9: PASS
+  source_ledger_audit:
+    status: NOT_PROVIDED
+    reported_costs: null
+    raw_input_costs: 1100.0
+    deductible_costs: 1100.0
+    excluded_recorded_costs: 0.0
+    correction_delta: 0.0
+  correction_preview:
+    status: NOT_NEEDED
+    source_kpir_correction_required: false
+    return_correction_required: false
+    relief_adjustment_required: false
+    tax_unchanged_only_if_reliefs_updated: false
+    corrected_total_tax: 1333.0
+    corrected_overpayment: -1333.0
+    thermomodernization_used: 0.0
+    thermomodernization_carry_over: 0.0
   stops_reviews:
     stops: []
     reviews:

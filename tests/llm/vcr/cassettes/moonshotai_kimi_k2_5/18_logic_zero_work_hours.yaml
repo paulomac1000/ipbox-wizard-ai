@@ -4,18 +4,18 @@ meta:
   provider: openrouter
   requested_model: moonshotai/kimi-k2.5
   returned_model: moonshotai/kimi-k2.5
-  fingerprint: v3_d5c5dbec9025dd46fe019251373a520763008e0e52391e6a8f28fbffc66ccf73
-  request_hash: 75a4681750645495f62e3b41e24a47bc25849fdf79cfd973b306f4b133936461
-  recorded_at: '2026-07-19T17:40:24.742771+00:00'
-  request_id: gen-1784482820-xT7rMAwRHQBcdEL0dgAu
+  fingerprint: v3_63e6e235d3e33e915c3ce66d458e0fa761b037912abf8a0e48fc60b0c1d6b60d
+  request_hash: 875dc0095ea81f7935d3ed8ede7972a4c096827bb68539732cc49a0545426eb3
+  recorded_at: '2026-07-19T21:08:35.954155+00:00'
+  request_id: gen-1784495308-lkNhvsgCZmYwYrUf0PeB
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
   prompt_tokens: 245
-  completion_tokens: 148
-  total_tokens: 393
-  cost: 0.00044325
-  recording_duration_seconds: 4.202
+  completion_tokens: 215
+  total_tokens: 460
+  cost: 0.00052104
+  recording_duration_seconds: 7.479
   cassette_format_version: 4
 response: '{"reviews":["REVIEW_09"],"status":"STOPPED","stops":["STOP_04"]}'
 parsed_response:
@@ -44,6 +44,8 @@ parsed_response:
       źródło: domyślna_wizard
       wartość: null
       status: NOT_APPLICABLE
+      źródło_ref: null
+      rounding_granularity: per_cost_item
     alokacja_multi_ip: null
     podatek:
       podstawa_IP: 0
@@ -52,6 +54,7 @@ parsed_response:
       podatek_NIE_finalny: 0
       podatek_całościowy: 0
       nadpłata_lub_dopłata: 0.0
+      thermomodernization_used: 0.0
       termomodernization_carry_over: 0.0
       termomodernization_expired: 0.0
       health_tax_credit_used: 0.0
@@ -73,6 +76,23 @@ parsed_response:
     TEST_7: PASS
     TEST_8: PASS
     TEST_9: PASS
+  source_ledger_audit:
+    status: NOT_PROVIDED
+    reported_costs: null
+    raw_input_costs: 0.0
+    deductible_costs: 0.0
+    excluded_recorded_costs: 0.0
+    correction_delta: 0.0
+  correction_preview:
+    status: UNAVAILABLE
+    source_kpir_correction_required: false
+    return_correction_required: false
+    relief_adjustment_required: false
+    tax_unchanged_only_if_reliefs_updated: false
+    corrected_total_tax: null
+    corrected_overpayment: null
+    thermomodernization_used: null
+    thermomodernization_carry_over: null
   stops_reviews:
     stops:
     - STOP_04

@@ -4,18 +4,18 @@ meta:
   provider: openrouter
   requested_model: anthropic/claude-haiku-4.5
   returned_model: anthropic/claude-haiku-4.5
-  fingerprint: v3_8e3f7d20e9b10b1b660c21ab895c21746f70bddcd1108e0e6a3214c411bd36c7
-  request_hash: e2e53cfddac7c7bd9bf97028cb730a2ecb8c8a37899e8e56fb2398f732adac72
-  recorded_at: '2026-07-19T17:25:52.127681+00:00'
-  request_id: gen-1784481950-OiYRnwNdI4t8qJgJwglk
+  fingerprint: v3_ff9295b73f266a1cca5be36f88f555a6a3abefb4dcb33b01c994aa0b4f34c137
+  request_hash: 7ee805bb3627de9987b7935e9454e1950e7a3c5ac659e82881c0013b5666d413
+  recorded_at: '2026-07-19T21:00:45.765136+00:00'
+  request_id: gen-1784494842-XsIrnLeYfSbagDnttkVd
   finish_reason: stop
   native_finish_reason: end_turn
   system_fingerprint: null
-  prompt_tokens: 704
+  prompt_tokens: 720
   completion_tokens: 27
-  total_tokens: 731
-  cost: 0.000839
-  recording_duration_seconds: 1.384
+  total_tokens: 747
+  cost: 0.000855
+  recording_duration_seconds: 2.9
   cassette_format_version: 4
 response: '{"status":"STOPPED","stops":["STOP_08"],"reviews":["REVIEW_09"]}'
 parsed_response:
@@ -44,6 +44,8 @@ parsed_response:
       źródło: domyślna_wizard
       wartość: null
       status: NOT_APPLICABLE
+      źródło_ref: null
+      rounding_granularity: per_cost_item
     alokacja_multi_ip: null
     podatek:
       podstawa_IP: 0
@@ -52,6 +54,7 @@ parsed_response:
       podatek_NIE_finalny: 0
       podatek_całościowy: 0
       nadpłata_lub_dopłata: 0.0
+      thermomodernization_used: 0.0
       termomodernization_carry_over: 0.0
       termomodernization_expired: 0.0
       health_tax_credit_used: 0.0
@@ -73,6 +76,23 @@ parsed_response:
     TEST_7: PASS
     TEST_8: PASS
     TEST_9: PASS
+  source_ledger_audit:
+    status: NOT_PROVIDED
+    reported_costs: null
+    raw_input_costs: 0.0
+    deductible_costs: 0.0
+    excluded_recorded_costs: 0.0
+    correction_delta: 0.0
+  correction_preview:
+    status: UNAVAILABLE
+    source_kpir_correction_required: false
+    return_correction_required: false
+    relief_adjustment_required: false
+    tax_unchanged_only_if_reliefs_updated: false
+    corrected_total_tax: null
+    corrected_overpayment: null
+    thermomodernization_used: null
+    thermomodernization_carry_over: null
   stops_reviews:
     stops:
     - STOP_08

@@ -4,20 +4,20 @@ meta:
   provider: openrouter
   requested_model: deepseek/deepseek-chat-v3.1
   returned_model: deepseek/deepseek-chat-v3.1
-  fingerprint: v3_a30bf5393a6c60f3e54229490a9ce4e978447c46b16dd0376dd72fae121461f4
-  request_hash: 66f1301e8f78074b2adff998e85347fbc4d012f50ede0f59db981c0b41c032d8
-  recorded_at: '2026-07-19T17:29:37.907840+00:00'
-  request_id: gen-1784482161-OsbstbebdyoeqIW78hUz
+  fingerprint: v3_aad427b10170052b341aeea288abd672af69b238ce072d9b5033cd02583aaf8b
+  request_hash: ba3be5af85ab42c0d9f105ef45af6626845b482a25186f1a99c98561d97ee0cf
+  recorded_at: '2026-07-19T21:03:50.274065+00:00'
+  request_id: gen-1784495026-upFeDw2zK3GeRP1Wfu8g
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
-  prompt_tokens: 600
-  completion_tokens: 32
-  total_tokens: 632
-  cost: 0.00013352
-  recording_duration_seconds: 16.374
+  prompt_tokens: 251
+  completion_tokens: 39
+  total_tokens: 290
+  cost: 0.00010677
+  recording_duration_seconds: 3.365
   cassette_format_version: 4
-response: '{"status":"FINAL","stops":[],"reviews":["REVIEW_04","REVIEW_16","REVIEW_17"]}'
+response: "{\n  \"reviews\": [\"REVIEW_04\", \"REVIEW_16\", \"REVIEW_17\"],\n  \"status\": \"FINAL\",\n  \"stops\": []\n}"
 parsed_response:
   status: FINAL
   result:
@@ -44,6 +44,8 @@ parsed_response:
       źródło: interpretacja_KIS
       wartość: 0.8
       status: FINAL
+      źródło_ref: SYNTHETIC-KIS-REFERENCE
+      rounding_granularity: per_cost_item
     alokacja_multi_ip:
       stage1_software_share: 8000.0
       stage1_non_software_share: 2000.0
@@ -59,6 +61,7 @@ parsed_response:
       podatek_NIE_finalny: 3420
       podatek_całościowy: 3420
       nadpłata_lub_dopłata: -3420.0
+      thermomodernization_used: 0.0
       termomodernization_carry_over: 0.0
       termomodernization_expired: 0.0
       health_tax_credit_used: 0.0
@@ -78,6 +81,11 @@ parsed_response:
     nexus_source: outside_nexus
     nexus_basket: poza_nexus
     nexus_amount: 0.0
+    allocation_period: 2025-01
+    rounding_granularity: per_cost_item
+    rounding_adjustment: 0.0
+    nexus_evidence: ''
+    nexus_basis: explicit_amount
   monthly_W:
   - miesiąc: 2025-01
     wartość: 87.5
@@ -91,6 +99,23 @@ parsed_response:
     TEST_7: PASS
     TEST_8: PASS
     TEST_9: PASS
+  source_ledger_audit:
+    status: NOT_PROVIDED
+    reported_costs: null
+    raw_input_costs: 10000.0
+    deductible_costs: 10000.0
+    excluded_recorded_costs: 0.0
+    correction_delta: 0.0
+  correction_preview:
+    status: NOT_NEEDED
+    source_kpir_correction_required: false
+    return_correction_required: false
+    relief_adjustment_required: false
+    tax_unchanged_only_if_reliefs_updated: false
+    corrected_total_tax: 3420.0
+    corrected_overpayment: -3420.0
+    thermomodernization_used: 0.0
+    thermomodernization_carry_over: 0.0
   stops_reviews:
     stops: []
     reviews:

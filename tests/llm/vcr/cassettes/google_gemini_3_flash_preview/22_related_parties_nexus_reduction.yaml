@@ -4,18 +4,18 @@ meta:
   provider: openrouter
   requested_model: google/gemini-3-flash-preview
   returned_model: google/gemini-3-flash-preview
-  fingerprint: v3_7465ec123d35aeb4e36111f5a6c6a097168b39bf63046c289ef4b8ea9475a235
-  request_hash: 93b1484e84018f1d7b9d0c78acbf4ff46b61915b3907c37cd88502c1ee754c2b
-  recorded_at: '2026-07-19T17:23:33.646066+00:00'
-  request_id: gen-1784481812-2Xoj5S3n5xJTzzWvQq3R
+  fingerprint: v3_a0e1817ec5c46dcf8e7770c6b5a7c1c7b5b2699889b48dc283bbbb7edf2cea63
+  request_hash: 370a89e340ce88b3b3af9cd87c5009e9ba8c3223fa927732ca38dfa82728d6c3
+  recorded_at: '2026-07-19T20:58:08.394636+00:00'
+  request_id: gen-1784494687-rQylvxMXwO217EMptoy9
   finish_reason: stop
   native_finish_reason: STOP
   system_fingerprint: null
-  prompt_tokens: 544
+  prompt_tokens: 556
   completion_tokens: 20
-  total_tokens: 564
-  cost: 0.000332
-  recording_duration_seconds: 1.355
+  total_tokens: 576
+  cost: 0.000338
+  recording_duration_seconds: 1.325
   cassette_format_version: 4
 response: '{"status":"FINAL","stops":[],"reviews":["REVIEW_01","REVIEW_09"]}'
 parsed_response:
@@ -44,6 +44,8 @@ parsed_response:
       źródło: domyślna_wizard
       wartość: null
       status: NOT_APPLICABLE
+      źródło_ref: null
+      rounding_granularity: per_cost_item
     alokacja_multi_ip: null
     podatek:
       podstawa_IP: 6500
@@ -52,6 +54,7 @@ parsed_response:
       podatek_NIE_finalny: 0
       podatek_całościowy: 325
       nadpłata_lub_dopłata: -325.0
+      thermomodernization_used: 0.0
       termomodernization_carry_over: 0.0
       termomodernization_expired: 0.0
       health_tax_credit_used: 0.0
@@ -71,6 +74,11 @@ parsed_response:
     nexus_source: unrelated_br_contractor
     nexus_basket: B
     nexus_amount: 5000.0
+    allocation_period: 2025-01
+    rounding_granularity: per_cost_item
+    rounding_adjustment: 0.0
+    nexus_evidence: ewidencja_kosztu_IP
+    nexus_basis: explicit_amount
   - opis: Powiązany podwykonawca B+R
     amount: 5000.0
     basket: IP
@@ -82,6 +90,11 @@ parsed_response:
     nexus_source: related_br_contractor
     nexus_basket: C
     nexus_amount: 5000.0
+    allocation_period: 2025-01
+    rounding_granularity: per_cost_item
+    rounding_adjustment: 0.0
+    nexus_evidence: ewidencja_kosztu_IP
+    nexus_basis: explicit_amount
   monthly_W:
   - miesiąc: 2025-01
     wartość: 100.0
@@ -95,6 +108,23 @@ parsed_response:
     TEST_7: PASS
     TEST_8: PASS
     TEST_9: PASS
+  source_ledger_audit:
+    status: NOT_PROVIDED
+    reported_costs: null
+    raw_input_costs: 10000.0
+    deductible_costs: 10000.0
+    excluded_recorded_costs: 0.0
+    correction_delta: 0.0
+  correction_preview:
+    status: NOT_NEEDED
+    source_kpir_correction_required: false
+    return_correction_required: false
+    relief_adjustment_required: false
+    tax_unchanged_only_if_reliefs_updated: false
+    corrected_total_tax: 325.0
+    corrected_overpayment: -325.0
+    thermomodernization_used: 0.0
+    thermomodernization_carry_over: 0.0
   stops_reviews:
     stops: []
     reviews:

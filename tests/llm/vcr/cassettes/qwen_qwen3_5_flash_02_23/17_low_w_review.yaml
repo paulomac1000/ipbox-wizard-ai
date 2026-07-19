@@ -4,10 +4,10 @@ meta:
   provider: openrouter
   requested_model: qwen/qwen3.5-flash-02-23
   returned_model: qwen/qwen3.5-flash-02-23
-  fingerprint: v3_c10e0cc2bc8a0f685c0a622636536f7c7aa2f5581eb7b108e266db0b0d1a9371
-  request_hash: 9752ae1da554e104dc4304a8ba1a3d4989aad7aca9e57c875b17316bcb5612e7
-  recorded_at: '2026-07-19T17:52:38.633925+00:00'
-  request_id: gen-1784483555-uubsDM7HkLbmImIOHvqq
+  fingerprint: v3_91d77ca8c7fc18a192474c2334f569068d7289d3234d9b55aa18e3e53457bf33
+  request_hash: 64bfebc10ddeaffcae1032abe1a5c1f7e64d2c697abae6f5eb931b5c23ba1143
+  recorded_at: '2026-07-19T21:12:59.054368+00:00'
+  request_id: gen-1784495575-Miyi4jaDwCDHGLfTMAJl
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
@@ -15,7 +15,7 @@ meta:
   completion_tokens: 739
   total_tokens: 991
   cost: 0.00020852
-  recording_duration_seconds: 3.66
+  recording_duration_seconds: 3.673
   cassette_format_version: 4
 response: '{"status":"FINAL","stops":[],"reviews":["REVIEW_02","REVIEW_09"]}'
 parsed_response:
@@ -44,6 +44,8 @@ parsed_response:
       źródło: domyślna_wizard
       wartość: 0.4375
       status: FINAL
+      źródło_ref: null
+      rounding_granularity: per_cost_item
     alokacja_multi_ip: null
     podatek:
       podstawa_IP: 0
@@ -52,6 +54,7 @@ parsed_response:
       podatek_NIE_finalny: 2105
       podatek_całościowy: 2105
       nadpłata_lub_dopłata: -2105.0
+      thermomodernization_used: 0.0
       termomodernization_carry_over: 0.0
       termomodernization_expired: 0.0
       health_tax_credit_used: 0.0
@@ -71,6 +74,11 @@ parsed_response:
     nexus_source: outside_nexus
     nexus_basket: poza_nexus
     nexus_amount: 0.0
+    allocation_period: 2025-01
+    rounding_granularity: per_cost_item
+    rounding_adjustment: 0.0
+    nexus_evidence: ''
+    nexus_basis: explicit_amount
   monthly_W:
   - miesiąc: 2025-01
     wartość: 43.75
@@ -84,6 +92,23 @@ parsed_response:
     TEST_7: PASS
     TEST_8: PASS
     TEST_9: PASS
+  source_ledger_audit:
+    status: NOT_PROVIDED
+    reported_costs: null
+    raw_input_costs: 300.0
+    deductible_costs: 300.0
+    excluded_recorded_costs: 0.0
+    correction_delta: 0.0
+  correction_preview:
+    status: NOT_NEEDED
+    source_kpir_correction_required: false
+    return_correction_required: false
+    relief_adjustment_required: false
+    tax_unchanged_only_if_reliefs_updated: false
+    corrected_total_tax: 2105.0
+    corrected_overpayment: -2105.0
+    thermomodernization_used: 0.0
+    thermomodernization_carry_over: 0.0
   stops_reviews:
     stops: []
     reviews:

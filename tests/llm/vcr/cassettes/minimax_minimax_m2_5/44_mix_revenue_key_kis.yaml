@@ -4,18 +4,18 @@ meta:
   provider: openrouter
   requested_model: minimax/minimax-m2.5
   returned_model: minimax/minimax-m2.5
-  fingerprint: v3_2bed3c631af502c3ddb85c2c8020105f50c5c469a680e82130749aed367d01ea
-  request_hash: 23bb30399a2a9c37be432e2ec9e166a2652a4dc05ab2436e14daa498eb454f5a
-  recorded_at: '2026-07-19T17:32:45.192301+00:00'
-  request_id: gen-1784482363-8ixUkjpZFe6EsKI7Ua0T
+  fingerprint: v3_4a8d045c269d18ac57fe97aa6933951ddb29382e1110f299f3c88b6e7672f323
+  request_hash: d10107e4747a40f8ff2b0d1f7620da6d27e28e287a8ff6acf59b69931045c8a5
+  recorded_at: '2026-07-19T21:06:19.308296+00:00'
+  request_id: gen-1784495177-Hd1T6YtsmxnVal9Oga8D
   finish_reason: stop
   native_finish_reason: stop
-  system_fingerprint: vllm-0.21.0-tp4-bf80359e
-  prompt_tokens: 557
+  system_fingerprint: null
+  prompt_tokens: 570
   completion_tokens: 104
-  total_tokens: 661
-  cost: 0.00012755
-  recording_duration_seconds: 1.269
+  total_tokens: 674
+  cost: 0.0002958
+  recording_duration_seconds: 1.501
   cassette_format_version: 4
 response: '{"status":"FINAL","stops":[],"reviews":["REVIEW_09","REVIEW_16","REVIEW_17"]}'
 parsed_response:
@@ -44,6 +44,8 @@ parsed_response:
       źródło: interpretacja_KIS
       wartość: 0.9
       status: FINAL
+      źródło_ref: SYNTHETIC-KIS-REFERENCE
+      rounding_granularity: per_cost_item
     alokacja_multi_ip: null
     podatek:
       podstawa_IP: 8450
@@ -52,6 +54,7 @@ parsed_response:
       podatek_NIE_finalny: 181
       podatek_całościowy: 604
       nadpłata_lub_dopłata: -604.0
+      thermomodernization_used: 0.0
       termomodernization_carry_over: 0.0
       termomodernization_expired: 0.0
       health_tax_credit_used: 0.0
@@ -71,6 +74,11 @@ parsed_response:
     nexus_source: outside_nexus
     nexus_basket: poza_nexus
     nexus_amount: 0.0
+    allocation_period: 2025-01
+    rounding_granularity: per_cost_item
+    rounding_adjustment: 0.0
+    nexus_evidence: ''
+    nexus_basis: explicit_amount
   - opis: Licencja JetBrains
     amount: 100.0
     basket: IP
@@ -82,6 +90,11 @@ parsed_response:
     nexus_source: own_br
     nexus_basket: A
     nexus_amount: 100.0
+    allocation_period: 2025-01
+    rounding_granularity: per_cost_item
+    rounding_adjustment: 0.0
+    nexus_evidence: ewidencja_kosztu_IP
+    nexus_basis: explicit_amount
   monthly_W:
   - miesiąc: 2025-01
     wartość: 87.5
@@ -95,6 +108,23 @@ parsed_response:
     TEST_7: PASS
     TEST_8: PASS
     TEST_9: PASS
+  source_ledger_audit:
+    status: NOT_PROVIDED
+    reported_costs: null
+    raw_input_costs: 600.0
+    deductible_costs: 600.0
+    excluded_recorded_costs: 0.0
+    correction_delta: 0.0
+  correction_preview:
+    status: NOT_NEEDED
+    source_kpir_correction_required: false
+    return_correction_required: false
+    relief_adjustment_required: false
+    tax_unchanged_only_if_reliefs_updated: false
+    corrected_total_tax: 604.0
+    corrected_overpayment: -604.0
+    thermomodernization_used: 0.0
+    thermomodernization_carry_over: 0.0
   stops_reviews:
     stops: []
     reviews:

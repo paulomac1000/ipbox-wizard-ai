@@ -4,20 +4,20 @@ meta:
   provider: openrouter
   requested_model: google/gemini-3-flash-preview
   returned_model: google/gemini-3-flash-preview
-  fingerprint: v3_3454b0a7dead046435780f951ff769b0cf4a734cbb4629a76dca15ee49ca7949
-  request_hash: c370d1aa23c783f7508b6b7aa1b9789319c23c4ea2b5b8a1ca16949b416878f3
-  recorded_at: '2026-07-19T17:23:52.607333+00:00'
-  request_id: gen-1784481830-3xjWWU366omgCLzmUJIU
+  fingerprint: v3_90ef067359f7468e5690146d56010083d24a34811ae6b3fba7fbfaffe90f3085
+  request_hash: ad393c84a51343fc44aa9ea6841806a2ac87bd44543e82b492f4b5c0f70af62c
+  recorded_at: '2026-07-19T20:58:26.395065+00:00'
+  request_id: gen-1784494705-AIR0Cz5LSDKbcK19ilAn
   finish_reason: stop
   native_finish_reason: STOP
   system_fingerprint: null
-  prompt_tokens: 552
-  completion_tokens: 28
-  total_tokens: 580
-  cost: 0.00036
-  recording_duration_seconds: 1.863
+  prompt_tokens: 564
+  completion_tokens: 34
+  total_tokens: 598
+  cost: 0.000384
+  recording_duration_seconds: 1.417
   cassette_format_version: 4
-response: '{"status":"STOPPED","stops":["ZUS_DOUBLE_DIP"],"reviews":["REVIEW_01","REVIEW_09"]}'
+response: '{"status": "STOPPED", "stops": ["ZUS_DOUBLE_DIP"], "reviews": ["REVIEW_01", "REVIEW_09"]}'
 parsed_response:
   status: STOPPED
   result:
@@ -44,6 +44,8 @@ parsed_response:
       źródło: domyślna_wizard
       wartość: null
       status: NOT_APPLICABLE
+      źródło_ref: null
+      rounding_granularity: per_cost_item
     alokacja_multi_ip: null
     podatek:
       podstawa_IP: 0
@@ -52,6 +54,7 @@ parsed_response:
       podatek_NIE_finalny: 0
       podatek_całościowy: 0
       nadpłata_lub_dopłata: 0.0
+      thermomodernization_used: 0.0
       termomodernization_carry_over: 0.0
       termomodernization_expired: 0.0
       health_tax_credit_used: 0.0
@@ -73,6 +76,23 @@ parsed_response:
     TEST_7: PASS
     TEST_8: PASS
     TEST_9: PASS
+  source_ledger_audit:
+    status: NOT_PROVIDED
+    reported_costs: null
+    raw_input_costs: 0.0
+    deductible_costs: 0.0
+    excluded_recorded_costs: 0.0
+    correction_delta: 0.0
+  correction_preview:
+    status: UNAVAILABLE
+    source_kpir_correction_required: false
+    return_correction_required: false
+    relief_adjustment_required: false
+    tax_unchanged_only_if_reliefs_updated: false
+    corrected_total_tax: null
+    corrected_overpayment: null
+    thermomodernization_used: null
+    thermomodernization_carry_over: null
   stops_reviews:
     stops:
     - ZUS_DOUBLE_DIP

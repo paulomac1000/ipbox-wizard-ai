@@ -4,20 +4,20 @@ meta:
   provider: openrouter
   requested_model: deepseek/deepseek-chat-v3.1
   returned_model: deepseek/deepseek-chat-v3.1
-  fingerprint: v3_a7f321c8017c0b2813063d78d577398d76543c99da873c45675452196bcb97ea
-  request_hash: d0ca943d967c2720cbc207cb5c914f32a8e28efd75448a6aa0a92cb014a67767
-  recorded_at: '2026-07-19T17:29:01.485658+00:00'
-  request_id: gen-1784482138-qhks1gBy11cB8LSkMbLS
+  fingerprint: v3_dbbe8d737a3264cd149de64944177fe0243f9926d0fa4bd56bb2204418b6440f
+  request_hash: 632a047d563ee839828e79f421262f079f8d0983a35a80adbb73beb21cd2c652
+  recorded_at: '2026-07-19T21:03:28.062688+00:00'
+  request_id: gen-1784495005-XzIRt3P1TrXcXbygqH5g
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
-  prompt_tokens: 590
-  completion_tokens: 24
-  total_tokens: 614
-  cost: 0.00012282
-  recording_duration_seconds: 2.74
+  prompt_tokens: 603
+  completion_tokens: 22
+  total_tokens: 625
+  cost: 0.00012433
+  recording_duration_seconds: 2.125
   cassette_format_version: 4
-response: '{"status": "FINAL", "stops": [], "reviews": ["REVIEW_04"]}'
+response: '{"status":"FINAL","stops":[],"reviews":["REVIEW_04"]}'
 parsed_response:
   status: FINAL
   result:
@@ -44,6 +44,8 @@ parsed_response:
       źródło: domyślna_wizard
       wartość: null
       status: NOT_APPLICABLE
+      źródło_ref: null
+      rounding_granularity: per_cost_item
     alokacja_multi_ip: null
     podatek:
       podstawa_IP: 18400
@@ -52,6 +54,7 @@ parsed_response:
       podatek_NIE_finalny: 1235
       podatek_całościowy: 2155
       nadpłata_lub_dopłata: -2155.0
+      thermomodernization_used: 0.0
       termomodernization_carry_over: 0.0
       termomodernization_expired: 0.0
       health_tax_credit_used: 0.0
@@ -71,6 +74,11 @@ parsed_response:
     nexus_source: own_br
     nexus_basket: A
     nexus_amount: 100.0
+    allocation_period: 2025-01
+    rounding_granularity: per_cost_item
+    rounding_adjustment: 0.0
+    nexus_evidence: ewidencja_kosztu_IP
+    nexus_basis: explicit_amount
   monthly_W:
   - miesiąc: 2025-01
     wartość: 74.0
@@ -84,6 +92,23 @@ parsed_response:
     TEST_7: PASS
     TEST_8: PASS
     TEST_9: PASS
+  source_ledger_audit:
+    status: NOT_PROVIDED
+    reported_costs: null
+    raw_input_costs: 100.0
+    deductible_costs: 100.0
+    excluded_recorded_costs: 0.0
+    correction_delta: 0.0
+  correction_preview:
+    status: NOT_NEEDED
+    source_kpir_correction_required: false
+    return_correction_required: false
+    relief_adjustment_required: false
+    tax_unchanged_only_if_reliefs_updated: false
+    corrected_total_tax: 2155.0
+    corrected_overpayment: -2155.0
+    thermomodernization_used: 0.0
+    thermomodernization_carry_over: 0.0
   stops_reviews:
     stops: []
     reviews:

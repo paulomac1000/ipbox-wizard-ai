@@ -1,21 +1,21 @@
 meta:
   scenario_id: 52_cost_date_revenue_mix_policy
-  scenario_name: MIX według proporcji przychodowej w dacie kosztu
+  scenario_name: Miesięczna pula proporcji przychodowej i dowody NEXUS
   provider: openrouter
   requested_model: minimax/minimax-m2.5
   returned_model: minimax/minimax-m2.5
-  fingerprint: v3_a7b8b090c2d5d7636f71263489420e27f7b7496956a0b4cfdc6ef37a789996ec
-  request_hash: 23bb30399a2a9c37be432e2ec9e166a2652a4dc05ab2436e14daa498eb454f5a
-  recorded_at: '2026-07-19T17:33:08.161015+00:00'
-  request_id: gen-1784482387-4QWMmM8NILXvMllF554s
+  fingerprint: v3_89ea23272d7b6a7b5b10f93fb63b354b6548762bb1e4c9714855e1aa9542ed5a
+  request_hash: d10107e4747a40f8ff2b0d1f7620da6d27e28e287a8ff6acf59b69931045c8a5
+  recorded_at: '2026-07-19T21:06:46.999569+00:00'
+  request_id: gen-1784495204-c0pD0YdnlDUiJBIq7vDM
   finish_reason: stop
   native_finish_reason: stop
-  system_fingerprint: vllm-0.21.0-tp4-bf80359e
-  prompt_tokens: 557
-  completion_tokens: 105
-  total_tokens: 662
-  cost: 0.00012365
-  recording_duration_seconds: 1.2
+  system_fingerprint: null
+  prompt_tokens: 568
+  completion_tokens: 107
+  total_tokens: 675
+  cost: 0.00017919
+  recording_duration_seconds: 2.481
   cassette_format_version: 4
 response: '{"status":"FINAL","stops":[],"reviews":["REVIEW_09","REVIEW_16","REVIEW_17"]}'
 parsed_response:
@@ -23,35 +23,38 @@ parsed_response:
   result:
     rok: 2025
     przychody_roczne:
-      IP: 10000.0
-      NIE: 10000.0
+      IP: 3333.0
+      NIE: 6667.0
     koszty_roczne:
-      IP: 1100.0
-      NIE: 1000.0
-      MIX: 2000.0
+      IP: 100.0
+      NIE: 200.03
+      MIX: 300.03
       WYKLUCZONE: 0.0
     nexus_koszty:
       A: 100.0
       B: 0.0
       C: 0.0
       D: 0.0
-      poza_nexus: 2000.0
+      poza_nexus: 200.03
     nexus: 1.0
-    dochód_IP: 8900.0
-    dochód_NIE: 9000.0
+    dochód_IP: 3233.0
+    dochód_NIE: 6466.97
     klucz_MIX:
       metoda: przychodowa_w_dacie_kosztu
       źródło: interpretacja_KIS
       wartość: null
       status: FINAL
+      źródło_ref: SYNTHETIC-KIS-REFERENCE
+      rounding_granularity: monthly_pool
     alokacja_multi_ip: null
     podatek:
-      podstawa_IP: 8900
-      podstawa_NIE: 9000
-      podatek_IP: 445
-      podatek_NIE_finalny: 1710
-      podatek_całościowy: 2155
-      nadpłata_lub_dopłata: -2155.0
+      podstawa_IP: 3233
+      podstawa_NIE: 6467
+      podatek_IP: 162
+      podatek_NIE_finalny: 1229
+      podatek_całościowy: 1391
+      nadpłata_lub_dopłata: -1391.0
+      thermomodernization_used: 0.0
       termomodernization_carry_over: 0.0
       termomodernization_expired: 0.0
       health_tax_credit_used: 0.0
@@ -60,44 +63,57 @@ parsed_response:
       ulga_BR_carry_over: 0.0
       dochód_dodatkowy_skala: 0.0
   classifications:
-  - opis: Wspólny koszt styczniowy
-    amount: 1000.0
+  - opis: Wspólny koszt A
+    amount: 100.01
     basket: MIX
     allocation_method: przychodowa_w_dacie_kosztu
     allocation_source: interpretacja_KIS
-    allocation_key: 0.8
-    ip_amount: 800.0
-    non_ip_amount: 200.0
-    nexus_source: outside_nexus
-    nexus_basket: poza_nexus
-    nexus_amount: 0.0
-  - opis: Bezpośredni koszt projektu
-    amount: 100.0
-    basket: IP
-    allocation_method: direct
-    allocation_source: syntetyczna-ewidencja-projektowa
-    allocation_key: 1.0
-    ip_amount: 100.0
-    non_ip_amount: 0.0
+    allocation_key: 0.3333
+    ip_amount: 33.34
+    non_ip_amount: 66.67
     nexus_source: own_br
     nexus_basket: A
-    nexus_amount: 100.0
-  - opis: Wspólny koszt lutowy
-    amount: 1000.0
+    nexus_amount: 33.34
+    allocation_period: 2025-06
+    rounding_granularity: monthly_pool
+    rounding_adjustment: 0.01
+    nexus_evidence: SYNTHETIC-NEXUS-EVIDENCE-A
+    nexus_basis: allocated_ip_cost
+  - opis: Wspólny koszt B
+    amount: 100.01
     basket: MIX
     allocation_method: przychodowa_w_dacie_kosztu
     allocation_source: interpretacja_KIS
-    allocation_key: 0.2
-    ip_amount: 200.0
-    non_ip_amount: 800.0
-    nexus_source: outside_nexus
-    nexus_basket: poza_nexus
-    nexus_amount: 0.0
+    allocation_key: 0.3333
+    ip_amount: 33.33
+    non_ip_amount: 66.68
+    nexus_source: own_br
+    nexus_basket: A
+    nexus_amount: 33.33
+    allocation_period: 2025-06
+    rounding_granularity: monthly_pool
+    rounding_adjustment: 0.0
+    nexus_evidence: SYNTHETIC-NEXUS-EVIDENCE-B
+    nexus_basis: allocated_ip_cost
+  - opis: Wspólny koszt C
+    amount: 100.01
+    basket: MIX
+    allocation_method: przychodowa_w_dacie_kosztu
+    allocation_source: interpretacja_KIS
+    allocation_key: 0.3333
+    ip_amount: 33.33
+    non_ip_amount: 66.68
+    nexus_source: own_br
+    nexus_basket: A
+    nexus_amount: 33.33
+    allocation_period: 2025-06
+    rounding_granularity: monthly_pool
+    rounding_adjustment: 0.0
+    nexus_evidence: SYNTHETIC-NEXUS-EVIDENCE-C
+    nexus_basis: allocated_ip_cost
   monthly_W:
-  - miesiąc: 2025-01
-    wartość: 90.0
-  - miesiąc: 2025-02
-    wartość: 90.0
+  - miesiąc: 2025-06
+    wartość: 75.0
   tests:
     TEST_1: PASS
     TEST_2: PASS
@@ -108,6 +124,23 @@ parsed_response:
     TEST_7: PASS
     TEST_8: PASS
     TEST_9: PASS
+  source_ledger_audit:
+    status: NOT_PROVIDED
+    reported_costs: null
+    raw_input_costs: 300.03
+    deductible_costs: 300.03
+    excluded_recorded_costs: 0.0
+    correction_delta: 0.0
+  correction_preview:
+    status: NOT_NEEDED
+    source_kpir_correction_required: false
+    return_correction_required: false
+    relief_adjustment_required: false
+    tax_unchanged_only_if_reliefs_updated: false
+    corrected_total_tax: 1391.0
+    corrected_overpayment: -1391.0
+    thermomodernization_used: 0.0
+    thermomodernization_carry_over: 0.0
   stops_reviews:
     stops: []
     reviews:
