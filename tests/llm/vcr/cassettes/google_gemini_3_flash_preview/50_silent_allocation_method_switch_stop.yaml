@@ -4,10 +4,10 @@ meta:
   provider: openrouter
   requested_model: google/gemini-3-flash-preview
   returned_model: google/gemini-3-flash-preview
-  fingerprint: v3_6a9da5d68bb2b940a462188049bc38796fccd61cf640fbee24c42e7e27f1d69e
+  fingerprint: v3_e775269c0047c46703f309dd456e6df6111ddc19b9046cdfd852548e3f0ebb95
   request_hash: 534fe0c85ff095d36a2446cf73bf94039254bf7ce83ef6e9cede9f000844c002
-  recorded_at: '2026-07-19T13:48:28.270648+00:00'
-  request_id: gen-1784468907-GryM0aNB98B4ZlQZm2xs
+  recorded_at: '2026-07-19T17:24:31.330184+00:00'
+  request_id: gen-1784481869-vPVKY3P34r19S9gBilmi
   finish_reason: stop
   native_finish_reason: STOP
   system_fingerprint: null
@@ -15,7 +15,7 @@ meta:
   completion_tokens: 30
   total_tokens: 584
   cost: 0.000367
-  recording_duration_seconds: 1.252
+  recording_duration_seconds: 1.421
   cassette_format_version: 4
 response: '{"status":"STOPPED","stops":["STOP_09","STOP_10","STOP_11"],"reviews":["REVIEW_09"]}'
 parsed_response:
@@ -62,9 +62,9 @@ parsed_response:
   classifications: []
   monthly_W:
   - miesiąc: 2025-01
-    wartość: 70.0
+    wartość: 68.72
   - miesiąc: 2025-02
-    wartość: 90.0
+    wartość: 86.9
   tests:
     TEST_1: PASS
     TEST_2: PASS

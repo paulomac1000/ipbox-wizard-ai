@@ -4,10 +4,10 @@ meta:
   provider: openrouter
   requested_model: anthropic/claude-haiku-4.5
   returned_model: anthropic/claude-haiku-4.5
-  fingerprint: v3_56c456d8cb135325ae46bd0fa6cfcd29d9d4a4b0cce2778de833d0cd923b82f7
+  fingerprint: v3_11faa0cca5e265855f0215c49b4d3d03c39c53ccb86035c5e98c8ff1a811d150
   request_hash: f173d621f0855ca77d0270123478339d5a3df2d63c72e227c830952579d2feee
-  recorded_at: '2026-07-19T13:49:11.293860+00:00'
-  request_id: gen-1784468950-wop5TVt2xvlug9vYrkm7
+  recorded_at: '2026-07-19T17:25:17.144489+00:00'
+  request_id: gen-1784481915-658pxwEN6xma32ZsqGFA
   finish_reason: stop
   native_finish_reason: end_turn
   system_fingerprint: null
@@ -15,7 +15,7 @@ meta:
   completion_tokens: 22
   total_tokens: 721
   cost: 0.000809
-  recording_duration_seconds: 1.13
+  recording_duration_seconds: 1.224
   cassette_format_version: 4
 response: '{"status":"FINAL","stops":[],"reviews":["REVIEW_09"]}'
 parsed_response:

@@ -4,20 +4,20 @@ meta:
   provider: openrouter
   requested_model: deepseek/deepseek-chat-v3.1
   returned_model: deepseek/deepseek-chat-v3.1
-  fingerprint: v3_15311a028b1ded2714a8ea83379d0898982259f17604c83d0f7204842cd0105d
+  fingerprint: v3_9915b7f91dc23c98954a15d97e94826bafb4fc3b9d6ae4e7a7adb5aedd4f1149
   request_hash: 6cbfd1126763520875df63e98d318be299464e35b98220268656a5ece90c9266
-  recorded_at: '2026-07-19T13:52:20.350899+00:00'
-  request_id: gen-1784469133-3I51wFj2svszlrElOQCp
+  recorded_at: '2026-07-19T17:28:44.218471+00:00'
+  request_id: gen-1784482117-bHpVGMRmguEjqNYrBhWZ
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
   prompt_tokens: 250
-  completion_tokens: 40
-  total_tokens: 290
-  cost: 7.638e-05
-  recording_duration_seconds: 6.514
+  completion_tokens: 36
+  total_tokens: 286
+  cost: 7.258e-05
+  recording_duration_seconds: 6.672
   cassette_format_version: 4
-response: "{\n  \"status\": \"FINAL\",\n  \"stops\": [],\n  \"reviews\": [\"REVIEW_02\", \"REVIEW_08\", \"REVIEW_09\"]\n}"
+response: '{"status": "FINAL", "stops": [], "reviews": ["REVIEW_02", "REVIEW_08", "REVIEW_09"]}'
 parsed_response:
   status: FINAL
   result:

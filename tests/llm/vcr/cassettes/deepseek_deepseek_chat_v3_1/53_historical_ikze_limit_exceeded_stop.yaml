@@ -4,20 +4,20 @@ meta:
   provider: openrouter
   requested_model: deepseek/deepseek-chat-v3.1
   returned_model: deepseek/deepseek-chat-v3.1
-  fingerprint: v3_c90348087c8c055978212b4b3ce395ca7f1ee1ff23157609cf3a78dec5c53101
+  fingerprint: v3_14b7cd811ef03701aadc1e9ba85957a51e954a86e4c3323f5fbe88b9daff105c
   request_hash: 14a326a2c2cddd4cd050dca27561e950139edd05c3de3db70583ba621afdde87
-  recorded_at: '2026-07-19T13:53:41.049878+00:00'
-  request_id: gen-1784469215-9eVPQh47tPDIdFC5xXyo
+  recorded_at: '2026-07-19T17:30:06.768954+00:00'
+  request_id: gen-1784482202-gGMIdbYwODi3tbv9YNPn
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
   prompt_tokens: 247
-  completion_tokens: 35
-  total_tokens: 282
-  cost: 7.088e-05
-  recording_duration_seconds: 5.246
+  completion_tokens: 31
+  total_tokens: 278
+  cost: 6.564e-05
+  recording_duration_seconds: 4.161
   cassette_format_version: 4
-response: "{\n  \"status\": \"STOPPED\",\n  \"stops\": [\"STOP_14\"],\n  \"reviews\": [\"REVIEW_09\"]\n}"
+response: '{"status": "STOPPED", "stops": ["STOP_14"], "reviews": ["REVIEW_09"]}'
 parsed_response:
   status: STOPPED
   result:

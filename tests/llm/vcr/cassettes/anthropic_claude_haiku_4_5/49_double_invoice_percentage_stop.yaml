@@ -1,13 +1,13 @@
 meta:
   scenario_id: 49_double_invoice_percentage_stop
-  scenario_name: Podwójne zastosowanie procentu faktury
+  scenario_name: Podwójne zastosowanie zaokrąglonego procentu faktury
   provider: openrouter
   requested_model: anthropic/claude-haiku-4.5
   returned_model: anthropic/claude-haiku-4.5
-  fingerprint: v3_fd7220dfe67a63a55e972563afe7f001a943f0ab947ffe0230848b4eccc7ece9
+  fingerprint: v3_bf6cdcaa76d77442eafac01080e68df7bf56d74dbf91ce25f2b4763803b5e8f0
   request_hash: 973a3330212e43705509ecaeac8c67dc6f718be09cb363289d88e1683cde4ac5
-  recorded_at: '2026-07-19T13:49:57.591021+00:00'
-  request_id: gen-1784468996-I7oFWdUKmoKrOuXpGeuy
+  recorded_at: '2026-07-19T17:26:05.720223+00:00'
+  request_id: gen-1784481964-RUVgK7Uefy13uuLrfGOJ
   finish_reason: stop
   native_finish_reason: end_turn
   system_fingerprint: null
@@ -15,7 +15,7 @@ meta:
   completion_tokens: 32
   total_tokens: 741
   cost: 0.000869
-  recording_duration_seconds: 1.13
+  recording_duration_seconds: 1.135
   cassette_format_version: 4
 response: '{"status":"STOPPED","stops":["STOP_09","STOP_10"],"reviews":["REVIEW_09"]}'
 parsed_response:
@@ -62,7 +62,7 @@ parsed_response:
   classifications: []
   monthly_W:
   - miesiąc: 2025-01
-    wartość: 70.0
+    wartość: 68.72
   tests:
     TEST_1: PASS
     TEST_2: PASS

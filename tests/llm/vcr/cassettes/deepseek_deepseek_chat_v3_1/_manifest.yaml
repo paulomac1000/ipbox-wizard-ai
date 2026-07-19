@@ -1,326 +1,326 @@
 manifest_format_version: 2
 model: deepseek/deepseek-chat-v3.1
-generated_at: '2026-07-19T13:53:51.298469+00:00'
+generated_at: '2026-07-19T17:30:13.155000+00:00'
 entries:
   01_basic_linear:
     file: 01_basic_linear.yaml
-    fingerprint: v3_8e2ba94ded45cc4cf0a2d55f2132f2a19a38916480ff025faa9033813dd67a47
+    fingerprint: v3_40da8aaac2d69ebcaa0e54e9fad8030f1e23fc7c01f4153c1e83f6e851b0baad
     request_hash: 7a2bf8713a36a0b776b040b9dc84345c192ae5d32c243b60325bd96bb66cffd8
-    recorded_at: '2026-07-19T13:50:13.030577+00:00'
+    recorded_at: '2026-07-19T17:26:30.959335+00:00'
     returned_model: deepseek/deepseek-chat-v3.1
-    cost: 8.636e-05
+    cost: 9.307e-05
   02_basic_scale_single_client:
     file: 02_basic_scale_single_client.yaml
-    fingerprint: v3_4dec81f23fdfd75db4f85cecb3ab883de53977f7b31603ab62fc3e84bcc9cdcb
+    fingerprint: v3_bc311a2c88aca5bc28fc10ca0c3727f45e421c30d99847918b6944c63955bec0
     request_hash: 0df55823def61dd3a14211d3e79fab78f6e6a511aa9ff91cb27863e685a4d5be
-    recorded_at: '2026-07-19T13:50:16.388535+00:00'
+    recorded_at: '2026-07-19T17:26:37.343470+00:00'
     returned_model: deepseek/deepseek-chat-v3.1
-    cost: 0.00018765
+    cost: 8.951e-05
   03_fx_usd_single_client:
     file: 03_fx_usd_single_client.yaml
-    fingerprint: v3_ecb1e440a1f127f8ddcbf03696bd15c397c593ecdb4272a17edb283d9cb8fa44
+    fingerprint: v3_019740e308e3422c7b03cba55926a2a8e0c24fc00440fb66b9af44b97ff296e5
     request_hash: 0df55823def61dd3a14211d3e79fab78f6e6a511aa9ff91cb27863e685a4d5be
-    recorded_at: '2026-07-19T13:50:30.850252+00:00'
+    recorded_at: '2026-07-19T17:26:41.919546+00:00'
     returned_model: deepseek/deepseek-chat-v3.1
-    cost: 6.623e-05
+    cost: 6.047e-05
   11_multi_client_mixed_currencies:
     file: 11_multi_client_mixed_currencies.yaml
-    fingerprint: v3_8d9f557054f09cbc220db8e8c1a30f8a3b33d14afedecedf79f132bb5cddb413
+    fingerprint: v3_184bb7d8d9037a4aff46ad79df624509283612b923e4754edd6344ca2e22f400
     request_hash: 06b2b3c73d63110f322a0034e44cfa8f1f054b20bed428281f5512d850803d13
-    recorded_at: '2026-07-19T13:50:34.097171+00:00'
+    recorded_at: '2026-07-19T17:26:45.870957+00:00'
     returned_model: deepseek/deepseek-chat-v3.1
-    cost: 9.307e-05
+    cost: 6.296e-05
   12_zus_in_pit_path:
     file: 12_zus_in_pit_path.yaml
-    fingerprint: v3_2ad54b44a06757c1493c5dd2d4b09c2acc24a0dbaca48ba3caec8d60b2035fe1
+    fingerprint: v3_cf7db04a58d0a2ed5daadaaa1a3a1541f77cda3c364a4244245d0e135f0faeaf
     request_hash: 06b2b3c73d63110f322a0034e44cfa8f1f054b20bed428281f5512d850803d13
-    recorded_at: '2026-07-19T13:50:37.993888+00:00'
+    recorded_at: '2026-07-19T17:26:53.232148+00:00'
     returned_model: deepseek/deepseek-chat-v3.1
-    cost: 9.307e-05
+    cost: 8.636e-05
   13_income_from_employment_impact:
     file: 13_income_from_employment_impact.yaml
-    fingerprint: v3_b557c928c776da074494465191a8a3d5aee7b5337a06b096749f7e2d96c2673c
+    fingerprint: v3_80c941f46e3876912a792dd3064683ff8d6fbfdf77ff891924f14fc2b9453eba
     request_hash: 06b2b3c73d63110f322a0034e44cfa8f1f054b20bed428281f5512d850803d13
-    recorded_at: '2026-07-19T13:50:41.667948+00:00'
+    recorded_at: '2026-07-19T17:27:02.410003+00:00'
     returned_model: deepseek/deepseek-chat-v3.1
-    cost: 0.00012282
+    cost: 5.412e-05
   14_lump_sum_ineligible_check:
     file: 14_lump_sum_ineligible_check.yaml
-    fingerprint: v3_4cc5446e894134c0ff98e04e7eae51d4de45dfa63c4311baa6174fd71141fe72
+    fingerprint: v3_ea958fbdb3dfbd658e6fa5b946573c377471efb7ec9958c5c18b498e8f3e086e
     request_hash: b8737e4d4fbe80dd5b3e66e7613e92f8abc97cb853c4dd7fc295d7d28402d8cd
-    recorded_at: '2026-07-19T13:50:50.931792+00:00'
+    recorded_at: '2026-07-19T17:27:06.594259+00:00'
     returned_model: deepseek/deepseek-chat-v3.1
-    cost: 6.596e-05
+    cost: 9.461e-05
   15_vacation_sick_mix:
     file: 15_vacation_sick_mix.yaml
-    fingerprint: v3_b1b8d017f042efea7ec381fa49873970e6a3d0bd6ca9fe13e70b1fee6c9d3a2a
+    fingerprint: v3_4b0db533944fc28efcf57e897d6b4c0e98a6c51d3e8b947e42eb570a5fa034ca
     request_hash: 7a2bf8713a36a0b776b040b9dc84345c192ae5d32c243b60325bd96bb66cffd8
-    recorded_at: '2026-07-19T13:50:54.852188+00:00'
+    recorded_at: '2026-07-19T17:27:11.245323+00:00'
     returned_model: deepseek/deepseek-chat-v3.1
-    cost: 8.256e-05
+    cost: 5.928e-05
   16_high_w_review:
     file: 16_high_w_review.yaml
-    fingerprint: v3_f4930bbfed15e69a3a7328cee87a5c42edb53dcfb232c27590e4b535362e0162
+    fingerprint: v3_d90d90d0c86f3625182f9c84ddd72513f27dcf99ea2de5c889dd9c201db1472c
     request_hash: 0df55823def61dd3a14211d3e79fab78f6e6a511aa9ff91cb27863e685a4d5be
-    recorded_at: '2026-07-19T13:50:59.592107+00:00'
+    recorded_at: '2026-07-19T17:27:17.746049+00:00'
     returned_model: deepseek/deepseek-chat-v3.1
     cost: 6.047e-05
   17_low_w_review:
     file: 17_low_w_review.yaml
-    fingerprint: v3_85140993e1ab8c658ad94a93b73c086d8d7ec880348e74f03b9d587154db16a3
+    fingerprint: v3_5bce010b47016a18382642e1cb4a7e620636afcad48eb36c8bb2f3a241f9e72a
     request_hash: 416c3b6559642f70ac21ab3686312d4255a0b0ae4b65d6f0aa0e07daa23f0849
-    recorded_at: '2026-07-19T13:51:03.088806+00:00'
+    recorded_at: '2026-07-19T17:27:23.306285+00:00'
     returned_model: deepseek/deepseek-chat-v3.1
     cost: 7.003e-05
   18_logic_zero_work_hours:
     file: 18_logic_zero_work_hours.yaml
-    fingerprint: v3_63bedbf907280e53e44a9c108a83cf41f510c7869a9e82bcafee336167934963
+    fingerprint: v3_6d38438b1f757b224d6df4ca890ae46532db0f4b00411a0fece49d1594b1c99b
     request_hash: 590ed722e07db7fd101bcd561eaf308f8df0f133f11207456510750e8f3b4111
-    recorded_at: '2026-07-19T13:51:06.751053+00:00'
+    recorded_at: '2026-07-19T17:27:27.970033+00:00'
     returned_model: deepseek/deepseek-chat-v3.1
     cost: 0.00010196
   21_monthly_loss_impact:
     file: 21_monthly_loss_impact.yaml
-    fingerprint: v3_a2853406daf565228ae9f4386dc9538aa5ffc88eb9f3907a434fcd8ccb43f27d
+    fingerprint: v3_e77ff67d01eab91b121e0f0b2e323003060e157ee2b8d917b352df7b209fa954
     request_hash: 0df55823def61dd3a14211d3e79fab78f6e6a511aa9ff91cb27863e685a4d5be
-    recorded_at: '2026-07-19T13:51:15.886522+00:00'
+    recorded_at: '2026-07-19T17:27:38.507338+00:00'
     returned_model: deepseek/deepseek-chat-v3.1
-    cost: 6.623e-05
+    cost: 7.051e-05
   22_related_parties_nexus_reduction:
     file: 22_related_parties_nexus_reduction.yaml
-    fingerprint: v3_f81117f42678fcc97ce7f01713f8fd64e8fafcc44c3d4c65f94f781d6a46a7bf
+    fingerprint: v3_6237ccddfb6cd35e7fa902134558c78351fe31861b085721f8b233d1a37ef641
     request_hash: 0df55823def61dd3a14211d3e79fab78f6e6a511aa9ff91cb27863e685a4d5be
-    recorded_at: '2026-07-19T13:51:22.412018+00:00'
+    recorded_at: '2026-07-19T17:27:44.867610+00:00'
     returned_model: deepseek/deepseek-chat-v3.1
     cost: 6.427e-05
   23_loss_carry_forward:
     file: 23_loss_carry_forward.yaml
-    fingerprint: v3_f292f09b801606574b70ebffccdb6ce82ac87db6ffc5c3e81d139214de7ac002
+    fingerprint: v3_b8fdf4cb7949a0cd1aee990f970f61443abe66e2a62de2254e4dab08606cebd3
     request_hash: 0b0feeb6d00024e9b4e7139984f34becfa37fb65550e831e80a95469816a467c
-    recorded_at: '2026-07-19T13:51:28.353716+00:00'
+    recorded_at: '2026-07-19T17:27:47.845170+00:00'
     returned_model: deepseek/deepseek-chat-v3.1
-    cost: 8.572e-05
+    cost: 0.00017495
   24_donations_relief:
     file: 24_donations_relief.yaml
-    fingerprint: v3_8d374c0cc6befc6e472c10ccb46d56b7577088bdd08a7f6c6e917540b80ef18d
+    fingerprint: v3_97894a9aef7b31c3353bc3f4efa7719bea442f53c411848e9dca2eba45e6ef4f
     request_hash: 0b0feeb6d00024e9b4e7139984f34becfa37fb65550e831e80a95469816a467c
-    recorded_at: '2026-07-19T13:51:31.377822+00:00'
+    recorded_at: '2026-07-19T17:27:51.146182+00:00'
     returned_model: deepseek/deepseek-chat-v3.1
-    cost: 8.572e-05
+    cost: 5.756e-05
   25_rehab_relief:
     file: 25_rehab_relief.yaml
-    fingerprint: v3_8951d48daffe94cb211fdd8d1a12810fd3bb908dde039cba08b39edde2f6dd12
+    fingerprint: v3_0e488b7174dbf6faebe7f5d7c905130c3182355893b610ae27e580008d3cf994
     request_hash: 0b0feeb6d00024e9b4e7139984f34becfa37fb65550e831e80a95469816a467c
-    recorded_at: '2026-07-19T13:51:33.909297+00:00'
+    recorded_at: '2026-07-19T17:27:54.875811+00:00'
     returned_model: deepseek/deepseek-chat-v3.1
-    cost: 5.708e-05
+    cost: 4.872e-05
   26_rd_relief_nexus:
     file: 26_rd_relief_nexus.yaml
-    fingerprint: v3_9ac34dd6068d2fcf9104478a87972f75e8cb806e855f07f7467faae488a10754
+    fingerprint: v3_eb99042f906e456b55178cd2af72877af8c56757de3ed8c845eefdb34b5079c5
     request_hash: 7a2bf8713a36a0b776b040b9dc84345c192ae5d32c243b60325bd96bb66cffd8
-    recorded_at: '2026-07-19T13:51:37.064869+00:00'
+    recorded_at: '2026-07-19T17:28:03.312703+00:00'
     returned_model: deepseek/deepseek-chat-v3.1
-    cost: 5.412e-05
+    cost: 5.928e-05
   27_termomodernizacja_full:
     file: 27_termomodernizacja_full.yaml
-    fingerprint: v3_99a04d53080be0271c25f1712b5f67b770f3159985be2906679ba5f1b31decf3
+    fingerprint: v3_9993f06e90e33867b5c9e90fd28436c3c06b6b8c8a86e3b981f7fdac73b969bb
     request_hash: 7a2bf8713a36a0b776b040b9dc84345c192ae5d32c243b60325bd96bb66cffd8
-    recorded_at: '2026-07-19T13:51:39.806411+00:00'
+    recorded_at: '2026-07-19T17:28:06.940971+00:00'
     returned_model: deepseek/deepseek-chat-v3.1
     cost: 5.792e-05
   28_edge_multiple_carry-overs:
     file: 28_edge_multiple_carry-overs.yaml
-    fingerprint: v3_d16fc9c5fa656511c7a565c5f28f589458d1d8b8f5080f1cbe8aaea734dde32b
+    fingerprint: v3_53c305b68549bac3179859e3615a87c724c2a95c43975ca60c49d1d5b7b64309
     request_hash: 0df55823def61dd3a14211d3e79fab78f6e6a511aa9ff91cb27863e685a4d5be
-    recorded_at: '2026-07-19T13:51:42.486675+00:00'
+    recorded_at: '2026-07-19T17:28:10.379995+00:00'
     returned_model: deepseek/deepseek-chat-v3.1
     cost: 6.047e-05
   29_edge_related_parties_nexus_0:
     file: 29_edge_related_parties_nexus_0.yaml
-    fingerprint: v3_8e688bf103270e9bb4e870d590eb95ab2dc833f948ac5abe55fef76a4c3c5228
+    fingerprint: v3_35c20b61cd12ebfd8d829728af964c60e00e3bbcf82992f08a7ea14f572f6e8d
     request_hash: 0df55823def61dd3a14211d3e79fab78f6e6a511aa9ff91cb27863e685a4d5be
-    recorded_at: '2026-07-19T13:51:47.208587+00:00'
+    recorded_at: '2026-07-19T17:28:15.077041+00:00'
     returned_model: deepseek/deepseek-chat-v3.1
-    cost: 6.427e-05
+    cost: 6.047e-05
   30_edge_related_parties_nexus_mixed:
     file: 30_edge_related_parties_nexus_mixed.yaml
-    fingerprint: v3_af277be2f4648c9809a572cb96e82e57dbeceed19bdc86418c9ba2f7f3c17c5f
+    fingerprint: v3_276a8946066885af35514f18f97c609827072c0d17b78e13ab01bf5eb8069cf9
     request_hash: 0df55823def61dd3a14211d3e79fab78f6e6a511aa9ff91cb27863e685a4d5be
-    recorded_at: '2026-07-19T13:51:52.021492+00:00'
+    recorded_at: '2026-07-19T17:28:18.132122+00:00'
     returned_model: deepseek/deepseek-chat-v3.1
-    cost: 6.427e-05
+    cost: 6.047e-05
   31_zus_double_dip_fail:
     file: 31_zus_double_dip_fail.yaml
-    fingerprint: v3_a1f6022688f82a4ce24b127d03c57836b3c96c440dfb5daca5114225fcbd408a
+    fingerprint: v3_54b859929c2b52d59b8250e3fe1fd9064ecea86b64aae61de80085148610593b
     request_hash: 5f20d1aca577fdc3e5639c8d54a7523dbe6eab4a82d29c82f1d804772742854e
-    recorded_at: '2026-07-19T13:51:55.849362+00:00'
+    recorded_at: '2026-07-19T17:28:25.330069+00:00'
     returned_model: deepseek/deepseek-chat-v3.1
-    cost: 0.00011312
+    cost: 0.00020035
   32_private_costs_ip_fail:
     file: 32_private_costs_ip_fail.yaml
-    fingerprint: v3_9de3730ee1fbd7f39c8e986724e7bc4d3e6b2660c26aac26d7b50f1b62d235ac
+    fingerprint: v3_571b51e5d16d0752853e29da0ce401b8990a63ab3a5866dedd244b8f47787471
     request_hash: 0df55823def61dd3a14211d3e79fab78f6e6a511aa9ff91cb27863e685a4d5be
-    recorded_at: '2026-07-19T13:52:00.806385+00:00'
+    recorded_at: '2026-07-19T17:28:28.444538+00:00'
     returned_model: deepseek/deepseek-chat-v3.1
     cost: 6.047e-05
   33_kpir_balance_fail:
     file: 33_kpir_balance_fail.yaml
-    fingerprint: v3_a265bd55217de5aed89d45b9c476ea164ab0258338d45c9c8d1ab1e1824fc8d7
+    fingerprint: v3_b9f95b2d5beedf14ca782bab924e472f60659f1e767c9a870a648951ac806962
     request_hash: 0df55823def61dd3a14211d3e79fab78f6e6a511aa9ff91cb27863e685a4d5be
-    recorded_at: '2026-07-19T13:52:05.867540+00:00'
+    recorded_at: '2026-07-19T17:28:33.846373+00:00'
     returned_model: deepseek/deepseek-chat-v3.1
-    cost: 6.047e-05
+    cost: 6.427e-05
   34_verify_fixed_asset_threshold_fail:
     file: 34_verify_fixed_asset_threshold_fail.yaml
-    fingerprint: v3_8bba12282322c30c4e0f47d84d6b8dba3ea26b21df42305bd70f94f56832f0f6
+    fingerprint: v3_4cb32cf959ec9292b7e6498f1af5b91fd0e83b48584c802fc7956c9649fed57a
     request_hash: 0df55823def61dd3a14211d3e79fab78f6e6a511aa9ff91cb27863e685a4d5be
-    recorded_at: '2026-07-19T13:52:13.121776+00:00'
+    recorded_at: '2026-07-19T17:28:36.801781+00:00'
     returned_model: deepseek/deepseek-chat-v3.1
     cost: 6.047e-05
   35_verify_monthly_w_jump_inconsistency:
     file: 35_verify_monthly_w_jump_inconsistency.yaml
-    fingerprint: v3_15311a028b1ded2714a8ea83379d0898982259f17604c83d0f7204842cd0105d
+    fingerprint: v3_9915b7f91dc23c98954a15d97e94826bafb4fc3b9d6ae4e7a7adb5aedd4f1149
     request_hash: 6cbfd1126763520875df63e98d318be299464e35b98220268656a5ece90c9266
-    recorded_at: '2026-07-19T13:52:20.350899+00:00'
+    recorded_at: '2026-07-19T17:28:44.218471+00:00'
     returned_model: deepseek/deepseek-chat-v3.1
-    cost: 7.638e-05
+    cost: 7.258e-05
   36_verify_negative_income_error:
     file: 36_verify_negative_income_error.yaml
-    fingerprint: v3_6ce1ce861943ab797ef1b2393220a5a324b5eeee4c0a3b771a635f1d315d7239
+    fingerprint: v3_953150ceae3424ec2de5b81d7ddbfc8475622dc9ab217a52c2c9f4492a4c169b
     request_hash: 0df55823def61dd3a14211d3e79fab78f6e6a511aa9ff91cb27863e685a4d5be
-    recorded_at: '2026-07-19T13:52:24.936196+00:00'
+    recorded_at: '2026-07-19T17:28:50.234413+00:00'
     returned_model: deepseek/deepseek-chat-v3.1
-    cost: 6.047e-05
+    cost: 6.611e-05
   37_verify_invalid_tax_form_stop:
     file: 37_verify_invalid_tax_form_stop.yaml
-    fingerprint: v3_5f5ca28502c6bc23b53498f2e4cf3c73834b3f9dd75f9a7fa845528789751487
+    fingerprint: v3_a2f53502509e1941255cfe5e1af93dab18d12128441bd7bdad5b209176877d98
     request_hash: 626a2d6c1d7970cb2a14152dadbc71e3ffbf29110ed8b936b7dd7b8fe1bf66fe
-    recorded_at: '2026-07-19T13:52:28.669905+00:00'
+    recorded_at: '2026-07-19T17:28:53.416172+00:00'
     returned_model: deepseek/deepseek-chat-v3.1
-    cost: 0.00010931
+    cost: 7.343e-05
   38_verify_missing_kpir_data:
     file: 38_verify_missing_kpir_data.yaml
-    fingerprint: v3_8040c4b8089c6316fc3dc0536f585238d63d05e6d57dad7d29bad1fa8e9ae836
+    fingerprint: v3_b884c7acd1b1ee721aa05facb4c98fd6e5995cda56fb525456b05b25dbfe4c65
     request_hash: 2af148625cfc37c22911dce911ba518158a4565a6e2fa3f6c832616b50021067
-    recorded_at: '2026-07-19T13:52:35.637800+00:00'
+    recorded_at: '2026-07-19T17:28:57.981530+00:00'
     returned_model: deepseek/deepseek-chat-v3.1
-    cost: 6.708e-05
+    cost: 0.00013571
   39_multi_project_weighted_W:
     file: 39_multi_project_weighted_W.yaml
-    fingerprint: v3_9341263fd621382d6bf7e65731f2a47c21a0aaeacfbdb924ad3bfe9351d165ab
+    fingerprint: v3_a7f321c8017c0b2813063d78d577398d76543c99da873c45675452196bcb97ea
     request_hash: d0ca943d967c2720cbc207cb5c914f32a8e28efd75448a6aa0a92cb014a67767
-    recorded_at: '2026-07-19T13:52:40.532415+00:00'
+    recorded_at: '2026-07-19T17:29:01.485658+00:00'
     returned_model: deepseek/deepseek-chat-v3.1
-    cost: 9.307e-05
+    cost: 0.00012282
   40_mixed_ip_clause:
     file: 40_mixed_ip_clause.yaml
-    fingerprint: v3_75041bd886a170cdee9159aea5be24aee788ebeb0086b666f7b92c4873fd3060
+    fingerprint: v3_771b16391c3ad232664040e47abed15f1172f0c3a5361719cdc5b07c046ba82e
     request_hash: 06b2b3c73d63110f322a0034e44cfa8f1f054b20bed428281f5512d850803d13
-    recorded_at: '2026-07-19T13:52:43.682957+00:00'
+    recorded_at: '2026-07-19T17:29:05.759178+00:00'
     returned_model: deepseek/deepseek-chat-v3.1
-    cost: 0.0001833
+    cost: 6.296e-05
   41_ikze_cascade:
     file: 41_ikze_cascade.yaml
-    fingerprint: v3_62813518a276ad590f4acd7a3696af40060af638587970256ac12b79bc5763c5
+    fingerprint: v3_5ce5c367ae9d9fbce6a6842b1a0a786554c5042ef76a348da8f0d983779bc9ee
     request_hash: 7a2bf8713a36a0b776b040b9dc84345c192ae5d32c243b60325bd96bb66cffd8
-    recorded_at: '2026-07-19T13:52:48.148071+00:00'
+    recorded_at: '2026-07-19T17:29:10.232246+00:00'
     returned_model: deepseek/deepseek-chat-v3.1
-    cost: 5.412e-05
+    cost: 5.792e-05
   42_stop_08_no_documentation:
     file: 42_stop_08_no_documentation.yaml
-    fingerprint: v3_8754310f2b5908a0b3be475837221f083bcedca4da4c0c7daa0beec22c0640a1
+    fingerprint: v3_c0e5efdc3fedc6b83f0497fe48a1614eb1422c572c8e2290303fa2aa14d2ad07
     request_hash: 2af148625cfc37c22911dce911ba518158a4565a6e2fa3f6c832616b50021067
-    recorded_at: '2026-07-19T13:52:54.448415+00:00'
+    recorded_at: '2026-07-19T17:29:13.602101+00:00'
     returned_model: deepseek/deepseek-chat-v3.1
-    cost: 6.168e-05
+    cost: 0.00013171
   43_review_09_single_client_100pct:
     file: 43_review_09_single_client_100pct.yaml
-    fingerprint: v3_93bf9fac4b5f2064a415e79e7dbccf7fedf9e9b646779f14c45d6e6cee67a810
+    fingerprint: v3_55499a0a4aeffa0b752345e1520515f7d370fbbed468361e8ffbe3cfb9d5c121
     request_hash: 0df55823def61dd3a14211d3e79fab78f6e6a511aa9ff91cb27863e685a4d5be
-    recorded_at: '2026-07-19T13:52:59.569057+00:00'
+    recorded_at: '2026-07-19T17:29:16.299565+00:00'
     returned_model: deepseek/deepseek-chat-v3.1
     cost: 6.047e-05
   44_mix_revenue_key_kis:
     file: 44_mix_revenue_key_kis.yaml
-    fingerprint: v3_ef190722a838fe707fa25d0d419b25b6909fda128730587f692793becca89379
+    fingerprint: v3_3e8dba1b9c5a43ab7b901096704f5b3a1a36d5bd9edd2fc5ac03f261fa0c543c
     request_hash: ad185590eaf0431f7b10ddac2570f1b3f2e9cbcdcb93d14151b84406327c0787
-    recorded_at: '2026-07-19T13:53:03.440535+00:00'
+    recorded_at: '2026-07-19T17:29:20.775634+00:00'
     returned_model: deepseek/deepseek-chat-v3.1
-    cost: 0.00010777
+    cost: 7.686e-05
   45_multi_ip_two_stage:
     file: 45_multi_ip_two_stage.yaml
-    fingerprint: v3_cd648a3258a57ec32f89d5c84a7e6e2b07580866df23c8541d1cd6e4ebac8294
+    fingerprint: v3_a30bf5393a6c60f3e54229490a9ce4e978447c46b16dd0376dd72fae121461f4
     request_hash: 66f1301e8f78074b2adff998e85347fbc4d012f50ede0f59db981c0b41c032d8
-    recorded_at: '2026-07-19T13:53:06.901105+00:00'
+    recorded_at: '2026-07-19T17:29:37.907840+00:00'
     returned_model: deepseek/deepseek-chat-v3.1
-    cost: 0.00014152
+    cost: 0.00013352
   46_historical_2019_health_credit:
     file: 46_historical_2019_health_credit.yaml
-    fingerprint: v3_28e6fc39c973d82b5d6d33a83df2fa8986641db03eff8e62c75c9b12777d4216
+    fingerprint: v3_36f105d9286a6602533a355fd59373ff0599b3e5491b089adc59f6682307b6d6
     request_hash: 7a2bf8713a36a0b776b040b9dc84345c192ae5d32c243b60325bd96bb66cffd8
-    recorded_at: '2026-07-19T13:53:10.191093+00:00'
+    recorded_at: '2026-07-19T17:29:40.428471+00:00'
     returned_model: deepseek/deepseek-chat-v3.1
     cost: 5.412e-05
   47_historical_2021_br_ipbox_stop:
     file: 47_historical_2021_br_ipbox_stop.yaml
-    fingerprint: v3_3d8b01548b52aac3fb5dc1dc1063c7036334d7d8ea1e1e94b68b673aaad2a2f7
+    fingerprint: v3_84115a6a50af68c9d2faf8d723ce2056db3da3f4ab1e3539f53d4933ee70ba4a
     request_hash: d577e1c5ef86f1eed36fa86349e2eaf097c9f83f690d2b058479e9a3225c985a
-    recorded_at: '2026-07-19T13:53:13.956063+00:00'
+    recorded_at: '2026-07-19T17:29:43.497639+00:00'
     returned_model: deepseek/deepseek-chat-v3.1
-    cost: 0.00019519
+    cost: 7.088e-05
   48_historical_2024_pit_like_cascade:
     file: 48_historical_2024_pit_like_cascade.yaml
-    fingerprint: v3_f74670d8670cdb6c52be3cee01d5885582e09188a6e80ab0ff9b17fa41ff835c
+    fingerprint: v3_0a722bb7211ffabb75eff82844bb23ee00fbe8d31ef1402021044af4cff77be3
     request_hash: 7a2bf8713a36a0b776b040b9dc84345c192ae5d32c243b60325bd96bb66cffd8
-    recorded_at: '2026-07-19T13:53:17.819996+00:00'
+    recorded_at: '2026-07-19T17:29:46.164356+00:00'
     returned_model: deepseek/deepseek-chat-v3.1
     cost: 5.412e-05
   49_double_invoice_percentage_stop:
     file: 49_double_invoice_percentage_stop.yaml
-    fingerprint: v3_1dcbf7216478a303bf42799deed6b1c19e88f3a62512dc442743c6c779ad0742
+    fingerprint: v3_7fec37bc07c0db970a52f3f465e01f467e783356add22c22fe7a584149e2aebb
     request_hash: 4652e692d8e52a1eaa1230c09199a9f3e374795b1ca7a7bc1b74c66c0328b522
-    recorded_at: '2026-07-19T13:53:20.269484+00:00'
+    recorded_at: '2026-07-19T17:29:50.995940+00:00'
     returned_model: deepseek/deepseek-chat-v3.1
-    cost: 0.0002096
+    cost: 7.639e-05
   50_silent_allocation_method_switch_stop:
     file: 50_silent_allocation_method_switch_stop.yaml
-    fingerprint: v3_e31e95d61141999c0ed5bc289f43a1afef5de570cd84ae912abb15d31e858206
+    fingerprint: v3_c0c8de546a62bdc1a265ab7de1527e5c3608f5e26e9d37080a214185a88e8079
     request_hash: 63c75e0a8f0b05efa5c2c92e26f5350ac9fa816931980449ba40f258ba3cab28
-    recorded_at: '2026-07-19T13:53:23.842243+00:00'
+    recorded_at: '2026-07-19T17:29:53.340786+00:00'
     returned_model: deepseek/deepseek-chat-v3.1
-    cost: 0.00015041
+    cost: 0.0002364
   51_return_ledger_classification_shift_stop:
     file: 51_return_ledger_classification_shift_stop.yaml
-    fingerprint: v3_e1943352a18c42934c789c2d729aa2e2878998fe1af806894b1968f9908a97fc
+    fingerprint: v3_13bf1a06bd78116903e8794d59ef60cb3aa677ada0f0ce781b15a38dd5369a4f
     request_hash: 4e5802297ca4ef2434a3161d6cc6b0696b6a4c5a318d06fb9afcd6d5415ed7ec
-    recorded_at: '2026-07-19T13:53:26.787780+00:00'
+    recorded_at: '2026-07-19T17:29:55.620883+00:00'
     returned_model: deepseek/deepseek-chat-v3.1
-    cost: 0.00013171
+    cost: 0.0001981
   52_cost_date_revenue_mix_policy:
     file: 52_cost_date_revenue_mix_policy.yaml
-    fingerprint: v3_96d91892ece51b023fd876d1a7a560bf92f750fdecb71e7f3090150a883b121c
+    fingerprint: v3_03960a409588abed7ffec502c0fa1633caee0a48c149a5bb4bda763d1926a798
     request_hash: ad185590eaf0431f7b10ddac2570f1b3f2e9cbcdcb93d14151b84406327c0787
-    recorded_at: '2026-07-19T13:53:35.084882+00:00'
+    recorded_at: '2026-07-19T17:30:01.881187+00:00'
     returned_model: deepseek/deepseek-chat-v3.1
-    cost: 7.686e-05
+    cost: 7.062e-05
   53_historical_ikze_limit_exceeded_stop:
     file: 53_historical_ikze_limit_exceeded_stop.yaml
-    fingerprint: v3_c90348087c8c055978212b4b3ce395ca7f1ee1ff23157609cf3a78dec5c53101
+    fingerprint: v3_14b7cd811ef03701aadc1e9ba85957a51e954a86e4c3323f5fbe88b9daff105c
     request_hash: 14a326a2c2cddd4cd050dca27561e950139edd05c3de3db70583ba621afdde87
-    recorded_at: '2026-07-19T13:53:41.049878+00:00'
+    recorded_at: '2026-07-19T17:30:06.768954+00:00'
     returned_model: deepseek/deepseek-chat-v3.1
-    cost: 7.088e-05
+    cost: 6.564e-05
   54_pre_ipbox_year_stop:
     file: 54_pre_ipbox_year_stop.yaml
-    fingerprint: v3_38aa3742eed113cda404ea256a7f1d41b62a9da347f829fbdc8b3c29576190cc
+    fingerprint: v3_59efdd503a5e8d3835a81310f4babdcb40b37b822389a325026f5c76c2dde218
     request_hash: 318e99599843dcb30270f4c7c89661a6535a8ad96c5d7e6de99989586c998b08
-    recorded_at: '2026-07-19T13:53:46.016791+00:00'
+    recorded_at: '2026-07-19T17:30:09.180612+00:00'
     returned_model: deepseek/deepseek-chat-v3.1
-    cost: 6.944e-05
+    cost: 0.0001981
   55_disjoint_w_semantics_clean:
     file: 55_disjoint_w_semantics_clean.yaml
-    fingerprint: v3_aa34907bca1a9f515daa8ddeb03f1d8598dd971f68270145772ee232b54cccea
-    request_hash: 7a2bf8713a36a0b776b040b9dc84345c192ae5d32c243b60325bd96bb66cffd8
-    recorded_at: '2026-07-19T13:53:51.293743+00:00'
+    fingerprint: v3_193332d6d9ad2538f1dd990bc65adabb6a4db756cc94b308b455a370c5a886af
+    request_hash: 0b0feeb6d00024e9b4e7139984f34becfa37fb65550e831e80a95469816a467c
+    recorded_at: '2026-07-19T17:30:13.150172+00:00'
     returned_model: deepseek/deepseek-chat-v3.1
-    cost: 5.868e-05
+    cost: 5.756e-05

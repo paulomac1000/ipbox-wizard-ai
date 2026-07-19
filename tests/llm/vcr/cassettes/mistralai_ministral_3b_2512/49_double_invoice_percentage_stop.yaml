@@ -1,13 +1,13 @@
 meta:
   scenario_id: 49_double_invoice_percentage_stop
-  scenario_name: Podwójne zastosowanie procentu faktury
+  scenario_name: Podwójne zastosowanie zaokrąglonego procentu faktury
   provider: openrouter
   requested_model: mistralai/ministral-3b-2512
   returned_model: mistralai/ministral-3b-2512
-  fingerprint: v3_d3da0c39387f6f88811ba81627682a2cb52e0c559ee29b01f51873e142d96379
+  fingerprint: v3_f2abf01ddd75960724cc36c866729f6622422088f7c1bbb6834de09804dd7381
   request_hash: 4b9bd0e43e45d0af8cf62d6e876fa1214a13dbbeeffe09aa03d5dcf02de8a559
-  recorded_at: '2026-07-19T14:09:59.559386+00:00'
-  request_id: gen-1784470198-kB38m4QyEe0iueZj3JAE
+  recorded_at: '2026-07-19T18:18:47.331857+00:00'
+  request_id: gen-1784485126-ISZHgFG4ZXIcTLoCjiVL
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
@@ -15,7 +15,7 @@ meta:
   completion_tokens: 43
   total_tokens: 310
   cost: 4.65e-05
-  recording_duration_seconds: 0.65
+  recording_duration_seconds: 0.655
   cassette_format_version: 4
 response: "{\n  \"status\": \"STOPPED\",\n  \"stops\": [\"STOP_09\", \"STOP_10\"],\n  \"reviews\": [\"REVIEW_09\"]\n}"
 parsed_response:
@@ -62,7 +62,7 @@ parsed_response:
   classifications: []
   monthly_W:
   - miesiąc: 2025-01
-    wartość: 70.0
+    wartość: 68.72
   tests:
     TEST_1: PASS
     TEST_2: PASS

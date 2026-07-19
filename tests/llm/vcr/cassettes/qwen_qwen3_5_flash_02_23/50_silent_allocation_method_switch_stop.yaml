@@ -4,18 +4,18 @@ meta:
   provider: openrouter
   requested_model: qwen/qwen3.5-flash-02-23
   returned_model: qwen/qwen3.5-flash-02-23
-  fingerprint: v3_d0f08725a54aeb250d60af85408e8d181938f6aa88a450170ff461541fcd8d50
+  fingerprint: v3_5353f61d0623cbace0dc972d51fb05dc8bb0ed54c1a001225d8fc09ad1c058a3
   request_hash: 5cc9a608dc6762474b7e1a7e6771f13d65ec7d57c0a28bac8e5510eaab03d2a5
-  recorded_at: '2026-07-19T14:08:03.414646+00:00'
-  request_id: gen-1784470076-b7vYeyAzXqwiOja7u3Gs
+  recorded_at: '2026-07-19T18:17:11.311131+00:00'
+  request_id: gen-1784485024-CaZskOlZ4kdkLFQA9r5z
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
   prompt_tokens: 261
-  completion_tokens: 896
-  total_tokens: 1157
-  cost: 0.000249925
-  recording_duration_seconds: 7.347
+  completion_tokens: 954
+  total_tokens: 1215
+  cost: 0.000265005
+  recording_duration_seconds: 7.032
   cassette_format_version: 4
 response: '{"status":"STOPPED","stops":["STOP_09","STOP_10","STOP_11"],"reviews":["REVIEW_09"]}'
 parsed_response:
@@ -62,9 +62,9 @@ parsed_response:
   classifications: []
   monthly_W:
   - miesiąc: 2025-01
-    wartość: 70.0
+    wartość: 68.72
   - miesiąc: 2025-02
-    wartość: 90.0
+    wartość: 86.9
   tests:
     TEST_1: PASS
     TEST_2: PASS

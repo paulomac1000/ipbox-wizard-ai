@@ -1,21 +1,21 @@
 meta:
   scenario_id: 49_double_invoice_percentage_stop
-  scenario_name: Podwójne zastosowanie procentu faktury
+  scenario_name: Podwójne zastosowanie zaokrąglonego procentu faktury
   provider: openrouter
   requested_model: moonshotai/kimi-k2.5
   returned_model: moonshotai/kimi-k2.5
-  fingerprint: v3_aa1d7325f425278109ad7915795ac1d313924ea1789a6ba541a7e0ed4be46a1e
+  fingerprint: v3_8435a8f7ea98b6fa8b1b13a51deb0b01b7ffda4cdd12854437c35b61cf60d7a9
   request_hash: db53abb476ce80540be9bafcfc225e6b84e98e422b6092c44b7a0dd8e68e6540
-  recorded_at: '2026-07-19T14:01:38.091554+00:00'
-  request_id: gen-1784469689-05jIEEZh8xAZHsfeOfwu
+  recorded_at: '2026-07-19T17:50:55.304216+00:00'
+  request_id: gen-1784483448-rbpbIUiWJ5t90BeKZLsB
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
   prompt_tokens: 249
-  completion_tokens: 386
-  total_tokens: 635
-  cost: 0.00090759
-  recording_duration_seconds: 8.379
+  completion_tokens: 275
+  total_tokens: 524
+  cost: 0.00065784
+  recording_duration_seconds: 6.525
   cassette_format_version: 4
 response: '{"reviews":["REVIEW_09"],"status":"STOPPED","stops":["STOP_09","STOP_10"]}'
 parsed_response:
@@ -62,7 +62,7 @@ parsed_response:
   classifications: []
   monthly_W:
   - miesiąc: 2025-01
-    wartość: 70.0
+    wartość: 68.72
   tests:
     TEST_1: PASS
     TEST_2: PASS

@@ -4,20 +4,20 @@ meta:
   provider: openrouter
   requested_model: google/gemini-3-flash-preview
   returned_model: google/gemini-3-flash-preview
-  fingerprint: v3_e62f73ec0ac6a0baa108dc5898b6fef5c440294bc572c19ccdf269b5636d74a6
+  fingerprint: v3_b1c61893b6a5390a6e5f95cb93ba82beda9f06837e4a62973b44e877331e5cb1
   request_hash: ef06ff728ac68746abb931bd5a838d7cd67d43c7e54994b356495bafa83f3612
-  recorded_at: '2026-07-19T13:47:18.898995+00:00'
-  request_id: gen-1784468837-OmAGDBVcS6e4b3g6fqa9
+  recorded_at: '2026-07-19T17:23:21.973993+00:00'
+  request_id: gen-1784481800-lMDlsWHgMlEZbeEYeIIi
   finish_reason: stop
   native_finish_reason: STOP
   system_fingerprint: null
   prompt_tokens: 540
-  completion_tokens: 35
-  total_tokens: 575
-  cost: 0.000375
-  recording_duration_seconds: 1.181
+  completion_tokens: 16
+  total_tokens: 556
+  cost: 0.000318
+  recording_duration_seconds: 1.214
   cassette_format_version: 4
-response: "{\n  \"status\": \"STOPPED\",\n  \"stops\": [\n    \"STOP_01\"\n  ],\n  \"reviews\": []\n}"
+response: '{"status":"STOPPED","stops":["STOP_01"],"reviews":[]}'
 parsed_response:
   status: STOPPED
   result:

@@ -4,36 +4,21 @@ meta:
   provider: openrouter
   requested_model: google/gemini-3-flash-preview
   returned_model: google/gemini-3-flash-preview
-  fingerprint: v3_d479e833d1a45a8b174591f395775f4b5b51fa2d25d6d98f68239e82a3930f88
+  fingerprint: v3_65dd51b7854ac8c5585660a5b1e29e76aca9053d683e4881ee32089e88b8ddcf
   request_hash: 5a580d837d6cb519d0be723de29d40fdf1d405c14264e64f0d0b98cc34413f99
-  recorded_at: '2026-07-19T13:48:21.668777+00:00'
-  request_id: gen-1784468900-4z1UlwN1LFyAp5KYOwRO
+  recorded_at: '2026-07-19T17:24:24.729649+00:00'
+  request_id: gen-1784481863-frTbBJDoGs9MA5WEX263
   finish_reason: stop
   native_finish_reason: STOP
   system_fingerprint: null
   prompt_tokens: 544
-  completion_tokens: 39
-  total_tokens: 583
-  cost: 0.000389
-  recording_duration_seconds: 1.387
+  completion_tokens: 46
+  total_tokens: 590
+  cost: 0.00041
+  recording_duration_seconds: 1.647
   cassette_format_version: 4
-response: '{
-
-  "status": "STOPPED",
-
-  "stops": [
-
-  "STOP_13"
-
-  ],
-
-  "reviews": [
-
-  "REVIEW_09"
-
-  ]
-
-  }'
+response: "{\n  \"status\": \"STOPPED\",\n  \"stops\": [\n    \"STOP_13\"\n  ],\n  \"reviews\": [\n    \"REVIEW_09\"\n  ]\n\
+  }"
 parsed_response:
   status: STOPPED
   result:

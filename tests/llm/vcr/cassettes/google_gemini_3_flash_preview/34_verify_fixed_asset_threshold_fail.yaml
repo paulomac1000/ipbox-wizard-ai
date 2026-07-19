@@ -4,34 +4,20 @@ meta:
   provider: openrouter
   requested_model: google/gemini-3-flash-preview
   returned_model: google/gemini-3-flash-preview
-  fingerprint: v3_08bfced0c05b9206279f61b653fdd8197ad7d1f93501ed131bee37efadc96aa0
+  fingerprint: v3_944cb4a0046056b9a704147c92a0cc0ced17e6b8cda07ad6a0e64e579be8431c
   request_hash: 93b1484e84018f1d7b9d0c78acbf4ff46b61915b3907c37cd88502c1ee754c2b
-  recorded_at: '2026-07-19T13:47:54.234142+00:00'
-  request_id: gen-1784468873-lycmjHLnz29L3V9xjFcp
+  recorded_at: '2026-07-19T17:23:58.609440+00:00'
+  request_id: gen-1784481837-zfb3iI66a7rcAAe4XHS1
   finish_reason: stop
   native_finish_reason: STOP
   system_fingerprint: null
   prompt_tokens: 544
-  completion_tokens: 36
-  total_tokens: 580
-  cost: 0.00038
-  recording_duration_seconds: 1.21
+  completion_tokens: 25
+  total_tokens: 569
+  cost: 0.000347
+  recording_duration_seconds: 1.285
   cassette_format_version: 4
-response: '{
-
-  "status": "FINAL",
-
-  "stops": [],
-
-  "reviews": [
-
-  "REVIEW_01",
-
-  "REVIEW_09"
-
-  ]
-
-  }'
+response: '{"status": "FINAL", "stops": [], "reviews": ["REVIEW_01", "REVIEW_09"]}'
 parsed_response:
   status: FINAL
   result:

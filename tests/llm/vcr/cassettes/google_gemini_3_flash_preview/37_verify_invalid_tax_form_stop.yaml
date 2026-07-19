@@ -4,10 +4,10 @@ meta:
   provider: openrouter
   requested_model: google/gemini-3-flash-preview
   returned_model: google/gemini-3-flash-preview
-  fingerprint: v3_aa16947d5a3e6bae91730eb5ef0927a87cde7e31edb60be7225551128377ec51
+  fingerprint: v3_ee4c0f4ea8500f3a1526b7884c67149a140602d6571ddfa90c0848e00e5083ce
   request_hash: 7e13619d264dcd8fc10c1cfd6515df694345bb0082c2af2e21bb3abba5525379
-  recorded_at: '2026-07-19T13:48:00.444095+00:00'
-  request_id: gen-1784468879-JPCUeZ0L7jTO6pcAJWPV
+  recorded_at: '2026-07-19T17:24:04.668298+00:00'
+  request_id: gen-1784481843-FhAxYgvftLpnpmex5Mcs
   finish_reason: stop
   native_finish_reason: STOP
   system_fingerprint: null
@@ -15,7 +15,7 @@ meta:
   completion_tokens: 25
   total_tokens: 574
   cost: 0.0003495
-  recording_duration_seconds: 1.466
+  recording_duration_seconds: 1.235
   cassette_format_version: 4
 response: '{"status":"STOPPED","stops":["STOP_01"],"reviews":["REVIEW_01","REVIEW_09"]}'
 parsed_response:

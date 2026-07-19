@@ -4,18 +4,18 @@ meta:
   provider: openrouter
   requested_model: qwen/qwen3.5-flash-02-23
   returned_model: qwen/qwen3.5-flash-02-23
-  fingerprint: v3_f4620532e6d7ee04a5911bc717a3dfd7a42f4107f1ff00e7112400456cb69fab
+  fingerprint: v3_33735bec5df5276c2ac52d08d3125f65e438d466a80bd41c01206e4b0e961657
   request_hash: e3661bed8be8661787d5127a23ca45b2d815c410686ac47a784d0f448e00b8ba
-  recorded_at: '2026-07-19T14:06:09.595924+00:00'
-  request_id: gen-1784469963-lKAnzjtArzat5qTWQu8r
+  recorded_at: '2026-07-19T18:06:23.120498+00:00'
+  request_id: gen-1784484379-vxHzNiMkWQjLSZsv19xE
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
   prompt_tokens: 252
-  completion_tokens: 656
-  total_tokens: 908
-  cost: 0.00018694
-  recording_duration_seconds: 6.76
+  completion_tokens: 645
+  total_tokens: 897
+  cost: 0.00018408
+  recording_duration_seconds: 3.816
   cassette_format_version: 4
 response: '{"status":"FINAL","stops":[],"reviews":["REVIEW_01","REVIEW_09"]}'
 parsed_response:

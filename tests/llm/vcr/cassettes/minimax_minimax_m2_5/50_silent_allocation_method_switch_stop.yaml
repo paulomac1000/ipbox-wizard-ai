@@ -4,18 +4,18 @@ meta:
   provider: openrouter
   requested_model: minimax/minimax-m2.5
   returned_model: minimax/minimax-m2.5
-  fingerprint: v3_ca1151a7b1999b10f778a9f268aa830c2e064fcc93300aa628a890b8bdee278d
+  fingerprint: v3_1c4faf56361f6f1be3b2707036deb71ebdb15ad03e2f43361648a133f9c90569
   request_hash: 16e222ff1e5cef42f5b003be22674006d45aa5211274ec81d570eeea5cf64e8e
-  recorded_at: '2026-07-19T13:56:30.428343+00:00'
-  request_id: gen-1784469383-vIvD7FmnU0CICKOp8qzb
+  recorded_at: '2026-07-19T17:33:02.464649+00:00'
+  request_id: gen-1784482378-wyH0C3Jaqclu4xMbGXbX
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
   prompt_tokens: 639
-  completion_tokens: 218
-  total_tokens: 857
-  cost: 0.000313125
-  recording_duration_seconds: 7.52
+  completion_tokens: 114
+  total_tokens: 753
+  cost: 0.000188325
+  recording_duration_seconds: 4.097
   cassette_format_version: 4
 response: '{"status":"STOPPED","stops":["STOP_09","STOP_10","STOP_11"],"reviews":["REVIEW_09"]}'
 parsed_response:
@@ -62,9 +62,9 @@ parsed_response:
   classifications: []
   monthly_W:
   - miesiąc: 2025-01
-    wartość: 70.0
+    wartość: 68.72
   - miesiąc: 2025-02
-    wartość: 90.0
+    wartość: 86.9
   tests:
     TEST_1: PASS
     TEST_2: PASS

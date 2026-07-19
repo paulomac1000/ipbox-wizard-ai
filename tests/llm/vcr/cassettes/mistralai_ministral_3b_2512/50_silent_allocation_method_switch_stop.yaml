@@ -4,10 +4,10 @@ meta:
   provider: openrouter
   requested_model: mistralai/ministral-3b-2512
   returned_model: mistralai/ministral-3b-2512
-  fingerprint: v3_601e8bbaaa959aad5a0ca7d714ccce739140651b22b8bc10a4b4e8adfcb1fc82
+  fingerprint: v3_8e9952c67f82997a17ab303c86288d42a5bfc70344be8d4ed53def2a5e81db65
   request_hash: 3c3fc2a0fde621593675901f5d7d3018197b78251cf1a63b72e0598034c0a4a6
-  recorded_at: '2026-07-19T14:10:02.854850+00:00'
-  request_id: gen-1784470200-sONgzp6M9NZrGTLWlLWz
+  recorded_at: '2026-07-19T18:18:48.757494+00:00'
+  request_id: gen-1784485128-wXkWEhhHg2OkaUtEud8I
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
@@ -15,7 +15,7 @@ meta:
   completion_tokens: 50
   total_tokens: 323
   cost: 4.845e-05
-  recording_duration_seconds: 2.555
+  recording_duration_seconds: 0.691
   cassette_format_version: 4
 response: "{\n  \"status\": \"STOPPED\",\n  \"stops\": [\"STOP_09\", \"STOP_10\", \"STOP_11\"],\n  \"reviews\": [\"REVIEW_09\"\
   ]\n}"
@@ -63,9 +63,9 @@ parsed_response:
   classifications: []
   monthly_W:
   - miesiąc: 2025-01
-    wartość: 70.0
+    wartość: 68.72
   - miesiąc: 2025-02
-    wartość: 90.0
+    wartość: 86.9
   tests:
     TEST_1: PASS
     TEST_2: PASS

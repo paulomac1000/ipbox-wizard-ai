@@ -4,38 +4,20 @@ meta:
   provider: openrouter
   requested_model: google/gemini-3-flash-preview
   returned_model: google/gemini-3-flash-preview
-  fingerprint: v3_d3337a889635d5481f96b9108cc86d0b9dd6e85cdd759d1def9a462b421cf05c
+  fingerprint: v3_3454b0a7dead046435780f951ff769b0cf4a734cbb4629a76dca15ee49ca7949
   request_hash: c370d1aa23c783f7508b6b7aa1b9789319c23c4ea2b5b8a1ca16949b416878f3
-  recorded_at: '2026-07-19T13:47:48.222730+00:00'
-  request_id: gen-1784468866-HZO35mbxW6P8ivvKF5uX
+  recorded_at: '2026-07-19T17:23:52.607333+00:00'
+  request_id: gen-1784481830-3xjWWU366omgCLzmUJIU
   finish_reason: stop
   native_finish_reason: STOP
   system_fingerprint: null
   prompt_tokens: 552
-  completion_tokens: 49
-  total_tokens: 601
-  cost: 0.000423
-  recording_duration_seconds: 1.456
+  completion_tokens: 28
+  total_tokens: 580
+  cost: 0.00036
+  recording_duration_seconds: 1.863
   cassette_format_version: 4
-response: '{
-
-  "status": "STOPPED",
-
-  "stops": [
-
-  "ZUS_DOUBLE_DIP"
-
-  ],
-
-  "reviews": [
-
-  "REVIEW_01",
-
-  "REVIEW_09"
-
-  ]
-
-  }'
+response: '{"status":"STOPPED","stops":["ZUS_DOUBLE_DIP"],"reviews":["REVIEW_01","REVIEW_09"]}'
 parsed_response:
   status: STOPPED
   result:

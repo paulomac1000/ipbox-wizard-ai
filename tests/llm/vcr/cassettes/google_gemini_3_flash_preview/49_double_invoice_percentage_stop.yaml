@@ -1,23 +1,23 @@
 meta:
   scenario_id: 49_double_invoice_percentage_stop
-  scenario_name: Podwójne zastosowanie procentu faktury
+  scenario_name: Podwójne zastosowanie zaokrąglonego procentu faktury
   provider: openrouter
   requested_model: google/gemini-3-flash-preview
   returned_model: google/gemini-3-flash-preview
-  fingerprint: v3_87035cef60c1efc3679ef1b1532227b79363d7110b4fed8b09e2e92bdafd3723
+  fingerprint: v3_155323ec8c558a44ed584e2d0396f4f3cee20ee8461c997e0c8ca74e66d9626d
   request_hash: e91551e2ad90365a4b6cf63d9e6987cc03b42c4c5b67b016d6bf71528cd70c0d
-  recorded_at: '2026-07-19T13:48:26.260804+00:00'
-  request_id: gen-1784468904-be2TU3DA3NBTsdA8ydkw
+  recorded_at: '2026-07-19T17:24:29.065879+00:00'
+  request_id: gen-1784481867-0wtldCax2mz4Mg8QEBmM
   finish_reason: stop
   native_finish_reason: STOP
   system_fingerprint: null
   prompt_tokens: 549
-  completion_tokens: 31
-  total_tokens: 580
-  cost: 0.0003675
-  recording_duration_seconds: 1.664
+  completion_tokens: 25
+  total_tokens: 574
+  cost: 0.0003495
+  recording_duration_seconds: 1.329
   cassette_format_version: 4
-response: '{"status": "STOPPED", "stops": ["STOP_09", "STOP_10"], "reviews": ["REVIEW_09"]}'
+response: '{"status":"STOPPED","stops":["STOP_09","STOP_10"],"reviews":["REVIEW_09"]}'
 parsed_response:
   status: STOPPED
   result:
@@ -62,7 +62,7 @@ parsed_response:
   classifications: []
   monthly_W:
   - miesiąc: 2025-01
-    wartość: 70.0
+    wartość: 68.72
   tests:
     TEST_1: PASS
     TEST_2: PASS

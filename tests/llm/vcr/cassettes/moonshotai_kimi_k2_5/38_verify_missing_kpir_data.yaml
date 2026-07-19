@@ -4,18 +4,18 @@ meta:
   provider: openrouter
   requested_model: moonshotai/kimi-k2.5
   returned_model: moonshotai/kimi-k2.5
-  fingerprint: v3_a750a43520a2acefa5e1e8a59ba2755b9e790d0c39d8fe161731330081246815
+  fingerprint: v3_98074dd6d40dde65029e06aa73d0d1fdfaa3eb1f2ea7cf5b9ac4373e24fc2f0e
   request_hash: 24fb0619c93166b69071663b138973496fddc5733ac56bba29cd1c25003cdf15
-  recorded_at: '2026-07-19T14:00:19.829306+00:00'
-  request_id: gen-1784469608-lHO2UNhDBV768wCcbcYw
+  recorded_at: '2026-07-19T17:48:55.781755+00:00'
+  request_id: gen-1784483327-EWZvtNoptjKoK5l1zC7O
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
   prompt_tokens: 245
-  completion_tokens: 439
-  total_tokens: 684
-  cost: 0.00102504
-  recording_duration_seconds: 11.849
+  completion_tokens: 332
+  total_tokens: 577
+  cost: 0.00085725
+  recording_duration_seconds: 8.18
   cassette_format_version: 4
 response: '{"reviews":["REVIEW_09"],"status":"STOPPED","stops":["STOP_08"]}'
 parsed_response:

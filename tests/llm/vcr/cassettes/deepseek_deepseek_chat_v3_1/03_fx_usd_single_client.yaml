@@ -4,18 +4,18 @@ meta:
   provider: openrouter
   requested_model: deepseek/deepseek-chat-v3.1
   returned_model: deepseek/deepseek-chat-v3.1
-  fingerprint: v3_ecb1e440a1f127f8ddcbf03696bd15c397c593ecdb4272a17edb283d9cb8fa44
+  fingerprint: v3_019740e308e3422c7b03cba55926a2a8e0c24fc00440fb66b9af44b97ff296e5
   request_hash: 0df55823def61dd3a14211d3e79fab78f6e6a511aa9ff91cb27863e685a4d5be
-  recorded_at: '2026-07-19T13:50:30.850252+00:00'
-  request_id: gen-1784469017-0dfVE2PPVoJmwiAV8fkY
+  recorded_at: '2026-07-19T17:26:41.919546+00:00'
+  request_id: gen-1784481998-83HkVssMzdEKSM4DCYlz
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
   prompt_tokens: 245
   completion_tokens: 30
   total_tokens: 275
-  cost: 6.623e-05
-  recording_duration_seconds: 13.808
+  cost: 6.047e-05
+  recording_duration_seconds: 3.79
   cassette_format_version: 4
 response: '{"status": "FINAL", "stops": [], "reviews": ["REVIEW_01", "REVIEW_09"]}'
 parsed_response:

@@ -4,18 +4,18 @@ meta:
   provider: openrouter
   requested_model: minimax/minimax-m2.5
   returned_model: minimax/minimax-m2.5
-  fingerprint: v3_76dd59236000a41852db79eec8fd1e3d8c4b409404bb3ef9f7d4d839e5807a39
+  fingerprint: v3_3194d3e54e04817072c40396df3ff152455886fd4e35c86965985f2a476dfb5e
   request_hash: 98abc1781f2101e466acee435f9c41acaa7e430bed07d7ae75686583ded054b4
-  recorded_at: '2026-07-19T13:55:03.191497+00:00'
-  request_id: gen-1784469301-4h2o9Kf2VRQVCU1EqECm
+  recorded_at: '2026-07-19T17:31:31.605772+00:00'
+  request_id: gen-1784482287-2GVZhsjiLD1Xv10z6fY3
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
-  prompt_tokens: 552
-  completion_tokens: 94
-  total_tokens: 646
-  cost: 0.00012963
-  recording_duration_seconds: 1.514
+  prompt_tokens: 632
+  completion_tokens: 103
+  total_tokens: 735
+  cost: 0.000189665
+  recording_duration_seconds: 4.288
   cassette_format_version: 4
 response: '{"status":"FINAL","stops":[],"reviews":["REVIEW_01","REVIEW_09"]}'
 parsed_response:

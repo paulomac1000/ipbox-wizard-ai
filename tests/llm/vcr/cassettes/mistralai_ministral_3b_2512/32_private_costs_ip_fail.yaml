@@ -4,10 +4,10 @@ meta:
   provider: openrouter
   requested_model: mistralai/ministral-3b-2512
   returned_model: mistralai/ministral-3b-2512
-  fingerprint: v3_581ab11c21b5206b04f5980cfdc914b7c0191e2b734f68c76a10e05fd8c7d37c
+  fingerprint: v3_cebbd8de1f0e3379c262d1abaa1c3bebdc5e922dad25a82a4add7decdc132eb2
   request_hash: b35cb122905ded4d20c7f95355c7f3f1b5ac440970d593f09fc1ce57cfcea2ff
-  recorded_at: '2026-07-19T14:09:29.710858+00:00'
-  request_id: gen-1784470168-VfYP5FOsZHPr6BoBw4zZ
+  recorded_at: '2026-07-19T18:18:18.752278+00:00'
+  request_id: gen-1784485097-q4PoCZGqNGiShBzggjEn
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
@@ -15,7 +15,7 @@ meta:
   completion_tokens: 35
   total_tokens: 294
   cost: 4.41e-05
-  recording_duration_seconds: 1.195
+  recording_duration_seconds: 1.297
   cassette_format_version: 4
 response: "{\n  \"status\": \"FINAL\",\n  \"stops\": [],\n  \"reviews\": [\"REVIEW_01\", \"REVIEW_09\"]\n}"
 parsed_response:

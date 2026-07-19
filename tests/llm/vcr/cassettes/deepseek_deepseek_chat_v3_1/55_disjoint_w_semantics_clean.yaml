@@ -1,30 +1,30 @@
 meta:
   scenario_id: 55_disjoint_w_semantics_clean
-  scenario_name: Jawna metoda W dla rozłącznych składników wynagrodzenia
+  scenario_name: Zaokrąglone W dla rozłącznych składników i osobna faktura NIE-IP
   provider: openrouter
   requested_model: deepseek/deepseek-chat-v3.1
   returned_model: deepseek/deepseek-chat-v3.1
-  fingerprint: v3_aa34907bca1a9f515daa8ddeb03f1d8598dd971f68270145772ee232b54cccea
-  request_hash: 7a2bf8713a36a0b776b040b9dc84345c192ae5d32c243b60325bd96bb66cffd8
-  recorded_at: '2026-07-19T13:53:51.293743+00:00'
-  request_id: gen-1784469226-FW7nxWfyNtua4VpBWjSn
+  fingerprint: v3_193332d6d9ad2538f1dd990bc65adabb6a4db756cc94b308b455a370c5a886af
+  request_hash: 0b0feeb6d00024e9b4e7139984f34becfa37fb65550e831e80a95469816a467c
+  recorded_at: '2026-07-19T17:30:13.150172+00:00'
+  request_id: gen-1784482209-oY5RlYcsxoULSZH8JmGs
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
-  prompt_tokens: 240
-  completion_tokens: 24
-  total_tokens: 264
-  cost: 5.868e-05
-  recording_duration_seconds: 4.536
+  prompt_tokens: 235
+  completion_tokens: 23
+  total_tokens: 258
+  cost: 5.756e-05
+  recording_duration_seconds: 3.242
   cassette_format_version: 4
-response: '{"status": "FINAL", "stops": [], "reviews": ["REVIEW_09"]}'
+response: "{\n  \"status\": \"FINAL\",\n  \"stops\": [],\n  \"reviews\": []\n}"
 parsed_response:
   status: FINAL
   result:
     rok: 2025
     przychody_roczne:
-      IP: 7000.0
-      NIE: 3000.0
+      IP: 15874.32
+      NIE: 9725.68
     koszty_roczne:
       IP: 100.0
       NIE: 0.0
@@ -37,8 +37,8 @@ parsed_response:
       D: 0.0
       poza_nexus: 0.0
     nexus: 1.0
-    dochód_IP: 6900.0
-    dochód_NIE: 3000.0
+    dochód_IP: 15774.32
+    dochód_NIE: 9725.68
     klucz_MIX:
       metoda: przychodowa_roczna
       źródło: użytkownik
@@ -46,12 +46,12 @@ parsed_response:
       status: NOT_APPLICABLE
     alokacja_multi_ip: null
     podatek:
-      podstawa_IP: 6900
-      podstawa_NIE: 3000
-      podatek_IP: 345
-      podatek_NIE_finalny: 570
-      podatek_całościowy: 915
-      nadpłata_lub_dopłata: -915.0
+      podstawa_IP: 15774
+      podstawa_NIE: 9726
+      podatek_IP: 789
+      podatek_NIE_finalny: 1848
+      podatek_całościowy: 2637
+      nadpłata_lub_dopłata: -2637.0
       termomodernization_carry_over: 0.0
       termomodernization_expired: 0.0
       health_tax_credit_used: 0.0
@@ -73,7 +73,7 @@ parsed_response:
     nexus_amount: 100.0
   monthly_W:
   - miesiąc: 2025-01
-    wartość: 70.0
+    wartość: 68.72
   tests:
     TEST_1: PASS
     TEST_2: PASS
@@ -86,6 +86,5 @@ parsed_response:
     TEST_9: PASS
   stops_reviews:
     stops: []
-    reviews:
-    - REVIEW_09
+    reviews: []
     warnings: []

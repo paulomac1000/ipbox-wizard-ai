@@ -1,21 +1,21 @@
 meta:
   scenario_id: 49_double_invoice_percentage_stop
-  scenario_name: Podwójne zastosowanie procentu faktury
+  scenario_name: Podwójne zastosowanie zaokrąglonego procentu faktury
   provider: openrouter
   requested_model: minimax/minimax-m2.5
   returned_model: minimax/minimax-m2.5
-  fingerprint: v3_3ea820759ef716db72d008dcbe824bcf9cf77e2613f3ae391565a6ffbfc9b539
+  fingerprint: v3_02954e31eb82830b86122b1b119b4e35dc7f239169cd7f06ea0b5dc0c05d32c5
   request_hash: 20ffc067ce1d55aa5bda99f98ed3b8563b4c9f6721e5bd2cf515976786b97f8c
-  recorded_at: '2026-07-19T13:56:22.178194+00:00'
-  request_id: gen-1784469377-WhiT2B6hLyjSbTrVGOna
+  recorded_at: '2026-07-19T17:32:57.565944+00:00'
+  request_id: gen-1784482375-42wDvryVzAhEZrIjtmWw
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
   prompt_tokens: 555
-  completion_tokens: 228
-  total_tokens: 783
-  cost: 0.000248235
-  recording_duration_seconds: 4.322
+  completion_tokens: 94
+  total_tokens: 649
+  cost: 0.000119715
+  recording_duration_seconds: 2.104
   cassette_format_version: 4
 response: '{"status":"STOPPED","stops":["STOP_09","STOP_10"],"reviews":["REVIEW_09"]}'
 parsed_response:
@@ -62,7 +62,7 @@ parsed_response:
   classifications: []
   monthly_W:
   - miesiąc: 2025-01
-    wartość: 70.0
+    wartość: 68.72
   tests:
     TEST_1: PASS
     TEST_2: PASS

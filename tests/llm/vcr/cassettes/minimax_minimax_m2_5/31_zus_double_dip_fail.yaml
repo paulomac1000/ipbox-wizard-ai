@@ -4,18 +4,18 @@ meta:
   provider: openrouter
   requested_model: minimax/minimax-m2.5
   returned_model: minimax/minimax-m2.5
-  fingerprint: v3_7b22015090d5e3833ea92a98ce21f87306e1e171a8df48eb89ff06860a3cf8af
+  fingerprint: v3_fe2f5702149ae358a6743c5c4b49173e95a23c3b331cbe80fff4ebdd6833dacb
   request_hash: 16fda39f5387fae42b7cbc773b09015c41f480db2659c4740b5f75512af71d92
-  recorded_at: '2026-07-19T13:55:11.031427+00:00'
-  request_id: gen-1784469308-1wJVb0U0drt1kuXt7toA
+  recorded_at: '2026-07-19T17:31:50.531024+00:00'
+  request_id: gen-1784482304-X2OCBnmjxgs7cGWBG2Yb
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
-  prompt_tokens: 557
-  completion_tokens: 109
-  total_tokens: 666
-  cost: 0.000223425
-  recording_duration_seconds: 2.356
+  prompt_tokens: 641
+  completion_tokens: 209
+  total_tokens: 850
+  cost: 0.000343245
+  recording_duration_seconds: 5.882
   cassette_format_version: 4
 response: '{"status":"STOPPED","stops":["ZUS_DOUBLE_DIP"],"reviews":["REVIEW_01","REVIEW_09"]}'
 parsed_response:

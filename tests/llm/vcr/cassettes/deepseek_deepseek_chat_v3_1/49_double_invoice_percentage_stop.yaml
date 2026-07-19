@@ -1,23 +1,23 @@
 meta:
   scenario_id: 49_double_invoice_percentage_stop
-  scenario_name: Podwójne zastosowanie procentu faktury
+  scenario_name: Podwójne zastosowanie zaokrąglonego procentu faktury
   provider: openrouter
   requested_model: deepseek/deepseek-chat-v3.1
   returned_model: deepseek/deepseek-chat-v3.1
-  fingerprint: v3_1dcbf7216478a303bf42799deed6b1c19e88f3a62512dc442743c6c779ad0742
+  fingerprint: v3_7fec37bc07c0db970a52f3f465e01f467e783356add22c22fe7a584149e2aebb
   request_hash: 4652e692d8e52a1eaa1230c09199a9f3e374795b1ca7a7bc1b74c66c0328b522
-  recorded_at: '2026-07-19T13:53:20.269484+00:00'
-  request_id: gen-1784469198-51srTe7GVBMGg7LiEb8D
+  recorded_at: '2026-07-19T17:29:50.995940+00:00'
+  request_id: gen-1784482186-kE8UcWFt64SVflCtvjlU
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
-  prompt_tokens: 253
-  completion_tokens: 34
-  total_tokens: 287
-  cost: 0.0002096
-  recording_duration_seconds: 1.735
+  prompt_tokens: 252
+  completion_tokens: 41
+  total_tokens: 293
+  cost: 7.639e-05
+  recording_duration_seconds: 4.097
   cassette_format_version: 4
-response: '{"reviews":["REVIEW_09"],"status":"STOPPED","stops":["STOP_09","STOP_10"]}'
+response: "{\n  \"status\": \"STOPPED\",\n  \"stops\": [\"STOP_09\", \"STOP_10\"],\n  \"reviews\": [\"REVIEW_09\"]\n}"
 parsed_response:
   status: STOPPED
   result:
@@ -62,7 +62,7 @@ parsed_response:
   classifications: []
   monthly_W:
   - miesiąc: 2025-01
-    wartość: 70.0
+    wartość: 68.72
   tests:
     TEST_1: PASS
     TEST_2: PASS

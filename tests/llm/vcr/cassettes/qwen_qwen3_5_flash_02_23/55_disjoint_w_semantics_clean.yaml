@@ -1,30 +1,30 @@
 meta:
   scenario_id: 55_disjoint_w_semantics_clean
-  scenario_name: Jawna metoda W dla rozłącznych składników wynagrodzenia
+  scenario_name: Zaokrąglone W dla rozłącznych składników i osobna faktura NIE-IP
   provider: openrouter
   requested_model: qwen/qwen3.5-flash-02-23
   returned_model: qwen/qwen3.5-flash-02-23
-  fingerprint: v3_c24b5727c10372107596328b5fd9d3a2de41a5d8b1d5764766038346d8df61a1
-  request_hash: 6a7696d23cfc967dd2d7618604c003d58a43373f9564a1930ca82832e81326e2
-  recorded_at: '2026-07-19T14:08:47.383687+00:00'
-  request_id: gen-1784470116-Qtovdf15DLJv37hHFtBM
+  fingerprint: v3_ff463035c1f34aa540ffad4c828e5d8109cd73d7373f489ee76350794d4cca66
+  request_hash: 6d15268532c6d37b7cfa6e5cf87c9b95f10a438ac7edd76521368a74f3645155
+  recorded_at: '2026-07-19T18:17:41.620681+00:00'
+  request_id: gen-1784485057-QGuIKFzkW0xAsjVfsDsV
   finish_reason: stop
   native_finish_reason: stop
   system_fingerprint: null
-  prompt_tokens: 246
-  completion_tokens: 1392
-  total_tokens: 1638
-  cost: 0.00037791
-  recording_duration_seconds: 10.501
+  prompt_tokens: 241
+  completion_tokens: 679
+  total_tokens: 920
+  cost: 0.000192205
+  recording_duration_seconds: 3.938
   cassette_format_version: 4
-response: '{"status":"FINAL","stops":[],"reviews":["REVIEW_09"]}'
+response: '{"status":"FINAL","stops":[],"reviews":[]}'
 parsed_response:
   status: FINAL
   result:
     rok: 2025
     przychody_roczne:
-      IP: 7000.0
-      NIE: 3000.0
+      IP: 15874.32
+      NIE: 9725.68
     koszty_roczne:
       IP: 100.0
       NIE: 0.0
@@ -37,8 +37,8 @@ parsed_response:
       D: 0.0
       poza_nexus: 0.0
     nexus: 1.0
-    dochód_IP: 6900.0
-    dochód_NIE: 3000.0
+    dochód_IP: 15774.32
+    dochód_NIE: 9725.68
     klucz_MIX:
       metoda: przychodowa_roczna
       źródło: użytkownik
@@ -46,12 +46,12 @@ parsed_response:
       status: NOT_APPLICABLE
     alokacja_multi_ip: null
     podatek:
-      podstawa_IP: 6900
-      podstawa_NIE: 3000
-      podatek_IP: 345
-      podatek_NIE_finalny: 570
-      podatek_całościowy: 915
-      nadpłata_lub_dopłata: -915.0
+      podstawa_IP: 15774
+      podstawa_NIE: 9726
+      podatek_IP: 789
+      podatek_NIE_finalny: 1848
+      podatek_całościowy: 2637
+      nadpłata_lub_dopłata: -2637.0
       termomodernization_carry_over: 0.0
       termomodernization_expired: 0.0
       health_tax_credit_used: 0.0
@@ -73,7 +73,7 @@ parsed_response:
     nexus_amount: 100.0
   monthly_W:
   - miesiąc: 2025-01
-    wartość: 70.0
+    wartość: 68.72
   tests:
     TEST_1: PASS
     TEST_2: PASS
@@ -86,6 +86,5 @@ parsed_response:
     TEST_9: PASS
   stops_reviews:
     stops: []
-    reviews:
-    - REVIEW_09
+    reviews: []
     warnings: []
