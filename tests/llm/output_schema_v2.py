@@ -45,9 +45,7 @@ for field in ("źródło_ref", "rounding_granularity"):
 _mix["properties"]["źródło_ref"] = {
     "anyOf": [{"type": "null"}, {"type": "string", "minLength": 1}]
 }
-_mix["properties"]["rounding_granularity"] = {
-    "enum": ["per_cost_item", "monthly_pool"]
-}
+_mix["properties"]["rounding_granularity"] = {"enum": ["per_cost_item", "monthly_pool"]}
 
 _tax = _result["podatek"]
 for field in (
@@ -104,9 +102,7 @@ _report_root["properties"]["source_ledger_audit"] = {
         "correction_delta",
     ],
     "properties": {
-        "status": {
-            "enum": ["NOT_PROVIDED", "OK", "REQUIRES_CORRECTION", "MISMATCH"]
-        },
+        "status": {"enum": ["NOT_PROVIDED", "OK", "REQUIRES_CORRECTION", "MISMATCH"]},
         "reported_costs": deepcopy(_nullable_nonnegative_money),
         "raw_input_costs": deepcopy(legacy.NONNEGATIVE_MONEY),
         "deductible_costs": deepcopy(legacy.NONNEGATIVE_MONEY),
