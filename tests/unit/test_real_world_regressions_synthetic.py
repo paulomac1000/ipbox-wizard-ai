@@ -8,7 +8,7 @@ import yaml
 from tests.llm.oracle import compute_reference
 
 SCENARIO_DIR = Path(__file__).parents[1] / "llm" / "scenarios"
-NEW_SCENARIOS = tuple(range(46, 56))
+NEW_SCENARIOS = tuple(range(46, 58))
 
 
 def _load(number: int) -> dict:
@@ -77,3 +77,18 @@ def test_year_boundaries_fail_closed_and_disjoint_w_is_supported() -> None:
     assert clean["status"] == "FINAL"
     assert clean["monthly_W"] == [{"miesiąc": "2025-01", "wartość": 70.0}]
     assert clean["result"]["przychody_roczne"] == {"IP": 7000.0, "NIE": 3000.0}
+
+
+def test_rounded_w_and_independent_non_ip_invoice_do_not_false_stop() -> None:
+    result = compute_reference(_load(56))
+    assert result["status"] == "FINAL"
+    assert result["stops_reviews"]["stops"] == []
+    assert result["result"]["przychody_roczne"] == {"IP": 15874.32, "NIE": 9725.68}
+
+
+def test_rounded_double_percentage_and_switch_are_detected() -> None:
+    result = compute_reference(_load(57))
+    assert result["status"] == "STOPPED"
+    assert set(result["stops_reviews"]["stops"]) >= {"STOP_09", "STOP_10", "STOP_11"}
+    assert "INVOICE_PERCENTAGE_DOUBLE_APPLIED" in result["stops_reviews"]["warnings"]
+    assert "ALLOCATION_METHOD_SWITCH" in result["stops_reviews"]["warnings"]
