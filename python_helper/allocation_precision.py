@@ -122,9 +122,7 @@ def _signature_candidates(
     return result
 
 
-def _closest_signature(
-    candidates: Mapping[str, tuple[Decimal, Decimal]], actual: Decimal
-) -> str:
+def _closest_signature(candidates: Mapping[str, tuple[Decimal, Decimal]], actual: Decimal) -> str:
     matches: list[tuple[Decimal, Decimal, str]] = []
     for name, (value, tolerance) in candidates.items():
         distance = abs(value - actual)
@@ -143,14 +141,10 @@ def audit_revenue_allocation(
     signatures: list[tuple[str, str]] = []
     for index, record in enumerate(streams):
         month = str(record.get("month", record.get("miesiac", index + 1)))
-        stream_id = str(
-            record.get("stream_id", record.get("allocation_id", ""))
-        ).strip()
+        stream_id = str(record.get("stream_id", record.get("allocation_id", ""))).strip()
         label = f"{month}/{stream_id}" if stream_id else month
         total = money(_nonnegative("total_revenue", record.get("total_revenue", 0)))
-        ip = money(
-            _nonnegative("reported_ip_revenue", record.get("reported_ip_revenue", 0))
-        )
+        ip = money(_nonnegative("reported_ip_revenue", record.get("reported_ip_revenue", 0)))
         non = money(
             _nonnegative(
                 "reported_non_ip_revenue",
@@ -158,9 +152,7 @@ def audit_revenue_allocation(
             )
         )
         rounding_steps = int(record.get("rounding_steps", 1))
-        split_allowed = amount_tolerance(
-            total, base=base, rounding_steps=rounding_steps
-        )
+        split_allowed = amount_tolerance(total, base=base, rounding_steps=rounding_steps)
         if abs(ip + non - total) > split_allowed:
             findings.append(
                 AllocationFinding(
@@ -197,9 +189,7 @@ def audit_revenue_allocation(
             "wartość_W",
         )
         reported_w = (
-            _nonnegative("reported_w_percent", reported_raw)
-            if reported_raw is not None
-            else None
+            _nonnegative("reported_w_percent", reported_raw) if reported_raw is not None else None
         )
         if expected_w > 100 or (reported_w is not None and reported_w > 100):
             raise ValueError("W percentage must not exceed 100")
@@ -211,9 +201,9 @@ def audit_revenue_allocation(
             "invoice_percentage_precision_pp",
             record.get("invoice_percentage_precision_pp", 0.01),
         )
-        if reported_w is not None and abs(
-            expected_w - reported_w
-        ) > w_precision / 2 + Decimal("0.0000001"):
+        if reported_w is not None and abs(expected_w - reported_w) > w_precision / 2 + Decimal(
+            "0.0000001"
+        ):
             findings.append(
                 AllocationFinding(
                     "W_VALUE_MISMATCH",
@@ -234,9 +224,7 @@ def audit_revenue_allocation(
             )
         else:
             used_w = reported_w
-            expected_allowed = amount_tolerance(
-                total, base=base, rounding_steps=rounding_steps
-            )
+            expected_allowed = amount_tolerance(total, base=base, rounding_steps=rounding_steps)
         expected = money(total * used_w / Decimal("100"))
         candidates = _signature_candidates(
             total=total,
@@ -251,9 +239,7 @@ def audit_revenue_allocation(
             reported_w_percent=reported_w,
         )
         signature = (
-            method
-            if abs(expected - ip) <= expected_allowed
-            else _closest_signature(candidates, ip)
+            method if abs(expected - ip) <= expected_allowed else _closest_signature(candidates, ip)
         )
         if abs(ip - total) <= split_allowed and used_w < 100:
             signature = "full_revenue"
@@ -283,23 +269,17 @@ def audit_revenue_allocation(
             )
         if signature == "full_revenue" and used_w < 100:
             findings.append(
-                AllocationFinding(
-                    "FULL_REVENUE_DESPITE_NON_IP_SHARE", label, expected, ip
-                )
+                AllocationFinding("FULL_REVENUE_DESPITE_NON_IP_SHARE", label, expected, ip)
             )
 
-    meaningful = [
-        signature for _, signature in signatures if signature != "unclassified"
-    ]
+    meaningful = [signature for _, signature in signatures if signature != "unclassified"]
     counts = Counter(meaningful)
     if len(counts) > 1:
         findings.append(
             AllocationFinding(
                 "ALLOCATION_METHOD_SWITCH",
                 None,
-                detail=", ".join(
-                    f"{name}={count}" for name, count in sorted(counts.items())
-                ),
+                detail=", ".join(f"{name}={count}" for name, count in sorted(counts.items())),
             )
         )
     return findings
