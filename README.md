@@ -2,7 +2,7 @@
 
 Deterministyczny-first wizard wspierający przygotowanie danych do rozliczenia IP Box programisty B2B.
 
-> To nie jest porada podatkowa ani generator gotowego zeznania. Wynik wymaga sprawdzenia z księgową lub doradcą. Audyt techniczny i semantyczny wykonano 18 lipca 2026 r.; reguły podatkowe są jawnie wersjonowane dla wszystkich lat obowiązywania IP Box 2019–2026.
+> To nie jest porada podatkowa ani generator gotowego zeznania. Wynik wymaga sprawdzenia z księgową lub doradcą. Audyt techniczny i semantyczny wykonano 19 lipca 2026 r.; reguły podatkowe są jawnie wersjonowane dla wszystkich lat obowiązywania IP Box 2019–2026.
 
 ## Architektura
 
@@ -13,8 +13,9 @@ Model językowy nie wykonuje krytycznej arytmetyki:
 3. Python składa kompletną autorytatywną kopertę `expected_decision` z rozdzielonymi kanałami STOP i REVIEW.
 4. LLM kopiuje bez zmian `status/stops/reviews`; nie klasyfikuje kodów i nie widzi faktów podatkowych ani nazw predykatów.
 5. Runner składa kopertę z raportem deterministycznym.
-6. Evaluator i JSON Schema porównują wynik fail-closed.
-7. VCR zapisuje tylko odpowiedź, która przeszła schema, semantykę i ponowne parsowanie.
+6. Evaluator i lokalna strict JSON Schema porównują wynik fail-closed.
+7. Adapter providera może zmienić wyłącznie reprezentację transportową. Pełna lokalna schema i evaluator pozostają niezmienione.
+8. VCR zapisuje tylko odpowiedź, która przeszła schema, semantykę i ponowne parsowanie.
 
 Najważniejszy invariant z issue #1: **przychód IP/NIE, alokacja kosztów pośrednich `MIX` i klasyfikacja NEXUS są trzema niezależnymi decyzjami**. Współczynnik czasu `W` nie jest domyślnym kluczem `MIX`.
 
@@ -53,27 +54,23 @@ python scripts/check_cassette_policy.py
 for script in scripts/*.sh dump-to-md.sh; do bash -n "$script"; done
 ```
 
-Stan po rozszerzeniu regresji: co najmniej **255 testów jednostkowych PASS**, coverage `python_helper` powyżej wymaganych **90%**; pełny bezpłatny suite i 46 kontrolowanych przypadków LLM przechodzą na Pythonie 3.11–3.13. Dokładne wartości raportuje CI.
+Bramka deterministyczna obejmuje co najmniej **256 testów jednostkowych**, coverage `python_helper` powyżej wymaganych **90%**, pełny bezpłatny suite i Python 3.11–3.13. Dokładne wartości raportuje CI.
 
 ## Benchmark wielorodzinny
 
 Benchmark używa siedmiu modeli z siedmiu niezależnych rodzin:
 
-| Rodzina | Model OpenRouter | Rola w macierzy |
+| Rodzina | Model OpenRouter | Transport |
 |---|---|---|
-| Google Gemini | `google/gemini-3-flash-preview` | tańszy i starszy próg zamiast Gemini 3.5 |
-| Anthropic Claude | `anthropic/claude-haiku-4.5` | mały model Claude |
-| DeepSeek | `deepseek/deepseek-chat-v3.1` | otwarta rodzina DeepSeek V3 |
-| MiniMax | `minimax/minimax-m2.5` | niezależna rodzina MoE |
-| Moonshot Kimi | `moonshotai/kimi-k2.5` | niezależna rodzina Kimi |
-| Qwen | `qwen/qwen3.5-flash-02-23` | tani model Flash Qwen |
-| Mistral | `mistralai/ministral-3b-2512` | bardzo mały model 3B jako dolna granica |
+| Google Gemini | `google/gemini-3-flash-preview` | strict `json_schema` |
+| Anthropic Claude | `anthropic/claude-haiku-4.5` | `json_schema` bez nieobsługiwanego przez endpoint keywordu `uniqueItems`; lokalna schema pozostaje pełna |
+| DeepSeek | `deepseek/deepseek-chat-v3.1` | strict `json_schema` |
+| MiniMax | `minimax/minimax-m2.5` | `json_object` z pełną lokalną schema, ponieważ routing DigitalOcean zwracał `content: null` dla `json_schema` |
+| Moonshot Kimi | `moonshotai/kimi-k2.5` | strict `json_schema` |
+| Qwen | `qwen/qwen3.5-flash-02-23` | strict `json_schema` |
+| Mistral | `mistralai/ministral-3b-2512` | strict `json_schema` |
 
-To jest **test przenośności protokołu**, nie dowód poprawności podatkowej i nie
-matematyczna gwarancja zachowania każdego mocniejszego modelu. Jeżeli małe modele
-różnych dostawców przechodzą identyczny ścisły kontrakt bez naprawiania odpowiedzi,
-to rośnie wiarygodność, że zadanie jest jednoznaczne i niezależne od jednej rodziny.
-Prawdą podatkową nadal pozostają Python, oracle i testy deterministyczne.
+To jest **test przenośności protokołu**, nie dowód poprawności podatkowej i nie matematyczna gwarancja zachowania każdego mocniejszego modelu. Jeżeli małe modele różnych dostawców przechodzą identyczny lokalny kontrakt bez naprawiania odpowiedzi, rośnie wiarygodność, że interfejs jest jednoznaczny i niezależny od jednej rodziny. Prawdą podatkową nadal pozostają Python, oracle i testy deterministyczne.
 
 Nagrywanie jest jawne i płatne:
 
@@ -82,9 +79,7 @@ export OPENROUTER_API_KEY='...'
 ./scripts/record_all_models.sh --max-cost-usd 5
 ```
 
-Pełna procedura: [`docs/testing.md`](docs/testing.md). Dobór modeli i ograniczenia
-wnioskowania: [`docs/model-diversity-benchmark.md`](docs/model-diversity-benchmark.md).
-Niezależny audyt: [`docs/independent-audit-brief.md`](docs/independent-audit-brief.md).
+Pełna procedura: [`docs/testing.md`](docs/testing.md). Dobór modeli i ograniczenia wnioskowania: [`docs/model-diversity-benchmark.md`](docs/model-diversity-benchmark.md). Niezależny audyt: [`docs/independent-audit-brief.md`](docs/independent-audit-brief.md).
 
 ## Zakres multi-IP
 
@@ -92,12 +87,14 @@ Niezależny audyt: [`docs/independent-audit-brief.md`](docs/independent-audit-br
 
 ## Stan wydania
 
-Rdzeń deterministyczny jest po audycie. Diagnostyczna macierz 317/322 ujawniła, że MiniMax w scenariuszu 51 przeniósł `REVIEW_09` do `stops`; ten sam błąd wcześniej wykonał GPT-5 Nano. Podatek i oracle były poprawne, lecz protokół wymagał zbędnej transformacji listy `{kind, code}`, a schema nie rozróżniała kanałów. Protokół zastąpiono autorytatywną kopertą `expected_decision`, schema ma osobne enumy STOP/REVIEW, a wszystkie stare kasety usunięto. Przed review trzeba nagrać od zera 322 odpowiedzi. PR pozostaje **draftem**.
+Nie ufaj liczbie kaset zapisanej w dokumentacji ani wcześniejszemu raportowi. PR jest gotowy do merge wyłącznie wtedy, gdy aktualny HEAD spełnia jednocześnie:
 
-Warunki zakończenia:
+- 46/46 kaset dla każdego z siedmiu modeli, czyli dokładnie 322 aktualne nagrania i 7 manifestów;
+- `python scripts/benchmark_report.py` zwraca `all_complete_and_valid=true`;
+- `python scripts/vcr_precommit.py --all-models` przechodzi bez błędów;
+- playback wszystkich modeli przechodzi bez `OPENROUTER_API_KEY`;
+- CI na Pythonie 3.11–3.13 jest zielone, a job Python 3.13 wykonuje pełny playback offline;
+- nie ma nierozwiązanych uwag do bieżącego HEAD;
+- niezależny audyt wydaje werdykt `READY`.
 
-- 46/46 kaset dla każdego z siedmiu modeli, czyli 322 aktualne nagrania;
-- playback bez `OPENROUTER_API_KEY`;
-- ręczny przegląd odpowiedzi, odrzuceń i raportu kosztu;
-- niezależny raport `READY` bez nierozwiązanych uwag;
-- ponowna weryfikacja źródeł przy zmianie roku lub zakresu podatkowego.
+Zmiana `ipbox_algorytm.md`, scenariusza, requestu, profilu modelu lub schema unieważnia odpowiednie fingerprinty. Takich kaset nie wolno poprawiać ręcznie — trzeba je usunąć i nagrać ponownie.
