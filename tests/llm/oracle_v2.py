@@ -8,11 +8,11 @@ from python_helper.ipbox_calculator import calculate_overpayment, tax_round
 from python_helper.tax_year_rules import calculate_tax_for_year
 
 from . import oracle as legacy
+from .allocation_guard import audit_facts
 from .oracle_adapter import legacy_safe_copy, number, prepare_scenario
 from .oracle_guards import (
     REVIEW_FACT_TO_CODE,
     STOP_FACT_TO_CODE,
-    audit_facts,
     derive_decision_codes,
     year_facts,
     zero_after_stop,
@@ -91,9 +91,7 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
         nexus=float(base["result"]["nexus"]),
         tax_form=str(input_data["forma_opodatkowania"]),
         previous_non_ip_business_losses=reliefs.get("strata_NIE_z_lat_poprzednich", 0),
-        social_security_deduction=(
-            0 if social_in_kpir else social.get("odliczenie_spoleczne_PIT", 0)
-        ),
+        social_security_deduction=(0 if social_in_kpir else social.get("odliczenie_spoleczne_PIT", 0)),
         health_income_deduction=(0 if health_in_kpir else annual_values["health_income"]),
         health_tax_credit=(0 if health_in_kpir else annual_values["health_credit"]),
         ikze=annual_values["ikze"],
@@ -104,9 +102,7 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
         rd_relief_ip=reliefs.get("ulga_BR_IP", 0),
         rd_relief_limit=reliefs.get("ulga_BR_limit_odliczenia", 0),
         thermomodernization_pool=(
-            0
-            if reliefs.get("termomodernizacja_loty") is not None
-            else reliefs.get("termomodernizacja_pula", 0)
+            0 if reliefs.get("termomodernizacja_loty") is not None else reliefs.get("termomodernizacja_pula", 0)
         ),
         thermomodernization_lots=reliefs.get("termomodernizacja_loty"),
         child_tax_credit=reliefs.get("ulga_prorodzinna", 0),
@@ -148,7 +144,9 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
         "PASS" if tax["ip_tax"] == tax_round(float(tax["ip_base_rounded"]) * 0.05) else "FAIL"
     )
     expected_total = tax_round(
-        float(tax["non_ip_tax_final"]) + float(tax["ip_tax"]) - float(tax["health_tax_credit_used"])
+        float(tax["non_ip_tax_final"])
+        + float(tax["ip_tax"])
+        - float(tax["health_tax_credit_used"])
     )
     base["tests"]["TEST_6"] = "PASS" if tax["total_tax"] == expected_total else "FAIL"
     base["status"] = "FINAL"
