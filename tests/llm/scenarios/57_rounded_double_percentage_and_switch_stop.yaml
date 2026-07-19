@@ -1,0 +1,60 @@
+meta:
+  id: 57_rounded_double_percentage_and_switch_stop
+  name: Zaokrąglony podwójny procent i zmiana metody
+  description: Syntetyczna regresja zachowująca pośrednią precyzję arkusza i wykrywająca podwójny procent oraz późniejsze przypisanie całej faktury.
+  tags: [regression, allocation, rounding, fail-closed, synthetic]
+  priority: P0
+input:
+  rok: 2025
+  forma_opodatkowania: liniowy_19%
+  metoda_W: disjoint_components
+  polityka_alokacji:
+    policy_id: rounded-switch-guard
+    przychody:
+      metoda: czasowa_W
+    koszty_MIX:
+      metoda: przychodowa_roczna
+      źródło: użytkownik
+      uzasadnienie: Jedna udokumentowana metoda ma obowiązywać wszystkie strumienie roku.
+  zus:
+    sposob: brak
+  kontrahenci:
+  - nazwa: ClientA
+    klauzula_IP: true
+  miesiace:
+  - miesiac: 2025-01
+    faktury:
+    - kwota_PLN: 23100
+      kontrahent: ClientA
+      kwalifikuje_IP: true
+    ewidencja:
+      godziny_pracy: 168
+      godziny_nie_IP: 22
+      procent_faktury_IP: 81.82
+      invoice_percentage_precision_pp: 0.01
+    kontrola_alokacji:
+      przychod_IP: 15463.64
+      przychod_NIE: 7636.36
+    koszty:
+    - opis: Dedykowany koszt projektu A
+      kwota: 100
+      kategoria: IP
+      allocation_source: syntetyczna-ewidencja-projektowa
+      nexus_source: own_br
+    opis_projektu: Rozwój syntetycznego kwalifikowanego programu komputerowego.
+  - miesiac: 2025-02
+    faktury:
+    - kwota_PLN: 23100
+      kontrahent: ClientA
+      kwalifikuje_IP: true
+    ewidencja:
+      godziny_pracy: 168
+      godziny_nie_IP: 22
+      procent_faktury_IP: 100
+    kontrola_alokacji:
+      przychod_IP: 23100
+      przychod_NIE: 0
+    koszty: []
+    opis_projektu: Rozwój syntetycznego kwalifikowanego programu komputerowego.
+assertions:
+  stops: [STOP_09, STOP_10, STOP_11]
