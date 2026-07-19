@@ -1,0 +1,55 @@
+meta:
+  id: 56_rounded_w_and_separate_non_ip_stream
+  name: Zaokrąglone W i niezależna faktura NIE-IP
+  description: Syntetyczna regresja dla arkusza liczącego przychód z W zaokrąglonego do 0,01 pp oraz osobnego strumienia NIE-IP.
+  tags: [regression, allocation, rounding, synthetic]
+  priority: P0
+input:
+  rok: 2024
+  forma_opodatkowania: liniowy_19%
+  metoda_W: disjoint_components
+  polityka_alokacji:
+    policy_id: rounded-w-clean
+    przychody:
+      metoda: czasowa_W
+    koszty_MIX:
+      metoda: przychodowa_roczna
+      źródło: użytkownik
+      uzasadnienie: Syntetyczny audyt precyzji W i rozdzielonych strumieni.
+  zus:
+    sposob: brak
+  kontrahenci:
+  - nazwa: ClientA
+    klauzula_IP: true
+  - nazwa: ClientB
+    klauzula_IP: false
+  miesiace:
+  - miesiac: 2024-01
+    faktury:
+    - kwota_PLN: 23100
+      kontrahent: ClientA
+      kwalifikuje_IP: true
+    - kwota_PLN: 2500
+      kontrahent: ClientB
+      kwalifikuje_IP: false
+    ewidencja:
+      godziny_pracy: 168
+      godziny_nie_IP: 22
+      procent_faktury_IP: 81.8181818182
+      W: 68.72
+      W_precision_pp: 0.01
+    kontrola_alokacji:
+      przychod_IP: 15874.32
+      przychod_NIE: 9725.68
+    koszty:
+    - opis: Dedykowany koszt projektu
+      kwota: 100
+      kategoria: IP
+      allocation_source: syntetyczna-ewidencja-projektowa
+      nexus_source: own_br
+    opis_projektu: Rozwój syntetycznego kwalifikowanego programu komputerowego.
+assertions:
+  stops: []
+  przychody_roczne:
+    IP: 15874.32
+    NIE: 9725.68
