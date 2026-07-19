@@ -14,6 +14,7 @@ input:
     koszty_MIX:
       metoda: przychodowa_w_dacie_kosztu
       źródło: interpretacja_KIS
+      źródło_ref: SYNTHETIC-KIS-REFERENCE
       uzasadnienie: Syntetyczny wariant polityki opisanej jako proporcja przychodowa w dacie kosztu.
   zus:
     sposob: brak
