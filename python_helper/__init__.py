@@ -1,6 +1,5 @@
 """Public deterministic helpers for the IP Box wizard."""
 
-from . import tax_year_rules as _tax_year_rules
 from .allocation_audit import (
     AllocationFinding,
     allocate_mix_at_cost_date,
@@ -20,11 +19,6 @@ from .tax_year_rules import (
     supported_years,
     validate_year_amounts,
 )
-
-# Keep the historical import path working. Python loads this package before a
-# direct ``python_helper.tax_year_rules`` import, so callers receive the fixed
-# cascade while the year-rule catalogue remains backwards compatible.
-_tax_year_rules.calculate_tax_for_year = calculate_tax_for_year
 
 __all__ = [
     "AllocationFinding",
