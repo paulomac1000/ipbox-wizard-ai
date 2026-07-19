@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from typing import Any
 
+from python_helper.cost_audit import apply_cost_audit, validate_cost_policy
 from python_helper.ipbox_calculator import calculate_overpayment, tax_round
 from python_helper.tax_year_rules import calculate_tax_for_year
 
@@ -19,6 +21,7 @@ from .oracle_guards import (
 )
 
 ScenarioError = legacy.ScenarioError
+CORRECTION_ONLY_STOPS = {"STOP_12", "SOURCE_KPIR_REQUIRES_CORRECTION"}
 
 __all__ = [
     "REVIEW_FACT_TO_CODE",
@@ -30,10 +33,21 @@ __all__ = [
 ]
 
 
+def _first(mapping: Mapping[str, Any], *keys: str) -> Any | None:
+    for key in keys:
+        if key in mapping and mapping[key] is not None:
+            return mapping[key]
+    return None
+
+
 def validate_scenario(scenario: dict[str, Any]) -> None:
     transformed, _shares, _method = prepare_scenario(scenario)
     try:
         legacy.validate_scenario(legacy_safe_copy(transformed, for_validation=True))
+        input_data = scenario.get("input")
+        if not isinstance(input_data, Mapping):
+            raise ScenarioError("input must be a mapping")
+        validate_cost_policy(input_data)
     except legacy.ScenarioError:
         raise
     except ValueError as exc:
@@ -41,49 +55,35 @@ def validate_scenario(scenario: dict[str, Any]) -> None:
     year_facts(scenario)
 
 
-def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
-    validate_scenario(scenario)
-    transformed, shares, method = prepare_scenario(scenario)
-    base = legacy.compute_reference(legacy_safe_copy(transformed, for_validation=False))
-    for row in base.get("monthly_W", []):
-        month = str(row.get("miesiąc", ""))
-        if method != "conditional_product" and month in shares:
-            row["wartość"] = round(shares[month] * 100, 2)
+def _tax_result(tax: Mapping[str, Any], signed_settlement: float) -> dict[str, Any]:
+    return {
+        "podstawa_IP": tax["ip_base_rounded"],
+        "podstawa_NIE": tax["non_ip_base_rounded"],
+        "podatek_IP": tax["ip_tax"],
+        "podatek_NIE_finalny": tax["non_ip_tax_final"],
+        "podatek_całościowy": tax["total_tax"],
+        "nadpłata_lub_dopłata": signed_settlement,
+        "thermomodernization_used": tax["thermomodernization_used"],
+        "termomodernization_carry_over": tax["thermomodernization_carry_over"],
+        "termomodernization_expired": tax["thermomodernization_expired"],
+        "health_tax_credit_used": tax["health_tax_credit_used"],
+        "ulga_BR_IP_wykorzystana": tax["rd_relief_ip_used"],
+        "ulga_BR_NIE_wykorzystana": tax["rd_relief_non_ip_used"],
+        "ulga_BR_carry_over": tax["rd_relief_carry_over"],
+        "dochód_dodatkowy_skala": tax["extra_income_scale_included"],
+    }
 
-    input_data = scenario["input"]
-    original_mix = input_data.get("polityka_alokacji", {}).get("koszty_MIX", {})
-    if original_mix.get("metoda") == "przychodowa_w_dacie_kosztu":
-        base["result"]["klucz_MIX"]["metoda"] = "przychodowa_w_dacie_kosztu"
-        base["result"]["klucz_MIX"]["wartość"] = None
-        for record in base.get("classifications", []):
-            if record.get("basket") == "MIX":
-                record["allocation_method"] = "przychodowa_w_dacie_kosztu"
-        base["tests"]["TEST_7"] = "PASS"
 
-    extra_facts, audit_codes = audit_facts(scenario, base, method)
-    annual_facts, annual_values, violations = year_facts(scenario)
-    facts = {**base.get("decision_facts", {}), **extra_facts, **annual_facts}
-    social = input_data.get("zus", {}) if isinstance(input_data.get("zus"), dict) else {}
-    health_in_kpir = bool(social.get("zdrowotna_w_KPiR", False))
-    social_in_kpir = str(social.get("sposob", "brak")) == "w_KPiR"
-    if health_in_kpir and (annual_values["health_income"] or annual_values["health_credit"]):
-        facts["health_contribution_double_counted"] = True
-    if social_in_kpir and number(social.get("odliczenie_spoleczne_PIT", 0), "zus.social") > 0:
-        facts["social_contributions_double_counted"] = True
-
-    stops, reviews = derive_decision_codes(facts)
-    base["decision_facts"] = facts
-    base["stops_reviews"]["stops"] = sorted(stops)
-    base["stops_reviews"]["reviews"] = sorted(reviews)
-    base["stops_reviews"]["warnings"] = sorted(
-        set(base["stops_reviews"].get("warnings", [])) | set(audit_codes) | set(violations)
-    )
-    if stops:
-        base["status"] = "STOPPED"
-        zero_after_stop(base)
-        return base
-
+def _calculate_tax(
+    input_data: dict[str, Any],
+    base: dict[str, Any],
+    annual_values: Mapping[str, float],
+    *,
+    social_in_kpir: bool,
+    health_in_kpir: bool,
+) -> tuple[dict[str, Any], float]:
     reliefs = input_data.get("ulgi", {}) if isinstance(input_data.get("ulgi"), dict) else {}
+    social = input_data.get("zus", {}) if isinstance(input_data.get("zus"), dict) else {}
     tax = calculate_tax_for_year(
         int(input_data["rok"]),
         non_ip_income=max(0.0, float(base["result"]["dochód_NIE"])),
@@ -124,21 +124,165 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
         if settlement["type"] == "overpayment"
         else -float(settlement["amount"])
     )
-    base["result"]["podatek"] = {
-        "podstawa_IP": tax["ip_base_rounded"],
-        "podstawa_NIE": tax["non_ip_base_rounded"],
-        "podatek_IP": tax["ip_tax"],
-        "podatek_NIE_finalny": tax["non_ip_tax_final"],
-        "podatek_całościowy": tax["total_tax"],
-        "nadpłata_lub_dopłata": signed,
-        "termomodernization_carry_over": tax["thermomodernization_carry_over"],
-        "termomodernization_expired": tax["thermomodernization_expired"],
-        "health_tax_credit_used": tax["health_tax_credit_used"],
-        "ulga_BR_IP_wykorzystana": tax["rd_relief_ip_used"],
-        "ulga_BR_NIE_wykorzystana": tax["rd_relief_non_ip_used"],
-        "ulga_BR_carry_over": tax["rd_relief_carry_over"],
-        "dochód_dodatkowy_skala": tax["extra_income_scale_included"],
+    return tax, signed
+
+
+def _reconcile_tax_fields(
+    reconciliation: Mapping[str, Any] | None,
+    tax: Mapping[str, Any],
+    signed_settlement: float,
+) -> tuple[list[str], bool, bool]:
+    if reconciliation is None:
+        return [], False, False
+    warnings: list[str] = []
+    claimed_thermo = _first(
+        reconciliation,
+        "termomodernizacja_odliczona",
+        "thermomodernization_used",
+    )
+    claimed_total_tax = _first(
+        reconciliation,
+        "podatek_łączny",
+        "podatek_laczny",
+        "total_tax",
+    )
+    claimed_overpayment = _first(
+        reconciliation,
+        "nadpłata",
+        "nadplata",
+        "overpayment",
+    )
+    relief_adjustment_required = False
+    if claimed_thermo is not None and abs(
+        number(claimed_thermo, "uzgodnienie.termomodernizacja")
+        - float(tax["thermomodernization_used"])
+    ) > 0.01:
+        warnings.append("RETURN_THERMOMODERNIZATION_MISMATCH")
+        relief_adjustment_required = True
+    if claimed_total_tax is not None and abs(
+        number(claimed_total_tax, "uzgodnienie.total_tax") - float(tax["total_tax"])
+    ) > 0.01:
+        warnings.append("RETURN_TOTAL_TAX_MISMATCH")
+    if claimed_overpayment is not None and abs(
+        number(claimed_overpayment, "uzgodnienie.overpayment") - signed_settlement
+    ) > 0.01:
+        warnings.append("RETURN_OVERPAYMENT_MISMATCH")
+    tax_unchanged_only_if_reliefs_updated = bool(
+        relief_adjustment_required
+        and claimed_total_tax is not None
+        and abs(number(claimed_total_tax, "uzgodnienie.total_tax") - float(tax["total_tax"]))
+        <= 0.01
+    )
+    return warnings, relief_adjustment_required, tax_unchanged_only_if_reliefs_updated
+
+
+def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
+    validate_scenario(scenario)
+    transformed, shares, method = prepare_scenario(scenario)
+    base = legacy.compute_reference(legacy_safe_copy(transformed, for_validation=False))
+    for row in base.get("monthly_W", []):
+        month = str(row.get("miesiąc", ""))
+        if method != "conditional_product" and month in shares:
+            row["wartość"] = round(shares[month] * 100, 2)
+
+    input_data = scenario["input"]
+    original_mix = input_data.get("polityka_alokacji", {}).get("koszty_MIX", {})
+    if original_mix.get("metoda") == "przychodowa_w_dacie_kosztu":
+        base["result"]["klucz_MIX"]["metoda"] = "przychodowa_w_dacie_kosztu"
+        base["result"]["klucz_MIX"]["wartość"] = None
+        for record in base.get("classifications", []):
+            if record.get("basket") == "MIX":
+                record["allocation_method"] = "przychodowa_w_dacie_kosztu"
+        base["tests"]["TEST_7"] = "PASS"
+
+    try:
+        source_ledger_audit, cost_warnings = apply_cost_audit(scenario, base)
+    except ValueError as exc:
+        raise ScenarioError(str(exc)) from exc
+    base["source_ledger_audit"] = source_ledger_audit
+
+    extra_facts, audit_codes = audit_facts(scenario, base, method)
+    annual_facts, annual_values, violations = year_facts(scenario)
+    facts = {**base.get("decision_facts", {}), **extra_facts, **annual_facts}
+    facts["source_kpir_requires_correction"] = (
+        source_ledger_audit["status"] == "REQUIRES_CORRECTION"
+    )
+    social = input_data.get("zus", {}) if isinstance(input_data.get("zus"), dict) else {}
+    health_in_kpir = bool(social.get("zdrowotna_w_KPiR", False))
+    social_in_kpir = str(social.get("sposob", "brak")) == "w_KPiR"
+    if health_in_kpir and (annual_values["health_income"] or annual_values["health_credit"]):
+        facts["health_contribution_double_counted"] = True
+    if social_in_kpir and number(social.get("odliczenie_spoleczne_PIT", 0), "zus.social") > 0:
+        facts["social_contributions_double_counted"] = True
+
+    preliminary_stops, _ = derive_decision_codes(facts)
+    tax: dict[str, Any] | None = None
+    signed_settlement: float | None = None
+    tax_warnings: list[str] = []
+    relief_adjustment_required = False
+    tax_unchanged_only_if_reliefs_updated = False
+    if not preliminary_stops or preliminary_stops <= CORRECTION_ONLY_STOPS:
+        tax, signed_settlement = _calculate_tax(
+            input_data,
+            base,
+            annual_values,
+            social_in_kpir=social_in_kpir,
+            health_in_kpir=health_in_kpir,
+        )
+        reconciliation = input_data.get("uzgodnienie_zeznania")
+        tax_warnings, relief_adjustment_required, tax_unchanged_only_if_reliefs_updated = (
+            _reconcile_tax_fields(
+                reconciliation if isinstance(reconciliation, Mapping) else None,
+                tax,
+                signed_settlement,
+            )
+        )
+        if tax_warnings:
+            facts["return_ledger_reconciliation_failed"] = True
+
+    stops, reviews = derive_decision_codes(facts)
+    correction_related = bool(stops & CORRECTION_ONLY_STOPS)
+    reconciliation_present = isinstance(input_data.get("uzgodnienie_zeznania"), Mapping)
+    base["correction_preview"] = {
+        "status": (
+            "UNAVAILABLE"
+            if tax is None
+            else ("AVAILABLE" if correction_related else "NOT_NEEDED")
+        ),
+        "source_kpir_correction_required": facts["source_kpir_requires_correction"],
+        "return_correction_required": bool(
+            reconciliation_present
+            and (facts["source_kpir_requires_correction"] or "STOP_12" in stops)
+        ),
+        "relief_adjustment_required": relief_adjustment_required,
+        "tax_unchanged_only_if_reliefs_updated": tax_unchanged_only_if_reliefs_updated,
+        "corrected_total_tax": float(tax["total_tax"]) if tax is not None else None,
+        "corrected_overpayment": signed_settlement,
+        "thermomodernization_used": (
+            float(tax["thermomodernization_used"]) if tax is not None else None
+        ),
+        "thermomodernization_carry_over": (
+            float(tax["thermomodernization_carry_over"]) if tax is not None else None
+        ),
     }
+
+    base["decision_facts"] = facts
+    base["stops_reviews"]["stops"] = sorted(stops)
+    base["stops_reviews"]["reviews"] = sorted(reviews)
+    base["stops_reviews"]["warnings"] = sorted(
+        set(base["stops_reviews"].get("warnings", []))
+        | set(audit_codes)
+        | set(violations)
+        | set(cost_warnings)
+        | set(tax_warnings)
+    )
+    if stops:
+        base["status"] = "STOPPED"
+        zero_after_stop(base)
+        return base
+
+    assert tax is not None and signed_settlement is not None
+    base["result"]["podatek"] = _tax_result(tax, signed_settlement)
     base["tests"]["TEST_4"] = (
         "PASS"
         if tax["non_ip_base_rounded"] >= 0 and tax["thermomodernization_carry_over"] >= 0
@@ -148,7 +292,9 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
         "PASS" if tax["ip_tax"] == tax_round(float(tax["ip_base_rounded"]) * 0.05) else "FAIL"
     )
     expected_total = tax_round(
-        float(tax["non_ip_tax_final"]) + float(tax["ip_tax"]) - float(tax["health_tax_credit_used"])
+        float(tax["non_ip_tax_final"])
+        + float(tax["ip_tax"])
+        - float(tax["health_tax_credit_used"])
     )
     base["tests"]["TEST_6"] = "PASS" if tax["total_tax"] == expected_total else "FAIL"
     base["status"] = "FINAL"
