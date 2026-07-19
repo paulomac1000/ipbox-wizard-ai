@@ -102,9 +102,7 @@ def test_rounded_double_percentage_and_switch_create_all_stops():
             "miesiace": [
                 {
                     "miesiac": "2025-01",
-                    "faktury": [
-                        {"kwota_PLN": 23100, "kontrahent": "A", "kwalifikuje_IP": True}
-                    ],
+                    "faktury": [{"kwota_PLN": 23100, "kontrahent": "A", "kwalifikuje_IP": True}],
                     "ewidencja": {
                         "godziny_pracy": 168,
                         "godziny_nie_IP": 22,
@@ -117,9 +115,7 @@ def test_rounded_double_percentage_and_switch_create_all_stops():
                 },
                 {
                     "miesiac": "2025-02",
-                    "faktury": [
-                        {"kwota_PLN": 23100, "kontrahent": "A", "kwalifikuje_IP": True}
-                    ],
+                    "faktury": [{"kwota_PLN": 23100, "kontrahent": "A", "kwalifikuje_IP": True}],
                     "ewidencja": {
                         "godziny_pracy": 168,
                         "godziny_nie_IP": 22,
