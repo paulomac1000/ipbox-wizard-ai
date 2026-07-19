@@ -90,9 +90,13 @@ def test_model_profiles_cover_seven_distinct_families() -> None:
         "mistralai/ministral-3b-2512",
     )
     assert len({get_model_profile(model).family for model in BENCHMARK_MODELS}) == 7
-    assert all(
-        get_model_profile(model).response_format_type == "json_schema" for model in BENCHMARK_MODELS
-    )
+    json_object_models = {
+        model
+        for model in BENCHMARK_MODELS
+        if get_model_profile(model).response_format_type == "json_object"
+    }
+    # MiniMax needs json_object: its DigitalOcean provider returns null content with json_schema.
+    assert json_object_models <= {"minimax/minimax-m2.5"}
     with pytest.raises(ValueError):
         get_model_profile("openai/gpt-5-nano")
     with pytest.raises(ValueError):

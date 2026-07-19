@@ -1,0 +1,81 @@
+meta:
+  scenario_id: 54_pre_ipbox_year_stop
+  scenario_name: Rok sprzed wprowadzenia IP Box
+  provider: openrouter
+  requested_model: minimax/minimax-m2.5
+  returned_model: minimax/minimax-m2.5
+  fingerprint: v3_af23100ce4c2d44cc6870079b438e04da9dd7f830fec1095acf39f39503105c3
+  request_hash: 389314786c1a1146fc57910d737bd05e48ca89b23bd706bbfe60f12a5192c0f4
+  recorded_at: '2026-07-19T00:40:25.751528+00:00'
+  request_id: gen-1784421622-3Y8jlIJVgYv1YGPaCqMQ
+  finish_reason: stop
+  native_finish_reason: stop
+  system_fingerprint: null
+  prompt_tokens: 631
+  completion_tokens: 96
+  total_tokens: 727
+  cost: 0.000165525
+  recording_duration_seconds: 2.876
+  cassette_format_version: 4
+response: '{"status":"STOPPED","stops":["STOP_16"],"reviews":["REVIEW_09"]}'
+parsed_response:
+  status: STOPPED
+  result:
+    rok: 2018
+    przychody_roczne:
+      IP: 0.0
+      NIE: 0.0
+    koszty_roczne:
+      IP: 0.0
+      NIE: 0.0
+      MIX: 0.0
+      WYKLUCZONE: 0.0
+    nexus_koszty:
+      A: 0.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 0.0
+    nexus: 0.0
+    dochód_IP: 0.0
+    dochód_NIE: 0.0
+    klucz_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      wartość: null
+      status: NOT_APPLICABLE
+    alokacja_multi_ip: null
+    podatek:
+      podstawa_IP: 0
+      podstawa_NIE: 0
+      podatek_IP: 0
+      podatek_NIE_finalny: 0
+      podatek_całościowy: 0
+      nadpłata_lub_dopłata: 0.0
+      termomodernization_carry_over: 0.0
+      termomodernization_expired: 0.0
+      health_tax_credit_used: 0.0
+      ulga_BR_IP_wykorzystana: 0.0
+      ulga_BR_NIE_wykorzystana: 0.0
+      ulga_BR_carry_over: 0.0
+      dochód_dodatkowy_skala: 0.0
+  classifications: []
+  monthly_W:
+  - miesiąc: 2018-01
+    wartość: 90.0
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+    TEST_3: PASS
+    TEST_4: PASS
+    TEST_5: PASS
+    TEST_6: PASS
+    TEST_7: PASS
+    TEST_8: PASS
+    TEST_9: PASS
+  stops_reviews:
+    stops:
+    - STOP_16
+    reviews:
+    - REVIEW_09
+    warnings: []

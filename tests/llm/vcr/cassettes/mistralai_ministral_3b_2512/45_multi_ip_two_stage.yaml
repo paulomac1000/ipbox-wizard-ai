@@ -1,0 +1,100 @@
+meta:
+  scenario_id: 45_multi_ip_two_stage
+  scenario_name: Dwustopniowa alokacja wielu IP
+  provider: openrouter
+  requested_model: mistralai/ministral-3b-2512
+  returned_model: mistralai/ministral-3b-2512
+  fingerprint: v3_167e9befc4eeb742c803443590d3f6b938ec1dc65aab67db273a3cc7ce6efd2d
+  request_hash: 397369758665962e8d90a80bb3d793c4aae422dc52f92b534623e3787cc51075
+  recorded_at: '2026-07-19T00:29:36.263466+00:00'
+  request_id: gen-1784420975-7YdQq0TRyP1yUFlwPU8x
+  finish_reason: stop
+  native_finish_reason: stop
+  system_fingerprint: null
+  prompt_tokens: 265
+  completion_tokens: 42
+  total_tokens: 307
+  cost: 4.605e-05
+  recording_duration_seconds: 1.243
+  cassette_format_version: 4
+response: "{\n  \"status\": \"FINAL\",\n  \"stops\": [],\n  \"reviews\": [\"REVIEW_04\", \"REVIEW_16\", \"REVIEW_17\"]\n}"
+parsed_response:
+  status: FINAL
+  result:
+    rok: 2025
+    przychody_roczne:
+      IP: 80000.0
+      NIE: 20000.0
+    koszty_roczne:
+      IP: 8000.0
+      NIE: 2000.0
+      MIX: 10000.0
+      WYKLUCZONE: 0.0
+    nexus_koszty:
+      A: 0.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 10000.0
+    nexus: 0.0
+    dochód_IP: 72000.0
+    dochód_NIE: 18000.0
+    klucz_MIX:
+      metoda: przychodowa_roczna
+      źródło: interpretacja_KIS
+      wartość: 0.8
+      status: FINAL
+    alokacja_multi_ip:
+      stage1_software_share: 8000.0
+      stage1_non_software_share: 2000.0
+      allocations:
+      - ip: IP_A
+        amount: 3000.0
+      - ip: IP_B
+        amount: 5000.0
+    podatek:
+      podstawa_IP: 0
+      podstawa_NIE: 18000
+      podatek_IP: 0
+      podatek_NIE_finalny: 3420
+      podatek_całościowy: 3420
+      nadpłata_lub_dopłata: -3420.0
+      termomodernization_carry_over: 0.0
+      termomodernization_expired: 0.0
+      health_tax_credit_used: 0.0
+      ulga_BR_IP_wykorzystana: 0.0
+      ulga_BR_NIE_wykorzystana: 0.0
+      ulga_BR_carry_over: 0.0
+      dochód_dodatkowy_skala: 0.0
+  classifications:
+  - opis: Serwer wspólny
+    amount: 10000.0
+    basket: MIX
+    allocation_method: przychodowa_roczna
+    allocation_source: interpretacja_KIS
+    allocation_key: 0.8
+    ip_amount: 8000.0
+    non_ip_amount: 2000.0
+    nexus_source: outside_nexus
+    nexus_basket: poza_nexus
+    nexus_amount: 0.0
+  monthly_W:
+  - miesiąc: 2025-01
+    wartość: 87.5
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+    TEST_3: PASS
+    TEST_4: PASS
+    TEST_5: PASS
+    TEST_6: PASS
+    TEST_7: PASS
+    TEST_8: PASS
+    TEST_9: PASS
+  stops_reviews:
+    stops: []
+    reviews:
+    - REVIEW_04
+    - REVIEW_16
+    - REVIEW_17
+    warnings: []

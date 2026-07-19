@@ -1,0 +1,82 @@
+meta:
+  scenario_id: 53_historical_ikze_limit_exceeded_stop
+  scenario_name: Historyczny limit IKZE przekroczony o grosz
+  provider: openrouter
+  requested_model: deepseek/deepseek-chat-v3.1
+  returned_model: deepseek/deepseek-chat-v3.1
+  fingerprint: v3_15d367c3c7e7637608092572ac1739b08d8704828db0c2075ef8ac5f6d3ead73
+  request_hash: 14a326a2c2cddd4cd050dca27561e950139edd05c3de3db70583ba621afdde87
+  recorded_at: '2026-07-19T00:26:57.426620+00:00'
+  request_id: gen-1784420814-GLvz0cYTX6wIkil5HMCK
+  finish_reason: stop
+  native_finish_reason: stop
+  system_fingerprint: null
+  prompt_tokens: 248
+  completion_tokens: 35
+  total_tokens: 283
+  cost: 0.00010196
+  recording_duration_seconds: 3.216
+  cassette_format_version: 4
+response: "{\n    \"reviews\": [\"REVIEW_09\"],\n    \"status\": \"STOPPED\",\n    \"stops\": [\"STOP_14\"]\n}"
+parsed_response:
+  status: STOPPED
+  result:
+    rok: 2019
+    przychody_roczne:
+      IP: 0.0
+      NIE: 0.0
+    koszty_roczne:
+      IP: 0.0
+      NIE: 0.0
+      MIX: 0.0
+      WYKLUCZONE: 0.0
+    nexus_koszty:
+      A: 0.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 0.0
+    nexus: 0.0
+    dochód_IP: 0.0
+    dochód_NIE: 0.0
+    klucz_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      wartość: null
+      status: NOT_APPLICABLE
+    alokacja_multi_ip: null
+    podatek:
+      podstawa_IP: 0
+      podstawa_NIE: 0
+      podatek_IP: 0
+      podatek_NIE_finalny: 0
+      podatek_całościowy: 0
+      nadpłata_lub_dopłata: 0.0
+      termomodernization_carry_over: 0.0
+      termomodernization_expired: 0.0
+      health_tax_credit_used: 0.0
+      ulga_BR_IP_wykorzystana: 0.0
+      ulga_BR_NIE_wykorzystana: 0.0
+      ulga_BR_carry_over: 0.0
+      dochód_dodatkowy_skala: 0.0
+  classifications: []
+  monthly_W:
+  - miesiąc: 2019-01
+    wartość: 90.0
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+    TEST_3: PASS
+    TEST_4: PASS
+    TEST_5: PASS
+    TEST_6: PASS
+    TEST_7: PASS
+    TEST_8: PASS
+    TEST_9: PASS
+  stops_reviews:
+    stops:
+    - STOP_14
+    reviews:
+    - REVIEW_09
+    warnings:
+    - IKZE_LIMIT_EXCEEDED

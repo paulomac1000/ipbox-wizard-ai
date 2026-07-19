@@ -1,0 +1,326 @@
+manifest_format_version: 2
+model: minimax/minimax-m2.5
+generated_at: '2026-07-19T00:40:28.375472+00:00'
+entries:
+  01_basic_linear:
+    file: 01_basic_linear.yaml
+    fingerprint: v3_abb2c3b2a04e7108de65c279f37042fe8a42586ab3d80e800a5a3bde40d05e99
+    request_hash: b38161b77f71a9df672471094b5b80771abf6405521547ae7a2d67b52eb074b0
+    recorded_at: '2026-07-19T00:38:23.464358+00:00'
+    returned_model: minimax/minimax-m2.5
+    cost: 0.00033135
+  02_basic_scale_single_client:
+    file: 02_basic_scale_single_client.yaml
+    fingerprint: v3_84903f871f56bafa6cf84deb0ca4c0f62ee373287b59b0e7b123bf6ac12b6b28
+    request_hash: 98abc1781f2101e466acee435f9c41acaa7e430bed07d7ae75686583ded054b4
+    recorded_at: '2026-07-19T00:38:26.624110+00:00'
+    returned_model: minimax/minimax-m2.5
+    cost: 0.00028884
+  03_fx_usd_single_client:
+    file: 03_fx_usd_single_client.yaml
+    fingerprint: v3_93922241ab31b4cb33af419cc6c2ab9accbc9bceacc52044a70537f70385dfb6
+    request_hash: 98abc1781f2101e466acee435f9c41acaa7e430bed07d7ae75686583ded054b4
+    recorded_at: '2026-07-19T00:38:28.444331+00:00'
+    returned_model: minimax/minimax-m2.5
+    cost: 0.00028305
+  11_multi_client_mixed_currencies:
+    file: 11_multi_client_mixed_currencies.yaml
+    fingerprint: v3_1696c81c2e7db79aa2dfb8c582152690788847278a1cc085c819fa9a2df6bb2c
+    request_hash: 770532cc64fdf981c4ff8ce042b3d795c7731f819cd5ff9ce4768c99d6e89e7e
+    recorded_at: '2026-07-19T00:38:35.918420+00:00'
+    returned_model: minimax/minimax-m2.5
+    cost: 0.00010805
+  12_zus_in_pit_path:
+    file: 12_zus_in_pit_path.yaml
+    fingerprint: v3_a523a9129614b1fe3fc5135363ee1274beb4583f09005d48333b790ec6da1f99
+    request_hash: 770532cc64fdf981c4ff8ce042b3d795c7731f819cd5ff9ce4768c99d6e89e7e
+    recorded_at: '2026-07-19T00:38:37.637786+00:00'
+    returned_model: minimax/minimax-m2.5
+    cost: 0.00010235
+  13_income_from_employment_impact:
+    file: 13_income_from_employment_impact.yaml
+    fingerprint: v3_8df159ab108670781d18835c940c2cd81e7cc3f2cf77d637f0cf574036825418
+    request_hash: 770532cc64fdf981c4ff8ce042b3d795c7731f819cd5ff9ce4768c99d6e89e7e
+    recorded_at: '2026-07-19T00:38:41.544910+00:00'
+    returned_model: minimax/minimax-m2.5
+    cost: 0.00010235
+  14_lump_sum_ineligible_check:
+    file: 14_lump_sum_ineligible_check.yaml
+    fingerprint: v3_dafb596a8a07bca85e467235906fcedb3411bca1bffbf4f48442223c57fdfb93
+    request_hash: b8593f6205888f15c2ed1a74d4809970d6252836882f58b1a2fb671da7aa083b
+    recorded_at: '2026-07-19T00:38:43.626834+00:00'
+    returned_model: minimax/minimax-m2.5
+    cost: 0.000306
+  15_vacation_sick_mix:
+    file: 15_vacation_sick_mix.yaml
+    fingerprint: v3_b8758505117fb4199664518100df2bad574f7b2e73df055da283b4c1b479ed73
+    request_hash: b38161b77f71a9df672471094b5b80771abf6405521547ae7a2d67b52eb074b0
+    recorded_at: '2026-07-19T00:38:46.847416+00:00'
+    returned_model: minimax/minimax-m2.5
+    cost: 0.000232875
+  16_high_w_review:
+    file: 16_high_w_review.yaml
+    fingerprint: v3_4bc725016b585ce7584bde859771bb3a42833b54963d0e9011a2405b70e93c25
+    request_hash: 98abc1781f2101e466acee435f9c41acaa7e430bed07d7ae75686583ded054b4
+    recorded_at: '2026-07-19T00:38:48.962564+00:00'
+    returned_model: minimax/minimax-m2.5
+    cost: 0.00012963
+  17_low_w_review:
+    file: 17_low_w_review.yaml
+    fingerprint: v3_bdb30db121313cf63f7c7277c0eb7d0080cb8fa2a3c4436aba50a7602e7bc7bf
+    request_hash: 3c06c940d0eaca438495b2899664444eb9dec14f0eecaa33881b4e63c39ff582
+    recorded_at: '2026-07-19T00:38:53.438789+00:00'
+    returned_model: minimax/minimax-m2.5
+    cost: 0.000259635
+  18_logic_zero_work_hours:
+    file: 18_logic_zero_work_hours.yaml
+    fingerprint: v3_773afbd6e0f8af1c312b56d119f1f89f978432f5917de21e9850774eaa1c2b35
+    request_hash: c74789545687e3f1a1be30e6b7ff3b42ae5bd30222d04aa61d7c87fc19b72be0
+    recorded_at: '2026-07-19T00:38:56.007810+00:00'
+    returned_model: minimax/minimax-m2.5
+    cost: 0.00036909
+  21_monthly_loss_impact:
+    file: 21_monthly_loss_impact.yaml
+    fingerprint: v3_b9f977f07224e2c5e728f979be32eaa291efcdc24cbc8fe4c73edc2ba21b5810
+    request_hash: 98abc1781f2101e466acee435f9c41acaa7e430bed07d7ae75686583ded054b4
+    recorded_at: '2026-07-19T00:38:57.810747+00:00'
+    returned_model: minimax/minimax-m2.5
+    cost: 0.00012963
+  22_related_parties_nexus_reduction:
+    file: 22_related_parties_nexus_reduction.yaml
+    fingerprint: v3_0128c92d2171debcb861cdd96690a1f7bc30ac00d8a72b47a10fc16079d2082d
+    request_hash: 98abc1781f2101e466acee435f9c41acaa7e430bed07d7ae75686583ded054b4
+    recorded_at: '2026-07-19T00:38:59.713444+00:00'
+    returned_model: minimax/minimax-m2.5
+    cost: 0.00012963
+  23_loss_carry_forward:
+    file: 23_loss_carry_forward.yaml
+    fingerprint: v3_f96d9703b3a7613a5ee012b8b9d33817f69cc1edd1a0207a64291524405eb936
+    request_hash: 985919c7c69c5c2469f22b46e5014910a9ce9694501e0f84c39a4f0f803c8dd0
+    recorded_at: '2026-07-19T00:39:02.409468+00:00'
+    returned_model: minimax/minimax-m2.5
+    cost: 0.0003504
+  24_donations_relief:
+    file: 24_donations_relief.yaml
+    fingerprint: v3_f76d41f2fb436914abaaff8fb18ed24b14aec41bd3d72e78829d00bc653b2e79
+    request_hash: 985919c7c69c5c2469f22b46e5014910a9ce9694501e0f84c39a4f0f803c8dd0
+    recorded_at: '2026-07-19T00:39:05.342771+00:00'
+    returned_model: minimax/minimax-m2.5
+    cost: 0.0002826
+  25_rehab_relief:
+    file: 25_rehab_relief.yaml
+    fingerprint: v3_3e7f959e2e61ae3fdbb8ad3b085f494c26488e00eb3689cc3d0e158647a6c782
+    request_hash: 985919c7c69c5c2469f22b46e5014910a9ce9694501e0f84c39a4f0f803c8dd0
+    recorded_at: '2026-07-19T00:39:10.900491+00:00'
+    returned_model: minimax/minimax-m2.5
+    cost: 0.00026295
+  26_rd_relief_nexus:
+    file: 26_rd_relief_nexus.yaml
+    fingerprint: v3_7a726bef805578130178f06b0ac2b4c71204a7a83eb353cf6aa25f627e5670a5
+    request_hash: b38161b77f71a9df672471094b5b80771abf6405521547ae7a2d67b52eb074b0
+    recorded_at: '2026-07-19T00:39:14.963038+00:00'
+    returned_model: minimax/minimax-m2.5
+    cost: 0.0006462
+  27_termomodernizacja_full:
+    file: 27_termomodernizacja_full.yaml
+    fingerprint: v3_9467f952906705d449e06f71d64c53de36c55d613141840fca13938494906bd9
+    request_hash: b38161b77f71a9df672471094b5b80771abf6405521547ae7a2d67b52eb074b0
+    recorded_at: '2026-07-19T00:39:17.220292+00:00'
+    returned_model: minimax/minimax-m2.5
+    cost: 0.0003732
+  28_edge_multiple_carry-overs:
+    file: 28_edge_multiple_carry-overs.yaml
+    fingerprint: v3_c94fd061d47450ef35e7d2757dd2a2c92695fcc9b1645d502ca04633abb49770
+    request_hash: 98abc1781f2101e466acee435f9c41acaa7e430bed07d7ae75686583ded054b4
+    recorded_at: '2026-07-19T00:39:19.167986+00:00'
+    returned_model: minimax/minimax-m2.5
+    cost: 0.00012963
+  29_edge_related_parties_nexus_0:
+    file: 29_edge_related_parties_nexus_0.yaml
+    fingerprint: v3_594e6812d32a7480dbe7bfcccc8638d03a44cb113f68640c6c15b1c00becf194
+    request_hash: 98abc1781f2101e466acee435f9c41acaa7e430bed07d7ae75686583ded054b4
+    recorded_at: '2026-07-19T00:39:20.982398+00:00'
+    returned_model: minimax/minimax-m2.5
+    cost: 0.00012963
+  30_edge_related_parties_nexus_mixed:
+    file: 30_edge_related_parties_nexus_mixed.yaml
+    fingerprint: v3_39f3cd27117bb0bece65eff883dbc12216df72256690503ba3fca9133a09c46d
+    request_hash: 98abc1781f2101e466acee435f9c41acaa7e430bed07d7ae75686583ded054b4
+    recorded_at: '2026-07-19T00:39:22.828029+00:00'
+    returned_model: minimax/minimax-m2.5
+    cost: 0.00012963
+  31_zus_double_dip_fail:
+    file: 31_zus_double_dip_fail.yaml
+    fingerprint: v3_773dc9777cedac5ee2c346b48a2c279e1d82dbd28070d30b55151c9be6e0a7a4
+    request_hash: 16fda39f5387fae42b7cbc773b09015c41f480db2659c4740b5f75512af71d92
+    recorded_at: '2026-07-19T00:39:26.791339+00:00'
+    returned_model: minimax/minimax-m2.5
+    cost: 0.00021741
+  32_private_costs_ip_fail:
+    file: 32_private_costs_ip_fail.yaml
+    fingerprint: v3_421054bd466035a63f3e1dfba75255fb4073fd3c3b90cf22df395e86e4458c8f
+    request_hash: 98abc1781f2101e466acee435f9c41acaa7e430bed07d7ae75686583ded054b4
+    recorded_at: '2026-07-19T00:39:28.707117+00:00'
+    returned_model: minimax/minimax-m2.5
+    cost: 0.00012963
+  33_kpir_balance_fail:
+    file: 33_kpir_balance_fail.yaml
+    fingerprint: v3_f201fd0a033307cbb0063c6037bb06eb0b77cd098b2cdfd17fd8fa51f2557783
+    request_hash: 98abc1781f2101e466acee435f9c41acaa7e430bed07d7ae75686583ded054b4
+    recorded_at: '2026-07-19T00:39:30.465245+00:00'
+    returned_model: minimax/minimax-m2.5
+    cost: 0.00012963
+  34_verify_fixed_asset_threshold_fail:
+    file: 34_verify_fixed_asset_threshold_fail.yaml
+    fingerprint: v3_7316cb2c069ded6754c39c72e412c790bebf191a637dc9f70edd71e0cf7af309
+    request_hash: 98abc1781f2101e466acee435f9c41acaa7e430bed07d7ae75686583ded054b4
+    recorded_at: '2026-07-19T00:39:32.339221+00:00'
+    returned_model: minimax/minimax-m2.5
+    cost: 0.00012963
+  35_verify_monthly_w_jump_inconsistency:
+    file: 35_verify_monthly_w_jump_inconsistency.yaml
+    fingerprint: v3_aeb69193e354574d1c215a885c45206b3c17a07ce1dacf0053d4da8175e11b46
+    request_hash: 81093681cb6b68332c0b14f2598f71c68ebcde1934bc30030715d427822f1170
+    recorded_at: '2026-07-19T00:39:36.716513+00:00'
+    returned_model: minimax/minimax-m2.5
+    cost: 0.000188625
+  36_verify_negative_income_error:
+    file: 36_verify_negative_income_error.yaml
+    fingerprint: v3_440b5f4648b4ccaa8520c8b72118e395b6b7bff88866432d48ae82c013a5cf39
+    request_hash: 98abc1781f2101e466acee435f9c41acaa7e430bed07d7ae75686583ded054b4
+    recorded_at: '2026-07-19T00:39:38.569192+00:00'
+    returned_model: minimax/minimax-m2.5
+    cost: 0.00012963
+  37_verify_invalid_tax_form_stop:
+    file: 37_verify_invalid_tax_form_stop.yaml
+    fingerprint: v3_868757227074a91b7e1ef74ed66e1718167db7474d6e749ebcc392a88eda6c01
+    request_hash: 992c0d7496562bd5eb8271928a90e6da6cc7f8e34fed01b28eab6c545df60678
+    recorded_at: '2026-07-19T00:39:41.211762+00:00'
+    returned_model: minimax/minimax-m2.5
+    cost: 0.0002214
+  38_verify_missing_kpir_data:
+    file: 38_verify_missing_kpir_data.yaml
+    fingerprint: v3_ec5a88b1a2eae177350b3a69e9872b082e11378d4da2b16dc7236ba986940115
+    request_hash: 04066a7d6ba5d98b17b80c108afc126ecd3c8d6538aa6ac5b81a59e888db1432
+    recorded_at: '2026-07-19T00:39:44.589074+00:00'
+    returned_model: minimax/minimax-m2.5
+    cost: 0.0002697
+  39_multi_project_weighted_W:
+    file: 39_multi_project_weighted_W.yaml
+    fingerprint: v3_9bffb70cde88e58ded16838dd1b95bf7d524d7e09d562a307e69f3cb5405e127
+    request_hash: b63579d8df732dba7fb592553ebf362588f74883037f780171c9096ebbbaf6eb
+    recorded_at: '2026-07-19T00:39:46.852957+00:00'
+    returned_model: minimax/minimax-m2.5
+    cost: 0.00016115
+  40_mixed_ip_clause:
+    file: 40_mixed_ip_clause.yaml
+    fingerprint: v3_b255a7d07a48eb8501e5d0d17d5deaf0b41f96ac604cfb612fa0aa691309078d
+    request_hash: 770532cc64fdf981c4ff8ce042b3d795c7731f819cd5ff9ce4768c99d6e89e7e
+    recorded_at: '2026-07-19T00:39:48.652324+00:00'
+    returned_model: minimax/minimax-m2.5
+    cost: 9.965e-05
+  41_ikze_cascade:
+    file: 41_ikze_cascade.yaml
+    fingerprint: v3_b354d5aa49ab4a46d8aa5ccba775e1def64a296376903f89ab45fa0064746dc8
+    request_hash: b38161b77f71a9df672471094b5b80771abf6405521547ae7a2d67b52eb074b0
+    recorded_at: '2026-07-19T00:39:50.809018+00:00'
+    returned_model: minimax/minimax-m2.5
+    cost: 0.0003732
+  42_stop_08_no_documentation:
+    file: 42_stop_08_no_documentation.yaml
+    fingerprint: v3_c6e4e5df6707779b985330f5259ad056b51386144014f9cafeebbc556c647a4a
+    request_hash: 04066a7d6ba5d98b17b80c108afc126ecd3c8d6538aa6ac5b81a59e888db1432
+    recorded_at: '2026-07-19T00:39:54.577994+00:00'
+    returned_model: minimax/minimax-m2.5
+    cost: 0.00018643
+  43_review_09_single_client_100pct:
+    file: 43_review_09_single_client_100pct.yaml
+    fingerprint: v3_ffe6f5e83d942a9cb63961a672c8bab790a9599563034004a4247a1c6d51eb70
+    request_hash: 98abc1781f2101e466acee435f9c41acaa7e430bed07d7ae75686583ded054b4
+    recorded_at: '2026-07-19T00:39:56.444957+00:00'
+    returned_model: minimax/minimax-m2.5
+    cost: 0.00012963
+  44_mix_revenue_key_kis:
+    file: 44_mix_revenue_key_kis.yaml
+    fingerprint: v3_e1e185fd7255967b76891df241ec950b6e1c70fc86aa3571a82cbeeb85b9b5ed
+    request_hash: 23bb30399a2a9c37be432e2ec9e166a2652a4dc05ab2436e14daa498eb454f5a
+    recorded_at: '2026-07-19T00:39:58.598537+00:00'
+    returned_model: minimax/minimax-m2.5
+    cost: 0.00017805
+  45_multi_ip_two_stage:
+    file: 45_multi_ip_two_stage.yaml
+    fingerprint: v3_c4586b8981b3171f3002b6fecbb264f6c79920aed5da6e28500d94cfdbcb0de1
+    request_hash: 31e937d582c70eebbc6cef1356970a1eb241accf80b73cf800be0653df3093c4
+    recorded_at: '2026-07-19T00:40:01.494562+00:00'
+    returned_model: minimax/minimax-m2.5
+    cost: 0.000137985
+  46_historical_2019_health_credit:
+    file: 46_historical_2019_health_credit.yaml
+    fingerprint: v3_6bf62c95d5fd247c7edebc0d428cfd9d3a199038fab27861612e4b4f0e055b9a
+    request_hash: b38161b77f71a9df672471094b5b80771abf6405521547ae7a2d67b52eb074b0
+    recorded_at: '2026-07-19T00:40:04.077401+00:00'
+    returned_model: minimax/minimax-m2.5
+    cost: 0.000108015
+  47_historical_2021_br_ipbox_stop:
+    file: 47_historical_2021_br_ipbox_stop.yaml
+    fingerprint: v3_bd7b3ac0c245eb57ce6b004af8627e321000dc49a4e4de1fecbb43cd30e8544e
+    request_hash: 082a83e8e9507d8918e626e7a3b49d46a19fa4b9603e73557b2d27bd10cc78ef
+    recorded_at: '2026-07-19T00:40:06.162899+00:00'
+    returned_model: minimax/minimax-m2.5
+    cost: 0.00011945
+  48_historical_2024_pit_like_cascade:
+    file: 48_historical_2024_pit_like_cascade.yaml
+    fingerprint: v3_5586b8ccacafd6c4f98bf7d11659df65cd2decca83717a70ec8ace4a295d8a73
+    request_hash: b38161b77f71a9df672471094b5b80771abf6405521547ae7a2d67b52eb074b0
+    recorded_at: '2026-07-19T00:40:08.386926+00:00'
+    returned_model: minimax/minimax-m2.5
+    cost: 0.000108015
+  49_double_invoice_percentage_stop:
+    file: 49_double_invoice_percentage_stop.yaml
+    fingerprint: v3_df6e5ba5b33598dd553f5e39e6b9187b3dbba567e68e58458361292d567903e5
+    request_hash: 20ffc067ce1d55aa5bda99f98ed3b8563b4c9f6721e5bd2cf515976786b97f8c
+    recorded_at: '2026-07-19T00:40:10.750755+00:00'
+    returned_model: minimax/minimax-m2.5
+    cost: 0.000134835
+  50_silent_allocation_method_switch_stop:
+    file: 50_silent_allocation_method_switch_stop.yaml
+    fingerprint: v3_c1fd1f64981dcec5e4ce19e9b987b650953f1569fce1394a53cfbefa9e88951b
+    request_hash: 16e222ff1e5cef42f5b003be22674006d45aa5211274ec81d570eeea5cf64e8e
+    recorded_at: '2026-07-19T00:40:12.975509+00:00'
+    returned_model: minimax/minimax-m2.5
+    cost: 0.00012715
+  51_return_ledger_classification_shift_stop:
+    file: 51_return_ledger_classification_shift_stop.yaml
+    fingerprint: v3_e4315a51336a03be516855365028e7325597b5320b9dead2046eaef13be953e3
+    request_hash: 33889b4a978f618300ed6d33eecf623377354fa7fc11a01c9533da5901f8ed33
+    recorded_at: '2026-07-19T00:40:16.652598+00:00'
+    returned_model: minimax/minimax-m2.5
+    cost: 0.00015429
+  52_cost_date_revenue_mix_policy:
+    file: 52_cost_date_revenue_mix_policy.yaml
+    fingerprint: v3_7b9bb142e274885e4a0a1a414dda3092970f7aa5931ea18b5740caa4554d9fa8
+    request_hash: 23bb30399a2a9c37be432e2ec9e166a2652a4dc05ab2436e14daa498eb454f5a
+    recorded_at: '2026-07-19T00:40:18.696809+00:00'
+    returned_model: minimax/minimax-m2.5
+    cost: 0.00012725
+  53_historical_ikze_limit_exceeded_stop:
+    file: 53_historical_ikze_limit_exceeded_stop.yaml
+    fingerprint: v3_00a23730a13dc6cba97556ef3b489e646c093dccf4cc4f7174a419f97b1bcdd9
+    request_hash: f3d49011cd775a58bd4eac1432a15ca83a1aad4ea0c76374dc910ab8eb5e1946
+    recorded_at: '2026-07-19T00:40:22.096932+00:00'
+    returned_model: minimax/minimax-m2.5
+    cost: 0.000189905
+  54_pre_ipbox_year_stop:
+    file: 54_pre_ipbox_year_stop.yaml
+    fingerprint: v3_af23100ce4c2d44cc6870079b438e04da9dd7f830fec1095acf39f39503105c3
+    request_hash: 389314786c1a1146fc57910d737bd05e48ca89b23bd706bbfe60f12a5192c0f4
+    recorded_at: '2026-07-19T00:40:25.751528+00:00'
+    returned_model: minimax/minimax-m2.5
+    cost: 0.000165525
+  55_disjoint_w_semantics_clean:
+    file: 55_disjoint_w_semantics_clean.yaml
+    fingerprint: v3_1ae3222613a3ec214b0cfcb54f9a62ebed784c1fd9ee5e8ee8759b50379068ea
+    request_hash: b38161b77f71a9df672471094b5b80771abf6405521547ae7a2d67b52eb074b0
+    recorded_at: '2026-07-19T00:40:28.370820+00:00'
+    returned_model: minimax/minimax-m2.5
+    cost: 0.000116835

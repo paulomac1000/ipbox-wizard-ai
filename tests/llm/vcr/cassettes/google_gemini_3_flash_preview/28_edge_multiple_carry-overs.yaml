@@ -1,0 +1,105 @@
+meta:
+  scenario_id: 28_edge_multiple_carry-overs
+  scenario_name: Wielokrotne carry-over ulg
+  provider: openrouter
+  requested_model: google/gemini-3-flash-preview
+  returned_model: google/gemini-3-flash-preview
+  fingerprint: v3_f2695ac8d918d25b4ef3907d2dadb04cfd28624b2e47828587a7a96f4f0278d5
+  request_hash: 93b1484e84018f1d7b9d0c78acbf4ff46b61915b3907c37cd88502c1ee754c2b
+  recorded_at: '2026-07-19T00:21:17.788044+00:00'
+  request_id: gen-1784420476-0C9faOMyb2w2x75dOJkN
+  finish_reason: stop
+  native_finish_reason: STOP
+  system_fingerprint: null
+  prompt_tokens: 544
+  completion_tokens: 20
+  total_tokens: 564
+  cost: 0.000332
+  recording_duration_seconds: 1.08
+  cassette_format_version: 4
+response: '{"status":"FINAL","stops":[],"reviews":["REVIEW_01","REVIEW_09"]}'
+parsed_response:
+  status: FINAL
+  result:
+    rok: 2025
+    przychody_roczne:
+      IP: 30000.0
+      NIE: 0.0
+    koszty_roczne:
+      IP: 200.0
+      NIE: 0.0
+      MIX: 0.0
+      WYKLUCZONE: 0.0
+    nexus_koszty:
+      A: 200.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 0.0
+    nexus: 1.0
+    dochód_IP: 29800.0
+    dochód_NIE: 0.0
+    klucz_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      wartość: null
+      status: NOT_APPLICABLE
+    alokacja_multi_ip: null
+    podatek:
+      podstawa_IP: 29800
+      podstawa_NIE: 0
+      podatek_IP: 1490
+      podatek_NIE_finalny: 0
+      podatek_całościowy: 1490
+      nadpłata_lub_dopłata: -1490.0
+      termomodernization_carry_over: 15000.0
+      termomodernization_expired: 0.0
+      health_tax_credit_used: 0.0
+      ulga_BR_IP_wykorzystana: 0.0
+      ulga_BR_NIE_wykorzystana: 0.0
+      ulga_BR_carry_over: 0.0
+      dochód_dodatkowy_skala: 0.0
+  classifications:
+  - opis: IDE
+    amount: 100.0
+    basket: IP
+    allocation_method: direct
+    allocation_source: ewidencja_kosztu_IP
+    allocation_key: 1.0
+    ip_amount: 100.0
+    non_ip_amount: 0.0
+    nexus_source: own_br
+    nexus_basket: A
+    nexus_amount: 100.0
+  - opis: IDE support
+    amount: 100.0
+    basket: IP
+    allocation_method: direct
+    allocation_source: ewidencja_kosztu_IP
+    allocation_key: 1.0
+    ip_amount: 100.0
+    non_ip_amount: 0.0
+    nexus_source: own_br
+    nexus_basket: A
+    nexus_amount: 100.0
+  monthly_W:
+  - miesiąc: 2025-01
+    wartość: 100.0
+  - miesiąc: 2025-02
+    wartość: 100.0
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+    TEST_3: PASS
+    TEST_4: PASS
+    TEST_5: PASS
+    TEST_6: PASS
+    TEST_7: PASS
+    TEST_8: PASS
+    TEST_9: PASS
+  stops_reviews:
+    stops: []
+    reviews:
+    - REVIEW_01
+    - REVIEW_09
+    warnings: []
