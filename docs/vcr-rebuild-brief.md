@@ -4,7 +4,7 @@
 
 Pobrać branch `fix/decouple-mix-allocation-from-w`, potwierdzić nowe regresje zaokrąglonego W i audytu per strumień, a następnie nagrać kompletną macierz VCR od zera.
 
-Punkt docelowy: **48 scenariuszy × 7 modeli = 336 świeżych kaset oraz 7 manifestów**.
+Punkt docelowy: **46 scenariuszy × 7 modeli = 322 świeże kasety oraz 7 manifestów**.
 
 ## Dlaczego poprzednie 322 kasety są nieważne
 
@@ -12,8 +12,8 @@ Zmieniły się:
 
 - autorytatywny `ipbox_algorytm.md`, którego hash wchodzi do fingerprintu;
 - oracle audytu alokacji;
-- scenariusz 39;
-- liczba scenariuszy — dodano 56 i 57.
+- scenariusze 39, 49, 50 i 55;
+- request fingerprinty wynikające z nowych kopert decyzji tych scenariuszy.
 
 Nie kopiuj odpowiedzi, nie edytuj fingerprintów i nie próbuj zachować poprzednich kaset.
 
@@ -49,10 +49,11 @@ pytest -q \
 
 Oczekiwane zachowanie:
 
-- scenariusz 56 ma status `FINAL` i nie emituje `STOP_09`;
-- scenariusz 57 emituje co najmniej `STOP_09`, `STOP_10` i `STOP_11`;
+- scenariusz 55 ma status `FINAL`, zachowuje zaokrąglone `W=68,72%` i nie emituje `STOP_09`;
+- scenariusz 49 emituje co najmniej `STOP_09` i `STOP_10` mimo zaokrąglonego procentu;
+- scenariusz 50 emituje co najmniej `STOP_09`, `STOP_10` i `STOP_11`;
 - scenariusz 39 audytuje oba projekty niezależnie;
-- dotychczasowe scenariusze pozostają zielone.
+- wszystkie 46 scenariuszy deterministycznych pozostaje zielone.
 
 ## Usuń unieważnione kasety
 
@@ -96,9 +97,9 @@ pytest tests/llm -q --run-llm
 
 ## Kryteria odbioru
 
-- dokładnie 48 scenariuszy;
-- 48/48 dla każdego z siedmiu modeli;
-- dokładnie 336 kaset i 7 manifestów;
+- dokładnie 46 scenariuszy;
+- 46/46 dla każdego z siedmiu modeli;
+- dokładnie 322 kasety i 7 manifestów;
 - `all_complete_and_valid=true`;
 - zero substytucji modelu, błędnych `finish_reason`, skrzyżowanych STOP/REVIEW i niespójnych fingerprintów;
 - playback przechodzi bez `OPENROUTER_API_KEY`;
@@ -109,4 +110,4 @@ pytest tests/llm -q --run-llm
 
 ## Raport końcowy
 
-Podaj HEAD, testy, coverage, 48/48 per model, liczbę kaset i manifestów, retry/odrzucenia, całkowity koszt, wynik playbacku bez sekretu, wynik CI oraz werdykt `READY` lub `NOT READY`. Nie merguj PR.
+Podaj HEAD, testy, coverage, 46/46 per model, liczbę kaset i manifestów, retry/odrzucenia, całkowity koszt, wynik playbacku bez sekretu, wynik CI oraz werdykt `READY` lub `NOT READY`. Nie merguj PR.
