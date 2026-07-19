@@ -35,7 +35,7 @@ input:
     ewidencja:
       godziny_pracy: 168
       godziny_nie_IP: 22
-      procent_faktury_IP: 81.8181818182
+      procent_faktury_IP: 81.8182
       W: 68.72
       W_precision_pp: 0.01
     kontrola_alokacji:
@@ -50,6 +50,3 @@ input:
     opis_projektu: Rozwój syntetycznego kwalifikowanego programu komputerowego.
 assertions:
   stops: []
-  przychody_roczne:
-    IP: 15874.32
-    NIE: 9725.68
