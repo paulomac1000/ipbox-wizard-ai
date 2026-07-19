@@ -1,69 +1,64 @@
 meta:
   id: 52_cost_date_revenue_mix_policy
-  name: MIX według proporcji przychodowej w dacie kosztu
-  description: Każdy koszt wspólny otrzymuje klucz z miesiąca jego poniesienia, a nie roczny W.
-  tags: [regression, allocation, kis-like]
+  name: Miesięczna pula proporcji przychodowej i dowody NEXUS
+  description: Syntetyczna regresja zachowująca grosze na poziomie miesięcznej puli i wymagająca dowodu dla każdego kosztu NEXUS.
+  tags: [regression, allocation, rounding, nexus, synthetic]
   priority: P0
 input:
   rok: 2025
   forma_opodatkowania: liniowy_19%
   polityka_alokacji:
-    policy_id: cost-date-revenue
+    policy_id: synthetic-monthly-pool
     przychody:
       metoda: dokumentowa
     koszty_MIX:
       metoda: przychodowa_w_dacie_kosztu
       źródło: interpretacja_KIS
       źródło_ref: SYNTHETIC-KIS-REFERENCE
-      uzasadnienie: Syntetyczny wariant polityki opisanej jako proporcja przychodowa w dacie kosztu.
+      rounding_granularity: monthly_pool
+      uzasadnienie: Syntetyczna polityka rozdzielająca miesięczną pulę metodą największych reszt.
   zus:
     sposob: brak
   kontrahenci:
-    - nazwa: ClientA
-      klauzula_IP: true
+  - nazwa: ClientA
+    klauzula_IP: true
   miesiace:
-    - miesiac: 2025-01
-      faktury:
-        - kwota_PLN: 10000
-          kwota_IP: 8000
-          kontrahent: ClientA
-          kwalifikuje_IP: true
-      ewidencja:
-        godziny_pracy: 160
-        godziny_nie_IP: 16
-        procent_faktury_IP: 100
-      koszty:
-        - opis: Wspólny koszt styczniowy
-          kwota: 1000
-          kategoria: MIX
-          nexus_source: outside_nexus
-        - opis: Bezpośredni koszt projektu
-          kwota: 100
-          kategoria: IP
-          allocation_source: syntetyczna-ewidencja-projektowa
-          nexus_source: own_br
-      opis_projektu: Rozwój kwalifikowanego programu komputerowego.
-    - miesiac: 2025-02
-      faktury:
-        - kwota_PLN: 10000
-          kwota_IP: 2000
-          kontrahent: ClientA
-          kwalifikuje_IP: true
-      ewidencja:
-        godziny_pracy: 160
-        godziny_nie_IP: 16
-        procent_faktury_IP: 100
-      koszty:
-        - opis: Wspólny koszt lutowy
-          kwota: 1000
-          kategoria: MIX
-          nexus_source: outside_nexus
-      opis_projektu: Rozwój kwalifikowanego programu komputerowego.
+  - miesiac: 2025-06
+    faktury:
+    - kwota_PLN: 10000
+      kwota_IP: 3333
+      kontrahent: ClientA
+      kwalifikuje_IP: true
+    ewidencja:
+      godziny_pracy: 160
+      godziny_nie_IP: 40
+      procent_faktury_IP: 100
+    koszty:
+    - opis: Wspólny koszt A
+      kwota: 100.01
+      kategoria: MIX
+      nexus_source: own_br
+      nexus_amount: 33.33
+      nexus_evidence: SYNTHETIC-NEXUS-EVIDENCE-A
+      nexus_basis: allocated_ip_cost
+    - opis: Wspólny koszt B
+      kwota: 100.01
+      kategoria: MIX
+      nexus_source: own_br
+      nexus_amount: 33.33
+      nexus_evidence: SYNTHETIC-NEXUS-EVIDENCE-B
+      nexus_basis: allocated_ip_cost
+    - opis: Wspólny koszt C
+      kwota: 100.01
+      kategoria: MIX
+      nexus_source: own_br
+      nexus_amount: 33.33
+      nexus_evidence: SYNTHETIC-NEXUS-EVIDENCE-C
+      nexus_basis: allocated_ip_cost
+    opis_projektu: Rozwój syntetycznego kwalifikowanego programu komputerowego.
 assertions:
+  stops: []
   klucz_MIX_metoda: przychodowa_w_dacie_kosztu
-  nie_używaj_W_do_MIX: true
-  koszty_koszyk:
-    Wspólny koszt styczniowy: MIX
-    Wspólny koszt lutowy: MIX
+  klucz_MIX_źródło: interpretacja_KIS
   testy_pass: [TEST_4, TEST_5, TEST_6, TEST_7, TEST_8, TEST_9]
   review_obecne: [REVIEW_16, REVIEW_17]
