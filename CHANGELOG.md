@@ -22,11 +22,14 @@
 - Granicę jednoczesnego B+R i IP Box: niedozwolone do 2021 r., obsługiwane od 2022 r.
 - Jawne semantyki W: `conditional_product`, `disjoint_components` i `time_only`.
 - Audyt miesięcznej alokacji wykrywający podwójny procent, przypisanie 100% mimo części NIE-IP i nieudokumentowaną zmianę metody w roku.
+- Precyzyjny audyt W z tolerancją zależną od zadeklarowanej dokładności procentu i wartości kontrolowanego przychodu.
+- Kontrolę alokacji na poziomie niezależnej faktury lub projektu, z miesięcznym agregatem wyłącznie jako fallbackiem.
+- Walidację, że suma kontrolowanych strumieni odpowiada sumie faktur kwalifikujących się, a jawne faktury NIE-IP pozostają poza W.
 - Metodę MIX `przychodowa_w_dacie_kosztu` z kluczem właściwym dla miesiąca kosztu.
 - Uzgodnienie ewidencji i zeznania osobno dla przychodów i kosztów IP/NIE, także gdy sumy globalne są identyczne.
 - Rocznikowe pule termomodernizacji z kontrolą limitu 53 000 zł, kolejnością wykorzystania i wygaśnięciem po sześciu latach.
 - Rozliczenie korekty odróżniające poprawioną nadpłatę od zwrotu już wypłaconego.
-- Syntetyczne scenariusze LLM/VCR `46`–`55` odtwarzające klasy błędów znalezionych w rozliczeniach rzeczywistych bez kopiowania danych podatnika.
+- Syntetyczne scenariusze LLM/VCR `46`–`57` odtwarzające klasy błędów znalezionych w rozliczeniach rzeczywistych bez kopiowania danych podatnika.
 - Test blokujący oczywiste identyfikatory osobowe w nowych scenariuszach regresyjnych.
 - Dokumentację historycznych źródeł, regresji rzeczywistych oraz brief pełnej odbudowy kaset.
 
@@ -50,6 +53,9 @@
 - Kwoty historycznych odliczeń nie są już blokowane tylko dlatego, że rok jest wcześniejszy niż 2025.
 - Kwoty ponad limit roczny nie są cicho obcinane do limitu.
 - Procent faktury nie może zostać zastosowany dwukrotnie bez aktywacji `STOP_10`.
+- Zaokrąglenie W do 0,01 pp nie powoduje już fałszywego `STOP_09` przy większych fakturach.
+- Zaokrąglony procent faktury nie ukrywa już sygnatury zastosowania procentu dwukrotnie ani późniejszego `STOP_11`.
+- Osobne faktury NIE-IP nie są już sumowane z fakturami kwalifikującymi się przed zastosowaniem jednego W.
 - Niejawne przejście pomiędzy metodami alokacji w jednym roku aktywuje `STOP_11`.
 - Równe sumy przychodów/kosztów nie maskują przesunięcia pomiędzy IP i NIE; aktywowany jest `STOP_12`.
 - Rok sprzed IP Box lub po ostatnim zweryfikowanym roku nie używa zasad sąsiedniego roku.
