@@ -26,7 +26,10 @@ STOP_FACT_TO_CODE = {
     "unsupported_tax_year": "STOP_16",
     "source_kpir_requires_correction": "SOURCE_KPIR_REQUIRES_CORRECTION",
 }
-REVIEW_FACT_TO_CODE = dict(legacy.REVIEW_FACT_TO_CODE)
+REVIEW_FACT_TO_CODE = {
+    **legacy.REVIEW_FACT_TO_CODE,
+    "nexus_evidence_missing": "REVIEW_18",
+}
 
 
 def derive_decision_codes(facts: dict[str, bool]) -> tuple[set[str], set[str]]:
@@ -159,6 +162,10 @@ def zero_after_stop(reference: dict[str, Any]) -> None:
     result["podatek"] = {
         "podstawa_IP": 0,
         "podstawa_NIE": 0,
+        "podstawa_zwykła": 0,
+        "dochód_IP_po_uldze_BR": 0.0,
+        "dochód_IP_kwalifikowany": 0.0,
+        "dochód_IP_poza_preferencją": 0.0,
         "podatek_IP": 0,
         "podatek_NIE_finalny": 0,
         "podatek_całościowy": 0,
