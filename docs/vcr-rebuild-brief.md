@@ -1,30 +1,32 @@
-# Brief: końcowa odbudowa kaset po poprawce audytu kosztów
+# Brief: ponowna odbudowa kaset po finalnej poprawce NEXUS i W
 
 ## Cel
 
-Pobrać branch `fix/decouple-mix-allocation-from-w`, potwierdzić poprawki audytu KUP, źródłowej KPiR, zaokrągleń kosztów, źródła polityki MIX i dowodów NEXUS, a następnie nagrać kompletną macierz VCR od zera.
+Pobrać najnowszy branch `fix/decouple-mix-allocation-from-w`, potwierdzić poprawkę opodatkowania części dochodu IP poza preferencją oraz fail-closed dla niejednoznacznej metody W, a następnie nagrać kompletną macierz VCR od zera.
 
-Punkt docelowy: **46 scenariuszy × 7 modeli = 322 świeże kasety oraz 7 manifestów**.
+Punkt docelowy:
 
-Nie dodawaj do repozytorium danych podatnika, prawdziwych nazw, identyfikatorów, sygnatur interpretacji ani dokładnych kwot z historycznego rozliczenia. Regresje 32 i 52 używają wyłącznie niezależnych danych syntetycznych.
+```text
+46 scenariuszy × 7 modeli = 322 kasety
+7 manifestów
+```
 
-## Dlaczego dotychczasowe kasety są nieważne
+Nie merguj PR i nie przełączaj go z draftu.
 
-Zmieniły się:
+## Dlaczego poprzednie 322 kasety są nieważne
 
-- autorytatywny `ipbox_algorytm.md`, którego hash wchodzi do fingerprintu;
-- deterministyczny oracle i schema raportu;
-- zestaw dozwolonych STOP-ów — dodano `SOURCE_KPIR_REQUIRES_CORRECTION`;
-- wykonywalna kwalifikacja `KUP: false` oraz audyt źródłowej KPiR;
-- polityka groszowa `per_cost_item` / `monthly_pool`;
-- raport `source_ledger_audit` i bezpieczny `correction_preview`;
-- obowiązkowe źródło referencyjne polityki KIS oraz dowód NEXUS;
-- scenariusze 32, 44, 45 i 52;
-- request fingerprinty i deterministyczne raporty scenariuszy.
+Po poprzednim nagraniu zmieniły się:
 
-Nie kopiuj odpowiedzi, nie edytuj fingerprintów i nie zachowuj poprzednich kaset przez ręczną podmianę metadanych.
+- deterministyczna kaskada podatkowa;
+- raport podatkowy i jego strict schema;
+- lista REVIEW — dodano `REVIEW_18`;
+- walidacja semantyki W;
+- `ipbox_algorytm.md`, którego hash wchodzi do fingerprintu;
+- oczekiwane raporty scenariuszy z `NEXUS < 1`.
 
-## 1. Pobierz dokładny branch
+Starych kaset nie wolno edytować, kopiować, przepisywać ani zachować przez podmianę hashy.
+
+## 1. Pobranie aktualnego kodu
 
 ```bash
 git fetch origin
@@ -34,9 +36,9 @@ git status --short
 git log -1 --oneline
 ```
 
-Przed rozpoczęciem zapisz HEAD w raporcie. Drzewo robocze musi być czyste.
+Zapisz HEAD w raporcie. Drzewo robocze musi być czyste.
 
-## 2. Utwórz środowisko i wykonaj bezpłatną bramkę
+## 2. Bezpłatna bramka przed requestami
 
 ```bash
 python -m venv .venv
@@ -54,52 +56,103 @@ pytest -q
 for script in scripts/*.sh dump-to-md.sh; do bash -n "$script"; done
 ```
 
-Nie wykonuj płatnych requestów, dopóki wszystkie powyższe polecenia nie przejdą.
+Nie uruchamiaj płatnych requestów, dopóki cała bramka nie przejdzie.
 
-## 3. Potwierdź najważniejsze regresje
+## 3. Krytyczne regresje
 
 ```bash
 pytest -q \
+  tests/unit/test_nexus_ordinary_tax_and_w_policy.py \
   tests/unit/test_cost_audit.py \
   tests/unit/test_allocation_precision.py \
   tests/unit/test_allocation_guard_streams.py \
   tests/unit/test_real_world_regressions_synthetic.py
 ```
 
-Oczekiwane zachowanie:
+### Kaskada NEXUS
 
-### Scenariusz 32 — NON-KUP pozostawiony w KPiR i zeznaniu
+Syntetyczny przypadek:
 
-- status `STOPPED`;
-- dokładne STOP-y obejmują `SOURCE_KPIR_REQUIRES_CORRECTION` i `STOP_12`;
-- wydatek z `KUP: false` jest `WYKLUCZONE`, a nie `NON`;
-- `source_ledger_audit.status` to `REQUIRES_CORRECTION`;
-- `correction_preview.status` to `AVAILABLE`;
-- preview wskazuje konieczność korekty KPiR i zeznania;
-- preview rozróżnia korektę ulgi od końcowej kwoty podatku;
-- `tax_unchanged_only_if_reliefs_updated=true` występuje wyłącznie wtedy, gdy poprawiona ulga rzeczywiście zachowuje podatek;
-- finalne pola finansowe pozostają wyzerowane, ponieważ istnieje STOP.
+```text
+dochód IP = 10 000
+NEXUS = 0,65
+forma = liniowy 19%
+```
 
-### Scenariusz 52 — miesięczna pula kosztów
+Musi dać:
 
-- status `FINAL`;
-- `rounding_granularity=monthly_pool`;
-- suma pozycyjnych `ip_amount` dokładnie odpowiada zaokrąglonej miesięcznej puli;
-- pojedynczy grosz jest rozdzielony deterministycznie metodą największych reszt;
-- `rounding_adjustment` zachowuje ślad tej korekty;
-- każda pozycja A/B/C/D ma `nexus_evidence`;
-- polityka `interpretacja_KIS` zawiera wyłącznie syntetyczny `źródło_ref`.
+```text
+dochód kwalifikowany = 6 500
+podatek IP 5% = 325
 
-### Pozostałe krytyczne regresje
+dochód IP poza preferencją = 3 500
+podatek zwykły 19% = 665
 
-- scenariusz 39 audytuje projekty niezależnie;
-- scenariusz 49 nadal wykrywa podwójny procent mimo zaokrąglenia;
-- scenariusz 50 nadal wykrywa nieudokumentowaną zmianę metody;
-- scenariusz 55 pozostaje `FINAL` dla poprawnie zaokrąglonego W i oddzielnego strumienia NIE-IP;
-- scenariusze 44, 45 i 52 nie używają prawdziwej sygnatury interpretacji;
-- dokładnie 46 scenariuszy przechodzi pełną walidację oracle i schema.
+podatek łączny = 990
+```
 
-## 4. Kontrola prywatności przed nagraniem
+### Scenariusz 29 — NEXUS zero
+
+Musi pozostać `FINAL` i dać:
+
+```text
+dochód_IP_kwalifikowany = 0
+dochód_IP_poza_preferencją = 5 000
+podatek_IP = 0
+podatek_NIE_finalny = 950
+podatek_całościowy = 950
+```
+
+NEXUS zero nie może wyzerować podatku od całego dochodu IP.
+
+### Scenariusz 30 — NEXUS mieszany
+
+Musi dać:
+
+```text
+podstawa_IP = 8 931
+podstawa_zwykła = 17 569
+podatek_IP = 447
+podatek_NIE_finalny = 3 338
+podatek_całościowy = 3 785
+```
+
+### Metoda W
+
+Brak `polityka_alokacji.W.metoda` musi zostać odrzucony, gdy w tym samym miesiącu jednocześnie:
+
+```text
+godziny_nie_IP != 0
+procent_faktury_IP != 100
+```
+
+Nie dodawaj domyślnego `conditional_product` dla tego przypadku.
+
+Jeżeli aktywny jest tylko jeden modyfikator, kanoniczna reprezentacja może pozostać używana, ponieważ obsługiwane wzory dają wtedy identyczny wynik.
+
+### Brak dowodu NEXUS
+
+Pozycja bez `nexus_evidence`:
+
+- trafia do `poza_nexus`;
+- ma `nexus_amount = 0`;
+- emituje `NEXUS_EVIDENCE_MISSING`;
+- aktywuje `REVIEW_18`;
+- nie wyzerowuje podatku, ponieważ część nieobjęta preferencją jest opodatkowana zwykłą stawką.
+
+### Wcześniejsze krytyczne regresje
+
+Potwierdź również:
+
+- scenariusz 32: `SOURCE_KPIR_REQUIRES_CORRECTION` i `STOP_12`;
+- scenariusz 52: `monthly_pool`, zachowanie groszy i kompletne dowody NEXUS;
+- scenariusz 39: niezależny audyt projektów;
+- scenariusz 49: wykrycie podwójnego procentu;
+- scenariusz 50: wykrycie nieudokumentowanej zmiany metody;
+- scenariusz 55: poprawny `disjoint_components` pozostaje `FINAL`;
+- katalog zawiera dokładnie 46 scenariuszy.
+
+## 4. Kontrola prywatności
 
 ```bash
 pytest -q tests/unit/test_real_world_regressions_synthetic.py
@@ -109,9 +162,17 @@ grep -RInE \
   tests/llm/scenarios python_helper tests/unit || true
 ```
 
-Przejrzyj każde trafienie. Dozwolone są wyłącznie wartości jawnie syntetyczne, nazwy techniczne i testy walidatora. Nie kopiuj danych z dokumentów użytkownika nawet wtedy, gdy wydają się zanonimizowane przez usunięcie nazwiska.
+Przejrzyj każde trafienie. Do repozytorium nie wolno dodawać:
 
-## 5. Usuń całą unieważnioną macierz
+- danych podatnika;
+- prawdziwych nazw i identyfikatorów;
+- sygnatur prywatnych interpretacji;
+- dokładnych kwot historycznego rozliczenia użytkownika;
+- fragmentów przesłanych dokumentów.
+
+Regresje mają pozostać niezależne i syntetyczne.
+
+## 5. Usuń unieważnioną macierz
 
 ```bash
 find tests/llm/vcr/cassettes \
@@ -121,9 +182,9 @@ find tests/llm/vcr/cassettes \
 find tests/llm/vcr/cassettes -mindepth 1 -print
 ```
 
-Ostatnie polecenie nie może zwrócić nic poza ewentualnym `.gitkeep` na właściwym poziomie. Nie pozostawiaj częściowej macierzy.
+Nie pozostawiaj częściowej macierzy.
 
-## 6. Nagraj całość od zera
+## 6. Nagraj wszystkie modele od zera
 
 ```bash
 export VCR_MODE=record
@@ -133,19 +194,24 @@ export OPENROUTER_API_KEY='...'
 
 Zasady:
 
-- nie zmieniaj modeli ani profili transportowych bez odtworzonego błędu i osobnej regresji;
+- nie zmieniaj modeli ani profili transportowych bez odtworzonego błędu i regresji;
 - nie osłabiaj schema, parsera, oracle ani evaluatora;
-- nie edytuj odpowiedzi modelu ani wygenerowanej kasety;
-- nie ponawiaj błędu semantycznego tylko po to, aby uzyskać szczęśliwy wynik;
-- odrzucone płatne wywołania muszą pozostać ujęte w limicie kosztu.
+- nie edytuj odpowiedzi ani kaset;
+- nie ponawiaj błędu semantycznego tylko po to, aby uzyskać PASS;
+- odrzucone płatne wywołania ujmij w koszcie.
 
 ## 7. Obsługa odrzucenia
 
-1. Zachowaj `/tmp/ipbox_llm_rejected/<model>/`.
-2. Sklasyfikuj problem jako transport/provider, format, schema, semantyka, model albo kod/oracle.
-3. W raporcie podaj model, scenariusz, liczbę prób, koszt i dokładną przyczynę.
-4. Problem kodu lub oracle napraw testem deterministycznym przed kolejnym nagraniem całej unieważnionej macierzy.
-5. Problem modelu nie uprawnia do ręcznej korekty odpowiedzi ani zmiany oczekiwanego wyniku.
+Dla każdego odrzucenia zachowaj `/tmp/ipbox_llm_rejected/<model>/` i sklasyfikuj problem jako:
+
+- transport/provider;
+- format;
+- schema;
+- semantyka;
+- model;
+- kod/oracle.
+
+Problem kodu lub oracle napraw najpierw testem deterministycznym. Każda taka zmiana może ponownie unieważnić całą macierz.
 
 ## 8. Pełna weryfikacja offline
 
@@ -163,38 +229,37 @@ pytest -q
 
 Playback nie może próbować połączenia z providerem i musi przejść bez sekretu.
 
-## 9. Wypchnij i sprawdź CI
+## 9. Push i CI
 
 ```bash
 git status --short
 git add tests/llm/vcr/cassettes
-git commit -m "test: regenerate cassettes after cost audit corrections"
+git commit -m "test: regenerate cassettes after final NEXUS cascade fix"
 git push origin fix/decouple-mix-allocation-from-w
 ```
 
 Po pushu:
 
-- poczekaj na pełny Deterministic CI dla Pythonów 3.11, 3.12 i 3.13;
-- potwierdź, że Python 3.13 wykonał kompletną bramkę i playback offline;
-- wywołaj świeże `@coderabbitai review` dla aktualnego HEAD;
-- rozwiąż wyłącznie zasadne uwagi i po każdej zmianie sprawdź, czy fingerprinty znów nie zostały unieważnione.
+1. poczekaj na Deterministic CI dla Pythonów 3.11, 3.12 i 3.13;
+2. potwierdź pełny playback offline w jobie 3.13;
+3. wywołaj `@coderabbitai review` dla aktualnego HEAD;
+4. nie zmieniaj kodu po nagraniu bez ponownej kontroli fingerprintów.
 
 ## Kryteria odbioru
 
-- dokładnie 46 scenariuszy;
-- dokładnie 46/46 dla każdego z siedmiu modeli;
-- dokładnie 322 kasety i 7 manifestów;
+- 46 scenariuszy;
+- 46/46 dla każdego z siedmiu modeli;
+- 322 kasety i 7 manifestów;
 - `all_complete_and_valid=true`;
 - zero substytucji modelu;
-- zero błędnych `finish_reason`;
+- `finish_reason=stop` dla każdej kasety;
 - zero skrzyżowanych STOP/REVIEW;
+- zero brakujących i osieroconych plików;
 - zero niespójnych request hashy i fingerprintów;
-- brak osieroconych lub brakujących kaset;
-- playback przechodzi bez `OPENROUTER_API_KEY`;
-- pełny `pytest -q` przechodzi;
-- Deterministic CI jest zielony na Pythonie 3.11, 3.12 i 3.13;
-- wszystkie świeże uwagi review do bieżącego HEAD są rozwiązane;
-- PR pozostaje draftem do czasu niezależnego werdyktu `READY`.
+- playback bez `OPENROUTER_API_KEY`;
+- pełny `pytest -q` i coverage powyżej 90%;
+- zielony CI 3.11–3.13;
+- świeże review bez nierozwiązanych blockerów.
 
 ## Raport końcowy
 
@@ -202,16 +267,15 @@ Podaj:
 
 - HEAD przed i po nagraniu;
 - wersje Pythona i narzędzi;
-- liczbę testów oraz coverage `python_helper`;
-- wynik każdej regresji krytycznej z punktu 3;
-- 46/46 dla każdego modelu;
+- liczbę testów oraz coverage;
+- wyniki scenariuszy 29, 30, 32, 39, 49, 50, 52 i 55;
+- wynik testu niejednoznacznego W i `REVIEW_18`;
+- 46/46 per model;
 - liczbę kaset i manifestów;
-- retry i odrzucenia per model/scenariusz;
-- całkowity koszt;
-- wynik `check_cassette_policy.py`, `benchmark_report.py` i `vcr_precommit.py`;
+- retry, odrzucenia i koszt;
+- wyniki trzech skryptów VCR;
 - wynik playbacku bez sekretu;
-- wynik CI;
-- wynik świeżego review;
-- werdykt `READY` albo `NOT READY` wraz z blockerami.
+- wynik CI i CodeRabbit;
+- werdykt `READY` albo `NOT READY` z dokładnymi blockerami.
 
 Nie merguj PR i nie przełączaj go z draftu bez osobnej zgody.
