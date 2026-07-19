@@ -34,11 +34,42 @@ def number(value: Any, name: str) -> float:
     return result
 
 
-def w_method(input_data: dict[str, Any]) -> str:
-    raw: Any = input_data.get("metoda_W", "conditional_product")
+def _explicit_w_method(input_data: dict[str, Any]) -> Any | None:
+    """Return an explicitly supplied W method without inventing a fallback."""
+    if input_data.get("metoda_W") is not None:
+        return input_data["metoda_W"]
     policy = input_data.get("polityka_alokacji")
     if isinstance(policy, dict) and isinstance(policy.get("W"), dict):
-        raw = policy["W"].get("metoda", raw)
+        return policy["W"].get("metoda")
+    return None
+
+
+def _w_inputs_are_ambiguous(input_data: dict[str, Any]) -> bool:
+    """Detect a month where time and invoice modifiers both change the result."""
+    for month in input_data.get("miesiace", []) or []:
+        if not isinstance(month, dict):
+            continue
+        evidence = month_evidence(month)
+        if evidence is None:
+            continue
+        non_ip = number(evidence.get("godziny_nie_IP", 0), "godziny_nie_IP")
+        percentage = number(evidence.get("procent_faktury_IP", 100), "procent_faktury_IP")
+        if non_ip != 0 and percentage != 100:
+            return True
+    return False
+
+
+def w_method(input_data: dict[str, Any]) -> str:
+    """Resolve W semantics and fail closed when two active modifiers conflict."""
+    raw = _explicit_w_method(input_data)
+    if raw is None:
+        if _w_inputs_are_ambiguous(input_data):
+            raise ScenarioError(
+                "polityka_alokacji.W.metoda is required when non-IP hours and "
+                "invoice percentage both affect the allocation"
+            )
+        # If at most one modifier is active, all supported formulae coincide.
+        return "conditional_product"
     normalized = W_METHOD_ALIASES.get(str(raw), str(raw))
     if normalized not in set(W_METHOD_ALIASES.values()):
         raise ScenarioError(f"unsupported W semantics {raw!r}")
@@ -140,7 +171,9 @@ def prepare_cost_date_policy(input_data: dict[str, Any], shares: dict[str, float
                 continue
             method = str(revenue_policy.get("metoda"))
             key = (
-                shares.get(month_id, 0.0) if method == "czasowa_W" else revenue_policy.get("klucz")
+                shares.get(month_id, 0.0)
+                if method == "czasowa_W"
+                else revenue_policy.get("klucz")
             )
             split = (
                 float(money(invoice.get("kwota_IP", amount))) if method == "dokumentowa" else None
