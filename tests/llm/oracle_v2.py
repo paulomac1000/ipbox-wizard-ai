@@ -5,9 +5,9 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Any
 
+from python_helper import calculate_tax_for_year
 from python_helper.cost_audit import apply_cost_audit, validate_cost_policy
 from python_helper.ipbox_calculator import calculate_overpayment, tax_round
-from python_helper.tax_year_rules import calculate_tax_for_year
 
 from . import oracle as legacy
 from .allocation_guard import audit_facts
@@ -58,7 +58,13 @@ def validate_scenario(scenario: dict[str, Any]) -> None:
 def _tax_result(tax: Mapping[str, Any], signed_settlement: float) -> dict[str, Any]:
     return {
         "podstawa_IP": tax["ip_base_rounded"],
+        # Compatibility name: this is now the entire ordinary-rate base and may
+        # include the part of IP income not covered by NEXUS.
         "podstawa_NIE": tax["non_ip_base_rounded"],
+        "podstawa_zwykła": tax["ordinary_base_rounded"],
+        "dochód_IP_po_uldze_BR": tax["ip_income_after_rd"],
+        "dochód_IP_kwalifikowany": tax["qualified_ip_income"],
+        "dochód_IP_poza_preferencją": tax["ordinary_ip_income"],
         "podatek_IP": tax["ip_tax"],
         "podatek_NIE_finalny": tax["non_ip_tax_final"],
         "podatek_całościowy": tax["total_tax"],
@@ -165,7 +171,8 @@ def _reconcile_tax_fields(
         relief_adjustment_required = True
     if (
         claimed_total_tax is not None
-        and abs(number(claimed_total_tax, "uzgodnienie.total_tax") - float(tax["total_tax"])) > 0.01
+        and abs(number(claimed_total_tax, "uzgodnienie.total_tax") - float(tax["total_tax"]))
+        > 0.01
     ):
         warnings.append("RETURN_TOTAL_TAX_MISMATCH")
     if (
@@ -213,6 +220,7 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
     facts["source_kpir_requires_correction"] = (
         source_ledger_audit["status"] == "REQUIRES_CORRECTION"
     )
+    facts["nexus_evidence_missing"] = "NEXUS_EVIDENCE_MISSING" in cost_warnings
     social = input_data.get("zus", {}) if isinstance(input_data.get("zus"), dict) else {}
     health_in_kpir = bool(social.get("zdrowotna_w_KPiR", False))
     social_in_kpir = str(social.get("sposob", "brak")) == "w_KPiR"
@@ -289,14 +297,16 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
     base["result"]["podatek"] = _tax_result(tax, signed_settlement)
     base["tests"]["TEST_4"] = (
         "PASS"
-        if tax["non_ip_base_rounded"] >= 0 and tax["thermomodernization_carry_over"] >= 0
+        if tax["ordinary_base_rounded"] >= 0 and tax["thermomodernization_carry_over"] >= 0
         else "FAIL"
     )
     base["tests"]["TEST_5"] = (
         "PASS" if tax["ip_tax"] == tax_round(float(tax["ip_base_rounded"]) * 0.05) else "FAIL"
     )
     expected_total = tax_round(
-        float(tax["non_ip_tax_final"]) + float(tax["ip_tax"]) - float(tax["health_tax_credit_used"])
+        float(tax["non_ip_tax_final"])
+        + float(tax["ip_tax"])
+        - float(tax["health_tax_credit_used"])
     )
     base["tests"]["TEST_6"] = "PASS" if tax["total_tax"] == expected_total else "FAIL"
     base["status"] = "FINAL"
