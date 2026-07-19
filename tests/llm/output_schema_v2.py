@@ -25,6 +25,10 @@ for code in (
     if code not in _stop_codes:
         _stop_codes.append(code)
 
+_review_codes = DECISION_JSON_SCHEMA["schema"]["properties"]["reviews"]["items"]["enum"]
+if "REVIEW_18" not in _review_codes:
+    _review_codes.append("REVIEW_18")
+
 # The assembled report must enforce the same channel-specific code sets as the
 # small decision envelope. A generic CODE pattern here would let a tampered
 # report route REVIEW codes through stops even though live parsing rejects it.
@@ -42,14 +46,20 @@ if "przychodowa_w_dacie_kosztu" not in _mix_method:
 for field in ("źródło_ref", "rounding_granularity"):
     if field not in _mix["required"]:
         _mix["required"].append(field)
-_mix["properties"]["źródło_ref"] = {"anyOf": [{"type": "null"}, {"type": "string", "minLength": 1}]}
+_mix["properties"]["źródło_ref"] = {
+    "anyOf": [{"type": "null"}, {"type": "string", "minLength": 1}]
+}
 _mix["properties"]["rounding_granularity"] = {"enum": ["per_cost_item", "monthly_pool"]}
 
 _tax = _result["podatek"]
 for field in (
     "thermomodernization_used",
-    "termomodernization_expired",
+    "thermomodernization_expired",
     "health_tax_credit_used",
+    "podstawa_zwykła",
+    "dochód_IP_po_uldze_BR",
+    "dochód_IP_kwalifikowany",
+    "dochód_IP_poza_preferencją",
 ):
     if field not in _tax["required"]:
         _tax["required"].append(field)
@@ -71,10 +81,14 @@ _classification["properties"]["allocation_period"] = {
         {"type": "string", "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$"},
     ]
 }
-_classification["properties"]["rounding_granularity"] = {"enum": ["per_cost_item", "monthly_pool"]}
+_classification["properties"]["rounding_granularity"] = {
+    "enum": ["per_cost_item", "monthly_pool"]
+}
 _classification["properties"]["rounding_adjustment"] = deepcopy(legacy.MONEY)
 _classification["properties"]["nexus_evidence"] = {"type": "string"}
-_classification["properties"]["nexus_basis"] = {"enum": ["explicit_amount", "allocated_ip_cost"]}
+_classification["properties"]["nexus_basis"] = {
+    "enum": ["explicit_amount", "allocated_ip_cost"]
+}
 
 for field in ("source_ledger_audit", "correction_preview"):
     if field not in _report_root["required"]:
