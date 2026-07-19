@@ -87,6 +87,8 @@ Pełna procedura: [`docs/testing.md`](docs/testing.md). Dobór modeli i ogranicz
 
 ## Stan wydania
 
+Aktualny branch celowo zawiera pusty katalog kaset po usunięciu macierzy unieważnionej przez synchronizację autorytatywnego kontraktu. Czerwona bramka kompletności na Pythonie 3.13 jest oczekiwana do czasu jednego końcowego nagrania.
+
 Nie ufaj liczbie kaset zapisanej w dokumentacji ani wcześniejszemu raportowi. PR jest gotowy do merge wyłącznie wtedy, gdy aktualny HEAD spełnia jednocześnie:
 
 - 46/46 kaset dla każdego z siedmiu modeli, czyli dokładnie 322 aktualne nagrania i 7 manifestów;
