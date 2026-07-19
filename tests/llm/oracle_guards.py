@@ -38,6 +38,35 @@ def derive_decision_codes(facts: dict[str, bool]) -> tuple[set[str], set[str]]:
     return stops, reviews
 
 
+def _usable_allocation_evidence(month: dict[str, Any]) -> dict[str, float] | None:
+    """Return normalized W evidence only when it is safe to audit.
+
+    Missing or unusable evidence is handled by the primary oracle as STOP_08 or
+    another explicit fact. The secondary allocation audit must not replace that
+    deterministic STOP report with a raw ValueError.
+    """
+    evidence = month_evidence(month)
+    if not isinstance(evidence, dict):
+        return None
+    work_hours = number(evidence.get("godziny_pracy", 0), "godziny_pracy")
+    non_ip_hours = number(evidence.get("godziny_nie_IP", 0), "godziny_nie_IP")
+    invoice_percentage = number(
+        evidence.get("procent_faktury_IP", 100),
+        "procent_faktury_IP",
+    )
+    if work_hours <= 0:
+        return None
+    if non_ip_hours < 0 or non_ip_hours > work_hours:
+        return None
+    if invoice_percentage < 0 or invoice_percentage > 100:
+        return None
+    return {
+        "work_hours": work_hours,
+        "non_ip_hours": non_ip_hours,
+        "invoice_percentage": invoice_percentage,
+    }
+
+
 def audit_facts(
     scenario: dict[str, Any], result: dict[str, Any], method: str
 ) -> tuple[dict[str, bool], list[str]]:
@@ -46,19 +75,19 @@ def audit_facts(
     for month in input_data.get("miesiace", []) or []:
         if not isinstance(month, dict) or not isinstance(month.get("kontrola_alokacji"), dict):
             continue
+        evidence = _usable_allocation_evidence(month)
+        if evidence is None:
+            continue
         declared = month["kontrola_alokacji"]
         ip = number(declared.get("przychod_IP"), "kontrola.przychod_IP")
         total = sum((invoice_amount(invoice) for invoice in month_invoices(month)), 0.0)
-        evidence = month_evidence(month) or {}
         rows.append(
             {
                 "month": str(month.get("miesiac", "")),
                 "total_revenue": total,
                 "reported_ip_revenue": ip,
                 "reported_non_ip_revenue": declared.get("przychod_NIE", total - ip),
-                "work_hours": evidence.get("godziny_pracy", 0),
-                "non_ip_hours": evidence.get("godziny_nie_IP", 0),
-                "invoice_percentage": evidence.get("procent_faktury_IP", 100),
+                **evidence,
                 "w_method": method,
             }
         )
