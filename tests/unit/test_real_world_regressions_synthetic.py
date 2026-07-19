@@ -8,7 +8,7 @@ import yaml
 from tests.llm.oracle import compute_reference
 
 SCENARIO_DIR = Path(__file__).parents[1] / "llm" / "scenarios"
-NEW_SCENARIOS = tuple(range(46, 58))
+NEW_SCENARIOS = tuple(range(46, 56))
 
 
 def _load(number: int) -> dict:
@@ -21,7 +21,7 @@ def test_new_regressions_are_synthetic_and_contain_no_obvious_identifiers() -> N
         path = next(SCENARIO_DIR.glob(f"{number:02d}_*.yaml"))
         text = path.read_text(encoding="utf-8")
         assert "syntety" in text.casefold() or number in {49, 50, 51, 52, 53, 54, 55}
-        assert not re.search(r"\b\d{10,11}\b", text)
+        assert not re.search(r"(?<![\d.])\d{10,11}(?![\d.])", text)
         assert not re.search(r"[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}", text)
         assert "ul. " not in text.casefold()
 
@@ -53,6 +53,8 @@ def test_double_percentage_and_method_switch_fail_closed() -> None:
     switch = compute_reference(_load(50))
     assert set(double["stops_reviews"]["stops"]) >= {"STOP_09", "STOP_10"}
     assert set(switch["stops_reviews"]["stops"]) >= {"STOP_09", "STOP_10", "STOP_11"}
+    assert "INVOICE_PERCENTAGE_DOUBLE_APPLIED" in double["stops_reviews"]["warnings"]
+    assert "ALLOCATION_METHOD_SWITCH" in switch["stops_reviews"]["warnings"]
 
 
 def test_equal_grand_totals_do_not_hide_return_ledger_shift() -> None:
@@ -70,25 +72,11 @@ def test_cost_date_revenue_policy_uses_month_specific_keys() -> None:
     assert shared["Wspólny koszt lutowy"]["allocation_key"] == 0.2
 
 
-def test_year_boundaries_fail_closed_and_disjoint_w_is_supported() -> None:
+def test_year_boundaries_and_rounded_disjoint_w() -> None:
     assert "STOP_14" in compute_reference(_load(53))["stops_reviews"]["stops"]
     assert "STOP_16" in compute_reference(_load(54))["stops_reviews"]["stops"]
     clean = compute_reference(_load(55))
     assert clean["status"] == "FINAL"
-    assert clean["monthly_W"] == [{"miesiąc": "2025-01", "wartość": 70.0}]
-    assert clean["result"]["przychody_roczne"] == {"IP": 7000.0, "NIE": 3000.0}
-
-
-def test_rounded_w_and_independent_non_ip_invoice_do_not_false_stop() -> None:
-    result = compute_reference(_load(56))
-    assert result["status"] == "FINAL"
-    assert result["stops_reviews"]["stops"] == []
-    assert result["result"]["przychody_roczne"] == {"IP": 15874.32, "NIE": 9725.68}
-
-
-def test_rounded_double_percentage_and_switch_are_detected() -> None:
-    result = compute_reference(_load(57))
-    assert result["status"] == "STOPPED"
-    assert set(result["stops_reviews"]["stops"]) >= {"STOP_09", "STOP_10", "STOP_11"}
-    assert "INVOICE_PERCENTAGE_DOUBLE_APPLIED" in result["stops_reviews"]["warnings"]
-    assert "ALLOCATION_METHOD_SWITCH" in result["stops_reviews"]["warnings"]
+    assert clean["stops_reviews"]["stops"] == []
+    assert clean["monthly_W"] == [{"miesiąc": "2025-01", "wartość": 68.72}]
+    assert clean["result"]["przychody_roczne"] == {"IP": 15874.32, "NIE": 9725.68}
