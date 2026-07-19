@@ -1,7 +1,7 @@
 meta:
   id: 39_multi_project_weighted_W
   name: Ważona średnia W dla wielu projektów
-  description: Ważona średnia W dla wielu projektów
+  description: Ważona średnia W dla wielu projektów oraz niezależny audyt każdego strumienia.
   tags:
   - regression
   priority: P0
@@ -41,10 +41,19 @@ input:
         godziny: 100
         godziny_nie_IP: 10
         przychod: 15000
+        kontrola_alokacji:
+          przychod_IP: 13500
+          przychod_NIE: 1500
+          W: 90
       - nazwa: B
         godziny: 60
         godziny_nie_IP: 30
         przychod: 10000
+        kontrola_alokacji:
+          przychod_IP: 5000
+          przychod_NIE: 5000
+          W: 50
+    kontrola_alokacji: {}
     koszty:
     - opis: IDE
       kwota: 100
