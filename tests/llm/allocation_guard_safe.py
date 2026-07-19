@@ -19,7 +19,9 @@ def _positive_work_hours(evidence: Any) -> bool:
     if not isinstance(evidence, dict):
         return False
     try:
-        return number(evidence.get("godziny_pracy", evidence.get("work_hours", 0)), "work_hours") > 0
+        return (
+            number(evidence.get("godziny_pracy", evidence.get("work_hours", 0)), "work_hours") > 0
+        )
     except Exception:
         return False
 
