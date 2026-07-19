@@ -145,3 +145,43 @@ def test_missing_nexus_evidence_is_visible_review_not_silent_false() -> None:
     first = result["classifications"][0]
     assert first["nexus_basket"] == "poza_nexus"
     assert first["nexus_amount"] == 0.0
+
+
+def test_private_description_overrides_explicit_ip_basket() -> None:
+    scenario = _scenario(1)
+    scenario["input"]["miesiace"][0]["koszty"][0]["opis"] = "Kawa do domu"
+
+    result = compute_reference(scenario)
+
+    private = next(item for item in result["classifications"] if item["opis"] == "Kawa do domu")
+    assert private["basket"] == "WYKLUCZONE"
+    assert private["ip_amount"] == 0.0
+    assert private["non_ip_amount"] == 0.0
+    assert private["nexus_amount"] == 0.0
+    assert result["tests"]["TEST_2"] == "FAIL"
+
+
+def test_missing_evidence_with_allocation_control_preserves_stop_08() -> None:
+    scenario = _scenario(42)
+    scenario["input"]["miesiace"][0]["kontrola_alokacji"] = {
+        "przychod_IP": 20_000,
+        "przychod_NIE": 0,
+    }
+
+    result = compute_reference(scenario)
+
+    assert result["status"] == "STOPPED"
+    assert "STOP_08" in result["stops_reviews"]["stops"]
+
+
+def test_positive_fx_difference_is_included_in_kpir_revenue_balance() -> None:
+    scenario = _scenario(3)
+    scenario["input"]["podsumowanie_kpir"] = {
+        "przychody": 20_150,
+        "koszty": 500,
+    }
+
+    result = compute_reference(scenario)
+
+    assert result["tests"]["TEST_1"] == "PASS"
+    assert result["result"]["przychody_roczne"]["NIE"] == 150.0
