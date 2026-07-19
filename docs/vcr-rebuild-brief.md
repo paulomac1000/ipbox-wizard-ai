@@ -1,16 +1,21 @@
-# Brief: końcowa odbudowa kaset przed merge PR #2
+# Brief: końcowa odbudowa kaset po poprawce audytu precyzji
 
 ## Cel
 
-Pobrać najnowszy branch `fix/decouple-mix-allocation-from-w`, uruchomić wszystkie bramki deterministyczne i nagrać ostatnią kompletną macierz VCR od zera dla modeli z `tests/llm/models.py`.
+Pobrać branch `fix/decouple-mix-allocation-from-w`, potwierdzić nowe regresje zaokrąglonego W i audytu per strumień, a następnie nagrać kompletną macierz VCR od zera.
 
-Punkt docelowy: **46 scenariuszy × 7 modeli = 322 świeże kasety oraz 7 manifestów**.
+Punkt docelowy: **48 scenariuszy × 7 modeli = 336 świeżych kaset oraz 7 manifestów**.
 
-## Dlaczego poprzednie 322/322 nie są finalne
+## Dlaczego poprzednie 322 kasety są nieważne
 
-Macierz nagrana na HEAD `be22ebb` poprawnie przeszła semantykę i playback. Końcowy audyt wykrył jednak, że `ipbox_algorytm.md` nadal opisywał starszy protokół zamiast wykonywalnej koperty `expected_decision`. Plik algorytmu jest źródłem prawdy i częścią fingerprintu, więc jego synchronizacja celowo unieważnia wszystkie stare kasety.
+Zmieniły się:
 
-Nie kopiuj poprzednich odpowiedzi i nie aktualizuj ręcznie hashy ani fingerprintów.
+- autorytatywny `ipbox_algorytm.md`, którego hash wchodzi do fingerprintu;
+- oracle audytu alokacji;
+- scenariusz 39;
+- liczba scenariuszy — dodano 56 i 57.
+
+Nie kopiuj odpowiedzi, nie edytuj fingerprintów i nie próbuj zachować poprzednich kaset.
 
 ## Bramka przed płatnymi requestami
 
@@ -33,18 +38,27 @@ pytest -q
 for script in scripts/*.sh dump-to-md.sh; do bash -n "$script"; done
 ```
 
-Oczekuj co najmniej 256 testów jednostkowych PASS, coverage ponad 90% i 46 kontrolowanych skipów LLM. `check_cassette_policy.py` może przejść dla pustego katalogu, ale pełny merge gate pozostanie czerwony do czasu nagrania 322/322.
+Przed nagraniem potwierdź szczególnie:
+
+```bash
+pytest -q \
+  tests/unit/test_allocation_precision.py \
+  tests/unit/test_allocation_guard_streams.py \
+  tests/unit/test_real_world_regressions_synthetic.py
+```
+
+Oczekiwane zachowanie:
+
+- scenariusz 56 ma status `FINAL` i nie emituje `STOP_09`;
+- scenariusz 57 emituje co najmniej `STOP_09`, `STOP_10` i `STOP_11`;
+- scenariusz 39 audytuje oba projekty niezależnie;
+- dotychczasowe scenariusze pozostają zielone.
 
 ## Usuń unieważnione kasety
 
 ```bash
 find tests/llm/vcr/cassettes -mindepth 1 -maxdepth 1 -type d -exec rm -rf {} +
 find tests/llm/vcr/cassettes -maxdepth 1 -type f ! -name '.gitkeep' -delete
-```
-
-Sprawdź:
-
-```bash
 find tests/llm/vcr/cassettes -mindepth 1 -print
 ```
 
@@ -58,26 +72,17 @@ export OPENROUTER_API_KEY='...'
 ./scripts/record_all_models.sh --max-cost-usd 5
 ```
 
-Profile transportowe są już ustalone:
-
-- Claude Haiku używa `json_schema` z usuniętym `uniqueItems` wyłącznie w głębokiej kopii transportowej;
-- MiniMax używa `json_object` z pełną lokalną walidacją;
-- pozostałe modele używają pełnego `json_schema`.
-
-Nie zmieniaj tych profili bez nowego odtworzonego błędu i regresji.
+Nie zmieniaj profili transportowych bez odtworzonego błędu i osobnej regresji.
 
 ## Obsługa odrzucenia
 
-Przy odrzuceniu:
+1. Zachowaj `/tmp/ipbox_llm_rejected/<model>/`.
+2. Sklasyfikuj problem jako transport/provider, format, schema, semantyka, model albo kod/oracle.
+3. Nie edytuj odpowiedzi ani kasety.
+4. Nie osłabiaj schema, parsera, oracle ani evaluatora.
+5. Nie ponawiaj błędu semantycznego dla uzyskania szczęśliwego wyniku.
 
-1. zatrzymaj się i zachowaj `/tmp/ipbox_llm_rejected/<model>/`;
-2. sklasyfikuj problem jako transport/provider, format, schema, semantyka, model albo kod/oracle;
-3. nie edytuj odpowiedzi lub kasety;
-4. nie osłabiaj lokalnej schema i asercji;
-5. nie ponawiaj błędu semantycznego dla „szczęśliwego” wyniku;
-6. przy błędzie transportowym sprawdź, czy żadna kaseta nie powstała, zanim wznowisz brakujący model.
-
-## Końcowa weryfikacja offline
+## Weryfikacja offline
 
 ```bash
 python scripts/check_cassette_policy.py
@@ -86,36 +91,22 @@ python scripts/vcr_precommit.py --all-models
 unset OPENROUTER_API_KEY
 export VCR_MODE=playback
 ./scripts/verify_all_models.sh
+pytest tests/llm -q --run-llm
 ```
 
 ## Kryteria odbioru
 
-- liczba scenariuszy wynosi 46;
-- każdy z siedmiu modeli ma dokładnie 46 świeżych kaset i kompletny manifest;
-- łącznie istnieją dokładnie 322 kasety i 7 manifestów;
-- `benchmark_report.py` zwraca `all_complete_and_valid=true`;
-- zero starych modeli, dodatkowych katalogów i częściowych manifestów;
-- zero Markdown fences, substytucji modelu, błędnych `finish_reason`, skrzyżowanych STOP/REVIEW i niespójnych fingerprintów;
-- playback przechodzi po usunięciu `OPENROUTER_API_KEY`;
-- scenariusz 51 dla każdego modelu ma dokładnie `status=STOPPED`, `stops=[STOP_12]`, `reviews=[REVIEW_09]`;
-- git status jest czysty po commit/push;
-- `Deterministic CI` przechodzi na Pythonie 3.11, 3.12 i 3.13;
+- dokładnie 48 scenariuszy;
+- 48/48 dla każdego z siedmiu modeli;
+- dokładnie 336 kaset i 7 manifestów;
+- `all_complete_and_valid=true`;
+- zero substytucji modelu, błędnych `finish_reason`, skrzyżowanych STOP/REVIEW i niespójnych fingerprintów;
+- playback przechodzi bez `OPENROUTER_API_KEY`;
+- Deterministic CI przechodzi na Pythonie 3.11, 3.12 i 3.13;
 - job Python 3.13 wykonuje pełny raport i playback offline;
-- PR pozostaje niezmieniony po zatwierdzonym nagraniu poza aktualizacją opisu/statusu.
+- wszystkie świeże uwagi review do bieżącego HEAD są rozwiązane;
+- PR pozostaje draftem do czasu niezależnego werdyktu `READY`.
 
-## Wypchnięcie i raport
+## Raport końcowy
 
-Wypchnij kasety na ten sam branch. Nie twórz nowego PR i nie merguj.
-
-Raport końcowy ma zawierać:
-
-- HEAD;
-- wynik unit/coverage, pełnego suite i shell check;
-- liczbę scenariuszy, kaset i manifestów;
-- wynik 46/46 per model;
-- retry i odrzucenia wraz z klasyfikacją;
-- pełny koszt, łącznie z odrzuconymi requestami;
-- wynik `benchmark_report.py`, `vcr_precommit.py` i playbacku bez sekretu;
-- wynik CI dla Pythonów 3.11–3.13;
-- potwierdzenie, że PR nadal nie został zmergowany;
-- werdykt `READY` lub `NOT READY`.
+Podaj HEAD, testy, coverage, 48/48 per model, liczbę kaset i manifestów, retry/odrzucenia, całkowity koszt, wynik playbacku bez sekretu, wynik CI oraz werdykt `READY` lub `NOT READY`. Nie merguj PR.
