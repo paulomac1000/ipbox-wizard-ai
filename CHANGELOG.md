@@ -26,10 +26,18 @@
 - Kontrolę alokacji na poziomie niezależnej faktury lub projektu, z miesięcznym agregatem wyłącznie jako fallbackiem.
 - Walidację, że suma kontrolowanych strumieni odpowiada sumie faktur kwalifikujących się, a jawne faktury NIE-IP pozostają poza W.
 - Metodę MIX `przychodowa_w_dacie_kosztu` z kluczem właściwym dla miesiąca kosztu.
+- Jawne polityki zaokrąglania `per_cost_item` i `monthly_pool` oraz rozdział groszy metodą największych reszt.
+- `source_ledger_audit` rozróżniający poprawną KPiR, brak danych, rozbieżność i źródło wymagające korekty.
+- `correction_preview`, który przy korekcyjnym STOP-ie pokazuje poprawiony podatek, rozliczenie oraz wykorzystanie ulg bez odblokowania finalnego wyniku.
+- Kod `SOURCE_KPIR_REQUIRES_CORRECTION` dla wykluczonych wydatków pozostawionych w źródłowej KPiR.
+- Obowiązkowy `źródło_ref` dla polityki deklarowanej jako pochodząca z interpretacji KIS.
+- Dowód `nexus_evidence` i podstawę `nexus_basis` oddzielające kwalifikację KUP od kwalifikacji NEXUS.
 - Uzgodnienie ewidencji i zeznania osobno dla przychodów i kosztów IP/NIE, także gdy sumy globalne są identyczne.
+- Uzgodnienie wykorzystanej termomodernizacji, podatku łącznego i nadpłaty, gdy te wartości są dostępne w danych zeznania.
 - Rocznikowe pule termomodernizacji z kontrolą limitu 53 000 zł, kolejnością wykorzystania i wygaśnięciem po sześciu latach.
 - Rozliczenie korekty odróżniające poprawioną nadpłatę od zwrotu już wypłaconego.
 - Syntetyczne scenariusze LLM/VCR `46`–`55` odtwarzające klasy błędów znalezionych w rozliczeniach rzeczywistych bez kopiowania danych podatnika.
+- Syntetyczne rozszerzenia scenariuszy 32 i 52 dla korekty KPiR oraz miesięcznej puli zaokrągleń.
 - Test blokujący oczywiste identyfikatory osobowe w nowych scenariuszach regresyjnych.
 - Dokumentację historycznych źródeł, regresji rzeczywistych oraz brief pełnej odbudowy kaset.
 
@@ -39,6 +47,11 @@
 - Poprawiono NEXUS z `(A×1,3+B)` na `((A+B)×1,3)`.
 - Nieudokumentowane IDE, chmura, sprzęt i repozytoria nie są automatycznie kosztami IP.
 - Niesklasyfikowany zakup powyżej 10 000 zł jest wyłączany do udokumentowania odpisu.
+- Jawne `KUP: false` zawsze usuwa wydatek z kosztów IP i NIE zamiast przenosić go do `NON`.
+- Wyłączenie kosztu z kalkulacji nie ukrywa już konieczności korekty źródłowej KPiR.
+- Koszt NEXUS bez osobnego dowodu nie trafia automatycznie do A/B/C/D; jest raportowany jako `poza_nexus`.
+- Miesięczna pula MIX zachowuje dokładnie zaokrągloną kwotę źródłową, eliminując fałszywe różnice groszowe wynikające z zaokrąglania każdej pozycji osobno.
+- Niezmieniony podatek po korekcie jest raportowany jako warunkowy, jeżeli wymaga aktualizacji wykorzystanej ulgi.
 - Osobiste ulgi niedostępne przy podatku liniowym są odrzucane.
 - Ulga internetowa ma limit 760 zł, a zwykłe darowizny wspólny limit 6%.
 - Ulga B+R nie jest już błędnie ograniczona do dochodu NIE-IP.
@@ -79,7 +92,7 @@
 - Provider-specific ograniczenie schema jest obsługiwane wyłącznie w adapterze transportowym; źródłem prawdy pozostaje pełna lokalna schema.
 - Roczna metoda przychodowa odracza `MIX` do finalnego true-up.
 - Polityka W musi opisywać znaczenie procentu faktury względem godzin NIE-IP, zamiast zakładać jeden wzór dla wszystkich umów.
-- Polityka z interpretacji KIS jest oznaczana do przeglądu, a jej faktyczne wdrożenie jest porównywane z ewidencją.
+- Polityka z interpretacji KIS wymaga identyfikatora źródła, jest oznaczana do przeglądu, a jej faktyczne wdrożenie jest porównywane z ewidencją.
 - `strata_NIE_z_lat_poprzednich` dotyczy wyłącznie pozostałej działalności; straty IP wymagają ewidencji per prawo.
 - Działalność liniowa z dodatkowymi dochodami skali wymaga osobnej kaskady dla osobnego zeznania.
 - Kalkulator multi-IP wspiera podział wspólnych kosztów, ale nie udaje pełnej ewidencji PIT/IP per IP.
