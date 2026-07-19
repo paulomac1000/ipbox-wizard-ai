@@ -8,7 +8,7 @@ import yaml
 from tests.llm.oracle import compute_reference
 
 SCENARIO_DIR = Path(__file__).parents[1] / "llm" / "scenarios"
-NEW_SCENARIOS = tuple(range(46, 58))
+REGRESSION_SCENARIOS = (32, *range(46, 56))
 
 
 def _load(number: int) -> dict:
@@ -17,10 +17,10 @@ def _load(number: int) -> dict:
 
 
 def test_new_regressions_are_synthetic_and_contain_no_obvious_identifiers() -> None:
-    for number in NEW_SCENARIOS:
+    for number in REGRESSION_SCENARIOS:
         path = next(SCENARIO_DIR.glob(f"{number:02d}_*.yaml"))
         text = path.read_text(encoding="utf-8")
-        assert "syntety" in text.casefold() or number in {49, 50, 51, 52, 53, 54, 55}
+        assert "syntety" in text.casefold() or number in {49, 50, 51, 53, 54, 55}
         assert not re.search(r"(?<![\d.])\d{10,11}(?![\d.])", text)
         assert not re.search(r"[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}", text)
         assert "ul. " not in text.casefold()
@@ -63,13 +63,19 @@ def test_equal_grand_totals_do_not_hide_return_ledger_shift() -> None:
     assert "STOP_12" in result["stops_reviews"]["stops"]
 
 
-def test_cost_date_revenue_policy_uses_month_specific_keys() -> None:
+def test_monthly_pool_rounding_preserves_cents_and_nexus_evidence() -> None:
     result = compute_reference(_load(52))
     assert result["status"] == "FINAL"
+    assert result["stops_reviews"]["stops"] == []
+    assert result["result"]["koszty_roczne"]["IP"] == 100.0
+    assert result["result"]["koszty_roczne"]["NIE"] == 200.03
+    assert result["result"]["nexus_koszty"]["A"] == 100.0
     assert result["result"]["klucz_MIX"]["metoda"] == "przychodowa_w_dacie_kosztu"
-    shared = {item["opis"]: item for item in result["classifications"] if item["basket"] == "MIX"}
-    assert shared["Wspólny koszt styczniowy"]["allocation_key"] == 0.8
-    assert shared["Wspólny koszt lutowy"]["allocation_key"] == 0.2
+    assert result["result"]["klucz_MIX"]["źródło_ref"] == "SYNTHETIC-KIS-REFERENCE"
+    assert result["result"]["klucz_MIX"]["rounding_granularity"] == "monthly_pool"
+    assert [item["ip_amount"] for item in result["classifications"]] == [33.34, 33.33, 33.33]
+    assert sum(item["rounding_adjustment"] for item in result["classifications"]) == 0.01
+    assert all(item["nexus_evidence"] for item in result["classifications"])
 
 
 def test_year_boundaries_and_rounded_disjoint_w() -> None:
@@ -83,7 +89,7 @@ def test_year_boundaries_and_rounded_disjoint_w() -> None:
 
 
 def test_private_non_kup_produces_source_and_return_correction_preview() -> None:
-    result = compute_reference(_load(56))
+    result = compute_reference(_load(32))
     assert result["status"] == "STOPPED"
     assert set(result["stops_reviews"]["stops"]) == {
         "SOURCE_KPIR_REQUIRES_CORRECTION",
@@ -107,17 +113,3 @@ def test_private_non_kup_produces_source_and_return_correction_preview() -> None
     assert preview["corrected_overpayment"] == 4100.0
     assert preview["thermomodernization_used"] == 4000.0
     assert preview["thermomodernization_carry_over"] == 1000.0
-
-
-def test_monthly_pool_rounding_preserves_cents_and_nexus_evidence() -> None:
-    result = compute_reference(_load(57))
-    assert result["status"] == "FINAL"
-    assert result["stops_reviews"]["stops"] == []
-    assert result["result"]["koszty_roczne"]["IP"] == 100.0
-    assert result["result"]["koszty_roczne"]["NIE"] == 200.03
-    assert result["result"]["nexus_koszty"]["A"] == 100.0
-    assert result["result"]["klucz_MIX"]["źródło_ref"] == "SYNTHETIC-KIS-REFERENCE"
-    assert result["result"]["klucz_MIX"]["rounding_granularity"] == "monthly_pool"
-    assert [item["ip_amount"] for item in result["classifications"]] == [33.34, 33.33, 33.33]
-    assert sum(item["rounding_adjustment"] for item in result["classifications"]) == 0.01
-    assert all(item["nexus_evidence"] for item in result["classifications"])
