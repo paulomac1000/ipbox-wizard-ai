@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import copy
 import json
 from copy import deepcopy
 from pathlib import Path
@@ -104,6 +105,18 @@ class LLMTestRunner:
             "Do not return the financial report; the system attaches it deterministically.\n"
         )
 
+    @staticmethod
+    def _transport_schema(strip_unique: bool) -> dict[str, Any]:
+        """Return DECISION_JSON_SCHEMA, optionally stripping uniqueItems for provider compat."""
+        schema: dict[str, Any] = DECISION_JSON_SCHEMA
+        if strip_unique:
+            schema = copy.deepcopy(DECISION_JSON_SCHEMA)
+            _props = schema.get("schema", schema).get("properties", {})
+            for _key, _val in _props.items():
+                if isinstance(_val, dict) and _val.get("type") == "array":
+                    _val.pop("uniqueItems", None)
+        return schema
+
     def request_spec(self, prompt: str, config: VCRConfig) -> LLMRequestSpec:
         profile = config.profile
         if profile.response_format_type == "json_object":
@@ -114,7 +127,8 @@ class LLMTestRunner:
                 + json.dumps(DECISION_JSON_SCHEMA["schema"], ensure_ascii=False, indent=2)
             )
         else:
-            response_format = {"type": "json_schema", "json_schema": DECISION_JSON_SCHEMA}
+            transport = self._transport_schema(profile.strip_unique_items_for_transport)
+            response_format = {"type": "json_schema", "json_schema": transport}
             system_prompt = SYSTEM_PROMPT
         return LLMRequestSpec(
             provider=config.provider,
