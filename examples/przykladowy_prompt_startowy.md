@@ -41,4 +41,4 @@ Nie przedstawiaj wyniku jako porady podatkowej ani kompletnego zeznania.
 To materiał roboczy wymagający weryfikacji przez księgową lub doradcę podatkowego.
 ```
 
-W harnessie model nie dostaje pełnego zadania rachunkowego ani pełnej mapy faktów. Python ustala `decision_facts`, runner filtruje je do prawdziwych `active_rules` z gotowymi kodami, a model kopiuje wyłącznie te kody do `status/stops/reviews`.
+W harnessie model nie dostaje pełnego zadania rachunkowego ani faktów podatkowych. Python ustala `decision_facts`, buduje pełną kopertę `expected_decision`, a model kopiuje bez zmian wyłącznie `status`, `stops` i `reviews`.
