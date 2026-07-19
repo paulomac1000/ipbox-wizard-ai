@@ -8,6 +8,10 @@
 - Autorytatywną kopertę `expected_decision`, która nie pokazuje modelowi faktów podatkowych ani nie wymaga klasyfikowania kodów do kanałów.
 - Fail-closed oracle, evaluator, strict JSON Schema i VCR format 4.
 - Siedmiorodzinny benchmark tanich modeli; rozmiar macierzy jest wyliczany dynamicznie z liczby scenariuszy.
+- Jawne profile transportowe providerów, odseparowane od pełnej lokalnej schema i evaluatora.
+- Regresje gwarantujące, że adapter transportowy nie mutuje ani nie osłabia lokalnego kontraktu.
+- Automatyczną bramkę kompletności macierzy i pełny playback offline bez sekretu w standardowym CI na Pythonie 3.13.
+- Test zgodności dokumentacji kontraktu z wykonywalnym protokołem `expected_decision`.
 - Regresje dla wzoru NEXUS podwyższającego A+B.
 - Jawny podział ulgi B+R na część IP i NIE wraz z odliczeniem IP przed NEXUS.
 - Pełne połączenie działalności na skali z `dochody_dodatkowe_skala`.
@@ -54,27 +58,33 @@
 - Parser odrzuca Markdown fences zamiast naprawiać odpowiedź modelu.
 - Decision JSON Schema ma oddzielne enumy STOP i REVIEW oraz odrzuca kody w niewłaściwym kanale przed oceną semantyczną.
 - Profil MiniMax używa temperatury `0.0`; scenariusz 51 ma regresję dokładnej koperty `STOP_12` + `REVIEW_09`.
+- Claude Haiku używa provider-compatible kopii JSON Schema bez nieobsługiwanego `uniqueItems`, przy zachowaniu pełnej lokalnej walidacji.
+- MiniMax używa jawnego transportu `json_object`, gdy routing DigitalOcean zwraca `content: null` dla `json_schema`; odpowiedź nadal przechodzi pełną local schema i evaluator.
+- Profile transportowe są walidowane fail-closed i nie pozwalają łączyć sprzecznych ustawień.
 - Manifest jest porównywany z kasetą także dla `returned_model`, `recorded_at` i kosztu.
 - Recorder odrzuca podmianę zwróconego modelu i wlicza odrzucone płatne wywołania do limitu kosztu.
 - Walidacja wiąże każdy miesiąc z rokiem rozliczenia i egzekwuje limit termomodernizacji 53 000 zł.
+- Dokumentacja źródeł prawdy została zsynchronizowana z wykonywalną kopertą `expected_decision`; starsze opisy `active_rules` są blokowane regresją.
 - Workflowy używają minimalnych uprawnień i `persist-credentials: false`.
 
 ### Changed
 
-- Standardowy CI jest bezpłatny i działa na Pythonie 3.11–3.13.
+- Standardowy CI jest bezpłatny w zakresie requestów i działa na Pythonie 3.11–3.13; na Pythonie 3.13 wymaga kompletnej commitowanej macierzy i wykonuje playback offline.
+- Provider-specific ograniczenie schema jest obsługiwane wyłącznie w adapterze transportowym; źródłem prawdy pozostaje pełna lokalna schema.
 - Roczna metoda przychodowa odracza `MIX` do finalnego true-up.
 - Polityka W musi opisywać znaczenie procentu faktury względem godzin NIE-IP, zamiast zakładać jeden wzór dla wszystkich umów.
 - Polityka z interpretacji KIS jest oznaczana do przeglądu, a jej faktyczne wdrożenie jest porównywane z ewidencją.
 - `strata_NIE_z_lat_poprzednich` dotyczy wyłącznie pozostałej działalności; straty IP wymagają ewidencji per prawo.
 - Działalność liniowa z dodatkowymi dochodami skali wymaga osobnej kaskady dla osobnego zeznania.
 - Kalkulator multi-IP wspiera podział wspólnych kosztów, ale nie udaje pełnej ewidencji PIT/IP per IP.
-- Kasety VCR po tej zmianie muszą zostać zbudowane od zera dla całej macierzy; stara macierz jest niezgodna z nowym oracle i schema.
+- Każda zmiana autorytatywnego algorytmu, scenariusza, requestu, profilu modelu lub schema unieważnia odpowiednie fingerprinty i wymaga ponownego nagrania.
 
 ### Removed
 
 - Wpływ `meta.expected_reviews` na prawdę oracle.
 - Pełny raport finansowy w odpowiedzi LLM.
 - Pełna mapa aktywnych i nieaktywnych faktów w promptcie modelu.
+- Transformacja listy aktywnych kodów do kanałów przez model.
 - Historyczne, częściowe i semantycznie niepoprawne kasety poprzednich kontraktów.
 - VCR auto, nadpisywanie `--force`, aliasy Gemini i live fallback z playbacku.
 - Założenie, że jedyny poprawny wzór W to iloczyn czasu i procentu faktury.
