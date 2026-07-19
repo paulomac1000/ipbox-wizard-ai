@@ -24,6 +24,7 @@ STOP_FACT_TO_CODE = {
     "year_limit_exceeded": "STOP_14",
     "health_deduction_mode_invalid_for_year": "STOP_15",
     "unsupported_tax_year": "STOP_16",
+    "source_kpir_requires_correction": "SOURCE_KPIR_REQUIRES_CORRECTION",
 }
 REVIEW_FACT_TO_CODE = dict(legacy.REVIEW_FACT_TO_CODE)
 
@@ -162,6 +163,7 @@ def zero_after_stop(reference: dict[str, Any]) -> None:
         "podatek_NIE_finalny": 0,
         "podatek_całościowy": 0,
         "nadpłata_lub_dopłata": 0.0,
+        "thermomodernization_used": 0.0,
         "termomodernization_carry_over": 0.0,
         "termomodernization_expired": 0.0,
         "health_tax_credit_used": 0.0,
