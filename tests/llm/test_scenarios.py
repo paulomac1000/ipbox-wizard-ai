@@ -19,11 +19,9 @@ def discover_scenarios() -> list[pytest.ParameterSet]:
     requested = os.environ.get("IPBOX_SCENARIO")
     paths = sorted(SCENARIO_DIR.glob("*.yaml"))
     if requested:
-        paths = [
-            path for path in paths if path.stem == requested or path.stem.startswith(requested)
-        ]
+        paths = [path for path in paths if path.stem == requested]
         if not paths:
-            raise RuntimeError(f"IPBOX_SCENARIO matched no scenarios: {requested}")
+            raise RuntimeError(f"IPBOX_SCENARIO matched no exact scenario: {requested}")
     return [pytest.param(path, id=path.stem) for path in paths]
 
 
