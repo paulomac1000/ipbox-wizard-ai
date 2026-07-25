@@ -10,7 +10,7 @@ permissions:
 
 concurrency:
   group: apply-audit-fixes-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   apply-and-record:
@@ -41,12 +41,17 @@ jobs:
           git apply /tmp/audit.patch
           rm -rf tests/llm/vcr/cassettes
           mkdir -p tests/llm/vcr/cassettes
+      - name: Format and lint audited code
+        run: |
+          set -euo pipefail
+          ruff format .
+          ruff check --fix .
+          ruff format --check .
+          ruff check .
       - name: Deterministic gates before paid calls
         run: |
           set -euo pipefail
           test -n "$OPENROUTER_API_KEY" || { echo "::error::missing OPENROUTER_API_KEY"; exit 1; }
-          ruff format --check .
-          ruff check .
           python -m compileall -q python_helper tests scripts
           pytest tests/unit --cov=python_helper --cov-report=term-missing --cov-fail-under=90
           pytest -q
