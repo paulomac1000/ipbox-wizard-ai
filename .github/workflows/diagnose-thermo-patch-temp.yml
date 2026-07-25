@@ -1,4 +1,4 @@
-name: Diagnose thermomodernization patch generator
+name: Publish verified thermomodernization audit patch
 
 on:
   pull_request:
@@ -6,27 +6,37 @@ on:
       - main
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
-  group: diagnose-thermo-patch-${{ github.head_ref || github.ref_name }}
+  group: publish-thermo-patch-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
 
 jobs:
-  diagnose:
+  verify-and-publish:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.head_ref || github.ref_name }}
-          persist-credentials: false
+          fetch-depth: 0
+          persist-credentials: true
 
-      - name: Run generator with traceback capture
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements-test.txt
+
+      - name: Install dependencies
+        run: pip install -q -r requirements.txt -r requirements-test.txt
+
+      - name: Apply generator as repository data
         run: |
-          set +e
-          mkdir -p reports
-          python - <<'PYRUN' > reports/patch-generator.txt 2>&1
+          python - <<'PYRUN'
           from pathlib import Path
           import re
           import textwrap
@@ -48,18 +58,47 @@ jobs:
           script = textwrap.dedent(match.group(1))
           exec(compile(script, "<debug-patch>", "exec"), {})
           PYRUN
-          printf '%s\n' "$?" > reports/patch-generator-status.txt
-          exit 0
 
-      - name: Upload generator diagnostics
-        uses: actions/upload-artifact@v4
-        with:
-          name: thermo-generator-${{ github.sha }}
-          path: reports/
-          if-no-files-found: error
-          retention-days: 1
-
-      - name: Enforce generator
+      - name: Format, lint, and compile
         run: |
-          cat reports/patch-generator.txt
-          test "$(cat reports/patch-generator-status.txt)" -eq 0
+          set -euo pipefail
+          ruff format .
+          ruff check --fix .
+          ruff format --check .
+          ruff check .
+          python -m compileall -q python_helper tests scripts
+
+      - name: Unit tests with coverage
+        run: pytest tests/unit --cov=python_helper --cov-report=term-missing --cov-fail-under=90
+
+      - name: Full free suite
+        run: pytest -q
+
+      - name: Shell syntax and diff checks
+        run: |
+          set -euo pipefail
+          for script in scripts/*.sh dump-to-md.sh; do bash -n "$script"; done
+          git diff --check
+
+      - name: Publish verified code patch
+        run: |
+          set -euo pipefail
+          git add \
+            python_helper/tax_year_rules.py \
+            python_helper/tax_cascade.py \
+            tests/llm/oracle.py \
+            tests/llm/oracle_guards.py \
+            tests/llm/output_schema.py \
+            tests/llm/scenarios/27_termomodernizacja_full.yaml \
+            tests/llm/scenarios/28_edge_multiple_carry-overs.yaml \
+            tests/llm/scenarios/48_historical_2024_pit_like_cascade.yaml \
+            tests/unit/test_tax_year_rules.py \
+            tests/unit/test_final_audit_regressions.py \
+            tests/unit/test_scenarios_and_evaluator.py \
+            tests/unit/test_vcr_and_client.py \
+            docs/historical-tax-rules.md
+          test -n "$(git diff --cached --name-only)"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "fix: make relief evidence and recording budgets auditable"
+          git push origin "HEAD:${GITHUB_HEAD_REF:-$GITHUB_REF_NAME}"
