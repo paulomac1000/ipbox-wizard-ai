@@ -1,6 +1,9 @@
 name: Source snapshot for final audit
 
 on:
+  pull_request:
+    branches:
+      - main
   push:
     branches:
       - fix/decouple-mix-allocation-from-w
@@ -14,6 +17,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ github.head_ref || github.ref_name }}
           persist-credentials: false
       - name: Archive exact tracked source
         run: git archive --format=zip --output=source-snapshot.zip HEAD
