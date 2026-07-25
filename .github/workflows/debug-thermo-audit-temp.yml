@@ -57,6 +57,32 @@ jobs:
               raise SystemExit("Cannot extract audited patch definition")
           script = textwrap.dedent(match.group(1))
           exec(compile(script, "<audited-patch>", "exec"), {})
+
+          target = Path("tests/unit/test_final_audit_regressions.py")
+          text = target.read_text(encoding="utf-8")
+          broken_meta = 'path.write_text("meta: {}' + "\n" + '", encoding="utf-8")'
+          fixed_meta = 'path.write_text("meta: {}\\n", encoding="utf-8")'
+          broken_cassette = (
+              '"meta:'
+              + "\n"
+              + "  cost: 0.20"
+              + "\n"
+              + "response: ok"
+              + "\n"
+              + "parsed_response: {}"
+              + "\n"
+              + '"'
+          )
+          fixed_cassette = '"meta:\\n  cost: 0.20\\nresponse: ok\\nparsed_response: {}\\n"'
+          if broken_meta not in text or broken_cassette not in text:
+              raise SystemExit("Expected generated newline-literal defects were not found")
+          target.write_text(
+              text.replace(broken_meta, fixed_meta).replace(
+                  broken_cassette,
+                  fixed_cassette,
+              ),
+              encoding="utf-8",
+          )
           PYRUN
 
       - name: Capture Ruff format diagnostics
