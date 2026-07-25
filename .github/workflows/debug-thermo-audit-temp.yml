@@ -1,0 +1,108 @@
+name: Debug and publish thermomodernization audit fixes
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+concurrency:
+  group: debug-thermo-audit-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  patch-test-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
+          fetch-depth: 0
+          persist-credentials: true
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements-test.txt
+
+      - name: Install dependencies
+        run: pip install -q -r requirements.txt -r requirements-test.txt
+
+      - name: Reuse audited patch definition
+        run: |
+          python - <<'PYRUN'
+          from pathlib import Path
+          import re
+          import textwrap
+
+          workflow = Path(".github/workflows/apply-thermo-audit-temp.yml").read_text(
+              encoding="utf-8"
+          )
+          match = re.search(
+              r"      - name: Apply audited patch\n"
+              r"        run: \|\n"
+              r"          python - <<'PY'\n"
+              r"(.*?)\n"
+              r"          PY\n",
+              workflow,
+              re.DOTALL,
+          )
+          if match is None:
+              raise SystemExit("Cannot extract audited patch definition")
+          script = textwrap.dedent(match.group(1))
+          exec(compile(script, "<audited-patch>", "exec"), {})
+          PYRUN
+
+      - name: Ruff format
+        run: |
+          ruff format .
+          ruff format --check .
+
+      - name: Ruff lint
+        run: |
+          ruff check --fix .
+          ruff check .
+
+      - name: Compile Python
+        run: python -m compileall -q python_helper tests scripts
+
+      - name: Unit tests with coverage
+        run: pytest tests/unit --cov=python_helper --cov-report=term-missing --cov-fail-under=90
+
+      - name: Full free suite
+        run: pytest -q
+
+      - name: Shell syntax and diff checks
+        run: |
+          set -euo pipefail
+          for script in scripts/*.sh dump-to-md.sh; do bash -n "$script"; done
+          git diff --check
+
+      - name: Publish verified code patch
+        run: |
+          set -euo pipefail
+          git add \
+            python_helper/tax_year_rules.py \
+            python_helper/tax_cascade.py \
+            tests/llm/oracle.py \
+            tests/llm/oracle_guards.py \
+            tests/llm/output_schema.py \
+            tests/llm/scenarios/27_termomodernizacja_full.yaml \
+            tests/llm/scenarios/28_edge_multiple_carry-overs.yaml \
+            tests/unit/test_tax_year_rules.py \
+            tests/unit/test_final_audit_regressions.py \
+            docs/historical-tax-rules.md
+          if git diff --cached --quiet; then
+            echo "Patch already applied"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "fix: make relief evidence and recording budgets auditable"
+          git push origin "HEAD:${GITHUB_HEAD_REF:-$GITHUB_REF_NAME}"
