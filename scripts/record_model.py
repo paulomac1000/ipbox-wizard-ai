@@ -300,8 +300,10 @@ def main() -> int:
             rejected_root,
             since=session_started_at,
         )
-        if code or _budget_exceeded(args.model, model_paid, per_model_limit) or _budget_exceeded(
-            "whole recording session", total_paid, total_limit
+        if (
+            code
+            or _budget_exceeded(args.model, model_paid, per_model_limit)
+            or _budget_exceeded("whole recording session", total_paid, total_limit)
         ):
             failures.append(path.stem)
             break
@@ -326,7 +328,9 @@ def main() -> int:
     )
     if failures:
         print("Failed scenarios:", ", ".join(sorted(set(failures))), file=sys.stderr)
-        print("Inspect VCR_REJECTED_ROOT and rerun only the exact missing scenario.", file=sys.stderr)
+        print(
+            "Inspect VCR_REJECTED_ROOT and rerun only the exact missing scenario.", file=sys.stderr
+        )
         return 1
     return 0
 
