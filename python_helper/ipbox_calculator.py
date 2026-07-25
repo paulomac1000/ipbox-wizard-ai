@@ -414,6 +414,8 @@ def classify_cost(
         if health_insurance_in_kpir:
             return replace(item, basket="MIX", note="Health contribution in KPiR")
         return replace(item, basket="WYKLUCZONE", note="Health contribution handled outside costs")
+    if item.basket:
+        return item
     if has_non_deductible_description_signal(description):
         return replace(
             item,
@@ -423,8 +425,6 @@ def classify_cost(
                 "Require explicit KUP=false or verified statutory classification to exclude it"
             ),
         )
-    if item.basket:
-        return item
     if item.amount > asset_threshold:
         return replace(
             item,

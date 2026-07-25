@@ -145,3 +145,14 @@ def test_ambiguous_asset_and_tool_require_explicit_policy() -> None:
     assert tool.basket == "MIX"
     assert "depreciation" in asset.note.lower()
     assert "documented" in tool.note.lower()
+
+
+def test_description_signal_does_not_override_explicit_cost_classification() -> None:
+    explicit = CostItem(
+        "Kawa do domu — koszt zweryfikowany dokumentem",
+        100,
+        basket="IP",
+        allocation_source="verified-cost-ledger",
+    )
+
+    assert classify_cost(explicit, False, False) is explicit
