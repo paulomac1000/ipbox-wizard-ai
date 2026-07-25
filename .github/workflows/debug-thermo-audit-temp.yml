@@ -59,10 +59,29 @@ jobs:
           exec(compile(script, "<audited-patch>", "exec"), {})
           PYRUN
 
-      - name: Ruff format
+      - name: Capture Ruff format diagnostics
         run: |
-          ruff format .
+          set +e
+          mkdir -p reports
+          ruff format . > reports/ruff-format.txt 2>&1
+          printf '%s\n' "$?" > reports/ruff-format-status.txt
+          exit 0
+
+      - name: Upload Ruff diagnostics
+        uses: actions/upload-artifact@v4
+        with:
+          name: thermo-ruff-${{ github.sha }}
+          path: reports/
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Enforce Ruff format
+        run: |
+          set -euo pipefail
+          cat reports/ruff-format.txt
+          test "$(cat reports/ruff-format-status.txt)" -eq 0
           ruff format --check .
+          rm -rf reports
 
       - name: Ruff lint
         run: |
