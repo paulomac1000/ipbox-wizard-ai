@@ -2,7 +2,7 @@
 
 Deterministyczny-first wizard wspierający przygotowanie danych do rozliczenia IP Box programisty B2B.
 
-> To nie jest porada podatkowa ani generator gotowego zeznania. Wynik wymaga sprawdzenia z księgową lub doradcą. Audyt techniczny i semantyczny wykonano 25 lipca 2026 r.; reguły podatkowe są jawnie wersjonowane dla wszystkich lat obowiązywania IP Box 2019–2026.
+> To nie jest porada podatkowa ani generator gotowego zeznania. Wynik wymaga sprawdzenia z księgową lub doradcą. Audyt techniczny i semantyczny wykonano 25 lipca 2026 r.; reguły podatkowe są jawnie przypisane do wszystkich lat obowiązywania IP Box 2019–2026.
 
 ## Architektura
 
@@ -30,15 +30,14 @@ Najważniejszy invariant z issue #1: **przychód IP/NIE, alokacja kosztów pośr
 - `strata_NIE_z_lat_poprzednich` dotyczy wyłącznie pozostałej działalności. Straty kwalifikowanego IP wymagają osobnej ewidencji per IP.
 - Działalność na skali łączy `dochody_dodatkowe_skala` z pozostałym dochodem skali i liczy pełny podatek od wspólnej podstawy.
 - Działalność liniowa i dodatkowe dochody na skali wymagają dwóch odrębnych kaskad/zeznań; oracle odmawia ich mieszania.
-- Limity zdrowotnej i IKZE są wersjonowane per rok; nieznany rok z dodatnim odliczeniem kończy się błędem.
+- Limity zdrowotnej i IKZE są przypisane per rok; nieznany rok z dodatnim odliczeniem kończy się błędem.
 - Miesiąc musi mieć ścisły format `YYYY-MM` i rok zgodny z `input.rok`.
-- Pula ulgi termomodernizacyjnej nie może przekroczyć 53 000 zł na podatnika.
+- Limit termomodernizacji pochodzi z reguł roku. Dodatni lot wymaga `origin_year` i niepustego `evidence_ref`; zbiorcza `termomodernizacja_pula` jest wyłącznie trybem zgodnościowym `PROVISIONAL` z `REVIEW_22`.
 - Odpowiedź z modelem innym niż żądany jest odrzucana podczas live runu, playbacku i pre-commit.
 - Brak kursu, daty płatności, dowodu kwalifikacji lub ujemna faktura jest błędem danych, nie wartością zero.
 - Rok i flagi kwalifikacji mają ścisłe typy; stringi nie są konwertowane na boolean ani rok.
 - Metoda `dokumentowa` wymaga jawnego `kwota_IP` albo `całość_IP: true`.
 - Opis wydatku może utworzyć sygnał do przeglądu, ale nie ustala samodzielnie `KUP: false`.
-
 
 ## Kompletność i reprodukowalność
 
@@ -86,12 +85,16 @@ Benchmark używa siedmiu modeli z siedmiu niezależnych rodzin:
 
 To jest **test przenośności protokołu**, nie dowód poprawności podatkowej i nie matematyczna gwarancja zachowania każdego mocniejszego modelu. Jeżeli małe modele różnych dostawców przechodzą identyczny lokalny kontrakt bez naprawiania odpowiedzi, rośnie wiarygodność, że interfejs jest jednoznaczny i niezależny od jednej rodziny. Prawdą podatkową nadal pozostają Python, oracle i testy deterministyczne.
 
-Nagrywanie jest jawne i płatne:
+Nagrywanie jest jawne i płatne. Wybór scenariusza jest dokładny, a koszty zaakceptowanych i odrzuconych odpowiedzi wliczają się do limitu przebiegu:
 
 ```bash
 export OPENROUTER_API_KEY='...'
-./scripts/record_all_models.sh --max-cost-usd 5
+./scripts/record_all_models.sh \
+  --max-cost-per-model-usd 5 \
+  --max-total-cost-usd 5
 ```
+
+Ręczny workflow `Paid multi-model LLM benchmark` wymaga wpisania tekstu potwierdzenia oraz podania obu limitów. Standardowy CI nigdy nie wykonuje płatnych requestów. Limit globalny jest sprawdzany przed i po każdym requestcie; ponieważ provider raportuje koszt po odpowiedzi, pojedyncza odpowiedź może przekroczyć próg, lecz po jej zaksięgowaniu żaden kolejny request nie zostanie uruchomiony.
 
 Pełna procedura: [`docs/testing.md`](docs/testing.md). Dobór modeli i ograniczenia wnioskowania: [`docs/model-diversity-benchmark.md`](docs/model-diversity-benchmark.md). Niezależny audyt: [`docs/independent-audit-brief.md`](docs/independent-audit-brief.md).
 
@@ -101,7 +104,7 @@ Pełna procedura: [`docs/testing.md`](docs/testing.md). Dobór modeli i ogranicz
 
 ## Stan wydania
 
-Macierz VCR obejmuje 46 scenariuszy dla siedmiu rodzin modeli, czyli dokładnie 322 kasety i 7 manifestów. Jej aktualność nie wynika z tekstu dokumentacji: fingerprinty wiążą kasety z algorytmem, scenariuszem, requestem, schemą i profilem modelu, a CI odrzuca stan niepełny lub nieaktualny.
+Docelowa macierz VCR obejmuje 46 scenariuszy dla siedmiu rodzin modeli, czyli dokładnie 322 kasety i 7 manifestów. Jej aktualność nie wynika z tekstu dokumentacji: fingerprinty wiążą kasety z algorytmem, scenariuszem, requestem, schemą i profilem modelu, a CI odrzuca stan niepełny lub nieaktualny.
 
 PR jest gotowy do merge wyłącznie wtedy, gdy aktualny HEAD spełnia jednocześnie:
 
