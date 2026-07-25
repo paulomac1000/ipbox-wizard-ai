@@ -31,7 +31,10 @@ input:
   - nazwa: ClientA
     klauzula_IP: true
   ulgi:
-    termomodernizacja_pula: 53000
+    termomodernizacja_loty:
+    - origin_year: 2025
+      remaining_amount: 53000
+      evidence_ref: synthetic-thermo-27-2025
     ikze: 2000
   miesiace:
   - miesiac: 2025-01

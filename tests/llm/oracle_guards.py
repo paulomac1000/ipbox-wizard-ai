@@ -32,6 +32,7 @@ REVIEW_FACT_TO_CODE = {
     "source_coverage_incomplete": "REVIEW_19",
     "asset_classification_requires_review": "REVIEW_20",
     "contribution_classification_requires_review": "REVIEW_21",
+    "legacy_thermomodernization_pool_requires_review": "REVIEW_22",
 }
 
 
@@ -205,6 +206,10 @@ def zero_after_stop(reference: dict[str, Any]) -> None:
         "thermomodernization_used": 0.0,
         "termomodernization_carry_over": 0.0,
         "termomodernization_expired": 0.0,
+        "thermomodernization_mode": "none",
+        "thermomodernization_evidence_status": "NOT_APPLICABLE",
+        "thermomodernization_rules_source_id": "MF_THERMOMODERNIZATION",
+        "thermomodernization_limit": 53000.0,
         "health_tax_credit_used": 0.0,
         "ulga_BR_IP_wykorzystana": 0.0,
         "ulga_BR_NIE_wykorzystana": 0.0,

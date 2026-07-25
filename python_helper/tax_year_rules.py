@@ -39,6 +39,8 @@ class TaxYearRules:
     scale_second_rate: Decimal
     scale_fixed_second_bracket: Decimal
     source_ids: tuple[str, ...]
+    thermomodernization_limit: Decimal = Decimal("53000")
+    thermomodernization_source_id: str = "MF_THERMOMODERNIZATION"
 
 
 @dataclass(frozen=True, slots=True)
@@ -52,8 +54,14 @@ class ThermomodernizationLot:
         object.__setattr__(self, "origin_year", origin_year)
         if origin_year < 2019:
             raise ValueError("thermomodernization origin_year cannot precede 2019")
-        if self.remaining_amount < 0:
-            raise ValueError("thermomodernization remaining_amount must be non-negative")
+        amount = money(self.remaining_amount)
+        object.__setattr__(self, "remaining_amount", amount)
+        if not isinstance(self.evidence_ref, str):
+            raise ValueError("thermomodernization evidence_ref must be a string")
+        evidence_ref = self.evidence_ref.strip()
+        if amount > 0 and not evidence_ref:
+            raise ValueError("positive thermomodernization lot requires evidence_ref")
+        object.__setattr__(self, "evidence_ref", evidence_ref)
 
 
 # Official-source identifiers are intentionally stable and human-auditable.
@@ -282,7 +290,7 @@ def apply_thermomodernization_lots(
     ``Y`` may still be used in ``Y + 6`` and expires for ``Y + 7``.
     """
     tax_year = strict_year(tax_year, "tax_year")
-    get_tax_year_rules(tax_year)
+    rules = get_tax_year_rules(tax_year)
     remaining_income = _nonnegative("available_income", available_income)
     normalized: list[ThermomodernizationLot] = []
     for index, raw in enumerate(lots):
@@ -301,7 +309,7 @@ def apply_thermomodernization_lots(
             lot = ThermomodernizationLot(
                 origin_year=origin_year,
                 remaining_amount=amount,
-                evidence_ref=str(raw.get("evidence_ref", "")),
+                evidence_ref=raw.get("evidence_ref", ""),
             )
         else:
             raise ValueError(f"thermomodernization_lots[{index}] must be a mapping")
@@ -310,8 +318,11 @@ def apply_thermomodernization_lots(
         normalized.append(lot)
 
     opening_total = sum((money(lot.remaining_amount) for lot in normalized), Decimal("0"))
-    if opening_total > Decimal("53000"):
-        raise ValueError("thermomodernization lots exceed the 53000 PLN taxpayer limit")
+    if opening_total > rules.thermomodernization_limit:
+        raise ValueError(
+            "thermomodernization lots exceed the "
+            f"{rules.thermomodernization_limit} PLN taxpayer limit"
+        )
 
     rows: list[dict[str, Any]] = []
     used_total = Decimal("0")
@@ -343,6 +354,10 @@ def apply_thermomodernization_lots(
             }
         )
     return {
+        "mode": "evidence_lots",
+        "evidence_status": "VERIFIED",
+        "rules_source_id": rules.thermomodernization_source_id,
+        "limit": float(rules.thermomodernization_limit),
         "used": float(money(used_total)),
         "carry_over": float(money(carry_total)),
         "expired": float(money(expired_total)),

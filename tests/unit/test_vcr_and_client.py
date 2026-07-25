@@ -571,7 +571,9 @@ def test_workflows_harden_checkout_and_shell_inputs() -> None:
     assert "persist-credentials: false" in deterministic
     assert "persist-credentials: false" in paid
     assert "BENCHMARK_MODEL: ${{ inputs.model }}" in paid
-    assert "MAX_COST_USD: ${{ inputs.max-cost-usd }}" in paid
+    assert "MAX_COST_PER_MODEL_USD: ${{ inputs.max-cost-per-model-usd }}" in paid
+    assert "MAX_TOTAL_COST_USD: ${{ inputs.max-total-cost-usd }}" in paid
+    assert "inputs.confirmation == 'RUN_PAID_BENCHMARK'" in paid
     assert 'if [ "${{ inputs.model }}"' not in paid
 
 

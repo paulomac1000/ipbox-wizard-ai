@@ -34,6 +34,8 @@ def test_historical_limits(year: int, ikze: float, health: float | None) -> None
     rules = get_tax_year_rules(year)
     assert float(rules.ikze_business_limit) == ikze
     assert (float(rules.health_linear_limit) if rules.health_linear_limit else None) == health
+    assert float(rules.thermomodernization_limit) == 53000
+    assert rules.thermomodernization_source_id == "MF_THERMOMODERNIZATION"
 
 
 @pytest.mark.parametrize("year", [2019, 2020, 2021])
@@ -219,8 +221,16 @@ def test_tax_cascade_accepts_thermomodernization_lots() -> None:
         nexus=1,
         tax_form="liniowy_19%",
         thermomodernization_lots=[
-            {"origin_year": 2022, "remaining_amount": 2000},
-            {"origin_year": 2024, "remaining_amount": 2000},
+            {
+                "origin_year": 2022,
+                "remaining_amount": 2000,
+                "evidence_ref": "thermo-2022",
+            },
+            {
+                "origin_year": 2024,
+                "remaining_amount": 2000,
+                "evidence_ref": "thermo-2024",
+            },
         ],
     )
     assert result["thermomodernization_used"] == 3000
@@ -253,8 +263,16 @@ def test_thermomodernization_lots_enforce_total_taxpayer_limit() -> None:
         apply_thermomodernization_lots(
             2025,
             [
-                {"origin_year": 2023, "remaining_amount": 30000},
-                {"origin_year": 2024, "remaining_amount": 23000.01},
+                {
+                    "origin_year": 2023,
+                    "remaining_amount": 30000,
+                    "evidence_ref": "thermo-limit-2023",
+                },
+                {
+                    "origin_year": 2024,
+                    "remaining_amount": 23000.01,
+                    "evidence_ref": "thermo-limit-2024",
+                },
             ],
             10000,
         )
@@ -288,3 +306,31 @@ def test_donation_requires_explicit_verified_limit() -> None:
         calculate_tax_for_year(**base, donations=1_001, donation_limit=1_000)
     result = calculate_tax_for_year(**base, donations=1_000, donation_limit=3_000)
     assert any(step["step"] == "Donations" for step in result["deduction_steps"])
+
+
+def test_positive_thermomodernization_lot_requires_evidence() -> None:
+    from python_helper.tax_year_rules import ThermomodernizationLot
+
+    with pytest.raises(ValueError, match="requires evidence_ref"):
+        ThermomodernizationLot(origin_year=2025, remaining_amount=1)
+
+
+def test_thermomodernization_result_exposes_rule_source_and_mode() -> None:
+    result = calculate_tax_for_year(
+        2025,
+        non_ip_income=3000,
+        ip_income=10000,
+        nexus=1,
+        tax_form="liniowy_19%",
+        thermomodernization_lots=[
+            {
+                "origin_year": 2025,
+                "remaining_amount": 1000,
+                "evidence_ref": "thermo-2025",
+            }
+        ],
+    )
+    assert result["thermomodernization_mode"] == "evidence_lots"
+    assert result["thermomodernization_evidence_status"] == "VERIFIED"
+    assert result["thermomodernization_rules_source_id"] == "MF_THERMOMODERNIZATION"
+    assert result["thermomodernization_limit"] == 53000.0

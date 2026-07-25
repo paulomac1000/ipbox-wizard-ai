@@ -82,6 +82,10 @@ def _tax_result(tax: Mapping[str, Any], signed_settlement: float) -> dict[str, A
         "thermomodernization_used": tax["thermomodernization_used"],
         "termomodernization_carry_over": tax["thermomodernization_carry_over"],
         "termomodernization_expired": tax["thermomodernization_expired"],
+        "thermomodernization_mode": tax["thermomodernization_mode"],
+        "thermomodernization_evidence_status": (tax["thermomodernization_evidence_status"]),
+        "thermomodernization_rules_source_id": (tax["thermomodernization_rules_source_id"]),
+        "thermomodernization_limit": tax["thermomodernization_limit"],
         "health_tax_credit_used": tax["health_tax_credit_used"],
         "ulga_BR_IP_wykorzystana": tax["rd_relief_ip_used"],
         "ulga_BR_NIE_wykorzystana": tax["rd_relief_non_ip_used"],
@@ -262,6 +266,16 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
     except ValueError as exc:
         raise ScenarioError(str(exc)) from exc
     facts["source_coverage_incomplete"] = not coverage_complete
+    reliefs = input_data.get("ulgi", {})
+    facts["legacy_thermomodernization_pool_requires_review"] = bool(
+        isinstance(reliefs, Mapping)
+        and reliefs.get("termomodernizacja_loty") is None
+        and number(
+            reliefs.get("termomodernizacja_pula", 0),
+            "ulgi.termomodernizacja_pula",
+        )
+        > 0
+    )
     facts["no_qualifying_ip_income_after_complete_evidence"] = bool(
         coverage_complete
         and base["result"]["przychody_roczne"]["IP"] == 0
@@ -386,6 +400,7 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
         "source_coverage_incomplete",
         "asset_classification_requires_review",
         "contribution_classification_requires_review",
+        "legacy_thermomodernization_pool_requires_review",
     }
     base["status"] = (
         "PROVISIONAL" if any(facts.get(name) is True for name in provisional_facts) else "FINAL"

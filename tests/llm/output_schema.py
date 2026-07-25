@@ -26,7 +26,7 @@ for code in (
         _stop_codes.append(code)
 
 _review_codes = DECISION_JSON_SCHEMA["schema"]["properties"]["reviews"]["items"]["enum"]
-for code in ("REVIEW_18", "REVIEW_19", "REVIEW_20", "REVIEW_21"):
+for code in ("REVIEW_18", "REVIEW_19", "REVIEW_20", "REVIEW_21", "REVIEW_22"):
     if code not in _review_codes:
         _review_codes.append(code)
 
@@ -63,6 +63,24 @@ for field in (
     if field not in _tax["required"]:
         _tax["required"].append(field)
     _tax["properties"][field] = deepcopy(legacy.NONNEGATIVE_MONEY)
+
+for field in (
+    "thermomodernization_mode",
+    "thermomodernization_evidence_status",
+    "thermomodernization_rules_source_id",
+    "thermomodernization_limit",
+):
+    if field not in _tax["required"]:
+        _tax["required"].append(field)
+_tax["properties"]["thermomodernization_mode"] = {"enum": ["none", "legacy_pool", "evidence_lots"]}
+_tax["properties"]["thermomodernization_evidence_status"] = {
+    "enum": ["NOT_APPLICABLE", "PROVISIONAL", "VERIFIED"]
+}
+_tax["properties"]["thermomodernization_rules_source_id"] = {
+    "type": "string",
+    "minLength": 1,
+}
+_tax["properties"]["thermomodernization_limit"] = deepcopy(legacy.NONNEGATIVE_MONEY)
 
 _classification = _report_root["properties"]["classifications"]["items"]
 for field in (

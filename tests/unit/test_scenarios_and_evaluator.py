@@ -427,7 +427,29 @@ def test_stopped_report_zeros_every_financial_output() -> None:
     assert all(value == 0 for value in result["nexus_koszty"].values())
     assert result["nexus"] == 0
     assert result["dochód_IP"] == result["dochód_NIE"] == 0
-    assert all(value == 0 for value in result["podatek"].values())
+    financial_tax_fields = (
+        "podstawa_IP",
+        "podstawa_NIE",
+        "podstawa_zwykła",
+        "dochód_IP_po_uldze_BR",
+        "dochód_IP_kwalifikowany",
+        "dochód_IP_poza_preferencją",
+        "podatek_IP",
+        "podatek_NIE_finalny",
+        "podatek_całościowy",
+        "nadpłata_lub_dopłata",
+        "thermomodernization_used",
+        "termomodernization_carry_over",
+        "termomodernization_expired",
+        "health_tax_credit_used",
+        "ulga_BR_IP_wykorzystana",
+        "ulga_BR_NIE_wykorzystana",
+        "ulga_BR_carry_over",
+        "dochód_dodatkowy_skala",
+    )
+    assert all(result["podatek"][field] == 0 for field in financial_tax_fields)
+    assert result["podatek"]["thermomodernization_mode"] == "none"
+    assert result["podatek"]["thermomodernization_evidence_status"] == "NOT_APPLICABLE"
     assert result["alokacja_multi_ip"] is None
     assert result["klucz_MIX"]["wartość"] is None
     assert reference["classifications"] == []

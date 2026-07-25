@@ -32,7 +32,10 @@ input:
       klauzula_IP: true
   ulgi:
     ikze: 14000
-    termomodernizacja_pula: 10000
+    termomodernizacja_loty:
+      - origin_year: 2024
+        remaining_amount: 10000
+        evidence_ref: synthetic-thermo-48-2024
   zaliczki:
     suma: 38000
   miesiace:

@@ -14,6 +14,7 @@ Stan źródeł zweryfikowany: 18 lipca 2026 r.
 - `MF_HEALTH_HISTORY`: ta sama informacja wraz z zasadami obowiązującymi do 31 grudnia 2021 r.; kwota jest odliczeniem od podatku opartym o udokumentowane 7,75% podstawy, a nie stałym rocznym limitem.
 - `MF_SCALE_HISTORY`: podatki.gov.pl, historyczne skale 2019–2021, w tym zmienna kwota zmniejszająca podatek.
 - `MF_SCALE_CURRENT`: skala 12%/32%, próg 120 000 zł i kwota zmniejszająca 3 600 zł od 2022 r.
+- `MF_THERMOMODERNIZATION`: podatki.gov.pl, zasady ulgi termomodernizacyjnej — limit 53 000 zł na podatnika i przenoszenie niewykorzystanej kwoty przez maksymalnie sześć lat.
 
 ## Limity
 
@@ -34,4 +35,5 @@ Algorytm nie obcina kwoty do limitu. Przekroczenie choćby o grosz jest błędem
 
 - Kwota zdrowotna 2019–2021 musi być już zweryfikowaną kwotą odliczenia od podatku. Silnik nie rekonstruuje podstaw miesięcznych ZUS bez dokumentów.
 - Ulga B+R pomniejszająca dochód IP jest niedozwolona w modelu dla 2019–2021 i dozwolona od 2022 r.
+- Dodatnia przeniesiona kwota termomodernizacji wymaga osobnego lotu z `origin_year` i `evidence_ref`; zbiorcza `termomodernizacja_pula` jest wyłącznie trybem zgodnościowym `PROVISIONAL`.
 - Kolejny rok wymaga dodania urzędowych źródeł, stałych i regresji przed odblokowaniem.

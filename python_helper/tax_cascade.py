@@ -129,12 +129,23 @@ def calculate_tax_for_year(
             raise ValueError("donations exceed the verified donation_limit")
     if values["internet_tax_relief"] > Decimal("760"):
         raise ValueError("internet_tax_relief cannot exceed 760 PLN")
-    if values["thermomodernization_pool"] > Decimal("53000"):
-        raise ValueError("thermomodernization_pool cannot exceed 53000 PLN")
+    if values["thermomodernization_pool"] > rules.thermomodernization_limit:
+        raise ValueError(
+            f"thermomodernization_pool cannot exceed {rules.thermomodernization_limit} PLN"
+        )
     if values["rd_relief_ip"] + values["rd_relief_non_ip"] > values["rd_relief_limit"]:
         raise ValueError("allocated R&D relief exceeds documented rd_relief_limit")
     if thermomodernization_lots is not None and values["thermomodernization_pool"] > 0:
         raise ValueError("use thermomodernization_pool or thermomodernization_lots, not both")
+    if thermomodernization_lots is not None:
+        thermomodernization_mode = "evidence_lots"
+        thermomodernization_evidence_status = "VERIFIED"
+    elif values["thermomodernization_pool"] > 0:
+        thermomodernization_mode = "legacy_pool"
+        thermomodernization_evidence_status = "PROVISIONAL"
+    else:
+        thermomodernization_mode = "none"
+        thermomodernization_evidence_status = "NOT_APPLICABLE"
 
     rd_ip_used = min(values["rd_relief_ip"], values["ip_income"])
     ip_income_after_rd = values["ip_income"] - rd_ip_used
@@ -229,6 +240,10 @@ def calculate_tax_for_year(
         "deduction_steps": steps,
         "thermomodernization_used": float(money(thermo_used)),
         "thermomodernization_carry_over": float(money(thermo_carry)),
+        "thermomodernization_mode": thermomodernization_mode,
+        "thermomodernization_evidence_status": (thermomodernization_evidence_status),
+        "thermomodernization_rules_source_id": (rules.thermomodernization_source_id),
+        "thermomodernization_limit": float(rules.thermomodernization_limit),
         "thermomodernization_expired": (
             float(thermo_lot_result["expired"]) if thermo_lot_result is not None else 0.0
         ),

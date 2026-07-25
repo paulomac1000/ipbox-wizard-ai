@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import time
 from copy import deepcopy
 from pathlib import Path
 
@@ -11,8 +12,10 @@ import yaml
 
 from python_helper.ipbox_calculator import calculate_w_coefficient
 from scripts.check_cassette_policy import main as cassette_policy_main
+from scripts.record_model import paid_cost_since, select_scenarios
 from tests.llm.oracle import ScenarioError, compute_reference, validate_scenario
 from tests.llm.runner import LLMTestRunner, build_tool_context
+from tests.llm.test_scenarios import discover_scenarios
 
 SCENARIOS = Path(__file__).resolve().parents[1] / "llm/scenarios"
 
@@ -143,3 +146,61 @@ def test_high_value_service_requires_review_instead_of_exclusion() -> None:
     assert reference["classifications"][0]["basket"] == "MIX"
     assert reference["status"] == "PROVISIONAL"
     assert "REVIEW_20" in reference["stops_reviews"]["reviews"]
+
+
+def test_paid_recording_scenario_selection_is_exact(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    paths = [tmp_path / "0.yaml", tmp_path / "01.yaml"]
+    for path in paths:
+        path.write_text("meta: {}\n", encoding="utf-8")
+    assert select_scenarios(paths, "0") == [tmp_path / "0.yaml"]
+    with pytest.raises(ValueError, match="No exact scenario"):
+        select_scenarios(paths, "missing")
+
+    monkeypatch.setenv("IPBOX_SCENARIO", "0")
+    with pytest.raises(RuntimeError, match="no exact scenario"):
+        discover_scenarios()
+    monkeypatch.delenv("IPBOX_SCENARIO")
+
+
+def test_global_paid_cost_counts_accepted_and_rejected_calls(tmp_path: Path) -> None:
+    started = time.time() - 10
+    cassette_root = tmp_path / "cassettes"
+    model_dir = cassette_root / "model-a"
+    model_dir.mkdir(parents=True)
+    (model_dir / "accepted.yaml").write_text(
+        "meta:\n  cost: 0.20\nresponse: ok\nparsed_response: {}\n",
+        encoding="utf-8",
+    )
+    rejected_root = tmp_path / "rejected"
+    rejected_dir = rejected_root / "model-a"
+    rejected_dir.mkdir(parents=True)
+    (rejected_dir / "rejected.json").write_text(
+        json.dumps({"metadata": {"cost": 0.30}}),
+        encoding="utf-8",
+    )
+    assert paid_cost_since(
+        cassette_root,
+        rejected_root,
+        since=started,
+    ) == pytest.approx(0.50)
+    assert paid_cost_since(
+        cassette_root,
+        rejected_root,
+        since=started,
+        model="model-a",
+    ) == pytest.approx(0.50)
+
+
+def test_legacy_thermomodernization_pool_is_explicitly_provisional() -> None:
+    loaded = deepcopy(scenario("27_termomodernizacja_full"))
+    reliefs = loaded["input"]["ulgi"]
+    reliefs.pop("termomodernizacja_loty")
+    reliefs["termomodernizacja_pula"] = 53000
+    reference = compute_reference(loaded)
+    assert reference["status"] == "PROVISIONAL"
+    assert "REVIEW_22" in reference["stops_reviews"]["reviews"]
+    assert reference["result"]["podatek"]["thermomodernization_mode"] == "legacy_pool"
+    assert reference["result"]["podatek"]["thermomodernization_evidence_status"] == "PROVISIONAL"
