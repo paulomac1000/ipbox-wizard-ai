@@ -8,19 +8,14 @@ from decimal import ROUND_HALF_UP, Decimal
 from typing import Any
 
 from .allocation_audit import AllocationFinding, calculate_w_share, money
+from .input_validation import strict_decimal
 
 DEFAULT_W_PRECISION_PP = Decimal("0.01")
 DEFAULT_INVOICE_PERCENTAGE_PRECISION_PP = Decimal("0.01")
 
 
 def _decimal(name: str, value: float | int | Decimal) -> Decimal:
-    try:
-        result = Decimal(str(value))
-    except Exception as exc:  # pragma: no cover
-        raise ValueError(f"{name} must be numeric") from exc
-    if not result.is_finite():
-        raise ValueError(f"{name} must be finite")
-    return result
+    return strict_decimal(value, name)
 
 
 def _nonnegative(name: str, value: float | int | Decimal) -> Decimal:

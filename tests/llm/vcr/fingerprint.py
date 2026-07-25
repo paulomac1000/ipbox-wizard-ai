@@ -5,7 +5,7 @@ from __future__ import annotations
 import hashlib
 from pathlib import Path
 
-FINGERPRINT_VERSION = "v3"
+FINGERPRINT_NAMESPACE = "canonical"
 ALGORITHM_PATH = Path(__file__).resolve().parents[3] / "ipbox_algorytm.md"
 
 
@@ -20,10 +20,10 @@ def content_hash(content: str) -> str:
 def compute_fingerprint(scenario_path: Path, request_hash: str) -> str:
     material = "\0".join(
         (
-            FINGERPRINT_VERSION,
+            FINGERPRINT_NAMESPACE,
             file_hash(ALGORITHM_PATH),
             file_hash(scenario_path),
             request_hash,
         )
     )
-    return f"{FINGERPRINT_VERSION}_{content_hash(material)}"
+    return f"{FINGERPRINT_NAMESPACE}_{content_hash(material)}"

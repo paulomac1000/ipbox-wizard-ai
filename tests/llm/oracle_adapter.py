@@ -7,10 +7,10 @@ from decimal import Decimal
 from typing import Any
 
 from python_helper.allocation_audit import calculate_w_share
-from python_helper.input_validation import strict_bool
+from python_helper.input_validation import strict_bool, strict_number
 from python_helper.ipbox_calculator import allocate_revenue_monthly, money
 
-from . import oracle as legacy
+from . import oracle_legacy as legacy
 
 ScenarioError = legacy.ScenarioError
 W_METHOD_ALIASES = {
@@ -27,12 +27,9 @@ W_METHOD_ALIASES = {
 
 def number(value: Any, name: str) -> float:
     try:
-        result = float(value)
-    except (TypeError, ValueError) as exc:
-        raise ScenarioError(f"{name} must be numeric") from exc
-    if result != result or result in {float("inf"), float("-inf")}:
-        raise ScenarioError(f"{name} must be finite")
-    return result
+        return strict_number(value, name)
+    except ValueError as exc:
+        raise ScenarioError(str(exc)) from exc
 
 
 def _explicit_w_method(input_data: dict[str, Any]) -> Any | None:

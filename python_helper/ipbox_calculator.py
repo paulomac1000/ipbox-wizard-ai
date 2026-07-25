@@ -19,6 +19,8 @@ from datetime import datetime, timedelta
 from decimal import ROUND_DOWN, ROUND_HALF_UP, Decimal
 from typing import Any
 
+from .input_validation import strict_number
+
 MONEY_QUANT = Decimal("0.01")
 INTEGER_QUANT = Decimal("1")
 CANONICAL_BASKETS = {"IP", "MIX", "NON", "WYKLUCZONE"}
@@ -36,13 +38,7 @@ NEXUS_SOURCE_MAP = {
 
 
 def _finite(name: str, value: float | int | Decimal) -> float:
-    try:
-        number = float(value)
-    except (TypeError, ValueError) as exc:
-        raise ValueError(f"{name} must be numeric") from exc
-    if not math.isfinite(number):
-        raise ValueError(f"{name} must be finite, got {value!r}")
-    return number
+    return strict_number(value, name)
 
 
 def _nonnegative(name: str, value: float | int | Decimal) -> float:
@@ -252,6 +248,18 @@ def canonical_basket(value: str) -> str:
     return normalized
 
 
+VALID_COST_TYPES = {"ordinary", "social_contribution", "health_contribution", "unknown"}
+VALID_ASSET_STATUSES = {"not_applicable", "fixed_asset", "current_cost", "unknown"}
+VALID_ASSET_TREATMENTS = {
+    "",
+    "depreciation",
+    "one_off",
+    "excluded",
+    "pending",
+    "amortyzacja_poza_tym_przebiegiem",
+}
+
+
 @dataclass(frozen=True, slots=True)
 class CostItem:
     description: str
@@ -264,11 +272,32 @@ class CostItem:
     nexus_source: str = "outside_nexus"
     nexus_basket: str = "poza_nexus"
     nexus_amount: float | None = None
+    cost_type: str = "ordinary"
+    asset_status: str = "not_applicable"
+    asset_treatment: str = ""
+    asset_evidence_ref: str = ""
 
     def __post_init__(self) -> None:
         if not self.description.strip():
             raise ValueError("description cannot be empty")
         amount = _nonnegative("amount", self.amount)
+        if self.cost_type not in VALID_COST_TYPES:
+            raise ValueError(f"unsupported cost_type {self.cost_type!r}")
+        if self.asset_status not in VALID_ASSET_STATUSES:
+            raise ValueError(f"unsupported asset_status {self.asset_status!r}")
+        if self.asset_treatment not in VALID_ASSET_TREATMENTS:
+            raise ValueError(f"unsupported asset_treatment {self.asset_treatment!r}")
+        if (
+            self.asset_status == "fixed_asset"
+            and self.asset_treatment
+            in {
+                "depreciation",
+                "one_off",
+                "excluded",
+            }
+            and not self.asset_evidence_ref.strip()
+        ):
+            raise ValueError("documented fixed-asset treatment requires asset_evidence_ref")
         if self.basket:
             object.__setattr__(self, "basket", canonical_basket(self.basket))
         if self.basket == "IP" and not self.allocation_source.strip():
@@ -403,19 +432,32 @@ def classify_cost(
     health_insurance_in_kpir: bool,
     asset_threshold: float = 10_000,
 ) -> CostItem:
-    """Classify a KPiR item conservatively and deterministically."""
+    """Classify conservatively; structured facts and explicit baskets outrank descriptions."""
     asset_threshold = _nonnegative("asset_threshold", asset_threshold)
-    description = item.description.lower()
-    if re.search(SOCIAL_SECURITY_PATTERN, description):
+    description = item.description.casefold()
+
+    # A reviewed source classification is stronger than every description heuristic.
+    if item.basket:
+        return item
+
+    if item.cost_type == "social_contribution":
         if social_security_in_kpir:
-            return replace(item, basket="MIX", note="ZUS in KPiR; do not deduct again")
-        return replace(item, basket="WYKLUCZONE", note="ZUS handled outside KPiR")
-    if re.search(HEALTH_PATTERN, description):
+            return replace(item, basket="MIX", note="Social contribution in KPiR")
+        return replace(item, basket="WYKLUCZONE", note="Social contribution handled outside KPiR")
+    if item.cost_type == "health_contribution":
         if health_insurance_in_kpir:
             return replace(item, basket="MIX", note="Health contribution in KPiR")
         return replace(item, basket="WYKLUCZONE", note="Health contribution handled outside costs")
-    if item.basket:
-        return item
+
+    if re.search(SOCIAL_SECURITY_PATTERN, description) or re.search(HEALTH_PATTERN, description):
+        return replace(
+            item,
+            basket="MIX",
+            note=(
+                "Potential contribution; description alone is not evidence. "
+                "Confirm cost_type before contribution-specific treatment"
+            ),
+        )
     if has_non_deductible_description_signal(description):
         return replace(
             item,
@@ -425,13 +467,20 @@ def classify_cost(
                 "Require explicit KUP=false or verified statutory classification to exclude it"
             ),
         )
-    if item.amount > asset_threshold:
+
+    if item.asset_status == "fixed_asset" and item.asset_treatment == "excluded":
+        return replace(item, basket="WYKLUCZONE", note="Documented fixed-asset exclusion")
+    if (
+        item.amount > asset_threshold
+        or item.asset_status in {"fixed_asset", "unknown"}
+        or item.asset_treatment == "pending"
+    ):
         return replace(
             item,
-            basket="WYKLUCZONE",
+            basket="MIX",
             note=(
-                "Potential fixed asset above the one-off threshold; exclude the purchase "
-                "from this run and enter only documented depreciation/write-off separately"
+                "Potential asset or high-value service; amount alone is not classification. "
+                "Confirm asset status and documented tax treatment"
             ),
         )
     if any(keyword in description for keyword in DIRECT_IP_KEYWORDS):

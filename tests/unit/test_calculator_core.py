@@ -91,11 +91,11 @@ def test_cost_item_validations() -> None:
     ("description", "amount", "social", "health", "expected"),
     [
         ("ZUS społeczne", 100, True, False, "MIX"),
-        ("ZUS społeczne", 100, False, False, "WYKLUCZONE"),
+        ("ZUS społeczne", 100, False, False, "MIX"),
         ("Składka zdrowotna", 100, False, True, "MIX"),
-        ("Składka zdrowotna", 100, False, False, "WYKLUCZONE"),
+        ("Składka zdrowotna", 100, False, False, "MIX"),
         ("Mandat", 100, False, False, "MIX"),
-        ("Laptop", 12000, False, False, "WYKLUCZONE"),
+        ("Laptop", 12000, False, False, "MIX"),
         ("Kawa do domu", 100, False, False, "MIX"),
         ("Licencja JetBrains", 100, False, False, "MIX"),
         ("Księgowość", 100, False, False, "MIX"),
@@ -141,9 +141,9 @@ def test_classify_cost_preserves_explicit_evidence() -> None:
 def test_ambiguous_asset_and_tool_require_explicit_policy() -> None:
     asset = classify_cost(CostItem("Laptop", 12000), False, False)
     tool = classify_cost(CostItem("Licencja JetBrains", 100), False, False)
-    assert asset.basket == "WYKLUCZONE"
+    assert asset.basket == "MIX"
     assert tool.basket == "MIX"
-    assert "depreciation" in asset.note.lower()
+    assert "amount alone" in asset.note.lower()
     assert "documented" in tool.note.lower()
 
 
@@ -156,3 +156,44 @@ def test_description_signal_does_not_override_explicit_cost_classification() -> 
     )
 
     assert classify_cost(explicit, False, False) is explicit
+
+
+def test_explicit_basket_outranks_contribution_descriptions() -> None:
+    ip = CostItem(
+        "Integracja systemu z API NFZ",
+        5000,
+        basket="IP",
+        allocation_source="project-ledger",
+    )
+    non = CostItem("Usługa dla projektu ZUS", 3000, basket="NON")
+    assert classify_cost(ip, False, False) is ip
+    assert classify_cost(non, False, False) is non
+
+
+def test_structured_contribution_type_controls_contribution_treatment() -> None:
+    health = CostItem("Przelew miesięczny", 100, cost_type="health_contribution")
+    assert classify_cost(health, False, True).basket == "MIX"
+    assert classify_cost(health, False, False).basket == "WYKLUCZONE"
+
+
+def test_description_only_contribution_is_review_candidate_not_final_decision() -> None:
+    candidate = classify_cost(CostItem("Integracja z API NFZ", 5000), False, False)
+    assert candidate.basket == "MIX"
+    assert candidate.note.startswith("Potential contribution")
+
+
+def test_high_value_service_is_not_automatically_excluded() -> None:
+    service = classify_cost(CostItem("Usługa audytu bezpieczeństwa", 12500), False, False)
+    assert service.basket == "MIX"
+    assert "amount alone" in service.note
+
+
+def test_documented_fixed_asset_exclusion_requires_structured_evidence() -> None:
+    asset = CostItem(
+        "Sprzęt",
+        12500,
+        asset_status="fixed_asset",
+        asset_treatment="excluded",
+        asset_evidence_ref="asset-register-1",
+    )
+    assert classify_cost(asset, False, False).basket == "WYKLUCZONE"

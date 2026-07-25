@@ -1,5 +1,11 @@
 # AGENTS.md
 
+- Nie używaj numerowanych nazw modułów ani funkcji (`*_v2`, `*_v3`). Aktualna implementacja ma nazwę kanoniczną, a stara — jawny sufiks `_legacy`.
+- `STOP_03` wymaga jawnej, kompletnej deklaracji `input.coverage`; brak kompletności daje `PROVISIONAL` i REVIEW.
+- Opis, nazwa kontrahenta i sama kwota nie mogą nadpisać jawnego koszyka ani samodzielnie ustalić KUP, składki czy środka trwałego.
+- Pola liczbowe odrzucają booleany i teksty wyglądające jak liczby.
+- Finalny raport musi zawierać `calculation_meta` z hashem wejścia, źródłami reguł i rewizją kodu.
+
 ## Misja
 
 Utrzymuj wiarygodne, fail-closed narzędzie wspierające przygotowanie danych do IP Box. Nie przedstawiaj wyniku jako porady podatkowej ani kompletnego zeznania bez kontroli księgowej lub doradcy.
@@ -8,8 +14,8 @@ Utrzymuj wiarygodne, fail-closed narzędzie wspierające przygotowanie danych do
 
 1. `ipbox_algorytm.md` — reguły i granice zakresu.
 2. `python_helper/ipbox_calculator.py`, `tax_year_rules.py` i `allocation_audit.py` — deterministyczna matematyka, reguły roczne i strażniki alokacji.
-3. `tests/llm/oracle_v2.py` — wynik referencyjny harnessu.
-4. `tests/llm/output_schema_v2.py` — kontrakt raportu.
+3. `tests/llm/oracle.py` — kanoniczny wynik referencyjny harnessu; `oracle_legacy.py` jest wyłącznie jawnym adapterem zgodności.
+4. `tests/llm/output_schema.py` — kanoniczny kontrakt raportu; `output_schema_legacy.py` jest bazą zgodności.
 5. `tests/llm/scenarios/` — przypadki biznesowe.
 6. `tests/unit/` — wykonywalna specyfikacja.
 7. `docs/testing.md` — procedura wydania i VCR.

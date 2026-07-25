@@ -14,13 +14,18 @@ from tests.llm.models import BENCHMARK_MODELS, model_slug  # noqa: E402
 
 
 def unexpected_model_directories(root: Path) -> set[str]:
+    if not root.exists():
+        return set()
     expected = {model_slug(model) for model in BENCHMARK_MODELS}
     discovered = {path.name for path in root.iterdir() if path.is_dir()}
     return discovered - expected
 
 
-def main() -> int:
-    root = ROOT / "tests/llm/vcr/cassettes"
+def main(root: Path | None = None) -> int:
+    root = root or ROOT / "tests/llm/vcr/cassettes"
+    if not root.exists():
+        print("Cassette policy: no cassette matrix committed yet — deterministic CI only")
+        return 0
     cassette_files = [path for path in root.glob("*/*.yaml") if path.name != "_manifest.yaml"]
     manifests = list(root.glob("*/_manifest.yaml"))
     extras = unexpected_model_directories(root)

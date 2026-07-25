@@ -16,27 +16,20 @@ from collections.abc import Mapping
 from decimal import ROUND_DOWN, ROUND_HALF_UP, Decimal
 from typing import Any
 
+from .input_validation import strict_decimal
+
 MONEY = Decimal("0.01")
 QUALIFIED_NEXUS_BASKETS = {"A", "B", "C", "D"}
 ROUNDING_GRANULARITIES = {"per_cost_item", "monthly_pool"}
 
 
 def money(value: Any) -> Decimal:
-    try:
-        result = Decimal(str(value))
-    except Exception as exc:  # pragma: no cover - Decimal exposes several input errors
-        raise ValueError("money value must be numeric") from exc
-    if not result.is_finite():
-        raise ValueError("money value must be finite")
-    return result.quantize(MONEY, rounding=ROUND_HALF_UP)
+    return strict_decimal(value, "money value").quantize(MONEY, rounding=ROUND_HALF_UP)
 
 
 def _fraction(value: Any, name: str) -> Decimal:
-    try:
-        result = Decimal(str(value))
-    except Exception as exc:  # pragma: no cover
-        raise ValueError(f"{name} must be numeric") from exc
-    if not result.is_finite() or not Decimal("0") <= result <= Decimal("1"):
+    result = strict_decimal(value, name)
+    if not Decimal("0") <= result <= Decimal("1"):
         raise ValueError(f"{name} must be between 0 and 1")
     return result
 
@@ -318,7 +311,7 @@ def apply_cost_audit(
             warnings.add("NEXUS_EVIDENCE_MISSING")
 
     if classifications and granularity == "monthly_pool":
-        groups: dict[tuple[str, str, str], list[int]] = defaultdict(list)
+        groups: dict[tuple[str, str, Decimal], list[int]] = defaultdict(list)
         for index, classification in enumerate(classifications[: len(rows)]):
             if classification.get("basket") != "MIX":
                 continue
@@ -328,7 +321,7 @@ def apply_cost_audit(
             group_key = (
                 str(classification.get("allocation_period", "")),
                 str(classification.get("allocation_method", "")),
-                str(key),
+                _fraction(key, "allocation_key"),
             )
             groups[group_key].append(index)
         for (_, _, key_raw), indices in groups.items():

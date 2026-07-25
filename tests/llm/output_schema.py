@@ -1,283 +1,165 @@
-"""Strict JSON Schema shared by all benchmark models."""
+"""Schema extension for historical-year and reconciliation-aware reports."""
 
 from __future__ import annotations
 
+from copy import deepcopy
 from typing import Any
 
-MONEY = {"type": "number"}
-NONNEGATIVE_MONEY = {"type": "number", "minimum": 0}
-FRACTION = {"type": "number", "minimum": 0, "maximum": 1}
-PERCENTAGE = {"type": "number", "minimum": 0, "maximum": 100}
-CODE = {"type": "string", "pattern": "^[A-Z][A-Z0-9_]*$"}
-LEGACY_STOP_CODES = [
-    "STOP_01",
-    "STOP_02",
-    "STOP_03",
-    "STOP_04",
-    "STOP_08",
-    "ZUS_DOUBLE_DIP",
-    "HEALTH_DOUBLE_DIP",
-]
-REVIEW_CODES = [
-    "REVIEW_01",
-    "REVIEW_02",
-    "REVIEW_04",
-    "REVIEW_08",
-    "REVIEW_09",
-    "REVIEW_16",
-    "REVIEW_17",
-]
-STOP_CODE = {"type": "string", "enum": LEGACY_STOP_CODES}
-REVIEW_CODE = {"type": "string", "enum": REVIEW_CODES}
+from . import output_schema_legacy as legacy
 
+DECISION_JSON_SCHEMA: dict[str, Any] = deepcopy(legacy.DECISION_JSON_SCHEMA)
+OUTPUT_JSON_SCHEMA: dict[str, Any] = deepcopy(legacy.OUTPUT_JSON_SCHEMA)
 
-DECISION_JSON_SCHEMA: dict[str, Any] = {
-    "name": "ipbox_decision",
-    "strict": True,
-    "schema": {
-        "type": "object",
-        "additionalProperties": False,
-        "required": ["status", "stops", "reviews"],
-        "properties": {
-            "status": {"enum": ["FINAL", "STOPPED"]},
-            "stops": {"type": "array", "items": STOP_CODE, "uniqueItems": True},
-            "reviews": {"type": "array", "items": REVIEW_CODE, "uniqueItems": True},
+_stop_codes = DECISION_JSON_SCHEMA["schema"]["properties"]["stops"]["items"]["enum"]
+for code in (
+    "STOP_09",
+    "STOP_10",
+    "STOP_11",
+    "STOP_12",
+    "STOP_13",
+    "STOP_14",
+    "STOP_15",
+    "STOP_16",
+    "SOURCE_KPIR_REQUIRES_CORRECTION",
+):
+    if code not in _stop_codes:
+        _stop_codes.append(code)
+
+_review_codes = DECISION_JSON_SCHEMA["schema"]["properties"]["reviews"]["items"]["enum"]
+for code in ("REVIEW_18", "REVIEW_19", "REVIEW_20", "REVIEW_21"):
+    if code not in _review_codes:
+        _review_codes.append(code)
+
+# The assembled report must enforce the same channel-specific code sets as the
+# small decision envelope. A generic CODE pattern here would let a tampered
+# report route REVIEW codes through stops even though live parsing rejects it.
+_decision_properties = DECISION_JSON_SCHEMA["schema"]["properties"]
+_report_root = OUTPUT_JSON_SCHEMA["schema"]
+_report_channels = _report_root["properties"]["stops_reviews"]["properties"]
+_report_channels["stops"]["items"] = deepcopy(_decision_properties["stops"]["items"])
+_report_channels["reviews"]["items"] = deepcopy(_decision_properties["reviews"]["items"])
+
+_result = _report_root["properties"]["result"]["properties"]
+_mix = _result["klucz_MIX"]
+_mix_method = _mix["properties"]["metoda"]["enum"]
+if "przychodowa_w_dacie_kosztu" not in _mix_method:
+    _mix_method.append("przychodowa_w_dacie_kosztu")
+for field in ("źródło_ref", "rounding_granularity"):
+    if field not in _mix["required"]:
+        _mix["required"].append(field)
+_mix["properties"]["źródło_ref"] = {"anyOf": [{"type": "null"}, {"type": "string", "minLength": 1}]}
+_mix["properties"]["rounding_granularity"] = {"enum": ["per_cost_item", "monthly_pool"]}
+
+_tax = _result["podatek"]
+for field in (
+    "thermomodernization_used",
+    "termomodernization_expired",
+    "health_tax_credit_used",
+    "podstawa_zwykła",
+    "dochód_IP_po_uldze_BR",
+    "dochód_IP_kwalifikowany",
+    "dochód_IP_poza_preferencją",
+):
+    if field not in _tax["required"]:
+        _tax["required"].append(field)
+    _tax["properties"][field] = deepcopy(legacy.NONNEGATIVE_MONEY)
+
+_classification = _report_root["properties"]["classifications"]["items"]
+for field in (
+    "allocation_period",
+    "rounding_granularity",
+    "rounding_adjustment",
+    "nexus_evidence",
+    "nexus_basis",
+):
+    if field not in _classification["required"]:
+        _classification["required"].append(field)
+_classification["properties"]["allocation_period"] = {
+    "anyOf": [
+        {"type": "null"},
+        {"type": "string", "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$"},
+    ]
+}
+_classification["properties"]["rounding_granularity"] = {"enum": ["per_cost_item", "monthly_pool"]}
+_classification["properties"]["rounding_adjustment"] = deepcopy(legacy.MONEY)
+_classification["properties"]["nexus_evidence"] = {"type": "string"}
+_classification["properties"]["nexus_basis"] = {"enum": ["explicit_amount", "allocated_ip_cost"]}
+
+for field in ("calculation_meta", "source_ledger_audit", "correction_preview"):
+    if field not in _report_root["required"]:
+        _report_root["required"].append(field)
+
+_report_root["properties"]["calculation_meta"] = {
+    "type": "object",
+    "additionalProperties": False,
+    "required": [
+        "engine_version",
+        "rule_pack",
+        "rules_source_ids",
+        "input_hash",
+        "calculated_at",
+        "code_revision",
+    ],
+    "properties": {
+        "engine_version": {"type": "string", "minLength": 1},
+        "rule_pack": {"type": "string", "pattern": "^PL-PIT-IPBOX-[0-9]{4}$"},
+        "rules_source_ids": {
+            "type": "array",
+            "items": {"type": "string", "minLength": 1},
+            "minItems": 1,
+            "uniqueItems": True,
         },
+        "input_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "calculated_at": {"type": "string", "format": "date-time"},
+        "code_revision": {"type": "string", "minLength": 1},
     },
 }
 
-OUTPUT_JSON_SCHEMA: dict[str, Any] = {
-    "name": "ipbox_wizard_result",
-    "strict": True,
-    "schema": {
-        "type": "object",
-        "additionalProperties": False,
-        "required": [
-            "status",
-            "result",
-            "classifications",
-            "monthly_W",
-            "tests",
-            "stops_reviews",
-        ],
-        "properties": {
-            "status": {"enum": ["FINAL", "PROVISIONAL", "STOPPED"]},
-            "result": {
-                "type": "object",
-                "additionalProperties": False,
-                "required": [
-                    "rok",
-                    "przychody_roczne",
-                    "koszty_roczne",
-                    "nexus_koszty",
-                    "nexus",
-                    "dochód_IP",
-                    "dochód_NIE",
-                    "klucz_MIX",
-                    "alokacja_multi_ip",
-                    "podatek",
-                ],
-                "properties": {
-                    "rok": {"type": "integer"},
-                    "przychody_roczne": {
-                        "type": "object",
-                        "additionalProperties": False,
-                        "required": ["IP", "NIE"],
-                        "properties": {"IP": NONNEGATIVE_MONEY, "NIE": NONNEGATIVE_MONEY},
-                    },
-                    "koszty_roczne": {
-                        "type": "object",
-                        "additionalProperties": False,
-                        "required": ["IP", "NIE", "MIX", "WYKLUCZONE"],
-                        "properties": {
-                            "IP": NONNEGATIVE_MONEY,
-                            "NIE": NONNEGATIVE_MONEY,
-                            "MIX": NONNEGATIVE_MONEY,
-                            "WYKLUCZONE": NONNEGATIVE_MONEY,
-                        },
-                    },
-                    "nexus_koszty": {
-                        "type": "object",
-                        "additionalProperties": False,
-                        "required": ["A", "B", "C", "D", "poza_nexus"],
-                        "properties": {
-                            "A": NONNEGATIVE_MONEY,
-                            "B": NONNEGATIVE_MONEY,
-                            "C": NONNEGATIVE_MONEY,
-                            "D": NONNEGATIVE_MONEY,
-                            "poza_nexus": NONNEGATIVE_MONEY,
-                        },
-                    },
-                    "nexus": FRACTION,
-                    "dochód_IP": MONEY,
-                    "dochód_NIE": MONEY,
-                    "klucz_MIX": {
-                        "type": "object",
-                        "additionalProperties": False,
-                        "required": ["metoda", "źródło", "wartość", "status"],
-                        "properties": {
-                            "metoda": {
-                                "enum": [
-                                    "przychodowa_roczna",
-                                    "czasowa_W",
-                                    "metraż",
-                                    "licencje",
-                                    "projekt",
-                                    "custom",
-                                ]
-                            },
-                            "źródło": {
-                                "enum": [
-                                    "interpretacja_KIS",
-                                    "księgowa",
-                                    "poprzednie_rozliczenie",
-                                    "domyślna_wizard",
-                                    "użytkownik",
-                                ]
-                            },
-                            "wartość": {
-                                "anyOf": [{"type": "null"}, FRACTION],
-                            },
-                            "status": {"enum": ["FINAL", "DEFERRED", "NOT_APPLICABLE"]},
-                        },
-                    },
-                    "alokacja_multi_ip": {
-                        "anyOf": [
-                            {"type": "null"},
-                            {
-                                "type": "object",
-                                "additionalProperties": False,
-                                "required": [
-                                    "stage1_software_share",
-                                    "stage1_non_software_share",
-                                    "allocations",
-                                ],
-                                "properties": {
-                                    "stage1_software_share": NONNEGATIVE_MONEY,
-                                    "stage1_non_software_share": NONNEGATIVE_MONEY,
-                                    "allocations": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "object",
-                                            "additionalProperties": False,
-                                            "required": ["ip", "amount"],
-                                            "properties": {
-                                                "ip": {"type": "string", "minLength": 1},
-                                                "amount": NONNEGATIVE_MONEY,
-                                            },
-                                        },
-                                    },
-                                },
-                            },
-                        ]
-                    },
-                    "podatek": {
-                        "type": "object",
-                        "additionalProperties": False,
-                        "required": [
-                            "podstawa_IP",
-                            "podstawa_NIE",
-                            "podatek_IP",
-                            "podatek_NIE_finalny",
-                            "podatek_całościowy",
-                            "nadpłata_lub_dopłata",
-                            "termomodernization_carry_over",
-                            "ulga_BR_IP_wykorzystana",
-                            "ulga_BR_NIE_wykorzystana",
-                            "ulga_BR_carry_over",
-                            "dochód_dodatkowy_skala",
-                        ],
-                        "properties": {
-                            "podstawa_IP": NONNEGATIVE_MONEY,
-                            "podstawa_NIE": NONNEGATIVE_MONEY,
-                            "podatek_IP": NONNEGATIVE_MONEY,
-                            "podatek_NIE_finalny": NONNEGATIVE_MONEY,
-                            "podatek_całościowy": NONNEGATIVE_MONEY,
-                            "nadpłata_lub_dopłata": MONEY,
-                            "termomodernization_carry_over": NONNEGATIVE_MONEY,
-                            "ulga_BR_IP_wykorzystana": NONNEGATIVE_MONEY,
-                            "ulga_BR_NIE_wykorzystana": NONNEGATIVE_MONEY,
-                            "ulga_BR_carry_over": NONNEGATIVE_MONEY,
-                            "dochód_dodatkowy_skala": NONNEGATIVE_MONEY,
-                        },
-                    },
-                },
-            },
-            "classifications": {
-                "type": "array",
-                "items": {
-                    "type": "object",
-                    "additionalProperties": False,
-                    "required": [
-                        "opis",
-                        "amount",
-                        "basket",
-                        "allocation_method",
-                        "allocation_source",
-                        "allocation_key",
-                        "ip_amount",
-                        "non_ip_amount",
-                        "nexus_source",
-                        "nexus_basket",
-                        "nexus_amount",
-                    ],
-                    "properties": {
-                        "opis": {"type": "string", "minLength": 1},
-                        "amount": NONNEGATIVE_MONEY,
-                        "basket": {"enum": ["IP", "MIX", "NON", "WYKLUCZONE"]},
-                        "allocation_method": {"type": "string"},
-                        "allocation_source": {"type": "string"},
-                        "allocation_key": {
-                            "anyOf": [{"type": "null"}, FRACTION],
-                        },
-                        "ip_amount": NONNEGATIVE_MONEY,
-                        "non_ip_amount": NONNEGATIVE_MONEY,
-                        "nexus_source": {
-                            "enum": [
-                                "own_br",
-                                "unrelated_br_contractor",
-                                "related_br_contractor",
-                                "acquired_ip",
-                                "outside_nexus",
-                                "indirect_or_general",
-                                "unknown",
-                            ]
-                        },
-                        "nexus_basket": {"enum": ["A", "B", "C", "D", "poza_nexus"]},
-                        "nexus_amount": NONNEGATIVE_MONEY,
-                    },
-                },
-            },
-            "monthly_W": {
-                "type": "array",
-                "items": {
-                    "type": "object",
-                    "additionalProperties": False,
-                    "required": ["miesiąc", "wartość"],
-                    "properties": {
-                        "miesiąc": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}$"},
-                        "wartość": PERCENTAGE,
-                    },
-                },
-            },
-            "tests": {
-                "type": "object",
-                "additionalProperties": False,
-                "required": [f"TEST_{number}" for number in range(1, 10)],
-                "properties": {
-                    f"TEST_{number}": {"enum": ["PASS", "FAIL"]} for number in range(1, 10)
-                },
-            },
-            "stops_reviews": {
-                "type": "object",
-                "additionalProperties": False,
-                "required": ["stops", "reviews", "warnings"],
-                "properties": {
-                    "stops": {"type": "array", "items": CODE, "uniqueItems": True},
-                    "reviews": {"type": "array", "items": CODE, "uniqueItems": True},
-                    "warnings": {"type": "array", "items": CODE, "uniqueItems": True},
-                },
-            },
-        },
+_nullable_nonnegative_money = {"anyOf": [{"type": "null"}, deepcopy(legacy.NONNEGATIVE_MONEY)]}
+_nullable_money = {"anyOf": [{"type": "null"}, deepcopy(legacy.MONEY)]}
+_report_root["properties"]["source_ledger_audit"] = {
+    "type": "object",
+    "additionalProperties": False,
+    "required": [
+        "status",
+        "reported_costs",
+        "raw_input_costs",
+        "deductible_costs",
+        "excluded_recorded_costs",
+        "correction_delta",
+    ],
+    "properties": {
+        "status": {"enum": ["NOT_PROVIDED", "OK", "REQUIRES_CORRECTION", "MISMATCH"]},
+        "reported_costs": deepcopy(_nullable_nonnegative_money),
+        "raw_input_costs": deepcopy(legacy.NONNEGATIVE_MONEY),
+        "deductible_costs": deepcopy(legacy.NONNEGATIVE_MONEY),
+        "excluded_recorded_costs": deepcopy(legacy.NONNEGATIVE_MONEY),
+        "correction_delta": deepcopy(legacy.NONNEGATIVE_MONEY),
+    },
+}
+_report_root["properties"]["correction_preview"] = {
+    "type": "object",
+    "additionalProperties": False,
+    "required": [
+        "status",
+        "source_kpir_correction_required",
+        "return_correction_required",
+        "relief_adjustment_required",
+        "tax_unchanged_only_if_reliefs_updated",
+        "corrected_total_tax",
+        "corrected_overpayment",
+        "thermomodernization_used",
+        "thermomodernization_carry_over",
+    ],
+    "properties": {
+        "status": {"enum": ["NOT_NEEDED", "AVAILABLE", "UNAVAILABLE"]},
+        "source_kpir_correction_required": {"type": "boolean"},
+        "return_correction_required": {"type": "boolean"},
+        "relief_adjustment_required": {"type": "boolean"},
+        "tax_unchanged_only_if_reliefs_updated": {"type": "boolean"},
+        "corrected_total_tax": deepcopy(_nullable_nonnegative_money),
+        "corrected_overpayment": deepcopy(_nullable_money),
+        "thermomodernization_used": deepcopy(_nullable_nonnegative_money),
+        "thermomodernization_carry_over": deepcopy(_nullable_nonnegative_money),
     },
 }

@@ -27,7 +27,7 @@
 |---|---|
 | nieobsługiwana forma opodatkowania | `STOP_01` |
 | brak kwalifikowanego prawa przy zadeklarowanym IP Box | `STOP_02` |
-| brak kwalifikowanego dochodu po kompletnej analizie | `STOP_03` |
+| brak kwalifikowanego dochodu po jawnie potwierdzonej kompletnej analizie | `STOP_03` |
 | brak działalności B+R | `STOP_04` |
 | brak wymaganej ewidencji | `STOP_08` |
 | niespójna alokacja przychodu | `STOP_09` |
@@ -316,3 +316,13 @@ Model widzi tylko tę kopertę i zwraca dokładną kopię trzech pól:
 ```
 
 Model nie liczy podatku, W, KUP, MIX, NEXUS ani ulg. Nie dodaje, nie usuwa, nie przenosi i nie deduplikuje kodów. Lokalna schema, parser, oracle i evaluator pozostają źródłem prawdy.
+
+## Kompletność, status i metadane
+
+Brak kwalifikowanego przychodu w dostarczonym fragmencie danych nie oznacza `STOP_03`. Ten STOP wolno wydać wyłącznie wtedy, gdy `input.coverage` potwierdza liczbę oczekiwanych i zaimportowanych miesięcy, kompletność faktur, KPiR i ewidencji pracy, zamknięcie okresu oraz osobę potwierdzającą. Bez tego raport ma status `PROVISIONAL` i `REVIEW_19`.
+
+`PROVISIONAL` jest publicznym stanem raportu bez STOP-ów. Oznacza, że kalkulacja została wykonana na dostarczonych danych, ale źródła albo klasyfikacja aktywa/składki wymagają potwierdzenia. `FINAL` wymaga pełnej deklaracji kompletności i braku nierozstrzygniętych kandydatur.
+
+Każdy raport zawiera `calculation_meta` z identyfikatorem silnika, rule packiem roku, identyfikatorami źródeł reguł, hashem wejścia, czasem obliczenia i rewizją kodu.
+
+Opis kosztu i sama kwota są wyłącznie sygnałami. Jawny koszyk ma pierwszeństwo. Składki społeczne i zdrowotne wymagają `cost_type`, a pozycja powyżej 10 000 zł wymaga jawnego statusu aktywa i sposobu ujęcia; bez nich koszt nie staje się automatycznie `WYKLUCZONE`.

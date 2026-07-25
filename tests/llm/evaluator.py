@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 import json
-import math
 from typing import Any
+
+from python_helper.input_validation import strict_number
 
 from .oracle import compute_reference
 
@@ -43,11 +44,12 @@ def _failure(kind: str, message: str, expected: Any = None, actual: Any = None) 
 
 
 def _number(value: Any) -> float | None:
-    try:
-        result = float(value)
-    except (TypeError, ValueError):
+    if value is None:
         return None
-    return result if math.isfinite(result) else None
+    try:
+        return strict_number(value, "reported number")
+    except ValueError:
+        return None
 
 
 def _path(mapping: Any, dotted: str) -> Any:

@@ -8,6 +8,8 @@ from dataclasses import dataclass
 from decimal import ROUND_HALF_UP, Decimal
 from typing import Any
 
+from .input_validation import strict_decimal
+
 MONEY = Decimal("0.01")
 VALID_W_METHODS = {"conditional_product", "disjoint_components", "time_only"}
 
@@ -22,13 +24,7 @@ class AllocationFinding:
 
 
 def _decimal(name: str, value: float | int | Decimal) -> Decimal:
-    try:
-        result = Decimal(str(value))
-    except Exception as exc:  # pragma: no cover
-        raise ValueError(f"{name} must be numeric") from exc
-    if not result.is_finite():
-        raise ValueError(f"{name} must be finite")
-    return result
+    return strict_decimal(value, name)
 
 
 def _nonnegative(name: str, value: float | int | Decimal) -> Decimal:

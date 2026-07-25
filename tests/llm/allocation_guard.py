@@ -8,7 +8,7 @@ from python_helper.allocation_audit import AllocationFinding, reconcile_return_t
 from python_helper.allocation_precision import audit_revenue_allocation
 from python_helper.input_validation import strict_bool
 
-from . import oracle as legacy
+from . import oracle_legacy as legacy
 from .oracle_adapter import invoice_amount, month_evidence, month_invoices, number
 
 ScenarioError = legacy.ScenarioError

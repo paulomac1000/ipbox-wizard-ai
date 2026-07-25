@@ -10,7 +10,7 @@ from python_helper.allocation_audit import (
 )
 from python_helper.tax_year_rules import get_tax_year_rules, strict_year, validate_year_amounts
 
-from . import oracle as legacy
+from . import oracle_legacy as legacy
 from .oracle_adapter import invoice_amount, month_evidence, month_invoices, number
 
 ScenarioError = legacy.ScenarioError
@@ -29,6 +29,9 @@ STOP_FACT_TO_CODE = {
 REVIEW_FACT_TO_CODE = {
     **legacy.REVIEW_FACT_TO_CODE,
     "nexus_evidence_missing": "REVIEW_18",
+    "source_coverage_incomplete": "REVIEW_19",
+    "asset_classification_requires_review": "REVIEW_20",
+    "contribution_classification_requires_review": "REVIEW_21",
 }
 
 

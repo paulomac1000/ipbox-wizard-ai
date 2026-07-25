@@ -5,6 +5,14 @@ meta:
   tags: [regression, allocation, rounding, nexus, synthetic]
   priority: P0
 input:
+  coverage:
+    expected_months: 1
+    imported_months: 1
+    invoices_complete: true
+    kpir_complete: true
+    work_records_complete: true
+    period_closed: true
+    confirmed_by: synthetic-scenario
   rok: 2025
   forma_opodatkowania: liniowy_19%
   kwalifikowane_IP: true

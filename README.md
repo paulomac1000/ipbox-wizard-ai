@@ -9,7 +9,7 @@ Deterministyczny-first wizard wspierający przygotowanie danych do rozliczenia I
 Model językowy nie wykonuje krytycznej arytmetyki:
 
 1. `python_helper/ipbox_calculator.py`, `tax_year_rules.py` i `allocation_audit.py` walidują dane, liczą W, alokacje, NEXUS, reguły roczne, ulgi i podatek.
-2. `tests/llm/oracle_v2.py` tworzy niezależny wynik referencyjny i atomowe `decision_facts`.
+2. `tests/llm/oracle.py` tworzy niezależny wynik referencyjny i atomowe `decision_facts`.
 3. Python składa kompletną autorytatywną kopertę `expected_decision` z rozdzielonymi kanałami STOP i REVIEW.
 4. LLM kopiuje bez zmian `status/stops/reviews`; nie klasyfikuje kodów i nie widzi faktów podatkowych ani nazw predykatów.
 5. Runner składa kopertę z raportem deterministycznym.
@@ -24,7 +24,7 @@ Najważniejszy invariant z issue #1: **przychód IP/NIE, alokacja kosztów pośr
 - NEXUS: `min(1, ((A+B) × 1,3) / (A+B+C+D))`.
 - Brak kosztów A/B/C/D daje NEXUS `0`, nie `1`.
 - Koszt bez dowodu wyłącznego związku nie staje się automatycznie `IP`.
-- Niesklasyfikowany zakup powyżej 10 000 zł jest `WYKLUCZONE` do czasu wprowadzenia udokumentowanego odpisu lub amortyzacji.
+- Kwota powyżej 10 000 zł sama nie rozstrzyga klasyfikacji. Bez jawnego statusu aktywa i udokumentowanego sposobu ujęcia koszt pozostaje `MIX`, raport jest `PROVISIONAL` i wymaga `REVIEW_20`.
 - Zwykłe darowizny, ulga internetowa, rehabilitacyjna i na dziecko są odrzucane dla podatku liniowego.
 - Ulga B+R jest rozdzielana jawnie na `ulga_BR_IP` i `ulga_BR_NIE`; część IP pomniejsza dochód kwalifikowany przed NEXUS.
 - `strata_NIE_z_lat_poprzednich` dotyczy wyłącznie pozostałej działalności. Straty kwalifikowanego IP wymagają osobnej ewidencji per IP.
@@ -38,6 +38,13 @@ Najważniejszy invariant z issue #1: **przychód IP/NIE, alokacja kosztów pośr
 - Rok i flagi kwalifikacji mają ścisłe typy; stringi nie są konwertowane na boolean ani rok.
 - Metoda `dokumentowa` wymaga jawnego `kwota_IP` albo `całość_IP: true`.
 - Opis wydatku może utworzyć sygnał do przeglądu, ale nie ustala samodzielnie `KUP: false`.
+
+
+## Kompletność i reprodukowalność
+
+`STOP_03` oznacza brak kwalifikowanego przychodu dopiero po jawnym potwierdzeniu kompletności źródeł w `input.coverage`. Brak potwierdzenia nie tworzy fałszywego STOP-u: wynik ma status `PROVISIONAL` i `REVIEW_19`. Podobnie nierozstrzygnięta klasyfikacja składki lub aktywa generuje review zamiast automatycznego wyzerowania kosztu.
+
+Każdy raport zawiera `calculation_meta`: identyfikator silnika, rule pack roku, źródła reguł, SHA-256 wejścia, czas obliczenia i rewizję kodu.
 
 ## Granica wejścia
 

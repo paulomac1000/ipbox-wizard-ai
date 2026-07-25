@@ -35,9 +35,11 @@ def build_tool_context(reference: dict[str, Any]) -> dict[str, Any]:
     """Expose only the authoritative decision envelope; never expose tax facts."""
     stops = sorted(reference["stops_reviews"]["stops"])
     reviews = sorted(reference["stops_reviews"]["reviews"])
-    expected_status = "STOPPED" if stops else "FINAL"
-    if reference["status"] != expected_status:
+    expected_status = reference["status"]
+    if stops and expected_status != "STOPPED":
         raise ValueError("oracle status is inconsistent with its authoritative STOP channel")
+    if not stops and expected_status not in {"FINAL", "PROVISIONAL"}:
+        raise ValueError("oracle status is invalid for an empty STOP channel")
     return {
         "expected_decision": {
             "status": expected_status,
@@ -67,6 +69,7 @@ def assemble_response(reference: dict[str, Any], decision: dict[str, Any]) -> di
     """Merge the small model decision with the deterministic financial report."""
     return {
         "status": decision["status"],
+        "calculation_meta": deepcopy(reference["calculation_meta"]),
         "result": deepcopy(reference["result"]),
         "classifications": deepcopy(reference["classifications"]),
         "monthly_W": deepcopy(reference["monthly_W"]),
@@ -185,11 +188,12 @@ class LLMTestRunner:
                 "decision contains non-REVIEW codes in reviews: "
                 + ", ".join(sorted(invalid_reviews))
             )
-        expected_status = "STOPPED" if parsed["stops"] else "FINAL"
-        if parsed["status"] != expected_status:
+        if parsed["stops"] and parsed["status"] != "STOPPED":
+            raise ValueError("decision status is inconsistent with stops; expected 'STOPPED'")
+        if not parsed["stops"] and parsed["status"] not in {"FINAL", "PROVISIONAL"}:
             raise ValueError(
-                f"decision status {parsed['status']!r} is inconsistent with stops; "
-                f"expected {expected_status!r}"
+                "decision status is inconsistent with stops (empty STOP channel); "
+                "expected 'FINAL' or 'PROVISIONAL'"
             )
         return parsed
 
