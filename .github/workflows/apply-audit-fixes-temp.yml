@@ -49,34 +49,19 @@ jobs:
 
           calculator = Path("python_helper/ipbox_calculator.py")
           text = calculator.read_text(encoding="utf-8")
-          old = '''    if has_non_deductible_description_signal(description):
-              return replace(
-                  item,
-                  basket="MIX",
-                  note=(
-                      "Potential non-deductible expense; description alone is not evidence. "
-                      "Require explicit KUP=false or verified statutory classification to exclude it"
-                  ),
+          signal = "    if has_non_deductible_description_signal(description):\n"
+          explicit = "    if item.basket:\n        return item\n"
+          signal_index = text.index(signal)
+          explicit_index = text.index(explicit)
+          if explicit_index > signal_index:
+              signal_block = text[signal_index:explicit_index]
+              text = (
+                  text[:signal_index]
+                  + explicit
+                  + signal_block
+                  + text[explicit_index + len(explicit):]
               )
-          if item.basket:
-              return item
-          '''
-          new = '''    if item.basket:
-              return item
-          if has_non_deductible_description_signal(description):
-              return replace(
-                  item,
-                  basket="MIX",
-                  note=(
-                      "Potential non-deductible expense; description alone is not evidence. "
-                      "Require explicit KUP=false or verified statutory classification to exclude it"
-                  ),
-              )
-          '''
-          if old in text:
-              calculator.write_text(text.replace(old, new, 1), encoding="utf-8")
-          elif new not in text:
-              raise SystemExit("classify_cost audit hunk not found")
+              calculator.write_text(text, encoding="utf-8")
 
           tests = Path("tests/unit/test_calculator_core.py")
           test_text = tests.read_text(encoding="utf-8")
