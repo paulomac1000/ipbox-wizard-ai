@@ -58,21 +58,8 @@ jobs:
           script = textwrap.dedent(match.group(1))
           exec(compile(script, "<debug-patch>", "exec"), {})
 
-          def normalize_generated_range(
-              path: str,
-              *,
-              start_index: int,
-              end_index: int,
-          ) -> None:
-              target = Path(path)
-              lines = target.read_text(encoding="utf-8").splitlines()
-              raw_block = "\n".join(lines[start_index : end_index + 1])
-              normalized = textwrap.indent(textwrap.dedent(raw_block), "    ").splitlines()
-              lines[start_index : end_index + 1] = normalized
-              target.write_text("\n".join(lines) + "\n", encoding="utf-8")
-
-          stopped_path = "tests/unit/test_scenarios_and_evaluator.py"
-          stopped_lines = Path(stopped_path).read_text(encoding="utf-8").splitlines()
+          stopped_path = Path("tests/unit/test_scenarios_and_evaluator.py")
+          stopped_lines = stopped_path.read_text(encoding="utf-8").splitlines()
           stopped_start = next(
               index
               for index, line in enumerate(stopped_lines)
@@ -84,16 +71,38 @@ jobs:
               if '== "NOT_APPLICABLE"' in stopped_lines[index]
           )
           stopped_end = evidence_line + 1
-          if stopped_lines[stopped_end].strip() != ")":
-              raise SystemExit("Cannot find generated STOP assertion terminator")
-          normalize_generated_range(
-              stopped_path,
-              start_index=stopped_start,
-              end_index=stopped_end,
-          )
+          stopped_lines[stopped_start : stopped_end + 1] = [
+              "    financial_tax_fields = (",
+              '        "podstawa_IP",',
+              '        "podstawa_NIE",',
+              '        "podstawa_zwykła",',
+              '        "dochód_IP_po_uldze_BR",',
+              '        "dochód_IP_kwalifikowany",',
+              '        "dochód_IP_poza_preferencją",',
+              '        "podatek_IP",',
+              '        "podatek_NIE_finalny",',
+              '        "podatek_całościowy",',
+              '        "nadpłata_lub_dopłata",',
+              '        "thermomodernization_used",',
+              '        "termomodernization_carry_over",',
+              '        "termomodernization_expired",',
+              '        "health_tax_credit_used",',
+              '        "ulga_BR_IP_wykorzystana",',
+              '        "ulga_BR_NIE_wykorzystana",',
+              '        "ulga_BR_carry_over",',
+              '        "dochód_dodatkowy_skala",',
+              "    )",
+              '    assert all(result["podatek"][field] == 0 for field in financial_tax_fields)',
+              '    assert result["podatek"]["thermomodernization_mode"] == "none"',
+              "    assert (",
+              '        result["podatek"]["thermomodernization_evidence_status"]',
+              '        == "NOT_APPLICABLE"',
+              "    )",
+          ]
+          stopped_path.write_text("\n".join(stopped_lines) + "\n", encoding="utf-8")
 
-          workflow_path = "tests/unit/test_vcr_and_client.py"
-          workflow_lines = Path(workflow_path).read_text(encoding="utf-8").splitlines()
+          workflow_path = Path("tests/unit/test_vcr_and_client.py")
+          workflow_lines = workflow_path.read_text(encoding="utf-8").splitlines()
           model_budget_line = next(
               index
               for index, line in enumerate(workflow_lines)
@@ -102,60 +111,39 @@ jobs:
           workflow_start = model_budget_line
           while workflow_start >= 0 and workflow_lines[workflow_start].strip() != "assert (":
               workflow_start -= 1
-          if workflow_start < 0:
-              raise SystemExit("Cannot find generated workflow assertion start")
           workflow_end = next(
               index
               for index in range(model_budget_line, len(workflow_lines))
               if "RUN_PAID_BENCHMARK" in workflow_lines[index]
           )
-          normalize_generated_range(
-              workflow_path,
-              start_index=workflow_start,
-              end_index=workflow_end,
-          )
+          expr_open = "$" + "{{"
+          expr_close = "}}"
+          workflow_lines[workflow_start : workflow_end + 1] = [
+              "    assert (",
+              (
+                  '        "MAX_COST_PER_MODEL_USD: '
+                  f"{expr_open} inputs.max-cost-per-model-usd {expr_close}"
+                  '" in paid'
+              ),
+              "    )",
+              (
+                  '    assert "MAX_TOTAL_COST_USD: '
+                  f"{expr_open} inputs.max-total-cost-usd {expr_close}"
+                  '" in paid'
+              ),
+              '    assert "inputs.confirmation == \'RUN_PAID_BENCHMARK\'" in paid',
+          ]
+          workflow_path.write_text("\n".join(workflow_lines) + "\n", encoding="utf-8")
           PYRUN
 
-      - name: Capture generated sources and Ruff diagnostics
-        run: |
-          set +e
-          mkdir -p reports/generated
-          cp --parents \
-            python_helper/tax_year_rules.py \
-            python_helper/tax_cascade.py \
-            tests/llm/oracle.py \
-            tests/llm/oracle_guards.py \
-            tests/llm/output_schema.py \
-            tests/unit/test_tax_year_rules.py \
-            tests/unit/test_final_audit_regressions.py \
-            tests/unit/test_scenarios_and_evaluator.py \
-            tests/unit/test_vcr_and_client.py \
-            reports/generated/
-          ruff format . > reports/ruff-format.txt 2>&1
-          printf '%s\n' "$?" > reports/ruff-format-status.txt
-          ruff check --fix . > reports/ruff-fix.txt 2>&1
-          printf '%s\n' "$?" > reports/ruff-fix-status.txt
-          exit 0
-
-      - name: Upload generated patch diagnostics
-        uses: actions/upload-artifact@v4
-        with:
-          name: generated-thermo-patch-${{ github.sha }}
-          path: reports/
-          if-no-files-found: error
-          retention-days: 1
-
-      - name: Enforce Ruff and compile
+      - name: Format, lint, and compile
         run: |
           set -euo pipefail
-          cat reports/ruff-format.txt
-          cat reports/ruff-fix.txt
-          test "$(cat reports/ruff-format-status.txt)" -eq 0
-          test "$(cat reports/ruff-fix-status.txt)" -eq 0
+          ruff format .
+          ruff check --fix .
           ruff format --check .
           ruff check .
           python -m compileall -q python_helper tests scripts
-          rm -rf reports
 
       - name: Unit tests with coverage
         run: pytest tests/unit --cov=python_helper --cov-report=term-missing --cov-fail-under=90
