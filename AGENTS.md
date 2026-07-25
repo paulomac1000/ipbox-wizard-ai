@@ -1,10 +1,11 @@
 # AGENTS.md
 
-- Nie używaj numerowanych nazw modułów ani funkcji (`*_v2`, `*_v3`). Aktualna implementacja ma nazwę kanoniczną, a stara — jawny sufiks `_legacy`.
+- Nie używaj numerowanych nazw modułów ani funkcji. Aktualna implementacja ma nazwę kanoniczną, a stara — jawny sufiks `_legacy`.
 - `STOP_03` wymaga jawnej, kompletnej deklaracji `input.coverage`; brak kompletności daje `PROVISIONAL` i REVIEW.
 - Opis, nazwa kontrahenta i sama kwota nie mogą nadpisać jawnego koszyka ani samodzielnie ustalić KUP, składki czy środka trwałego.
 - Pola liczbowe odrzucają booleany i teksty wyglądające jak liczby.
 - Finalny raport musi zawierać `calculation_meta` z hashem wejścia, źródłami reguł i rewizją kodu.
+- Dodatnia przeniesiona kwota termomodernizacji wymaga osobnego lotu z `origin_year` i `evidence_ref`; zbiorcza pula jest wyłącznie trybem zgodnościowym `PROVISIONAL`.
 
 ## Misja
 
@@ -37,6 +38,7 @@ Sprzeczność między źródłami jest błędem. Nie wybieraj wygodniejszej wers
 - działalność na skali obejmuje wspólną podstawę z innymi dochodami skali;
 - działalność liniowa nie miesza w jednej kaskadzie osobnego zeznania skali;
 - dodatnie odliczenie roczne bez zweryfikowanego limitu jest błędem;
+- dodatni lot termomodernizacji wymaga roku pochodzenia i referencji dowodu;
 - rok i flagi kwalifikacji mają ścisłe typy; nie konwertuj stringów, floatów ani booleanów na rok;
 - `kwalifikowane_IP`, `kwalifikuje_IP` i `klauzula_IP` nie mają korzystnych domyślnych wartości;
 - `allocation_source` i `nexus_evidence` są odrębnymi dowodami;
@@ -62,6 +64,7 @@ Sprzeczność między źródłami jest błędem. Nie wybieraj wygodniejszej wers
 - wymyślać kursów, limitów, NEXUS A/B lub dowodów kwalifikacji;
 - używać niejednoznacznych pól `ulga_BR` albo `straty_poprzednie`;
 - włączać płatnych requestów do standardowego CI;
+- uruchamiać płatnej macierzy bez jawnego potwierdzenia oraz limitu per model i limitu całego przebiegu;
 - nadpisywać poprawnych kaset;
 - deklarować gotowości bez 322/322, raportu kompletności i playbacku offline.
 
@@ -84,4 +87,4 @@ Stan bazowy: co najmniej 256 testów jednostkowych, coverage powyżej wymaganych
 
 ## Nagrywanie
 
-Nagrywaj przez `scripts/record_model.py`. Po zmianie requestu, algorytmu, scenariusza lub schematu usuń wyłącznie unieważnione kasety. Wydanie wymaga 46/46 dla każdego z siedmiu modeli (322/322), czystego JSON bez Markdown fences, zgodnego modelu zwróconego, playbacku bez sekretu, kontroli manifestu i raportu niezależnego agenta.
+Nagrywaj przez `scripts/record_model.py` lub ręczny workflow `Paid multi-model LLM benchmark`. Wybór scenariusza jest dokładny, a literówka kończy proces przed requestem sieciowym. Każdy płatny przebieg musi mieć osobny limit per model i limit globalny obejmujący odpowiedzi zaakceptowane oraz odrzucone. Po zmianie requestu, algorytmu, scenariusza lub schematu usuń wyłącznie unieważnione kasety. Wydanie wymaga 46/46 dla każdego z siedmiu modeli (322/322), czystego JSON bez Markdown fences, zgodnego modelu zwróconego, playbacku bez sekretu, kontroli manifestu i raportu niezależnego agenta.
