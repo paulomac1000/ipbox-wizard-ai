@@ -1,0 +1,93 @@
+name: Apply final deterministic audit fixes
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+concurrency:
+  group: apply-final-audit-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  apply-and-verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      IPBOX_CALCULATED_AT: "2026-07-25T20:00:00Z"
+      IPBOX_CODE_REVISION: ${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements-test.txt
+      - name: Install dependencies
+        run: pip install -r requirements.txt -r requirements-test.txt
+      - name: Apply complete audited overlay
+        run: |
+          set -euo pipefail
+          cat .audit-overlay/part-* | base64 -d | xz -d | tar -xf -
+          cp -a payload/. .
+          while IFS= read -r path; do
+            if [ -n "$path" ]; then
+              rm -f "$path"
+            fi
+          done < delete-paths.txt
+          rm -rf payload delete-paths.txt
+          test -f tests/llm/oracle.py
+          test -f tests/llm/oracle_legacy.py
+          test ! -e tests/llm/oracle_v2.py
+          test -f tests/llm/output_schema.py
+          test -f tests/llm/output_schema_legacy.py
+          test ! -e tests/llm/output_schema_v2.py
+          ! grep -R --line-number --fixed-strings 'sys.modules[' tests/llm
+      - name: Format and lint
+        run: |
+          set -euo pipefail
+          ruff format .
+          ruff check --fix .
+          ruff format --check .
+          ruff check .
+      - name: Compile Python
+        run: python -m compileall -q python_helper tests scripts
+      - name: Unit tests with coverage
+        run: pytest tests/unit --cov=python_helper --cov-report=term-missing --cov-fail-under=90
+      - name: Full free suite
+        run: pytest -q
+      - name: Shell syntax
+        run: |
+          set -euo pipefail
+          for script in scripts/*.sh dump-to-md.sh; do
+            bash -n "$script"
+          done
+      - name: Cassette policy without committed matrix
+        run: python scripts/check_cassette_policy.py
+      - name: Final source checks
+        run: |
+          set -euo pipefail
+          git diff --check
+          ! grep -R --line-number -E 'oracle_v[0-9]+|output_schema_v[0-9]+|sys\.modules\[' tests README.md AGENTS.md docs python_helper scripts
+      - name: Commit verified changes and remove temporary audit files
+        run: |
+          set -euo pipefail
+          git rm -r --ignore-unmatch .audit-overlay
+          git rm --ignore-unmatch \
+            .github/workflows/apply-final-audit-overlay-temp.yml \
+            .github/workflows/source-snapshot-audit-temp.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --stat
+          git commit -m "fix: close final deterministic audit blockers"
+          git push origin "HEAD:${GITHUB_HEAD_REF:-$GITHUB_REF_NAME}"
