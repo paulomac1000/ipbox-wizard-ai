@@ -45,6 +45,41 @@ jobs:
             fi
           done < delete-paths.txt
           rm -rf payload delete-paths.txt
+          python - <<'PY'
+          from pathlib import Path
+
+          init_path = Path("python_helper/__init__.py")
+          init_text = init_path.read_text(encoding="utf-8")
+          init_text = init_text.replace(
+              "from .tax_cascade import calculate_tax_for_year\n",
+              "from .report_metadata import calculation_meta, source_coverage_complete\n"
+              "from .tax_cascade import calculate_tax_for_year\n",
+              1,
+          )
+          init_text = init_text.replace(
+              '    "calculate_scale_tax",\n',
+              '    "calculate_scale_tax",\n    "calculation_meta",\n',
+              1,
+          )
+          init_text = init_text.replace(
+              '    "strict_year",\n',
+              '    "source_coverage_complete",\n    "strict_year",\n',
+              1,
+          )
+          init_text = init_text.replace(
+              "\nfrom .report_metadata import calculation_meta, source_coverage_complete\n",
+              "\n",
+              1,
+          )
+          init_path.write_text(init_text, encoding="utf-8")
+
+          meta_path = Path("python_helper/report_metadata.py")
+          meta_text = meta_path.read_text(encoding="utf-8").replace(
+              "isinstance(months, (str, bytes))",
+              "isinstance(months, str | bytes)",
+          )
+          meta_path.write_text(meta_text, encoding="utf-8")
+          PY
           test -f tests/llm/oracle.py
           test -f tests/llm/oracle_legacy.py
           test ! -e tests/llm/oracle_v2.py
@@ -53,7 +88,6 @@ jobs:
           test ! -e tests/llm/output_schema_v2.py
           ! grep -R --line-number --fixed-strings 'sys.modules[' tests/llm
       - name: Format and collect lint diagnostics
-        id: lint
         run: |
           set +e
           ruff format . > ruff-format-apply.log 2>&1
