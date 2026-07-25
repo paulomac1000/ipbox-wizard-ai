@@ -3,6 +3,10 @@ name: Paid multi-model LLM benchmark
 on:
   workflow_dispatch:
     inputs:
+      confirmation:
+        description: "Type RUN_PAID_BENCHMARK to confirm paid requests"
+        required: true
+        type: string
       model:
         description: "Benchmark model (or 'all' for the full seven-family matrix)"
         required: true
@@ -17,8 +21,13 @@ on:
           - "moonshotai/kimi-k2.5"
           - "qwen/qwen3.5-flash-02-23"
           - "mistralai/ministral-3b-2512"
-      max-cost-usd:
-        description: "Soft per-model cost cap in USD (0 disables the guard)"
+      max-cost-per-model-usd:
+        description: "Per-model paid-cost guard in USD (0 disables it)"
+        required: true
+        type: string
+        default: "5"
+      max-total-cost-usd:
+        description: "Whole-run paid-cost guard in USD (0 disables it)"
         required: true
         type: string
         default: "5"
@@ -28,17 +37,20 @@ permissions:
 
 concurrency:
   group: llm-benchmark-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   benchmark:
+    if: inputs.confirmation == 'RUN_PAID_BENCHMARK'
     runs-on: ubuntu-latest
     timeout-minutes: 90
     env:
       OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
       LLM_PROVIDER: openrouter
       BENCHMARK_MODEL: ${{ inputs.model }}
-      MAX_COST_USD: ${{ inputs.max-cost-usd }}
+      MAX_COST_PER_MODEL_USD: ${{ inputs.max-cost-per-model-usd }}
+      MAX_TOTAL_COST_USD: ${{ inputs.max-total-cost-usd }}
+      VCR_REJECTED_ROOT: /tmp/ipbox_llm_rejected
 
     steps:
       - uses: actions/checkout@v4
@@ -57,29 +69,28 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt -r requirements-test.txt
 
-      - name: Validate API key
+      - name: Validate API key and cost guards
         run: |
           set -euo pipefail
           test -n "$OPENROUTER_API_KEY" || {
             echo "::error::OPENROUTER_API_KEY secret is not configured"
             exit 1
           }
-
-      - name: Validate cost cap
-        run: |
-          set -euo pipefail
           python - <<'PY'
-          import os, sys
-          raw = os.environ.get("MAX_COST_USD", "5").strip()
-          try:
-              value = float(raw)
-          except ValueError as exc:
-              print(f"::error::max-cost-usd must be a number, got {raw!r}", file=sys.stderr)
-              raise SystemExit(1) from exc
-          if value < 0:
-              print(f"::error::max-cost-usd must be >= 0, got {value}", file=sys.stderr)
-              raise SystemExit(1)
-          print(f"Soft per-model cost cap: ${value:.6f}")
+          import os
+          import sys
+
+          for name in ("MAX_COST_PER_MODEL_USD", "MAX_TOTAL_COST_USD"):
+              raw = os.environ.get(name, "0").strip()
+              try:
+                  value = float(raw)
+              except ValueError as exc:
+                  print(f"::error::{name} must be a number, got {raw!r}", file=sys.stderr)
+                  raise SystemExit(1) from exc
+              if value < 0:
+                  print(f"::error::{name} must be >= 0, got {value}", file=sys.stderr)
+                  raise SystemExit(1)
+              print(f"{name}: ${value:.6f}")
           PY
 
       - name: Deterministic gates before paid calls
@@ -99,12 +110,17 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p reports
+          rm -rf "$VCR_REJECTED_ROOT"
+          mkdir -p "$VCR_REJECTED_ROOT"
           if [ "$BENCHMARK_MODEL" = "all" ]; then
-            ./scripts/record_all_models.sh --max-cost-usd "$MAX_COST_USD"
+            ./scripts/record_all_models.sh \
+              --max-cost-per-model-usd "$MAX_COST_PER_MODEL_USD" \
+              --max-total-cost-usd "$MAX_TOTAL_COST_USD"
           else
             python scripts/record_model.py \
               --model "$BENCHMARK_MODEL" \
-              --max-cost-usd "$MAX_COST_USD"
+              --max-cost-per-model-usd "$MAX_COST_PER_MODEL_USD" \
+              --max-total-cost-usd "$MAX_TOTAL_COST_USD"
           fi
 
       - name: Offline verification (no API key)
@@ -130,7 +146,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p reports/rejected reports/responses
-          cp -a /tmp/ipbox_llm_rejected/. reports/rejected/ 2>/dev/null || true
+          cp -a "$VCR_REJECTED_ROOT"/. reports/rejected/ 2>/dev/null || true
           cp -a /tmp/ipbox_llm_responses/. reports/responses/ 2>/dev/null || true
 
       - name: Upload cassette candidates and reports
