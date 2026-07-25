@@ -145,8 +145,32 @@ jobs:
           ruff check .
           python -m compileall -q python_helper tests scripts
 
-      - name: Unit tests with coverage
-        run: pytest tests/unit --cov=python_helper --cov-report=term-missing --cov-fail-under=90
+      - name: Capture unit-test diagnostics
+        run: |
+          set +e
+          mkdir -p reports
+          pytest tests/unit \
+            --cov=python_helper \
+            --cov-report=term-missing \
+            --cov-fail-under=90 \
+            > reports/unit-tests.txt 2>&1
+          printf '%s\n' "$?" > reports/unit-tests-status.txt
+          exit 0
+
+      - name: Upload unit-test diagnostics
+        uses: actions/upload-artifact@v4
+        with:
+          name: publish-thermo-unit-${{ github.sha }}
+          path: reports/
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Enforce unit tests
+        run: |
+          set -euo pipefail
+          cat reports/unit-tests.txt
+          test "$(cat reports/unit-tests-status.txt)" -eq 0
+          rm -rf reports
 
       - name: Full free suite
         run: pytest -q
