@@ -37,18 +37,54 @@ jobs:
             requirements-test.txt
       - name: Install dependencies
         run: pip install -r requirements.txt -r requirements-test.txt
-      - name: Apply audited patch once
+      - name: Finalize audited source
         run: |
           set -euo pipefail
-          cat .audit-patch/part*.b64 | base64 -d | xz -d > /tmp/audit.patch
-          if git apply --check /tmp/audit.patch; then
-            git apply /tmp/audit.patch
-          elif git apply --reverse --check /tmp/audit.patch; then
-            echo "Audited patch is already applied"
-          else
-            echo "::error::audited patch neither applies nor matches the current tree"
+          test -f python_helper/input_validation.py || {
+            echo "::error::the main audited source commit is missing"
             exit 1
-          fi
+          }
+          python - <<'PY'
+          from pathlib import Path
+
+          calculator = Path("python_helper/ipbox_calculator.py")
+          text = calculator.read_text(encoding="utf-8")
+          old = '''    if has_non_deductible_description_signal(description):
+              return replace(
+                  item,
+                  basket="MIX",
+                  note=(
+                      "Potential non-deductible expense; description alone is not evidence. "
+                      "Require explicit KUP=false or verified statutory classification to exclude it"
+                  ),
+              )
+          if item.basket:
+              return item
+          '''
+          new = '''    if item.basket:
+              return item
+          if has_non_deductible_description_signal(description):
+              return replace(
+                  item,
+                  basket="MIX",
+                  note=(
+                      "Potential non-deductible expense; description alone is not evidence. "
+                      "Require explicit KUP=false or verified statutory classification to exclude it"
+                  ),
+              )
+          '''
+          if old in text:
+              calculator.write_text(text.replace(old, new, 1), encoding="utf-8")
+          elif new not in text:
+              raise SystemExit("classify_cost audit hunk not found")
+
+          tests = Path("tests/unit/test_calculator_core.py")
+          test_text = tests.read_text(encoding="utf-8")
+          marker = "def test_description_signal_does_not_override_explicit_cost_classification"
+          if marker not in test_text:
+              test_text += '''\n\ndef test_description_signal_does_not_override_explicit_cost_classification() -> None:\n    explicit = CostItem(\n        "Kawa do domu — koszt zweryfikowany dokumentem",\n        100,\n        basket="IP",\n        allocation_source="verified-cost-ledger",\n    )\n\n    assert classify_cost(explicit, False, False) is explicit\n'''
+              tests.write_text(test_text, encoding="utf-8")
+          PY
       - name: Format and lint audited code
         run: |
           set -euo pipefail
@@ -74,7 +110,7 @@ jobs:
             echo "Audited source is already committed"
           else
             git diff --cached --stat
-            git commit -m "fix: close final IP Box audit blockers"
+            git commit -m "fix: preserve explicit cost classification"
             git push origin "HEAD:${GITHUB_HEAD_REF:-$GITHUB_REF_NAME}"
           fi
       - name: Detect recording capability
