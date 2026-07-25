@@ -1,0 +1,75 @@
+name: Apply audit fixes and refresh cassettes
+
+on:
+  push:
+    branches:
+      - fix/decouple-mix-allocation-from-w
+
+permissions:
+  contents: write
+
+concurrency:
+  group: apply-audit-fixes-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  apply-and-record:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+      LLM_PROVIDER: openrouter
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements-test.txt
+      - name: Install dependencies
+        run: pip install -r requirements.txt -r requirements-test.txt
+      - name: Apply audited patch
+        run: |
+          set -euo pipefail
+          cat .audit-patch/part*.b64 | base64 -d | xz -d > /tmp/audit.patch
+          git apply --check /tmp/audit.patch
+          git apply /tmp/audit.patch
+          rm -rf tests/llm/vcr/cassettes
+          mkdir -p tests/llm/vcr/cassettes
+      - name: Deterministic gates before paid calls
+        run: |
+          set -euo pipefail
+          test -n "$OPENROUTER_API_KEY" || { echo "::error::missing OPENROUTER_API_KEY"; exit 1; }
+          ruff format --check .
+          ruff check .
+          python -m compileall -q python_helper tests scripts
+          pytest tests/unit --cov=python_helper --cov-report=term-missing --cov-fail-under=90
+          pytest -q
+          for script in scripts/*.sh dump-to-md.sh; do bash -n "$script"; done
+      - name: Record and verify full matrix
+        run: |
+          set -euo pipefail
+          ./scripts/record_all_models.sh --max-cost-usd 1
+          unset OPENROUTER_API_KEY
+          ./scripts/verify_all_models.sh
+          python scripts/vcr_precommit.py --all-models
+          python scripts/check_cassette_policy.py
+          python scripts/benchmark_report.py
+      - name: Commit audited fixes and cassettes
+        run: |
+          set -euo pipefail
+          git rm -r --ignore-unmatch .audit-patch
+          git rm --ignore-unmatch \
+            .github/workflows/apply-audit-fixes-temp.yml \
+            .github/workflows/source-snapshot-temp.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --stat
+          git commit -m "fix: close final IP Box audit blockers"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
