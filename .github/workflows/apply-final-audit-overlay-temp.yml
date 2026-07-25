@@ -113,26 +113,25 @@ jobs:
           set -euo pipefail
           git diff --check
           ! grep -R --line-number -E 'oracle_v[0-9]+|output_schema_v[0-9]+|sys\.modules\[' tests README.md AGENTS.md docs python_helper scripts
-      - name: Prepare final commit
+      - name: Prepare final code commit
         run: |
           set -euo pipefail
           git rm -r --ignore-unmatch .audit-overlay
-          git rm --ignore-unmatch \
-            .github/workflows/apply-final-audit-overlay-temp.yml \
-            .github/workflows/source-snapshot-audit-temp.yml
           git add -A
+          git reset -- \
+            .github/workflows/apply-final-audit-overlay-temp.yml \
+            .github/workflows/source-snapshot-audit-temp.yml || true
           git status --short
           test -n "$(git diff --cached --name-only)"
-      - name: Create final commit
+      - name: Create final code commit
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git diff --cached --stat
           git commit -m "fix: close final deterministic audit blockers"
-      - name: Push final commit
+      - name: Push final code commit
         run: |
           set -euo pipefail
           branch="${GITHUB_HEAD_REF:-$GITHUB_REF_NAME}"
-          git pull --rebase origin "$branch"
           git push origin "HEAD:$branch"
