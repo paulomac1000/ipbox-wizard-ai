@@ -1,19 +1,33 @@
 name: Rebuild canonical VCR matrix
 
 on:
-  push:
-    branches:
-      - fix/decouple-mix-allocation-from-w
+  workflow_dispatch:
+    inputs:
+      confirmation:
+        description: "Type REBUILD_322_CASSETTES to confirm paid recording"
+        required: true
+        type: string
+      max_cost_per_model_usd:
+        description: "Per-model paid-cost guard in USD"
+        required: true
+        default: "5"
+        type: string
+      max_total_cost_usd:
+        description: "Whole-run paid-cost guard in USD"
+        required: true
+        default: "5"
+        type: string
 
 permissions:
   contents: write
 
 concurrency:
   group: rebuild-canonical-vcr-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   record-verify-publish:
+    if: inputs.confirmation == 'REBUILD_322_CASSETTES'
     runs-on: ubuntu-latest
     timeout-minutes: 120
     env:
@@ -53,11 +67,15 @@ jobs:
           python scripts/check_cassette_policy.py
 
       - name: Record full seven-family matrix
+        env:
+          VCR_REJECTED_ROOT: /tmp/ipbox_llm_rejected
         run: |
           set -euo pipefail
-          rm -rf tests/llm/vcr/cassettes
-          mkdir -p tests/llm/vcr/cassettes
-          ./scripts/record_all_models.sh --max-cost-usd 5
+          rm -rf tests/llm/vcr/cassettes "$VCR_REJECTED_ROOT"
+          mkdir -p tests/llm/vcr/cassettes "$VCR_REJECTED_ROOT"
+          ./scripts/record_all_models.sh \
+            --max-cost-per-model-usd "${{ inputs.max_cost_per_model_usd }}" \
+            --max-total-cost-usd "${{ inputs.max_total_cost_usd }}"
 
       - name: Verify complete matrix offline
         run: |
