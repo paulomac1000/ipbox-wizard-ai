@@ -33,7 +33,7 @@ jobs:
             requirements.txt
             requirements-test.txt
       - name: Install dependencies
-        run: pip install -r requirements.txt -r requirements-test.txt
+        run: pip install -q -r requirements.txt -r requirements-test.txt
       - name: Apply complete audited overlay
         run: |
           set -euo pipefail
@@ -52,13 +52,41 @@ jobs:
           test -f tests/llm/output_schema_legacy.py
           test ! -e tests/llm/output_schema_v2.py
           ! grep -R --line-number --fixed-strings 'sys.modules[' tests/llm
-      - name: Format and lint
+      - name: Format and collect lint diagnostics
+        id: lint
+        run: |
+          set +e
+          ruff format . > ruff-format-apply.log 2>&1
+          format_apply=$?
+          ruff check --fix . > ruff-fix.log 2>&1
+          fix_status=$?
+          ruff format --check . > ruff-format-check.log 2>&1
+          format_check=$?
+          ruff check . > ruff-check.log 2>&1
+          lint_check=$?
+          printf '%s\n' "$format_apply $fix_status $format_check $lint_check" > ruff-status.txt
+          exit 0
+      - name: Upload Ruff diagnostics
+        uses: actions/upload-artifact@v4
+        with:
+          name: ruff-diagnostics-${{ github.sha }}
+          path: |
+            ruff-*.log
+            ruff-status.txt
+          if-no-files-found: error
+          retention-days: 1
+      - name: Enforce format and lint
         run: |
           set -euo pipefail
-          ruff format .
-          ruff check --fix .
-          ruff format --check .
-          ruff check .
+          read -r format_apply fix_status format_check lint_check < ruff-status.txt
+          cat ruff-fix.log
+          cat ruff-format-check.log
+          cat ruff-check.log
+          test "$format_apply" -eq 0
+          test "$fix_status" -eq 0
+          test "$format_check" -eq 0
+          test "$lint_check" -eq 0
+          rm -f ruff-*.log ruff-status.txt
       - name: Compile Python
         run: python -m compileall -q python_helper tests scripts
       - name: Unit tests with coverage
