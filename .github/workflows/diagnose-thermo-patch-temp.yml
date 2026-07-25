@@ -57,37 +57,68 @@ jobs:
               raise SystemExit("Cannot extract debug patch definition")
           script = textwrap.dedent(match.group(1))
           exec(compile(script, "<debug-patch>", "exec"), {})
+
+          def indent_generated_range(
+              path: str,
+              *,
+              start_index: int,
+              end_index: int,
+          ) -> None:
+              target = Path(path)
+              lines = target.read_text(encoding="utf-8").splitlines()
+              block = lines[start_index : end_index + 1]
+              lines[start_index : end_index + 1] = [
+                  f"    {line}" if line else line for line in block
+              ]
+              target.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+          stopped_path = "tests/unit/test_scenarios_and_evaluator.py"
+          stopped_lines = Path(stopped_path).read_text(encoding="utf-8").splitlines()
+          stopped_start = stopped_lines.index("financial_tax_fields = (")
+          evidence_line = next(
+              index
+              for index in range(stopped_start, len(stopped_lines))
+              if '== "NOT_APPLICABLE"' in stopped_lines[index]
+          )
+          stopped_end = evidence_line + 1
+          if stopped_lines[stopped_end].strip() != ")":
+              raise SystemExit("Cannot find generated STOP assertion terminator")
+          indent_generated_range(
+              stopped_path,
+              start_index=stopped_start,
+              end_index=stopped_end,
+          )
+
+          workflow_path = "tests/unit/test_vcr_and_client.py"
+          workflow_lines = Path(workflow_path).read_text(encoding="utf-8").splitlines()
+          model_budget_line = next(
+              index
+              for index, line in enumerate(workflow_lines)
+              if "MAX_COST_PER_MODEL_USD" in line
+          )
+          workflow_start = model_budget_line - 1
+          if workflow_lines[workflow_start].strip() != "assert (":
+              raise SystemExit("Cannot find generated workflow assertion start")
+          workflow_end = next(
+              index
+              for index in range(model_budget_line, len(workflow_lines))
+              if "RUN_PAID_BENCHMARK" in workflow_lines[index]
+          )
+          indent_generated_range(
+              workflow_path,
+              start_index=workflow_start,
+              end_index=workflow_end,
+          )
           PYRUN
 
-      - name: Capture Ruff diagnostics
-        run: |
-          set +e
-          mkdir -p reports
-          ruff format . > reports/ruff-format.txt 2>&1
-          printf '%s\n' "$?" > reports/ruff-format-status.txt
-          ruff check --fix . > reports/ruff-fix.txt 2>&1
-          printf '%s\n' "$?" > reports/ruff-fix-status.txt
-          exit 0
-
-      - name: Upload Ruff diagnostics
-        uses: actions/upload-artifact@v4
-        with:
-          name: publish-thermo-ruff-${{ github.sha }}
-          path: reports/
-          if-no-files-found: error
-          retention-days: 1
-
-      - name: Enforce Ruff and compile
+      - name: Format, lint, and compile
         run: |
           set -euo pipefail
-          cat reports/ruff-format.txt
-          cat reports/ruff-fix.txt
-          test "$(cat reports/ruff-format-status.txt)" -eq 0
-          test "$(cat reports/ruff-fix-status.txt)" -eq 0
+          ruff format .
+          ruff check --fix .
           ruff format --check .
           ruff check .
           python -m compileall -q python_helper tests scripts
-          rm -rf reports
 
       - name: Unit tests with coverage
         run: pytest tests/unit --cov=python_helper --cov-report=term-missing --cov-fail-under=90
@@ -110,7 +141,7 @@ jobs:
             tests/llm/oracle.py \
             tests/llm/oracle_guards.py \
             tests/llm/output_schema.py \
-            tests/llm/scenarios/27_termomodizacja_full.yaml \
+            tests/llm/scenarios/27_termomodernizacja_full.yaml \
             tests/llm/scenarios/28_edge_multiple_carry-overs.yaml \
             tests/llm/scenarios/48_historical_2024_pit_like_cascade.yaml \
             tests/unit/test_tax_year_rules.py \
