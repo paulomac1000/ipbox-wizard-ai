@@ -58,7 +58,7 @@ jobs:
           script = textwrap.dedent(match.group(1))
           exec(compile(script, "<debug-patch>", "exec"), {})
 
-          def indent_generated_range(
+          def normalize_generated_range(
               path: str,
               *,
               start_index: int,
@@ -66,15 +66,18 @@ jobs:
           ) -> None:
               target = Path(path)
               lines = target.read_text(encoding="utf-8").splitlines()
-              block = lines[start_index : end_index + 1]
-              lines[start_index : end_index + 1] = [
-                  f"    {line}" if line else line for line in block
-              ]
+              raw_block = "\n".join(lines[start_index : end_index + 1])
+              normalized = textwrap.indent(textwrap.dedent(raw_block), "    ").splitlines()
+              lines[start_index : end_index + 1] = normalized
               target.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
           stopped_path = "tests/unit/test_scenarios_and_evaluator.py"
           stopped_lines = Path(stopped_path).read_text(encoding="utf-8").splitlines()
-          stopped_start = stopped_lines.index("financial_tax_fields = (")
+          stopped_start = next(
+              index
+              for index, line in enumerate(stopped_lines)
+              if line.strip() == "financial_tax_fields = ("
+          )
           evidence_line = next(
               index
               for index in range(stopped_start, len(stopped_lines))
@@ -83,7 +86,7 @@ jobs:
           stopped_end = evidence_line + 1
           if stopped_lines[stopped_end].strip() != ")":
               raise SystemExit("Cannot find generated STOP assertion terminator")
-          indent_generated_range(
+          normalize_generated_range(
               stopped_path,
               start_index=stopped_start,
               end_index=stopped_end,
@@ -96,15 +99,17 @@ jobs:
               for index, line in enumerate(workflow_lines)
               if "MAX_COST_PER_MODEL_USD" in line
           )
-          workflow_start = model_budget_line - 1
-          if workflow_lines[workflow_start].strip() != "assert (":
+          workflow_start = model_budget_line
+          while workflow_start >= 0 and workflow_lines[workflow_start].strip() != "assert (":
+              workflow_start -= 1
+          if workflow_start < 0:
               raise SystemExit("Cannot find generated workflow assertion start")
           workflow_end = next(
               index
               for index in range(model_budget_line, len(workflow_lines))
               if "RUN_PAID_BENCHMARK" in workflow_lines[index]
           )
-          indent_generated_range(
+          normalize_generated_range(
               workflow_path,
               start_index=workflow_start,
               end_index=workflow_end,
