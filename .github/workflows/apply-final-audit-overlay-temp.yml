@@ -119,6 +119,7 @@ jobs:
           git rm -r --ignore-unmatch .audit-overlay
           git add -A
           git reset -- \
+            .github/workflows/deterministic-ci.yml \
             .github/workflows/apply-final-audit-overlay-temp.yml \
             .github/workflows/source-snapshot-audit-temp.yml || true
           git status --short
