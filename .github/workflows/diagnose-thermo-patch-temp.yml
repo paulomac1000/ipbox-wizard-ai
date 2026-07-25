@@ -1,0 +1,65 @@
+name: Diagnose thermomodernization patch generator
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: diagnose-thermo-patch-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
+          persist-credentials: false
+
+      - name: Run generator with traceback capture
+        run: |
+          set +e
+          mkdir -p reports
+          python - <<'PYRUN' > reports/patch-generator.txt 2>&1
+          from pathlib import Path
+          import re
+          import textwrap
+
+          workflow = Path(".github/workflows/debug-thermo-audit-temp.yml").read_text(
+              encoding="utf-8"
+          )
+          match = re.search(
+              r"      - name: Reuse audited patch definition\n"
+              r"        run: \|\n"
+              r"          python - <<'PYRUN'\n"
+              r"(.*?)\n"
+              r"          PYRUN\n",
+              workflow,
+              re.DOTALL,
+          )
+          if match is None:
+              raise SystemExit("Cannot extract debug patch definition")
+          script = textwrap.dedent(match.group(1))
+          exec(compile(script, "<debug-patch>", "exec"), {})
+          PYRUN
+          printf '%s\n' "$?" > reports/patch-generator-status.txt
+          exit 0
+
+      - name: Upload generator diagnostics
+        uses: actions/upload-artifact@v4
+        with:
+          name: thermo-generator-${{ github.sha }}
+          path: reports/
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Enforce generator
+        run: |
+          cat reports/patch-generator.txt
+          test "$(cat reports/patch-generator-status.txt)" -eq 0
