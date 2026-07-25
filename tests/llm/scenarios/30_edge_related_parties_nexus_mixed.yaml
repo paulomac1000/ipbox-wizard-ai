@@ -8,6 +8,7 @@ meta:
 input:
   rok: 2025
   forma_opodatkowania: liniowy_19%
+  kwalifikowane_IP: true
   polityka_alokacji:
     policy_id: scenario-policy
     przychody:
@@ -35,11 +36,13 @@ input:
     - opis: Laptop do B+R
       kwota: 3000
       nexus_source: own_br
+      nexus_evidence: synthetic-nexus-30_edge_related_parties_nexus_mixed-1
       kategoria: IP
       allocation_source: ewidencja_kosztu_IP
     - opis: Usługi CodeSis
       kwota: 5000
       nexus_source: related_br_contractor
+      nexus_evidence: synthetic-nexus-30_edge_related_parties_nexus_mixed-2
       kategoria: IP
       allocation_source: ewidencja_kosztu_IP
     opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.
@@ -56,11 +59,13 @@ input:
     - opis: Licencja JetBrains
       kwota: 500
       nexus_source: own_br
+      nexus_evidence: synthetic-nexus-30_edge_related_parties_nexus_mixed-3
       kategoria: IP
       allocation_source: ewidencja_kosztu_IP
     - opis: Usługi CodeSis 2
       kwota: 5000
       nexus_source: related_br_contractor
+      nexus_evidence: synthetic-nexus-30_edge_related_parties_nexus_mixed-4
       kategoria: IP
       allocation_source: ewidencja_kosztu_IP
     opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.

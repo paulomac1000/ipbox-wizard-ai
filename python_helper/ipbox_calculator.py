@@ -135,12 +135,14 @@ def aggregate_w_multiproject(projects: list[dict[str, float]]) -> float:
         revenue_total += revenue
         weighted += revenue * Decimal(str(w_value))
     if revenue_total == 0:
-        return 0.0
+        raise ValueError("sum of project revenue must be > 0")
     return round(float(weighted / revenue_total), 2)
 
 
-def get_nbp_rate(currency: str, date_str: str, max_lookback_days: int = 10) -> float | None:
-    """Fetch an NBP table-A rate, walking backwards through non-business days."""
+def get_nbp_rate_with_date(
+    currency: str, date_str: str, max_lookback_days: int = 10
+) -> tuple[float, str] | None:
+    """Fetch an NBP table-A rate and the actual business date used."""
     if not re.fullmatch(r"[A-Za-z]{3}", currency):
         raise ValueError("currency must be a three-letter ISO code")
     if max_lookback_days < 0:
@@ -170,11 +172,19 @@ def get_nbp_rate(currency: str, date_str: str, max_lookback_days: int = 10) -> f
                 rate = float(response.json()["rates"][0]["mid"])
             except (KeyError, IndexError, TypeError, ValueError):
                 return None
-            return rate if math.isfinite(rate) and rate > 0 else None
+            if math.isfinite(rate) and rate > 0:
+                return rate, date_value
+            return None
         if response.status_code != 404:
             return None
         current -= timedelta(days=1)
     return None
+
+
+def get_nbp_rate(currency: str, date_str: str, max_lookback_days: int = 10) -> float | None:
+    """Compatibility helper returning only the rate value."""
+    result = get_nbp_rate_with_date(currency, date_str, max_lookback_days)
+    return result[0] if result is not None else None
 
 
 def convert_fx_invoice(
@@ -199,29 +209,34 @@ def convert_fx_invoice(
         raise ValueError("payment_date cannot be earlier than issue_date")
     base_date = issue if method == "accrual" else payment
     assert base_date is not None
-    rate_date = (base_date - timedelta(days=1)).strftime("%Y-%m-%d")
-    base_rate = get_nbp_rate(currency, rate_date)
-    if base_rate is None:
-        return {"error": f"NBP rate unavailable for {currency} near {rate_date}"}
+    requested_rate_date = (base_date - timedelta(days=1)).strftime("%Y-%m-%d")
+    base_lookup = get_nbp_rate_with_date(currency, requested_rate_date)
+    if base_lookup is None:
+        return {"error": f"NBP rate unavailable for {currency} near {requested_rate_date}"}
+    base_rate, base_rate_date = base_lookup
 
     payment_rate: float | None = None
+    payment_rate_date: str | None = None
     difference = Decimal("0")
     if method == "accrual" and payment is not None and payment != issue:
-        payment_rate_date = (payment - timedelta(days=1)).strftime("%Y-%m-%d")
-        payment_rate = get_nbp_rate(currency, payment_rate_date)
-        if payment_rate is None:
+        requested_payment_rate_date = (payment - timedelta(days=1)).strftime("%Y-%m-%d")
+        payment_lookup = get_nbp_rate_with_date(currency, requested_payment_rate_date)
+        if payment_lookup is None:
             return {
                 "error": (
-                    f"NBP payment-date rate unavailable for {currency} near {payment_rate_date}"
+                    "NBP payment-date rate unavailable for "
+                    f"{currency} near {requested_payment_rate_date}"
                 )
             }
+        payment_rate, payment_rate_date = payment_lookup
         difference = money((payment_rate - base_rate) * amount_currency)
 
     return {
         "base_revenue_pln": float(money(amount_currency * base_rate)),
         "base_rate": base_rate,
-        "base_rate_date": rate_date,
+        "base_rate_date": base_rate_date,
         "payment_rate": payment_rate,
+        "payment_rate_date": payment_rate_date,
         "exchange_rate_difference": float(difference),
         "revenue_month": base_date.strftime("%Y-%m"),
         "difference_month": payment.strftime("%Y-%m") if payment else None,
@@ -341,23 +356,35 @@ class AllocationPolicy:
             raise ValueError("AllocationPolicy validation failed:\n- " + "\n- ".join(errors))
 
 
-PRIVATE_KEYWORDS = (
-    "prywatn",
-    "osobist",
-    "do domu",
-    "kawa",
-    "obiad",
-    "fryzjer",
-    "odzież",
-    "buty",
-    "luxmed",
-    "medicover",
+PRIVATE_DESCRIPTION_PATTERNS = (
+    r"\bprywatn\w*\b",
+    r"\bosobist\w*\b",
+    r"\bdo\s+domu\b",
+    r"\bkawa\b",
+    r"\bobiad\w*\b",
+    r"\bfryzjer\w*\b",
+    r"\bodzież\w*\b",
+    r"\bbuty\b",
+    r"\bluxmed\b",
+    r"\bmedicover\b",
 )
-EXCLUDED_PATTERNS = (r"kara", r"grzywna", r"odset.*karn", r"sankcj", r"mandat")
+EXCLUDED_PATTERNS = (
+    r"\bkara\b",
+    r"\bgrzywna\b",
+    r"\bodsetk[ia].*karn",
+    r"\bsankcj",
+    r"\bmandat\b",
+)
 SOCIAL_SECURITY_PATTERN = r"(zus.*społeczn|składk.*społeczn|ubezpiecz.*społeczn)"
 HEALTH_PATTERN = r"(zdrowotn|nfz)"
-INTERNET_RELIEF_MAX = 760.0
-GENERIC_DONATION_LIMIT_RATE = 0.06
+
+
+def has_non_deductible_description_signal(description: str) -> bool:
+    """Return a token-aware candidate signal; it is not a KUP decision."""
+    normalized = description.casefold()
+    private = any(re.search(pattern, normalized) for pattern in PRIVATE_DESCRIPTION_PATTERNS)
+    statutory = any(re.search(pattern, normalized) for pattern in EXCLUDED_PATTERNS)
+    return private or statutory
 
 
 DIRECT_IP_KEYWORDS = (
@@ -387,13 +414,14 @@ def classify_cost(
         if health_insurance_in_kpir:
             return replace(item, basket="MIX", note="Health contribution in KPiR")
         return replace(item, basket="WYKLUCZONE", note="Health contribution handled outside costs")
-    if any(re.search(pattern, description) for pattern in EXCLUDED_PATTERNS):
-        return replace(item, basket="WYKLUCZONE", note="Statutorily excluded cost")
-    if any(keyword in description for keyword in PRIVATE_KEYWORDS):
+    if has_non_deductible_description_signal(description):
         return replace(
             item,
-            basket="WYKLUCZONE",
-            note="Private/personal expense; not a deductible business cost",
+            basket="MIX",
+            note=(
+                "Potential non-deductible expense; description alone is not evidence. "
+                "Require explicit KUP=false or verified statutory classification to exclude it"
+            ),
         )
     if item.basket:
         return item
@@ -528,7 +556,12 @@ def allocate_costs_monthly(
             status = "WYKLUCZONE"
         elif basket == "MIX":
             totals["MIX"] += amount
-            if allocation_policy.mix_method == "przychodowa_roczna" and item.allocation_key is None:
+            if allocation_policy.mix_method == "przychodowa_roczna":
+                if item.allocation_key is not None or item.allocation_method:
+                    raise ValueError(
+                        "przychodowa_roczna forbids item allocation_key/allocation_method; "
+                        "all MIX costs must be deferred to annual true-up"
+                    )
                 totals["MIX_DEFERRED"] += amount
                 method = allocation_policy.mix_method
                 source = item.allocation_source or allocation_policy.source
@@ -739,11 +772,14 @@ def tax_cascade(
     nexus: float,
     tax_form: str,
     *,
+    year: int,
     previous_non_ip_business_losses: float = 0,
     social_security_deduction: float = 0,
     health_contribution_deduction: float = 0,
+    health_tax_credit: float = 0,
     ikze: float = 0,
     donations: float = 0,
+    donation_limit: float = 0,
     internet_tax_relief: float = 0,
     rehabilitative_relief_income: float = 0,
     rd_relief_non_ip: float = 0,
@@ -753,154 +789,31 @@ def tax_cascade(
     child_tax_credit: float = 0,
     extra_income_scale: float = 0,
 ) -> dict[str, Any]:
-    """Calculate the annual cascade with explicit validation and rounding."""
-    non_ip_income = _finite("non_ip_income", non_ip_income)
-    ip_income = _finite("ip_income", ip_income)
-    nexus = _fraction("nexus", nexus)
-    if tax_form not in {"liniowy_19%", "linear_19%", "skala", "scale"}:
-        raise ValueError("unsupported tax_form")
-    linear = tax_form in {"liniowy_19%", "linear_19%"}
+    """Compatibility adapter to the single canonical year-aware tax cascade."""
+    from .tax_cascade import calculate_tax_for_year
 
-    values = {
-        "previous_non_ip_business_losses": previous_non_ip_business_losses,
-        "social_security_deduction": social_security_deduction,
-        "health_contribution_deduction": health_contribution_deduction,
-        "ikze": ikze,
-        "donations": donations,
-        "internet_tax_relief": internet_tax_relief,
-        "rehabilitative_relief_income": rehabilitative_relief_income,
-        "rd_relief_non_ip": rd_relief_non_ip,
-        "rd_relief_ip": rd_relief_ip,
-        "rd_relief_limit": rd_relief_limit,
-        "thermomodernization_pool": thermomodernization_pool,
-        "child_tax_credit": child_tax_credit,
-        "extra_income_scale": extra_income_scale,
-    }
-    for name, value in values.items():
-        values[name] = _nonnegative(name, value)
-    if values["health_contribution_deduction"] > 0 and not linear:
-        raise ValueError("health contribution deduction is available only for linear tax")
-    rd_relief_requested = values["rd_relief_non_ip"] + values["rd_relief_ip"]
-    if rd_relief_requested > values["rd_relief_limit"] + 1e-9:
-        raise ValueError(
-            "allocated R&D relief exceeds rd_relief_limit; provide the documented "
-            "deduction limit after applying the taxpayer-specific percentage"
-        )
-
-    if linear:
-        unsupported_linear_reliefs = {
-            "donations": values["donations"],
-            "internet_tax_relief": values["internet_tax_relief"],
-            "rehabilitative_relief_income": values["rehabilitative_relief_income"],
-            "child_tax_credit": values["child_tax_credit"],
-        }
-        used = [name for name, amount in unsupported_linear_reliefs.items() if amount > 0]
-        if used:
-            raise ValueError("unsupported relief for linear tax: " + ", ".join(sorted(used)))
-
-    if values["internet_tax_relief"] > INTERNET_RELIEF_MAX:
-        raise ValueError(
-            f"internet_tax_relief cannot exceed {INTERNET_RELIEF_MAX:.0f} PLN per taxpayer"
-        )
-    if values["thermomodernization_pool"] > THERMOMODERNIZATION_RELIEF_MAX:
-        raise ValueError(
-            "thermomodernization_pool cannot exceed 53000 PLN per taxpayer across "
-            "all thermomodernization projects"
-        )
-
-    donation_limit_base = max(0.0, non_ip_income) + (
-        0.0 if linear else values["extra_income_scale"]
+    return calculate_tax_for_year(
+        year,
+        non_ip_income=non_ip_income,
+        ip_income=ip_income,
+        nexus=nexus,
+        tax_form=tax_form,
+        previous_non_ip_business_losses=previous_non_ip_business_losses,
+        social_security_deduction=social_security_deduction,
+        health_income_deduction=health_contribution_deduction,
+        health_tax_credit=health_tax_credit,
+        ikze=ikze,
+        donations=donations,
+        donation_limit=donation_limit,
+        internet_tax_relief=internet_tax_relief,
+        rehabilitative_relief_income=rehabilitative_relief_income,
+        rd_relief_non_ip=rd_relief_non_ip,
+        rd_relief_ip=rd_relief_ip,
+        rd_relief_limit=rd_relief_limit,
+        thermomodernization_pool=thermomodernization_pool,
+        child_tax_credit=child_tax_credit,
+        extra_income_scale=extra_income_scale,
     )
-    donation_limit = donation_limit_base * GENERIC_DONATION_LIMIT_RATE
-    if values["donations"] > donation_limit + 1e-9:
-        raise ValueError(
-            "donations exceed the generic 6% income limit; pass only the eligible amount "
-            "or model a separately regulated donation type explicitly"
-        )
-
-    if linear and values["extra_income_scale"] > 0:
-        raise ValueError(
-            "extra_income_scale with linear business tax requires a separate scale-return "
-            "calculation; do not mix PIT-36L and scale income in one cascade"
-        )
-
-    business_remaining = max(0.0, non_ip_income)
-    steps: list[dict[str, float | str]] = []
-    # Source-specific deductions cannot consume salary or other scale income.
-    for label, key in (
-        ("Previous non-IP business losses", "previous_non_ip_business_losses"),
-        ("Health contribution", "health_contribution_deduction"),
-        ("R&D relief — non-IP business", "rd_relief_non_ip"),
-    ):
-        amount = values[key]
-        used = min(amount, business_remaining)
-        if used:
-            business_remaining -= used
-            steps.append({"step": label, "deduction": used, "after": business_remaining})
-        if key == "rd_relief_non_ip":
-            rd_relief_non_ip_used = used
-
-    remaining = business_remaining + (0.0 if linear else values["extra_income_scale"])
-    # These deductions reduce the combined scale base (or the linear business base
-    # when no separate scale income is present).
-    for label, key in (
-        ("Social security", "social_security_deduction"),
-        ("IKZE", "ikze"),
-        ("Donations", "donations"),
-        ("Internet relief", "internet_tax_relief"),
-        ("Rehabilitative relief", "rehabilitative_relief_income"),
-    ):
-        amount = values[key]
-        used = min(amount, remaining)
-        if used:
-            remaining -= used
-            steps.append({"step": label, "deduction": used, "after": remaining})
-
-    thermo_used = min(values["thermomodernization_pool"], remaining)
-    remaining -= thermo_used
-    thermo_carry = values["thermomodernization_pool"] - thermo_used
-    if thermo_used:
-        steps.append({"step": "Thermomodernization", "deduction": thermo_used, "after": remaining})
-
-    non_ip_base = tax_round(remaining)
-    if linear:
-        non_ip_tax_before_credit = tax_round(non_ip_base * 0.19)
-    elif non_ip_base <= 120_000:
-        non_ip_tax_before_credit = max(0, tax_round(non_ip_base * 0.12 - 3_600))
-    else:
-        non_ip_tax_before_credit = tax_round(10_800 + (non_ip_base - 120_000) * 0.32)
-
-    child_used = min(values["child_tax_credit"], non_ip_tax_before_credit)
-    non_ip_tax = max(0, non_ip_tax_before_credit - tax_round(child_used))
-
-    # PIT/IP position 19 reduces income from qualified IP before the nexus
-    # calculation reported in position 20 (art. 30ca ust. 9a and ust. 4 PIT).
-    rd_relief_ip_used = min(values["rd_relief_ip"], max(0.0, ip_income))
-    ip_income_after_rd = max(0.0, ip_income - rd_relief_ip_used)
-    ip_base = tax_round(ip_income_after_rd * nexus)
-    ip_tax = tax_round(ip_base * 0.05)
-    rd_relief_carry = (
-        values["rd_relief_ip"]
-        - rd_relief_ip_used
-        + values["rd_relief_non_ip"]
-        - rd_relief_non_ip_used
-    )
-    return {
-        "deduction_steps": steps,
-        "thermomodernization_used": thermo_used,
-        "thermomodernization_carry_over": thermo_carry,
-        "non_ip_base_rounded": non_ip_base,
-        "extra_income_scale_included": 0.0 if linear else values["extra_income_scale"],
-        "non_ip_tax_before_child_relief": non_ip_tax_before_credit,
-        "child_tax_credit_used": child_used,
-        "non_ip_tax_final": non_ip_tax,
-        "rd_relief_ip_used": rd_relief_ip_used,
-        "rd_relief_non_ip_used": rd_relief_non_ip_used,
-        "rd_relief_carry_over": rd_relief_carry,
-        "ip_base_rounded": ip_base,
-        "ip_tax": ip_tax,
-        "total_tax": non_ip_tax + ip_tax,
-    }
 
 
 def calculate_overpayment(

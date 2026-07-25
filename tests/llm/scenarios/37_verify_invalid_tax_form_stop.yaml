@@ -8,6 +8,7 @@ meta:
 input:
   rok: 2025
   forma_opodatkowania: ryczalt
+  kwalifikowane_IP: true
   polityka_alokacji:
     policy_id: scenario-policy
     przychody:

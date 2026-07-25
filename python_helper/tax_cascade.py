@@ -38,6 +38,7 @@ def calculate_tax_for_year(
     health_tax_credit: float = 0,
     ikze: float = 0,
     donations: float = 0,
+    donation_limit: float = 0,
     internet_tax_relief: float = 0,
     rehabilitative_relief_income: float = 0,
     rd_relief_non_ip: float = 0,
@@ -80,6 +81,7 @@ def calculate_tax_for_year(
         "health_tax_credit": health_tax_credit,
         "ikze": ikze,
         "donations": donations,
+        "donation_limit": donation_limit,
         "internet_tax_relief": internet_tax_relief,
         "rehabilitative_relief_income": rehabilitative_relief_income,
         "rd_relief_non_ip": rd_relief_non_ip,
@@ -106,7 +108,10 @@ def calculate_tax_for_year(
     if normalized_form == "scale" and values["health_income_deduction"] > 0:
         raise ValueError("post-2021 health income deduction is available only for linear tax")
     if normalized_form == "linear" and values["extra_income_scale"] > 0:
-        raise ValueError("linear business and extra scale income require separate returns")
+        raise ValueError(
+            "extra_income_scale with linear business tax requires a separate "
+            "scale-return calculation"
+        )
     if normalized_form == "linear" and any(
         values[name] > 0
         for name in (
@@ -116,13 +121,18 @@ def calculate_tax_for_year(
             "child_tax_credit",
         )
     ):
-        raise ValueError("unsupported personal relief for linear tax")
+        raise ValueError("unsupported relief for linear tax")
+    if values["donations"] > 0:
+        if values["donation_limit"] <= 0:
+            raise ValueError("positive donations require a verified donation_limit")
+        if values["donations"] > values["donation_limit"]:
+            raise ValueError("donations exceed the verified donation_limit")
     if values["internet_tax_relief"] > Decimal("760"):
-        raise ValueError("internet relief exceeds 760 PLN")
+        raise ValueError("internet_tax_relief cannot exceed 760 PLN")
     if values["thermomodernization_pool"] > Decimal("53000"):
-        raise ValueError("thermomodernization pool exceeds 53000 PLN")
+        raise ValueError("thermomodernization_pool cannot exceed 53000 PLN")
     if values["rd_relief_ip"] + values["rd_relief_non_ip"] > values["rd_relief_limit"]:
-        raise ValueError("R&D relief exceeds documented limit")
+        raise ValueError("allocated R&D relief exceeds documented rd_relief_limit")
     if thermomodernization_lots is not None and values["thermomodernization_pool"] > 0:
         raise ValueError("use thermomodernization_pool or thermomodernization_lots, not both")
 

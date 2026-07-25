@@ -90,6 +90,20 @@ def validate_cost_policy(input_data: Mapping[str, Any]) -> tuple[str, str | None
         raise ValueError(
             "koszty_MIX with źródło=interpretacja_KIS requires źródło_ref/source_reference"
         )
+    if str(mix.get("metoda", "przychodowa_roczna")) == "przychodowa_roczna":
+        for month_id, cost in _cost_rows(input_data):
+            explicit = str(cost.get("koszyk", cost.get("kategoria", ""))).upper()
+            if explicit in {"IP", "NON", "NIE", "WYKLUCZONE", "EXCLUDED"}:
+                continue
+            if (
+                cost.get("allocation_key") is not None
+                or str(cost.get("allocation_method", "")).strip()
+            ):
+                raise ValueError(
+                    f"{month_id}: przychodowa_roczna forbids per-item allocation_key "
+                    "and allocation_method for MIX costs; all MIX costs must be deferred "
+                    "to annual true-up"
+                )
     return granularity, source_reference
 
 
@@ -272,21 +286,27 @@ def apply_cost_audit(
             )
             warnings.add("NON_DEDUCTIBLE_COST_EXCLUDED")
 
+        if cost.get("non_deductible_candidate") is True and kup_flag is not False:
+            warnings.add("NON_DEDUCTIBLE_CANDIDATE")
+
         evidence = str(
             _first(cost, "nexus_evidence", "br_evidence", "nexus_evidence_ref") or ""
         ).strip()
-        if (
-            not evidence
-            and classification.get("basket") == "IP"
-            and str(classification.get("allocation_source", "")).strip()
-        ):
-            evidence = str(classification["allocation_source"]).strip()
         classification["nexus_evidence"] = evidence
         basis = str(cost.get("nexus_basis", "explicit_amount"))
         if basis not in {"explicit_amount", "allocated_ip_cost"}:
             raise ValueError("nexus_basis must be explicit_amount or allocated_ip_cost")
         classification["nexus_basis"] = basis
-        if classification.get("nexus_basket") in QUALIFIED_NEXUS_BASKETS and not evidence:
+        declared_nexus_source = str(cost.get("nexus_source", "outside_nexus"))
+        declared_qualified = declared_nexus_source in {
+            "own_br",
+            "unrelated_br_contractor",
+            "related_br_contractor",
+            "acquired_ip",
+        }
+        if (
+            classification.get("nexus_basket") in QUALIFIED_NEXUS_BASKETS or declared_qualified
+        ) and not evidence:
             classification.update(
                 {
                     "nexus_source": "outside_nexus",

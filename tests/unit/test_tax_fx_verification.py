@@ -9,12 +9,32 @@ from python_helper.ipbox_calculator import (
     calculate_overpayment,
     convert_fx_invoice,
     get_nbp_rate,
-    tax_cascade,
     verify_ip_tax,
     verify_kpir_balance,
     verify_private_costs,
     verify_zus_no_double_dip,
 )
+from python_helper.ipbox_calculator import (
+    tax_cascade as _tax_cascade,
+)
+
+
+def tax_cascade(
+    non_ip_income: float,
+    ip_income: float,
+    nexus: float,
+    tax_form: str,
+    **kwargs,
+):
+    """Exercise the public compatibility adapter with an explicit tax year."""
+    return _tax_cascade(
+        non_ip_income,
+        ip_income,
+        nexus,
+        tax_form,
+        year=2025,
+        **kwargs,
+    )
 
 
 def test_tax_cascade_linear_and_scale() -> None:
@@ -65,7 +85,7 @@ def test_tax_cascade_contract_errors() -> None:
         tax_cascade(1, 1, 2, "liniowy_19%")
     with pytest.raises(ValueError):
         tax_cascade(1, 1, 1, "bad")
-    with pytest.raises(ValueError, match="exceeds rd_relief_limit"):
+    with pytest.raises(ValueError, match="exceeds documented rd_relief_limit"):
         tax_cascade(100, 100, 1, "liniowy_19%", rd_relief_ip=1)
 
 
@@ -83,8 +103,8 @@ def test_tax_cascade_rejects_reliefs_not_available_for_linear_tax() -> None:
 def test_tax_cascade_validates_personal_relief_limits_and_combined_return() -> None:
     with pytest.raises(ValueError, match="cannot exceed 760"):
         tax_cascade(20000, 0, 0, "skala", internet_tax_relief=760.01)
-    with pytest.raises(ValueError, match="6% income limit"):
-        tax_cascade(10000, 0, 0, "skala", donations=600.01)
+    with pytest.raises(ValueError, match="verified donation_limit"):
+        tax_cascade(10000, 0, 0, "skala", donations=600.01, donation_limit=600)
     combined = tax_cascade(
         10000,
         0,
@@ -108,13 +128,14 @@ def test_tax_cascade_applies_supported_scale_reliefs() -> None:
         0.5,
         "skala",
         donations=1000,
+        donation_limit=3000,
         internet_tax_relief=760,
         rd_relief_non_ip=2000,
         rd_relief_ip=1000,
         rd_relief_limit=3000,
     )
-    assert result["non_ip_base_rounded"] == 46240
-    assert result["non_ip_tax_final"] == 1949
+    assert result["non_ip_base_rounded"] == 55740
+    assert result["non_ip_tax_final"] == 3089
     # PIT/IP position 19 is deducted before applying the nexus in position 20.
     assert result["rd_relief_ip_used"] == 1000
     assert result["rd_relief_non_ip_used"] == 2000
@@ -182,18 +203,21 @@ def test_get_nbp_rate_handles_errors(monkeypatch) -> None:
 
 def test_convert_fx_invoice_success_and_missing_payment_rate(monkeypatch) -> None:
     rates = iter([4.0, 4.1])
-    monkeypatch.setattr(calc, "get_nbp_rate", lambda *a, **k: next(rates))
+    dates = iter(["2024-12-31", "2025-01-02"])
+    monkeypatch.setattr(calc, "get_nbp_rate_with_date", lambda *a, **k: (next(rates), next(dates)))
     result = convert_fx_invoice(100, "USD", "2025-01-02", "2025-01-03")
     assert result["base_revenue_pln"] == 400
     assert result["exchange_rate_difference"] == 10
-    rates = iter([4.0, None])
-    monkeypatch.setattr(calc, "get_nbp_rate", lambda *a, **k: next(rates))
+    assert result["base_rate_date"] == "2024-12-31"
+    assert result["payment_rate_date"] == "2025-01-02"
+    lookups = iter([(4.0, "2024-12-31"), None])
+    monkeypatch.setattr(calc, "get_nbp_rate_with_date", lambda *a, **k: next(lookups))
     result = convert_fx_invoice(100, "USD", "2025-01-02", "2025-01-03")
     assert "error" in result
 
 
 def test_convert_fx_invoice_contract_errors(monkeypatch) -> None:
-    monkeypatch.setattr(calc, "get_nbp_rate", lambda *a, **k: None)
+    monkeypatch.setattr(calc, "get_nbp_rate_with_date", lambda *a, **k: None)
     with pytest.raises(ValueError, match="payment_date"):
         convert_fx_invoice(100, "USD", "2025-01-02")
     with pytest.raises(ValueError):
@@ -212,9 +236,28 @@ def test_health_contribution_is_deducted_once_from_linear_income() -> None:
     result = tax_cascade(10000, 0, 0, "liniowy_19%", health_contribution_deduction=1000)
     assert result["non_ip_base_rounded"] == 9000
     assert result["non_ip_tax_final"] == 1710
-    assert any(step["step"] == "Health contribution" for step in result["deduction_steps"])
+    assert any(
+        step["step"] == "Health contribution — ordinary income"
+        for step in result["deduction_steps"]
+    )
 
 
 def test_health_contribution_rejected_for_scale() -> None:
     with pytest.raises(ValueError, match="only for linear"):
         tax_cascade(10000, 0, 0, "skala", health_contribution_deduction=1000)
+
+
+def test_public_tax_cascade_delegates_to_canonical_nexus_split() -> None:
+    partial = tax_cascade(0, 10_000, 0.65, "liniowy_19%")
+    assert partial["ip_tax"] == 325
+    assert partial["non_ip_tax_final"] == 665
+    assert partial["total_tax"] == 990
+
+    zero = tax_cascade(0, 5_000, 0, "liniowy_19%")
+    assert zero["ip_tax"] == 0
+    assert zero["non_ip_tax_final"] == 950
+    assert zero["total_tax"] == 950
+
+    scale = tax_cascade(0, 20_000, 0.5, "skala")
+    assert scale["ordinary_ip_income"] == 10_000
+    assert scale["ordinary_base_rounded"] == 10_000

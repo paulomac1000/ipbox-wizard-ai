@@ -513,3 +513,88 @@ def test_fx_scenarios_use_source_currency_and_derived_differences() -> None:
     mixed = compute_reference(scenario("11_multi_client_mixed_currencies"))
     assert mixed["result"]["przychody_roczne"] == {"IP": 22900.0, "NIE": 50.0}
     assert mixed["result"]["koszty_roczne"]["NIE"] == 100.0
+
+
+@pytest.mark.parametrize("value", ["false", "nie", "0", "true", "unexpected", 0, 1])
+def test_qualification_flags_require_actual_booleans(value) -> None:
+    loaded = deepcopy(scenario("01_basic_linear"))
+    loaded["input"]["miesiace"][0]["faktury"][0]["kwalifikuje_IP"] = value
+    with pytest.raises(ScenarioError, match="must be a boolean"):
+        validate_scenario(loaded)
+
+    loaded = deepcopy(scenario("01_basic_linear"))
+    loaded["input"]["kontrahenci"][0]["klauzula_IP"] = value
+    with pytest.raises(ScenarioError, match="must be a boolean"):
+        validate_scenario(loaded)
+
+
+def test_missing_global_qualified_right_is_not_assumed_true() -> None:
+    loaded = deepcopy(scenario("01_basic_linear"))
+    loaded["input"].pop("kwalifikowane_IP")
+
+    result = compute_reference(loaded)
+
+    assert result["status"] == "STOPPED"
+    assert "STOP_02" in result["stops_reviews"]["stops"]
+
+
+def test_documented_revenue_requires_explicit_split_or_explicit_full_ip() -> None:
+    loaded = deepcopy(scenario("40_mixed_ip_clause"))
+    invoice = loaded["input"]["miesiace"][0]["faktury"][0]
+    invoice.pop("całość_IP")
+    with pytest.raises(ScenarioError, match="kwota_IP or całość_IP"):
+        validate_scenario(loaded)
+
+    invoice["całość_IP"] = False
+    with pytest.raises(ScenarioError, match="całość_IP=false"):
+        validate_scenario(loaded)
+
+
+def test_cost_date_mix_denominator_includes_positive_fx_difference() -> None:
+    loaded = deepcopy(scenario("52_cost_date_revenue_mix_policy"))
+    invoice = loaded["input"]["miesiace"][0]["faktury"][0]
+    invoice.clear()
+    invoice.update(
+        {
+            "kwota_waluta": 1000,
+            "waluta": "USD",
+            "data_wystawienia": "2025-06-02",
+            "data_zaplaty": "2025-06-10",
+            "data_kursu_przychodu": "2025-05-30",
+            "kurs_przychodu": 10,
+            "data_kursu_zaplaty": "2025-06-09",
+            "kurs_zaplaty": 11,
+            "źródło_kursu": "NBP_table_A_fixture",
+            "kwota_IP": 3333,
+            "kontrahent": "ClientA",
+            "kwalifikuje_IP": True,
+        }
+    )
+
+    result = compute_reference(loaded)
+
+    mix_rows = [row for row in result["classifications"] if row["basket"] == "MIX"]
+    assert mix_rows
+    assert all(row["allocation_key"] == pytest.approx(3333 / 11000) for row in mix_rows)
+    assert result["result"]["przychody_roczne"]["NIE"] == pytest.approx(7667)
+
+
+@pytest.mark.parametrize("bad_year", [2025.5, "2025", True])
+def test_scenario_year_type_is_strict(bad_year) -> None:
+    loaded = deepcopy(scenario("01_basic_linear"))
+    loaded["input"]["rok"] = bad_year
+    with pytest.raises(ScenarioError, match="must be an integer"):
+        validate_scenario(loaded)
+
+
+def test_donation_scenario_rejects_missing_or_exceeded_verified_limit() -> None:
+    loaded = deepcopy(scenario("24_donations_relief"))
+    verification = loaded["input"]["ulgi"]["weryfikacja"]["darowizny"]
+    verification.pop("limit_kwotowy")
+    with pytest.raises(ScenarioError, match="limit_kwotowy"):
+        validate_scenario(loaded)
+
+    loaded = deepcopy(scenario("24_donations_relief"))
+    loaded["input"]["ulgi"]["weryfikacja"]["darowizny"]["limit_kwotowy"] = 999
+    with pytest.raises(ScenarioError, match="exceeds verified"):
+        validate_scenario(loaded)

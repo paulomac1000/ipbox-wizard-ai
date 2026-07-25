@@ -8,6 +8,7 @@ meta:
 input:
   rok: 2025
   forma_opodatkowania: skala
+  kwalifikowane_IP: true
   polityka_alokacji:
     policy_id: scenario-policy
     przychody:
@@ -30,6 +31,7 @@ input:
         zweryfikowana: true
         kategoria: darowizna_objęta_limitem_6proc
         dowod: potwierdzenie_przelewu_2025
+        limit_kwotowy: 2400
   miesiace:
   - miesiac: 2025-01
     faktury:
@@ -47,6 +49,7 @@ input:
     - opis: Licencja IDE
       kwota: 89
       nexus_source: own_br
+      nexus_evidence: synthetic-nexus-24_donations_relief-1
       kategoria: IP
       allocation_source: ewidencja_kosztu_IP
     opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.

@@ -46,7 +46,8 @@ def test_weighted_w() -> None:
     assert (
         aggregate_w_multiproject([{"revenue": 15000, "W": 90}, {"revenue": 10000, "W": 50}]) == 74.0
     )
-    assert aggregate_w_multiproject([{"revenue": 0, "W": 50}]) == 0.0
+    with pytest.raises(ValueError, match="project revenue"):
+        aggregate_w_multiproject([{"revenue": 0, "W": 50}])
     with pytest.raises(ValueError):
         aggregate_w_multiproject([])
     with pytest.raises(ValueError):
@@ -93,9 +94,9 @@ def test_cost_item_validations() -> None:
         ("ZUS społeczne", 100, False, False, "WYKLUCZONE"),
         ("Składka zdrowotna", 100, False, True, "MIX"),
         ("Składka zdrowotna", 100, False, False, "WYKLUCZONE"),
-        ("Mandat", 100, False, False, "WYKLUCZONE"),
+        ("Mandat", 100, False, False, "MIX"),
         ("Laptop", 12000, False, False, "WYKLUCZONE"),
-        ("Kawa do domu", 100, False, False, "WYKLUCZONE"),
+        ("Kawa do domu", 100, False, False, "MIX"),
         ("Licencja JetBrains", 100, False, False, "MIX"),
         ("Księgowość", 100, False, False, "MIX"),
     ],
@@ -109,6 +110,15 @@ def test_classify_cost(
 ) -> None:
     result = classify_cost(CostItem(description, amount), social, health)
     assert result.basket == expected
+
+
+@pytest.mark.parametrize(
+    "description",
+    ["Usługa firmy KawaSoft", "Akcesoria Kawasaki", "Faktura Mandat Consulting"],
+)
+def test_description_substrings_do_not_decide_kup(description: str) -> None:
+    result = classify_cost(CostItem(description, 100), False, False)
+    assert result.basket == "MIX"
 
 
 def test_classify_cost_threshold_validation() -> None:

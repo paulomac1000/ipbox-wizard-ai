@@ -2,7 +2,7 @@
 
 Deterministyczny-first wizard wspierający przygotowanie danych do rozliczenia IP Box programisty B2B.
 
-> To nie jest porada podatkowa ani generator gotowego zeznania. Wynik wymaga sprawdzenia z księgową lub doradcą. Audyt techniczny i semantyczny wykonano 19 lipca 2026 r.; reguły podatkowe są jawnie wersjonowane dla wszystkich lat obowiązywania IP Box 2019–2026.
+> To nie jest porada podatkowa ani generator gotowego zeznania. Wynik wymaga sprawdzenia z księgową lub doradcą. Audyt techniczny i semantyczny wykonano 25 lipca 2026 r.; reguły podatkowe są jawnie wersjonowane dla wszystkich lat obowiązywania IP Box 2019–2026.
 
 ## Architektura
 
@@ -35,6 +35,13 @@ Najważniejszy invariant z issue #1: **przychód IP/NIE, alokacja kosztów pośr
 - Pula ulgi termomodernizacyjnej nie może przekroczyć 53 000 zł na podatnika.
 - Odpowiedź z modelem innym niż żądany jest odrzucana podczas live runu, playbacku i pre-commit.
 - Brak kursu, daty płatności, dowodu kwalifikacji lub ujemna faktura jest błędem danych, nie wartością zero.
+- Rok i flagi kwalifikacji mają ścisłe typy; stringi nie są konwertowane na boolean ani rok.
+- Metoda `dokumentowa` wymaga jawnego `kwota_IP` albo `całość_IP: true`.
+- Opis wydatku może utworzyć sygnał do przeglądu, ale nie ustala samodzielnie `KUP: false`.
+
+## Granica wejścia
+
+Silnik przyjmuje znormalizowany YAML/dict. Repozytorium nie zawiera kompletnego, deterministycznego importera PDF/XLSX/KPiR/PIT. Odczyt dokumentów musi zachować jawne fakty źródłowe, w szczególności `KUP`, `source_ledger_included`, kwalifikację prawa, podział faktury i referencje dowodów. Poprawny kalkulator nie naprawi błędnie wyekstrahowanych danych.
 
 Szczegółowy kontrakt: [`ipbox_algorytm.md`](ipbox_algorytm.md). Raport audytu: [`docs/audit-2026-07-17.md`](docs/audit-2026-07-17.md).
 
@@ -87,9 +94,9 @@ Pełna procedura: [`docs/testing.md`](docs/testing.md). Dobór modeli i ogranicz
 
 ## Stan wydania
 
-Aktualny branch celowo zawiera pusty katalog kaset po usunięciu macierzy unieważnionej przez synchronizację autorytatywnego kontraktu. Czerwona bramka kompletności na Pythonie 3.13 jest oczekiwana do czasu jednego końcowego nagrania.
+Macierz VCR obejmuje 46 scenariuszy dla siedmiu rodzin modeli, czyli dokładnie 322 kasety i 7 manifestów. Jej aktualność nie wynika z tekstu dokumentacji: fingerprinty wiążą kasety z algorytmem, scenariuszem, requestem, schemą i profilem modelu, a CI odrzuca stan niepełny lub nieaktualny.
 
-Nie ufaj liczbie kaset zapisanej w dokumentacji ani wcześniejszemu raportowi. PR jest gotowy do merge wyłącznie wtedy, gdy aktualny HEAD spełnia jednocześnie:
+PR jest gotowy do merge wyłącznie wtedy, gdy aktualny HEAD spełnia jednocześnie:
 
 - 46/46 kaset dla każdego z siedmiu modeli, czyli dokładnie 322 aktualne nagrania i 7 manifestów;
 - `python scripts/benchmark_report.py` zwraca `all_complete_and_valid=true`;

@@ -18,6 +18,13 @@ IPBOX_FIRST_YEAR = 2019
 IPBOX_LAST_VERIFIED_YEAR = 2026
 
 
+def strict_year(value: Any, field: str = "year") -> int:
+    """Accept only an actual integer year; reject strings, floats and booleans."""
+    if type(value) is not int:
+        raise ValueError(f"{field} must be an integer")
+    return value
+
+
 @dataclass(frozen=True, slots=True)
 class TaxYearRules:
     year: int
@@ -39,7 +46,9 @@ class ThermomodernizationLot:
     evidence_ref: str = ""
 
     def __post_init__(self) -> None:
-        if self.origin_year < 2019:
+        origin_year = strict_year(self.origin_year, "thermomodernization origin_year")
+        object.__setattr__(self, "origin_year", origin_year)
+        if origin_year < 2019:
             raise ValueError("thermomodernization origin_year cannot precede 2019")
         if self.remaining_amount < 0:
             raise ValueError("thermomodernization remaining_amount must be non-negative")
@@ -177,10 +186,7 @@ def supported_years() -> tuple[int, ...]:
 
 
 def get_tax_year_rules(year: int) -> TaxYearRules:
-    try:
-        normalized = int(year)
-    except (TypeError, ValueError) as exc:
-        raise ValueError("year must be an integer") from exc
+    normalized = strict_year(year)
     try:
         return _RULES[normalized]
     except KeyError as exc:
@@ -216,6 +222,7 @@ def _historical_tax_reduction(year: int, base: Decimal) -> Decimal:
 
 def calculate_scale_tax(year: int, rounded_base: int | float | Decimal) -> int:
     """Calculate annual PIT under the scale applicable to ``year``."""
+    year = strict_year(year)
     rules = get_tax_year_rules(year)
     base = _nonnegative("rounded_base", rounded_base).quantize(INTEGER, rounding=ROUND_HALF_UP)
     if year >= 2022:
@@ -278,6 +285,7 @@ def apply_thermomodernization_lots(
     the end of the year of the first expenditure. Therefore a lot from year
     ``Y`` may still be used in ``Y + 6`` and expires for ``Y + 7``.
     """
+    tax_year = strict_year(tax_year, "tax_year")
     get_tax_year_rules(tax_year)
     remaining_income = _nonnegative("available_income", available_income)
     normalized: list[ThermomodernizationLot] = []
@@ -286,7 +294,9 @@ def apply_thermomodernization_lots(
             lot = raw
         elif isinstance(raw, Mapping):
             try:
-                origin_year = int(raw["origin_year"])
+                origin_year = strict_year(
+                    raw["origin_year"], f"thermomodernization_lots[{index}].origin_year"
+                )
                 amount = money(raw["remaining_amount"])
             except (KeyError, TypeError, ValueError) as exc:
                 raise ValueError(

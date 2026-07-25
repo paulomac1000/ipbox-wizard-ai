@@ -6,9 +6,10 @@ from collections.abc import Mapping
 from decimal import Decimal
 from typing import Any
 
-from python_helper import calculate_tax_for_year
+from python_helper import calculate_tax_for_year, strict_year
 from python_helper.cost_audit import apply_cost_audit, validate_cost_policy
 from python_helper.cost_normalization import normalize_known_non_deductible_costs
+from python_helper.input_validation import strict_bool
 from python_helper.ipbox_calculator import calculate_overpayment, money, tax_round
 
 from . import oracle as legacy
@@ -99,7 +100,7 @@ def _calculate_tax(
     reliefs = input_data.get("ulgi", {}) if isinstance(input_data.get("ulgi"), dict) else {}
     social = input_data.get("zus", {}) if isinstance(input_data.get("zus"), dict) else {}
     tax = calculate_tax_for_year(
-        int(input_data["rok"]),
+        strict_year(input_data["rok"], "input.rok"),
         non_ip_income=max(0.0, float(base["result"]["dochód_NIE"])),
         ip_income=max(0.0, float(base["result"]["dochód_IP"])),
         nexus=float(base["result"]["nexus"]),
@@ -112,6 +113,7 @@ def _calculate_tax(
         health_tax_credit=(0 if health_in_kpir else annual_values["health_credit"]),
         ikze=annual_values["ikze"],
         donations=reliefs.get("darowizny", 0),
+        donation_limit=legacy._verified_donation_limit(reliefs),
         internet_tax_relief=reliefs.get("ulga_internet", 0),
         rehabilitative_relief_income=reliefs.get("ulga_rehabilitacyjna", 0),
         rd_relief_non_ip=reliefs.get("ulga_BR_NIE", 0),
@@ -256,9 +258,19 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
     facts["source_kpir_requires_correction"] = (
         source_ledger_audit["status"] == "REQUIRES_CORRECTION"
     )
-    facts["nexus_evidence_missing"] = "NEXUS_EVIDENCE_MISSING" in cost_warnings
+    facts["nexus_evidence_missing"] = "NEXUS_EVIDENCE_MISSING" in {
+        *cost_warnings,
+        *base.get("stops_reviews", {}).get("warnings", []),
+    }
     social = input_data.get("zus", {}) if isinstance(input_data.get("zus"), dict) else {}
-    health_in_kpir = bool(social.get("zdrowotna_w_KPiR", False))
+    try:
+        health_in_kpir = (
+            strict_bool(social["zdrowotna_w_KPiR"], "input.zus.zdrowotna_w_KPiR")
+            if "zdrowotna_w_KPiR" in social
+            else False
+        )
+    except ValueError as exc:
+        raise ScenarioError(str(exc)) from exc
     social_in_kpir = str(social.get("sposob", "brak")) == "w_KPiR"
     if health_in_kpir and (annual_values["health_income"] or annual_values["health_credit"]):
         facts["health_contribution_double_counted"] = True

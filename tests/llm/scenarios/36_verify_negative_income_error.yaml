@@ -8,6 +8,7 @@ meta:
 input:
   rok: 2025
   forma_opodatkowania: liniowy_19%
+  kwalifikowane_IP: true
   polityka_alokacji:
     policy_id: scenario-policy
     przychody:
@@ -35,11 +36,13 @@ input:
     - opis: Serwer GPU B+R
       kwota: 2500
       nexus_source: own_br
+      nexus_evidence: synthetic-nexus-36_verify_negative_income_error-1
       kategoria: IP
       allocation_source: ewidencja_kosztu_IP
     - opis: Licencja ML
       kwota: 1800
       nexus_source: own_br
+      nexus_evidence: synthetic-nexus-36_verify_negative_income_error-2
       kategoria: IP
       allocation_source: ewidencja_kosztu_IP
     opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.
@@ -56,11 +59,13 @@ input:
     - opis: Serwer GPU B+R 2
       kwota: 2500
       nexus_source: own_br
+      nexus_evidence: synthetic-nexus-36_verify_negative_income_error-3
       kategoria: IP
       allocation_source: ewidencja_kosztu_IP
     - opis: Usługi cloud B+R
       kwota: 2000
       nexus_source: own_br
+      nexus_evidence: synthetic-nexus-36_verify_negative_income_error-4
       kategoria: IP
       allocation_source: ewidencja_kosztu_IP
     opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.

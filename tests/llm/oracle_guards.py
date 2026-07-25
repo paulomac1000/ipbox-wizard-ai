@@ -8,7 +8,7 @@ from python_helper.allocation_audit import (
     audit_revenue_allocation,
     reconcile_return_to_ledger,
 )
-from python_helper.tax_year_rules import get_tax_year_rules, validate_year_amounts
+from python_helper.tax_year_rules import get_tax_year_rules, strict_year, validate_year_amounts
 
 from . import oracle as legacy
 from .oracle_adapter import invoice_amount, month_evidence, month_invoices, number
@@ -133,10 +133,10 @@ def year_facts(
     year_raw = input_data.get("rok")
     unsupported = False
     try:
-        year = int(year_raw)
+        year = strict_year(year_raw, "input.rok")
         get_tax_year_rules(year)
-    except (TypeError, ValueError):
-        year = int(year_raw) if str(year_raw).isdigit() else 0
+    except ValueError:
+        year = year_raw if type(year_raw) is int else 0
         unsupported = True
     reliefs = input_data.get("ulgi", {}) if isinstance(input_data.get("ulgi"), dict) else {}
     social = input_data.get("zus", {}) if isinstance(input_data.get("zus"), dict) else {}

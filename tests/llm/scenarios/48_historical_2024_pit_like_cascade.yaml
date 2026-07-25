@@ -7,6 +7,7 @@ meta:
 input:
   rok: 2024
   forma_opodatkowania: liniowy_19%
+  kwalifikowane_IP: true
   polityka_alokacji:
     policy_id: synthetic-2024-cascade
     przychody:
@@ -43,6 +44,7 @@ input:
           kategoria: IP
           allocation_source: syntetyczna-ewidencja-projektowa
           nexus_source: own_br
+          nexus_evidence: synthetic-nexus-48_historical_2024_pit_like_cascade-1
       opis_projektu: Rozwój kwalifikowanego programu komputerowego.
 assertions:
   nexus: 1

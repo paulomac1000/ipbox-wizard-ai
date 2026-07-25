@@ -155,3 +155,95 @@ def test_qualified_nexus_without_evidence_is_downgraded_outside_nexus() -> None:
     assert classification["nexus_basket"] == "poza_nexus"
     assert classification["nexus_amount"] == 0.0
     assert "NEXUS_EVIDENCE_MISSING" in warnings
+
+
+def test_allocation_source_is_not_reused_as_nexus_evidence() -> None:
+    scenario = {
+        "input": {
+            "polityka_alokacji": {"koszty_MIX": {"źródło": "użytkownik"}},
+            "miesiace": [{"miesiac": "2025-01", "koszty": [{"kwota": 100}]}],
+        }
+    }
+    classification = _mix_classification("A")
+    classification["allocation_source"] = "exclusive-IP-allocation-document"
+    reference = _reference(classification)
+
+    _, warnings = apply_cost_audit(scenario, reference)
+
+    assert reference["classifications"][0]["nexus_evidence"] == ""
+    assert reference["classifications"][0]["nexus_basket"] == "poza_nexus"
+    assert "NEXUS_EVIDENCE_MISSING" in warnings
+
+
+def test_annual_revenue_mix_rejects_per_item_override() -> None:
+    input_data = {
+        "polityka_alokacji": {
+            "koszty_MIX": {"metoda": "przychodowa_roczna", "źródło": "użytkownik"}
+        },
+        "miesiace": [
+            {
+                "miesiac": "2025-01",
+                "koszty": [{"kwota": 100, "allocation_key": 0.5}],
+            }
+        ],
+    }
+    with pytest.raises(ValueError, match="forbids per-item"):
+        validate_cost_policy(input_data)
+
+
+def test_annual_revenue_mix_allows_direct_cost_metadata() -> None:
+    input_data = {
+        "polityka_alokacji": {
+            "koszty_MIX": {"metoda": "przychodowa_roczna", "źródło": "użytkownik"}
+        },
+        "miesiace": [
+            {
+                "miesiac": "2025-01",
+                "koszty": [
+                    {
+                        "kwota": 100,
+                        "kategoria": "IP",
+                        "allocation_method": "direct",
+                        "allocation_key": 1,
+                    }
+                ],
+            }
+        ],
+    }
+    assert validate_cost_policy(input_data) == ("per_cost_item", None)
+
+
+def test_description_candidate_never_creates_source_correction_without_explicit_kup_false() -> None:
+    scenario = {
+        "input": {
+            "polityka_alokacji": {"koszty_MIX": {"źródło": "użytkownik"}},
+            "miesiace": [
+                {
+                    "miesiac": "2025-01",
+                    "koszty": [{"kwota": 100, "non_deductible_candidate": True}],
+                }
+            ],
+        }
+    }
+    reference = _reference(
+        {
+            "opis": "Kawa do domu",
+            "amount": 100.0,
+            "basket": "MIX",
+            "allocation_method": "custom",
+            "allocation_source": "użytkownik",
+            "allocation_key": 0.5,
+            "ip_amount": 50.0,
+            "non_ip_amount": 50.0,
+            "nexus_source": "outside_nexus",
+            "nexus_basket": "poza_nexus",
+            "nexus_amount": 0.0,
+        }
+    )
+
+    audit, warnings = apply_cost_audit(scenario, reference)
+
+    assert audit["status"] == "NOT_PROVIDED"
+    assert reference["classifications"][0]["basket"] == "MIX"
+    assert "NON_DEDUCTIBLE_CANDIDATE" in warnings
+    assert "SOURCE_KPIR_REQUIRES_CORRECTION" not in warnings

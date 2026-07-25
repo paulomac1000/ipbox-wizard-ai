@@ -7,6 +7,7 @@ meta:
 input:
   rok: 2025
   forma_opodatkowania: liniowy_19%
+  kwalifikowane_IP: true
   polityka_alokacji:
     policy_id: silent-switch-guard
     W:
@@ -42,6 +43,7 @@ input:
           kategoria: IP
           allocation_source: syntetyczna-ewidencja-projektowa
           nexus_source: own_br
+          nexus_evidence: synthetic-nexus-50_silent_allocation_method_switch_stop-1
       opis_projektu: Rozwój kwalifikowanego programu komputerowego.
     - miesiac: 2025-02
       faktury:

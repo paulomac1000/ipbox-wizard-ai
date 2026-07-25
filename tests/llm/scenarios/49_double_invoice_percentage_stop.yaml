@@ -7,6 +7,7 @@ meta:
 input:
   rok: 2025
   forma_opodatkowania: liniowy_19%
+  kwalifikowane_IP: true
   polityka_alokacji:
     policy_id: double-percentage-guard
     W:
@@ -42,6 +43,7 @@ input:
           kategoria: IP
           allocation_source: syntetyczna-ewidencja-projektowa
           nexus_source: own_br
+          nexus_evidence: synthetic-nexus-49_double_invoice_percentage_stop-1
       opis_projektu: Rozwój kwalifikowanego programu komputerowego.
 assertions:
   stops: [STOP_09, STOP_10]

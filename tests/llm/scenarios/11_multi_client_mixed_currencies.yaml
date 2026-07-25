@@ -9,6 +9,7 @@ meta:
 input:
   rok: 2025
   forma_opodatkowania: liniowy_19%
+  kwalifikowane_IP: true
   polityka_alokacji:
     policy_id: scenario-policy
     przychody:
@@ -57,6 +58,7 @@ input:
     - opis: Repozytorium kodu
       kwota: 300
       nexus_source: own_br
+      nexus_evidence: synthetic-nexus-11_multi_client_mixed_currencies-1
       kategoria: IP
       allocation_source: ewidencja_kosztu_IP
     opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.

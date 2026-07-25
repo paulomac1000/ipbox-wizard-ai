@@ -7,6 +7,7 @@ from decimal import Decimal
 from typing import Any
 
 from python_helper.allocation_audit import calculate_w_share
+from python_helper.input_validation import strict_bool
 from python_helper.ipbox_calculator import allocate_revenue_monthly, money
 
 from . import oracle as legacy
@@ -152,11 +153,19 @@ def prepare_cost_date_policy(input_data: dict[str, Any], shares: dict[str, float
     policy = input_data["polityka_alokacji"]
     revenue_policy = policy["przychody"]
     mix_policy = policy["koszty_MIX"]
-    clients = {
-        str(client.get("nazwa")): bool(client.get("klauzula_IP", False))
-        for client in input_data.get("kontrahenci", [])
-        if isinstance(client, dict) and client.get("nazwa")
-    }
+    clients: dict[str, bool | None] = {}
+    for client in input_data.get("kontrahenci", []) or []:
+        if not isinstance(client, dict) or not client.get("nazwa"):
+            continue
+        try:
+            value = (
+                strict_bool(client["klauzula_IP"], f"client[{client.get('nazwa')}].klauzula_IP")
+                if "klauzula_IP" in client
+                else None
+            )
+        except ValueError as exc:
+            raise ScenarioError(str(exc)) from exc
+        clients[str(client.get("nazwa"))] = value
     for month in input_data.get("miesiace", []) or []:
         if not isinstance(month, dict):
             continue
@@ -166,16 +175,25 @@ def prepare_cost_date_policy(input_data: dict[str, Any], shares: dict[str, float
         for invoice in month_invoices(month):
             amount = money(invoice_amount(invoice))
             total += amount
+            fx_difference = legacy._invoice_fx_difference(invoice)
+            if fx_difference > 0:
+                total += fx_difference
             client = str(invoice.get("kontrahent", "default"))
-            if not bool(invoice.get("kwalifikuje_IP", clients.get(client, False))):
+            try:
+                eligible = (
+                    strict_bool(invoice["kwalifikuje_IP"], "invoice.kwalifikuje_IP")
+                    if "kwalifikuje_IP" in invoice
+                    else clients.get(client) is True
+                )
+            except ValueError as exc:
+                raise ScenarioError(str(exc)) from exc
+            if not eligible:
                 continue
             method = str(revenue_policy.get("metoda"))
             key = (
                 shares.get(month_id, 0.0) if method == "czasowa_W" else revenue_policy.get("klucz")
             )
-            split = (
-                float(money(invoice.get("kwota_IP", amount))) if method == "dokumentowa" else None
-            )
+            split = legacy._document_split(invoice, amount) if method == "dokumentowa" else None
             allocation = allocate_revenue_monthly(
                 float(amount), method, revenue_key=key, document_split_ip=split
             )

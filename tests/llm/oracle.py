@@ -9,6 +9,7 @@ from decimal import Decimal
 from itertools import pairwise
 from typing import Any
 
+from python_helper.input_validation import strict_bool
 from python_helper.ipbox_calculator import (
     AllocationPolicy,
     CostItem,
@@ -25,6 +26,7 @@ from python_helper.ipbox_calculator import (
     tax_cascade,
     tax_round,
 )
+from python_helper.tax_year_rules import strict_year, supported_years
 
 
 class ScenarioError(ValueError):
@@ -80,6 +82,45 @@ def _number(value: Any, name: str) -> float:
     except (TypeError, ValueError) as exc:
         raise ScenarioError(f"{name} must be numeric") from exc
     return result
+
+
+def _strict_bool(value: Any, name: str) -> bool:
+    try:
+        return strict_bool(value, name)
+    except ValueError as exc:
+        raise ScenarioError(str(exc)) from exc
+
+
+def _invoice_qualification(invoice: dict[str, Any], inherited: bool | None) -> bool:
+    if "kwalifikuje_IP" in invoice:
+        return _strict_bool(invoice["kwalifikuje_IP"], "invoice.kwalifikuje_IP")
+    return inherited is True
+
+
+def _document_split(invoice: dict[str, Any], amount: Decimal) -> float:
+    if "kwota_IP" in invoice:
+        return float(money(_number(invoice["kwota_IP"], "invoice.kwota_IP")))
+    if "całość_IP" not in invoice:
+        raise ScenarioError(
+            "documentowa revenue requires explicit invoice.kwota_IP or całość_IP=true"
+        )
+    if not _strict_bool(invoice["całość_IP"], "invoice.całość_IP"):
+        raise ScenarioError("invoice.całość_IP=false requires explicit invoice.kwota_IP")
+    return float(amount)
+
+
+def _verified_donation_limit(reliefs: dict[str, Any]) -> float:
+    donations = _number(reliefs.get("darowizny", 0), "input.ulgi.darowizny")
+    if donations <= 0:
+        return 0.0
+    verification = _mapping(reliefs.get("weryfikacja", {}), "input.ulgi.weryfikacja")
+    record = _mapping(verification.get("darowizny"), "input.ulgi.weryfikacja.darowizny")
+    limit = _number(record.get("limit_kwotowy"), "input.ulgi.weryfikacja.darowizny.limit_kwotowy")
+    if limit <= 0:
+        raise ScenarioError("positive donations require a verified positive limit_kwotowy")
+    if donations > limit:
+        raise ScenarioError("input.ulgi.darowizny exceeds verified limit_kwotowy")
+    return limit
 
 
 def _month_evidence(month: dict[str, Any]) -> dict[str, Any] | None:
@@ -160,23 +201,29 @@ def _invoice_fx_difference(invoice: dict[str, Any]) -> Decimal:
     return money(amount_currency * (payment_rate - revenue_rate))
 
 
-def _private_description(description: str) -> bool:
-    lowered = description.lower()
-    return any(
-        word in lowered
-        for word in (
-            "prywatn",
-            "osobist",
-            "do domu",
-            "kawa",
-            "obiad",
-            "fryzjer",
-            "odzież",
-            "buty",
-            "luxmed",
-            "medicover",
-        )
-    )
+def _explicit_private_business_declaration(cost: dict[str, Any], declared: str) -> bool:
+    """Detect a source contradiction from explicit facts, never from description text."""
+    if declared not in {"IP", "MIX", "NIE", "NON"}:
+        return False
+    for key in ("KUP", "kup", "deductible"):
+        if key not in cost:
+            continue
+        value = cost[key]
+        if value is False:
+            return True
+        if isinstance(value, str) and value.strip().casefold() in {
+            "nie",
+            "no",
+            "false",
+            "0",
+            "wykluczone",
+            "non-kup",
+            "not_kup",
+        }:
+            return True
+    if "private_expense" in cost:
+        return _strict_bool(cost["private_expense"], "cost.private_expense")
+    return False
 
 
 def validate_scenario(scenario: dict[str, Any]) -> None:
@@ -191,9 +238,9 @@ def validate_scenario(scenario: dict[str, Any]) -> None:
     if "rok" not in input_data:
         raise ScenarioError("input.rok is required")
     try:
-        year = int(input_data["rok"])
-    except (TypeError, ValueError) as exc:
-        raise ScenarioError("input.rok must be an integer year") from exc
+        year = strict_year(input_data["rok"], "input.rok")
+    except ValueError as exc:
+        raise ScenarioError(str(exc)) from exc
     if "forma_opodatkowania" not in input_data:
         raise ScenarioError("input.forma_opodatkowania is required")
     if not assertions:
@@ -240,6 +287,8 @@ def validate_scenario(scenario: dict[str, Any]) -> None:
             raise ScenarioError(f"input.ulgi.{key} requires a verified category")
         if not str(record.get("dowod", "")).strip():
             raise ScenarioError(f"input.ulgi.{key} requires an evidence reference")
+        if key == "darowizny":
+            _verified_donation_limit(reliefs)
     if _number(reliefs.get("ulga_BR", 0), "input.ulgi.ulga_BR") > 0:
         raise ScenarioError(
             "input.ulgi.ulga_BR is ambiguous; use ulga_BR_IP and/or ulga_BR_NIE "
@@ -268,7 +317,11 @@ def validate_scenario(scenario: dict[str, Any]) -> None:
     if clients is None:
         raise ScenarioError("input.kontrahenci must be a list, not null")
     for index, client in enumerate(_list(clients, "input.kontrahenci")):
-        _mapping(client, f"input.kontrahenci[{index}]")
+        client = _mapping(client, f"input.kontrahenci[{index}]")
+        if "klauzula_IP" in client:
+            _strict_bool(client["klauzula_IP"], f"input.kontrahenci[{index}].klauzula_IP")
+    if "kwalifikowane_IP" in input_data:
+        _strict_bool(input_data["kwalifikowane_IP"], "input.kwalifikowane_IP")
 
     multi_ip = input_data.get("alokacja_multi_ip")
     if multi_ip is not None:
@@ -304,7 +357,36 @@ def validate_scenario(scenario: dict[str, Any]) -> None:
             invoices = _list(month["faktury"], f"month[{index}].faktury")
             for item_index, invoice in enumerate(invoices):
                 invoice = _mapping(invoice, f"month[{index}].faktury[{item_index}]")
-                _invoice_amount(invoice)
+                amount = money(_invoice_amount(invoice))
+                if "kwalifikuje_IP" in invoice:
+                    _strict_bool(
+                        invoice["kwalifikuje_IP"],
+                        f"month[{index}].faktury[{item_index}].kwalifikuje_IP",
+                    )
+                if "całość_IP" in invoice:
+                    _strict_bool(
+                        invoice["całość_IP"],
+                        f"month[{index}].faktury[{item_index}].całość_IP",
+                    )
+                client_name = str(invoice.get("kontrahent", "default"))
+                client_record = next(
+                    (
+                        item
+                        for item in clients
+                        if isinstance(item, dict) and str(item.get("nazwa")) == client_name
+                    ),
+                    None,
+                )
+                inherited = (
+                    client_record.get("klauzula_IP")
+                    if isinstance(client_record, dict) and "klauzula_IP" in client_record
+                    else None
+                )
+                eligible = _invoice_qualification(invoice, inherited)
+                if eligible and revenue.get("metoda") == "dokumentowa":
+                    split = _document_split(invoice, amount)
+                    if money(split) > amount:
+                        raise ScenarioError("invoice.kwota_IP cannot exceed invoice amount")
         if "koszty" in month:
             costs = _list(month["koszty"], f"month[{index}].koszty")
             for item_index, raw_cost in enumerate(costs):
@@ -366,7 +448,7 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
     scenario = deepcopy(scenario)
     meta = scenario["meta"]
     input_data = scenario["input"]
-    year = int(input_data["rok"])
+    year = strict_year(input_data["rok"], "input.rok")
     tax_form = str(input_data["forma_opodatkowania"])
     policy_data = input_data["polityka_alokacji"]
     revenue_policy = policy_data["przychody"]
@@ -390,7 +472,11 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
     health_contribution_double_counted = False
 
     clients = {
-        str(client.get("nazwa")): bool(client.get("klauzula_IP", False))
+        str(client.get("nazwa")): (
+            _strict_bool(client["klauzula_IP"], f"client[{client.get('nazwa')}].klauzula_IP")
+            if "klauzula_IP" in client
+            else None
+        )
         for client in input_data.get("kontrahenci", [])
         if isinstance(client, dict) and client.get("nazwa")
     }
@@ -418,7 +504,7 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
             amount = money(_invoice_amount(invoice))
             client = str(invoice.get("kontrahent", "default"))
             client_revenue[client] = client_revenue.get(client, Decimal("0")) + amount
-            eligible = bool(invoice.get("kwalifikuje_IP", clients.get(client, False)))
+            eligible = _invoice_qualification(invoice, clients.get(client))
             if eligible:
                 eligible_amount += amount
                 positive_ip_claim = positive_ip_claim or amount > 0
@@ -475,7 +561,12 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
 
     w_values = valid_w_values
 
-    if positive_ip_claim and not input_data.get("kwalifikowane_IP", True):
+    qualified_right = (
+        _strict_bool(input_data["kwalifikowane_IP"], "input.kwalifikowane_IP")
+        if "kwalifikowane_IP" in input_data
+        else None
+    )
+    if positive_ip_claim and qualified_right is not True:
         claimed_ip_without_qualified_right = True
 
     annual_ip_revenue = Decimal("0")
@@ -488,7 +579,7 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
         for invoice in invoices_by_month[month_id]:
             amount = money(_invoice_amount(invoice))
             client = str(invoice.get("kontrahent", "default"))
-            eligible = bool(invoice.get("kwalifikuje_IP", clients.get(client, False)))
+            eligible = _invoice_qualification(invoice, clients.get(client))
             if not eligible:
                 annual_non_revenue += amount
                 continue
@@ -502,9 +593,7 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
                     method,
                     revenue_key=key,
                     document_split_ip=(
-                        float(money(invoice.get("kwota_IP", amount)))
-                        if method == "dokumentowa"
-                        else None
+                        _document_split(invoice, amount) if method == "dokumentowa" else None
                     ),
                 )
             except ValueError as exc:
@@ -527,7 +616,11 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
     social = input_data.get("zus", {}) if isinstance(input_data.get("zus"), dict) else {}
     social_method = str(social.get("sposob", "brak"))
     social_in_kpir = social_method == "w_KPiR"
-    health_in_kpir = bool(social.get("zdrowotna_w_KPiR", False))
+    health_in_kpir = (
+        _strict_bool(social["zdrowotna_w_KPiR"], "input.zus.zdrowotna_w_KPiR")
+        if "zdrowotna_w_KPiR" in social
+        else False
+    )
     social_pit_deduction = _number(social.get("odliczenie_spoleczne_PIT", 0), "ZUS deduction")
     health_pit_deduction = _number(social.get("odliczenie_zdrowotne_PIT", 0), "health deduction")
     social_contributions_double_counted = social_in_kpir and social_pit_deduction > 0
@@ -604,11 +697,43 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
                 raise ScenarioError("cost.opis is required")
             amount = _number(cost.get("kwota"), "cost.kwota")
             explicit_basket = cost.get("koszyk", cost.get("kategoria", ""))
+            explicit_basket_name = str(explicit_basket).upper()
+            if (
+                policy.mix_method == "przychodowa_roczna"
+                and explicit_basket_name in {"", "MIX"}
+                and (
+                    cost.get("allocation_key") is not None
+                    or str(cost.get("allocation_method", "")).strip()
+                )
+            ):
+                raise ScenarioError(
+                    "przychodowa_roczna forbids per-item allocation_key/allocation_method "
+                    "for MIX costs"
+                )
             allocation_source = str(cost.get("allocation_source", "")).strip()
             if str(explicit_basket).upper() == "IP" and not allocation_source:
                 raise ScenarioError(
                     "IP cost requires allocation_source proving exclusive attribution"
                 )
+            nexus_source = str(cost.get("nexus_source", "outside_nexus"))
+            nexus_evidence = str(
+                cost.get(
+                    "nexus_evidence",
+                    cost.get("br_evidence", cost.get("nexus_evidence_ref", "")),
+                )
+            ).strip()
+            if (
+                nexus_source
+                in {
+                    "own_br",
+                    "unrelated_br_contractor",
+                    "related_br_contractor",
+                    "acquired_ip",
+                }
+                and not nexus_evidence
+            ):
+                warnings.add("NEXUS_EVIDENCE_MISSING")
+                nexus_source = "outside_nexus"
             item = CostItem(
                 description=description,
                 amount=amount,
@@ -616,19 +741,19 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
                 allocation_method=str(cost.get("allocation_method", "")),
                 allocation_key=cost.get("allocation_key"),
                 allocation_source=allocation_source,
-                nexus_source=str(cost.get("nexus_source", "outside_nexus")),
+                nexus_source=nexus_source,
                 nexus_basket={
                     "own_br": "A",
                     "unrelated_br_contractor": "B",
                     "related_br_contractor": "C",
                     "acquired_ip": "D",
-                }.get(str(cost.get("nexus_source", "")), "poza_nexus"),
-                nexus_amount=cost.get("nexus_amount"),
+                }.get(nexus_source, "poza_nexus"),
+                nexus_amount=(cost.get("nexus_amount") if nexus_source != "outside_nexus" else 0),
             )
             if not item.basket:
                 item = classify_cost(item, social_in_kpir, health_in_kpir)
             declared = str(cost.get("deklarowany_koszyk", explicit_basket or "")).upper()
-            if _private_description(description) and declared in {"IP", "MIX", "NIE", "NON"}:
+            if _explicit_private_business_declaration(cost, declared):
                 declared_private_business = True
             all_costs.append(item)
 
@@ -731,7 +856,7 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
     income_ip = float(annual_ip_revenue - annual_ip_cost)
     income_non = float(annual_non_revenue - annual_non_cost)
 
-    if stops:
+    if stops or year not in supported_years():
         tax = {
             "ip_base_rounded": 0,
             "non_ip_base_rounded": 0,
@@ -747,8 +872,9 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
     else:
         try:
             tax = tax_cascade(
-                non_ip_income=income_non,
-                ip_income=income_ip,
+                non_ip_income=max(0.0, income_non),
+                year=year,
+                ip_income=max(0.0, income_ip),
                 nexus=nexus,
                 tax_form=tax_form,
                 previous_non_ip_business_losses=reliefs.get("strata_NIE_z_lat_poprzednich", 0),
@@ -756,6 +882,7 @@ def compute_reference(scenario: dict[str, Any]) -> dict[str, Any]:
                 health_contribution_deduction=(0 if health_in_kpir else health_pit_deduction),
                 ikze=reliefs.get("ikze", reliefs.get("IKZE", 0)),
                 donations=reliefs.get("darowizny", 0),
+                donation_limit=_verified_donation_limit(reliefs),
                 internet_tax_relief=reliefs.get("ulga_internet", 0),
                 rehabilitative_relief_income=reliefs.get("ulga_rehabilitacyjna", 0),
                 rd_relief_non_ip=reliefs.get("ulga_BR_NIE", 0),

@@ -9,6 +9,7 @@ meta:
 input:
   rok: 2025
   forma_opodatkowania: liniowy_19%
+  kwalifikowane_IP: true
   polityka_alokacji:
     policy_id: scenario-policy
     przychody:
@@ -36,11 +37,13 @@ input:
     - opis: Niepowiązany podwykonawca B+R
       kwota: 5000
       nexus_source: unrelated_br_contractor
+      nexus_evidence: synthetic-nexus-22_related_parties_nexus_reduction-1
       kategoria: IP
       allocation_source: ewidencja_kosztu_IP
     - opis: Powiązany podwykonawca B+R
       kwota: 5000
       nexus_source: related_br_contractor
+      nexus_evidence: synthetic-nexus-22_related_parties_nexus_reduction-2
       kategoria: IP
       allocation_source: ewidencja_kosztu_IP
     opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.

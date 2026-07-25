@@ -8,6 +8,7 @@ meta:
 input:
   rok: 2025
   forma_opodatkowania: liniowy_19%
+  kwalifikowane_IP: true
   polityka_alokacji:
     policy_id: scenario-policy
     przychody:
@@ -38,6 +39,7 @@ input:
     - opis: Licencja IDE
       kwota: 89
       nexus_source: own_br
+      nexus_evidence: synthetic-nexus-27_termomodernizacja_full-1
       kategoria: IP
       allocation_source: ewidencja_kosztu_IP
     opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.

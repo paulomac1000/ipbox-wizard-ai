@@ -62,7 +62,7 @@
 - Miesięczna pula MIX zachowuje dokładnie zaokrągloną kwotę źródłową, eliminując fałszywe różnice groszowe wynikające z zaokrąglania każdej pozycji osobno.
 - Niezmieniony podatek po korekcie jest raportowany jako warunkowy, jeżeli wymaga aktualizacji wykorzystanej ulgi.
 - Osobiste ulgi niedostępne przy podatku liniowym są odrzucane.
-- Ulga internetowa ma limit 760 zł, a zwykłe darowizny wspólny limit 6%.
+- Ulga internetowa ma limit 760 zł, a dodatnia darowizna wymaga jawnego, zweryfikowanego limitu właściwego dla kategorii.
 - Ulga B+R nie jest już błędnie ograniczona do dochodu NIE-IP.
 - Podatek skali obejmuje pełną wspólną podstawę z innymi dochodami skali.
 - Niejednoznaczne `ulga_BR` i `straty_poprzednie` są odrzucane; używane są pola rozdzielone semantycznie.
@@ -94,6 +94,16 @@
 - Walidacja wiąże każdy miesiąc z rokiem rozliczenia i egzekwuje limit termomodernizacji 53 000 zł.
 - Dokumentacja źródeł prawdy została zsynchronizowana z wykonywalną kopertą `expected_decision`; starsze opisy `active_rules` są blokowane regresją.
 - Workflowy używają minimalnych uprawnień i `persist-credentials: false`.
+- Rok, lata pochodzenia termomodernizacji i flagi kwalifikacji są walidowane bez konwersji truthy/string/float.
+- Dodatnia różnica kursowa zwiększa również miesięczny mianownik metody MIX `przychodowa_w_dacie_kosztu`.
+- Lookup NBP zapisuje rzeczywistą datę użytej tabeli po cofnięciu przez dzień wolny.
+- Roczna metoda przychodowa odrzuca pozycyjne klucze i metody dla kosztów MIX.
+- `allocation_source` nie jest już używany jako zastępczy `nexus_evidence`.
+- Metoda przychodowa `dokumentowa` nie zakłada już automatycznie 100% IP.
+- Brak jawnego potwierdzenia kwalifikowanego prawa nie jest już zamieniany na `true`.
+- Opis kosztu nie ustala już automatycznie `KUP: false`; tworzy wyłącznie kandydaturę do przeglądu.
+- Publiczna zgodnościowa funkcja `tax_cascade` deleguje do rocznego kalkulatora i zachowuje zwykłe opodatkowanie części IP poza NEXUS.
+- Zerowa suma wag projektów jest błędem wejścia zamiast poprawnego `W=0`.
 
 ### Changed
 

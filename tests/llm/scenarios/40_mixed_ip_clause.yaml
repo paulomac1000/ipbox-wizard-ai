@@ -8,6 +8,7 @@ meta:
 input:
   rok: 2025
   forma_opodatkowania: liniowy_19%
+  kwalifikowane_IP: true
   polityka_alokacji:
     policy_id: scenario-policy
     przychody:
@@ -29,6 +30,7 @@ input:
     - kwota_PLN: 20000
       kontrahent: A
       kwalifikuje_IP: true
+      całość_IP: true
     ewidencja:
       godziny_pracy: 160
       godziny_nie_IP: 0
@@ -37,6 +39,7 @@ input:
     - opis: IDE
       kwota: 100
       nexus_source: own_br
+      nexus_evidence: synthetic-nexus-40_mixed_ip_clause-1
       kategoria: IP
       allocation_source: ewidencja_kosztu_IP
     opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.
@@ -45,6 +48,7 @@ input:
     - kwota_PLN: 12000
       kontrahent: A
       kwalifikuje_IP: true
+      całość_IP: true
     - kwota_PLN: 8000
       kontrahent: B
       kwalifikuje_IP: false

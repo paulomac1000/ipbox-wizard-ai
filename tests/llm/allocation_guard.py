@@ -6,6 +6,7 @@ from typing import Any
 
 from python_helper.allocation_audit import AllocationFinding, reconcile_return_to_ledger
 from python_helper.allocation_precision import audit_revenue_allocation
+from python_helper.input_validation import strict_bool
 
 from . import oracle as legacy
 from .oracle_adapter import invoice_amount, month_evidence, month_invoices, number
@@ -13,17 +14,31 @@ from .oracle_adapter import invoice_amount, month_evidence, month_invoices, numb
 ScenarioError = legacy.ScenarioError
 
 
-def _clients(input_data: dict[str, Any]) -> dict[str, bool]:
-    return {
-        str(client.get("nazwa")): bool(client.get("klauzula_IP", False))
-        for client in input_data.get("kontrahenci", []) or []
-        if isinstance(client, dict) and client.get("nazwa")
-    }
+def _clients(input_data: dict[str, Any]) -> dict[str, bool | None]:
+    result: dict[str, bool | None] = {}
+    for client in input_data.get("kontrahenci", []) or []:
+        if not isinstance(client, dict) or not client.get("nazwa"):
+            continue
+        try:
+            value = (
+                strict_bool(client["klauzula_IP"], f"client[{client.get('nazwa')}].klauzula_IP")
+                if "klauzula_IP" in client
+                else None
+            )
+        except ValueError as exc:
+            raise ScenarioError(str(exc)) from exc
+        result[str(client.get("nazwa"))] = value
+    return result
 
 
-def _invoice_is_ip(invoice: dict[str, Any], clients: dict[str, bool]) -> bool:
+def _invoice_is_ip(invoice: dict[str, Any], clients: dict[str, bool | None]) -> bool:
     client = str(invoice.get("kontrahent", "default"))
-    return bool(invoice.get("kwalifikuje_IP", clients.get(client, False)))
+    if "kwalifikuje_IP" not in invoice:
+        return clients.get(client) is True
+    try:
+        return strict_bool(invoice["kwalifikuje_IP"], "invoice.kwalifikuje_IP")
+    except ValueError as exc:
+        raise ScenarioError(str(exc)) from exc
 
 
 def _first(mapping: dict[str, Any], *keys: str, default: Any = None) -> Any:

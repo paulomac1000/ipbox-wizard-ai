@@ -7,6 +7,7 @@ meta:
 input:
   rok: 2018
   forma_opodatkowania: liniowy_19%
+  kwalifikowane_IP: true
   polityka_alokacji:
     policy_id: pre-ipbox-year
     przychody:
@@ -36,6 +37,7 @@ input:
           kategoria: IP
           allocation_source: syntetyczna-ewidencja-projektowa
           nexus_source: own_br
+          nexus_evidence: synthetic-nexus-54_pre_ipbox_year_stop-1
       opis_projektu: Rozwój kwalifikowanego programu komputerowego.
 assertions:
   stops: [STOP_16]

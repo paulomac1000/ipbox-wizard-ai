@@ -7,6 +7,7 @@ meta:
 input:
   rok: 2025
   forma_opodatkowania: liniowy_19%
+  kwalifikowane_IP: true
   polityka_alokacji:
     policy_id: disjoint-w-clean
     W:
@@ -48,6 +49,7 @@ input:
           kategoria: IP
           allocation_source: syntetyczna-ewidencja-projektowa
           nexus_source: own_br
+          nexus_evidence: synthetic-nexus-55_disjoint_w_semantics_clean-1
       opis_projektu: Rozwój kwalifikowanego programu komputerowego.
 assertions:
   W_miesieczne:

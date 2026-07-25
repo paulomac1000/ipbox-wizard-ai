@@ -8,6 +8,7 @@ meta:
 input:
   rok: 2025
   forma_opodatkowania: liniowy_19%
+  kwalifikowane_IP: true
   polityka_alokacji:
     policy_id: scenario-policy
     przychody:
@@ -35,6 +36,7 @@ input:
     - opis: Usługi spółki powiązanej
       kwota: 15000
       nexus_source: related_br_contractor
+      nexus_evidence: synthetic-nexus-29_edge_related_parties_nexus_0-1
       kategoria: IP
       allocation_source: ewidencja_kosztu_IP
     opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.

@@ -16,6 +16,7 @@ from .tax_year_rules import (
     calculate_scale_tax,
     get_tax_year_rules,
     reconcile_correction_settlement,
+    strict_year,
     supported_years,
     validate_year_amounts,
 )
@@ -34,6 +35,7 @@ __all__ = [
     "get_tax_year_rules",
     "reconcile_correction_settlement",
     "reconcile_return_to_ledger",
+    "strict_year",
     "supported_years",
     "validate_year_amounts",
 ]

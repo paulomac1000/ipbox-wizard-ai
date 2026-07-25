@@ -258,3 +258,33 @@ def test_thermomodernization_lots_enforce_total_taxpayer_limit() -> None:
             ],
             10000,
         )
+
+
+def test_year_type_is_strict_at_every_public_boundary() -> None:
+    from decimal import Decimal
+
+    from python_helper.tax_year_rules import ThermomodernizationLot, strict_year
+
+    for bad in (2025.5, "2025", True, Decimal("2025.0")):
+        with pytest.raises(ValueError, match="must be an integer"):
+            strict_year(bad)
+        with pytest.raises(ValueError, match="must be an integer"):
+            get_tax_year_rules(bad)
+        with pytest.raises(ValueError, match="must be an integer"):
+            ThermomodernizationLot(origin_year=bad, remaining_amount=1)
+
+
+def test_donation_requires_explicit_verified_limit() -> None:
+    base = dict(
+        year=2025,
+        non_ip_income=50_000,
+        ip_income=0,
+        nexus=0,
+        tax_form="skala",
+    )
+    with pytest.raises(ValueError, match="verified donation_limit"):
+        calculate_tax_for_year(**base, donations=1_000)
+    with pytest.raises(ValueError, match="exceed"):
+        calculate_tax_for_year(**base, donations=1_001, donation_limit=1_000)
+    result = calculate_tax_for_year(**base, donations=1_000, donation_limit=3_000)
+    assert any(step["step"] == "Donations" for step in result["deduction_steps"])

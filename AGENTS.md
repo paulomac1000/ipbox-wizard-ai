@@ -31,6 +31,10 @@ Sprzeczność między źródłami jest błędem. Nie wybieraj wygodniejszej wers
 - działalność na skali obejmuje wspólną podstawę z innymi dochodami skali;
 - działalność liniowa nie miesza w jednej kaskadzie osobnego zeznania skali;
 - dodatnie odliczenie roczne bez zweryfikowanego limitu jest błędem;
+- rok i flagi kwalifikacji mają ścisłe typy; nie konwertuj stringów, floatów ani booleanów na rok;
+- `kwalifikowane_IP`, `kwalifikuje_IP` i `klauzula_IP` nie mają korzystnych domyślnych wartości;
+- `allocation_source` i `nexus_evidence` są odrębnymi dowodami;
+- opis kosztu może utworzyć kandydaturę do review, ale nie może sam ustalić `KUP: false`;
 - STOP zeruje finalne liczby i klasyfikacje;
 - TEST 1–9 ustala Python;
 - Python buduje pełną autorytatywną kopertę `expected_decision`; model kopiuje bez zmian wyłącznie `status`, `stops`, `reviews`;

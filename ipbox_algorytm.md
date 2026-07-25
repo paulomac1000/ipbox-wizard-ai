@@ -18,6 +18,8 @@
 6. Źródłowa KPiR, ewidencja IP Box, kalkulacja oraz złożone zeznanie są osobnymi artefaktami i muszą być uzgodnione.
 7. Testy i przykłady używają wyłącznie niezależnych danych syntetycznych. Nie zapisuj danych podatnika, kontrahentów, identyfikatorów, prywatnych sygnatur ani dokładnych historycznych rozliczeń.
 8. Provider LLM nie jest źródłem reguł podatkowych. Model kopiuje wyłącznie gotową kopertę decyzji.
+9. Pola roku przyjmują wyłącznie rzeczywisty typ całkowity; tekst, liczba zmiennoprzecinkowa i boolean są błędami wejścia.
+10. Flagi kwalifikacji przyjmują wyłącznie rzeczywiste wartości boolean. Tekst `"false"`, `"nie"` lub `"0"` nie jest konwertowany.
 
 ## 2. STOP-y
 
@@ -94,6 +96,8 @@ Kontrola działa na najniższym dostępnym niezależnym poziomie:
 
 Jawne faktury NIE-IP są oddzielane przed użyciem W. Suma strumieni musi zachować przychód źródłowy. Podwójne zastosowanie procentu aktywuje `STOP_10`, a nieudokumentowana zmiana metody `STOP_11`.
 
+Dodatni przychód IP wymaga jawnego `kwalifikowane_IP: true`; brak pola nie oznacza potwierdzenia prawa. Przy metodzie `dokumentowa` każda kwalifikująca faktura wymaga jawnej `kwota_IP` albo `całość_IP: true`. Brak podziału nie oznacza 100% IP.
+
 ## 5. KUP i źródłowa KPiR
 
 Najpierw ustal, czy wydatek jest KUP. Dopiero potem wybierz koszyk dochodowy:
@@ -121,6 +125,8 @@ stop = SOURCE_KPIR_REQUIRES_CORRECTION
 
 Samo pominięcie pozycji w kalkulatorze nie oznacza korekty KPiR.
 
+Opis kosztu może utworzyć wyłącznie sygnał `NON_DEDUCTIBLE_CANDIDATE`. Samo słowo lub fragment nazwy kontrahenta nie ustala `KUP: false`, nie zeruje kosztu i nie uruchamia korekty KPiR.
+
 ## 6. Alokacja kosztów MIX
 
 Każda polityka przechowuje:
@@ -143,7 +149,7 @@ MIX_IP    = MIX × klucz_MIX
 MIX_NIE   = MIX - MIX_IP
 ```
 
-Koszty miesięczne są `DEFERRED` do rocznego true-up.
+Koszty miesięczne są `DEFERRED` do rocznego true-up. Pozycyjny `allocation_key` lub `allocation_method` jest w tej metodzie sprzecznym wejściem i musi zostać odrzucony.
 
 ### `przychodowa_w_dacie_kosztu`
 
@@ -153,7 +159,7 @@ koszt_IP        = koszt_MIX × klucz_miesiąca
 koszt_NIE       = koszt_MIX - koszt_IP
 ```
 
-Ta metoda nie jest W i nie wolno zmieniać jej nazwy tylko dlatego, że wartości procentowe przypadkiem są równe.
+Ta metoda nie jest W i nie wolno zmieniać jej nazwy tylko dlatego, że wartości procentowe przypadkiem są równe. Mianownik miesięczny używa tej samej definicji przychodu całkowitego co rozliczenie roczne, w tym dodatnich różnic kursowych zaliczanych do przychodu `NIE`.
 
 ### Zaokrąglenia
 
@@ -175,7 +181,7 @@ NEXUS = min(1, ((A + B) × 1,3) / (A + B + C + D))
 
 KUP i NEXUS są odrębnymi testami. Koszt może obniżać dochód, ale pozostać poza NEXUS.
 
-A/B/C/D wymaga `nexus_evidence`. Koszt MIX wymaga dodatkowo `nexus_basis`:
+A/B/C/D wymaga jawnego `nexus_evidence`. `allocation_source` dowodzi alokacji dochodowej i nie jest automatycznie kopiowane jako dowód NEXUS. Koszt MIX wymaga dodatkowo `nexus_basis`:
 
 - `explicit_amount`;
 - `allocated_ip_cost`.
@@ -234,13 +240,13 @@ Pole zgodnościowe `podstawa_NIE` reprezentuje całą zwykłą podstawę i może
 
 ## 9. Waluty
 
-Dla faktur walutowych zapisz walutę, daty wystawienia i płatności, kursy NBP z właściwych poprzednich dni roboczych oraz źródła kursów. Różnice kursowe są wyliczane, nie wpisywane ręcznie. Dodatnia różnica zwiększa przychód NIE, a ujemna staje się kosztem `NON`.
+Dla faktur walutowych zapisz walutę, daty wystawienia i płatności, kursy NBP z właściwych poprzednich dni roboczych oraz źródła kursów. Lookup zapisuje rzeczywistą datę tabeli znalezioną po cofnięciu przez dni wolne, a nie wyłącznie datę pierwotnie żądaną. Różnice kursowe są wyliczane, nie wpisywane ręcznie. Dodatnia różnica zwiększa przychód NIE, a ujemna staje się kosztem `NON`.
 
 ## 10. Reguły roczne i ulgi
 
 Obsługiwane są lata 2019–2026. Limity IKZE, sposób rozliczenia zdrowotnej, skala podatkowa oraz dopuszczalność jednoczesnego B+R/IP Box pochodzą z wersjonowanego katalogu reguł.
 
-Kwoty ponad limit nie są cicho obcinane. Nieobsługiwany rok nie używa zasad roku sąsiedniego.
+Kwoty ponad limit nie są cicho obcinane. Nieobsługiwany rok nie używa zasad roku sąsiedniego. Dodatnia darowizna wymaga jawnego, zweryfikowanego limitu kwotowego właściwego dla jej kategorii; kalkulator odrzuca brak limitu i jego przekroczenie.
 
 Termomodernizacja używa rocznikowych pul, najstarszych najpierw. Raportuje osobno wykorzystanie, carry-over i wygaśnięcie. Niezmieniony podatek po korekcie może zostać stwierdzony tylko wtedy, gdy poprawiona kwota odliczenia mieści się w dostępnej puli i została uwzględniona w korekcie.
 

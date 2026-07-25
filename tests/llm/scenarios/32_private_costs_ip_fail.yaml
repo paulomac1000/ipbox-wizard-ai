@@ -7,6 +7,7 @@ meta:
 input:
   rok: 2025
   forma_opodatkowania: liniowy_19%
+  kwalifikowane_IP: true
   polityka_alokacji:
     policy_id: synthetic-source-ledger-correction
     przychody:
@@ -54,6 +55,7 @@ input:
       kategoria: IP
       allocation_source: SYNTHETIC-IP-EVIDENCE
       nexus_source: own_br
+      nexus_evidence: synthetic-nexus-32_private_costs_ip_fail-1
     - opis: Koszt wyłącznie działalności NIE
       kwota: 1000
       kategoria: NON

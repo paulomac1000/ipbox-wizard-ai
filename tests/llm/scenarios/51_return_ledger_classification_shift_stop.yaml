@@ -7,6 +7,7 @@ meta:
 input:
   rok: 2025
   forma_opodatkowania: liniowy_19%
+  kwalifikowane_IP: true
   polityka_alokacji:
     policy_id: return-ledger-reconciliation
     przychody:
@@ -42,6 +43,7 @@ input:
           kategoria: IP
           allocation_source: syntetyczna-ewidencja-projektowa
           nexus_source: own_br
+          nexus_evidence: synthetic-nexus-51_return_ledger_classification_shift_stop-1
         - opis: Koszt wyłącznie działalności NIE
           kwota: 2000
           kategoria: NON
