@@ -1,6 +1,9 @@
 name: Apply audit fixes and refresh cassettes
 
 on:
+  pull_request:
+    branches:
+      - main
   push:
     branches:
       - fix/decouple-mix-allocation-from-w
@@ -77,4 +80,4 @@ jobs:
           git add -A
           git diff --cached --stat
           git commit -m "fix: close final IP Box audit blockers"
-          git push origin "HEAD:${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_HEAD_REF:-$GITHUB_REF_NAME}"
