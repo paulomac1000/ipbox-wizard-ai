@@ -59,14 +59,35 @@ jobs:
           exec(compile(script, "<debug-patch>", "exec"), {})
           PYRUN
 
-      - name: Format, lint, and compile
+      - name: Capture Ruff diagnostics
+        run: |
+          set +e
+          mkdir -p reports
+          ruff format . > reports/ruff-format.txt 2>&1
+          printf '%s\n' "$?" > reports/ruff-format-status.txt
+          ruff check --fix . > reports/ruff-fix.txt 2>&1
+          printf '%s\n' "$?" > reports/ruff-fix-status.txt
+          exit 0
+
+      - name: Upload Ruff diagnostics
+        uses: actions/upload-artifact@v4
+        with:
+          name: publish-thermo-ruff-${{ github.sha }}
+          path: reports/
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Enforce Ruff and compile
         run: |
           set -euo pipefail
-          ruff format .
-          ruff check --fix .
+          cat reports/ruff-format.txt
+          cat reports/ruff-fix.txt
+          test "$(cat reports/ruff-format-status.txt)" -eq 0
+          test "$(cat reports/ruff-fix-status.txt)" -eq 0
           ruff format --check .
           ruff check .
           python -m compileall -q python_helper tests scripts
+          rm -rf reports
 
       - name: Unit tests with coverage
         run: pytest tests/unit --cov=python_helper --cov-report=term-missing --cov-fail-under=90
@@ -89,7 +110,7 @@ jobs:
             tests/llm/oracle.py \
             tests/llm/oracle_guards.py \
             tests/llm/output_schema.py \
-            tests/llm/scenarios/27_termomodernizacja_full.yaml \
+            tests/llm/scenarios/27_termomodizacja_full.yaml \
             tests/llm/scenarios/28_edge_multiple_carry-overs.yaml \
             tests/llm/scenarios/48_historical_2024_pit_like_cascade.yaml \
             tests/unit/test_tax_year_rules.py \
