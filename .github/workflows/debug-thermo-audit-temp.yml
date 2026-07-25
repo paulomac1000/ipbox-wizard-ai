@@ -83,6 +83,68 @@ jobs:
               ),
               encoding="utf-8",
           )
+
+          scenario48 = Path("tests/llm/scenarios/48_historical_2024_pit_like_cascade.yaml")
+          text = scenario48.read_text(encoding="utf-8")
+          old = "  ulgi:\n    ikze: 14000\n    termomodernizacja_pula: 10000\n"
+          new = (
+              "  ulgi:\n"
+              "    ikze: 14000\n"
+              "    termomodernizacja_loty:\n"
+              "      - origin_year: 2024\n"
+              "        remaining_amount: 10000\n"
+              "        evidence_ref: synthetic-thermo-48-2024\n"
+          )
+          if old not in text:
+              raise SystemExit("Scenario 48 aggregate pool block not found")
+          scenario48.write_text(text.replace(old, new, 1), encoding="utf-8")
+
+          stopped_test = Path("tests/unit/test_scenarios_and_evaluator.py")
+          text = stopped_test.read_text(encoding="utf-8")
+          old = '    assert all(value == 0 for value in result["podatek"].values())\n'
+          new = '''    financial_tax_fields = (
+              "podstawa_IP",
+              "podstawa_NIE",
+              "podstawa_zwykła",
+              "dochód_IP_po_uldze_BR",
+              "dochód_IP_kwalifikowany",
+              "dochód_IP_poza_preferencją",
+              "podatek_IP",
+              "podatek_NIE_finalny",
+              "podatek_całościowy",
+              "nadpłata_lub_dopłata",
+              "thermomodernization_used",
+              "termomodernization_carry_over",
+              "termomodernization_expired",
+              "health_tax_credit_used",
+              "ulga_BR_IP_wykorzystana",
+              "ulga_BR_NIE_wykorzystana",
+              "ulga_BR_carry_over",
+              "dochód_dodatkowy_skala",
+          )
+          assert all(result["podatek"][field] == 0 for field in financial_tax_fields)
+          assert result["podatek"]["thermomodernization_mode"] == "none"
+          assert (
+              result["podatek"]["thermomodernization_evidence_status"]
+              == "NOT_APPLICABLE"
+          )
+          '''
+          if old not in text:
+              raise SystemExit("STOP financial assertion not found")
+          stopped_test.write_text(text.replace(old, new, 1), encoding="utf-8")
+
+          workflow_test = Path("tests/unit/test_vcr_and_client.py")
+          text = workflow_test.read_text(encoding="utf-8")
+          old = '    assert "MAX_COST_USD: ${{ inputs.max-cost-usd }}" in paid\n'
+          new = '''    assert (
+              "MAX_COST_PER_MODEL_USD: ${{ inputs.max-cost-per-model-usd }}" in paid
+          )
+          assert "MAX_TOTAL_COST_USD: ${{ inputs.max-total-cost-usd }}" in paid
+          assert "inputs.confirmation == 'RUN_PAID_BENCHMARK'" in paid
+          '''
+          if old not in text:
+              raise SystemExit("Old paid workflow budget assertion not found")
+          workflow_test.write_text(text.replace(old, new, 1), encoding="utf-8")
           PYRUN
 
       - name: Format, lint, and compile
@@ -141,8 +203,11 @@ jobs:
             tests/llm/output_schema.py \
             tests/llm/scenarios/27_termomodernizacja_full.yaml \
             tests/llm/scenarios/28_edge_multiple_carry-overs.yaml \
+            tests/llm/scenarios/48_historical_2024_pit_like_cascade.yaml \
             tests/unit/test_tax_year_rules.py \
             tests/unit/test_final_audit_regressions.py \
+            tests/unit/test_scenarios_and_evaluator.py \
+            tests/unit/test_vcr_and_client.py \
             docs/historical-tax-rules.md
           if git diff --cached --quiet; then
             echo "Patch already applied"
