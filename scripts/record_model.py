@@ -17,6 +17,7 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 SCENARIO_DIR = ROOT / "tests/llm/scenarios"
 CASSETTE_ROOT = ROOT / "tests/llm/vcr/cassettes"
+PAID_RUN_CONFIRMATION = "RUN_PAID_BENCHMARK"
 sys.path.insert(0, str(ROOT))
 
 from scripts.local_env import load_local_env  # noqa: E402
@@ -47,6 +48,15 @@ def _finite_positive(name: str, value: object) -> float:
     if number <= 0:
         raise ValueError(f"{name} must be a finite number greater than zero")
     return number
+
+
+def _require_paid_confirmation(parser: argparse.ArgumentParser) -> None:
+    confirmation = os.environ.get("LLM_PAID_RUN_CONFIRMATION")
+    if confirmation != PAID_RUN_CONFIRMATION:
+        parser.error(
+            "paid recording requires an explicit process-level acknowledgement: "
+            f"LLM_PAID_RUN_CONFIRMATION={PAID_RUN_CONFIRMATION}"
+        )
 
 
 def _manifest_cost(manifest: Path, model: str) -> float:
@@ -195,6 +205,7 @@ def main() -> int:
         help="Required positive whole-session paid-cost guard across all models.",
     )
     args = parser.parse_args()
+    _require_paid_confirmation(parser)
     load_local_env()
     get_model_profile(args.model)
 
