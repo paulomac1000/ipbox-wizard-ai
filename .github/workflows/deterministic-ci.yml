@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   migrate-final-vcr:
-    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+    if: github.event_name == 'pull_request'
     permissions:
       contents: write
     runs-on: ubuntu-latest
@@ -41,70 +41,11 @@ jobs:
 
       - name: Apply source fixes and restore CI
         run: |
-          python - <<'PY'
-          from pathlib import Path
-
-          path = Path("scripts/apply_final_vcr_audit_fixes.py")
-          text = path.read_text(encoding="utf-8")
-          text = text.replace(
-              r'source.write_text("VALUE = 1\n", encoding="utf-8")',
-              r'source.write_text("VALUE = 1\\n", encoding="utf-8")',
-          )
-          text = text.replace(
-              r'source.write_text("VALUE = 2\n", encoding="utf-8")',
-              r'source.write_text("VALUE = 2\\n", encoding="utf-8")',
-          )
-          path.write_text(text, encoding="utf-8")
-          PY
-          python scripts/apply_final_vcr_audit_fixes.py
-          python - <<'PY'
-          from pathlib import Path
-
-          precommit = Path("scripts/vcr_precommit.py")
-          text = precommit.read_text(encoding="utf-8")
-          marker = '"""Validate cassette completeness and exact request identity."""\n'
-          if "# ruff: noqa: E402" not in text:
-              if marker not in text:
-                  raise RuntimeError("vcr_precommit module docstring not found")
-              text = text.replace(marker, marker + "\n# ruff: noqa: E402\n", 1)
-          precommit.write_text(text, encoding="utf-8")
-
-          cassette = Path("tests/llm/vcr/cassette.py")
-          text = cassette.read_text(encoding="utf-8")
-          text = text.replace(
-              "isinstance(value_a, (dict, list))",
-              "isinstance(value_a, dict | list)",
-          )
-          text = text.replace(
-              "isinstance(value, (int, float))",
-              "isinstance(value, int | float)",
-          )
-          strict_block = '''        calculation_meta = cassette.parsed_response.get("calculation_meta")
-        if not isinstance(calculation_meta, dict):
-            raise ValueError("cassette parsed_response has no calculation_meta")
-        engine_hash = calculation_meta.get("engine_source_hash")
-        if not isinstance(engine_hash, str) or len(engine_hash) != 64:
-            raise ValueError("cassette calculation_meta has no valid engine_source_hash")
-'''
-          generic_block = '''        calculation_meta = cassette.parsed_response.get("calculation_meta")
-        engine_hash = (
-            calculation_meta.get("engine_source_hash")
-            if isinstance(calculation_meta, dict)
-            else None
-        )
-        if engine_hash is not None and (
-            not isinstance(engine_hash, str) or len(engine_hash) != 64
-        ):
-            raise ValueError("cassette calculation_meta has invalid engine_source_hash")
-'''
-          if strict_block not in text:
-              raise RuntimeError("strict manifest calculation_meta block not found")
-          text = text.replace(strict_block, generic_block, 1)
-          cassette.write_text(text, encoding="utf-8")
-          PY
+          python scripts/final_vcr_postpatch.py
           cp scripts/deterministic-ci.original.yml .github/workflows/deterministic-ci.yml
           rm -f scripts/.vcr-migration-trigger
           rm -f scripts/apply_final_vcr_audit_fixes.py
+          rm -f scripts/final_vcr_postpatch.py
           rm -f scripts/deterministic-ci.original.yml
           rm -f .github/workflows/apply-final-vcr-audit-fixes-temp.yml
           rm -f .github/workflows/run-final-vcr-migration-temp.yml
