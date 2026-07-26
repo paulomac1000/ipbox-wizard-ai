@@ -244,7 +244,9 @@ class VCRRecorder:
     @staticmethod
     def _require_content(response: LLMResponse) -> None:
         if not response.content.strip():
-            detail = f"; provider_error={response.provider_error}" if response.provider_error else ""
+            detail = (
+                f"; provider_error={response.provider_error}" if response.provider_error else ""
+            )
             raise RecordingRejectedError(f"Response content is empty{detail}; response rejected")
 
     @staticmethod
