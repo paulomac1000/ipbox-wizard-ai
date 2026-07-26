@@ -50,6 +50,7 @@ jobs:
 
       - name: Ruff lint
         run: |
+          set -o pipefail
           mkdir -p reports
           ruff check . 2>&1 | tee reports/ruff-lint.txt
 
