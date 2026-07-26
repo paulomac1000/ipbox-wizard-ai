@@ -73,6 +73,23 @@ def main() -> None:
         raise RuntimeError("strict manifest calculation_meta block not found")
     cassette.write_text(text.replace(strict_block, generic_block, 1), encoding="utf-8")
 
+    test_path = ROOT / "tests/unit/test_vcr_and_client.py"
+    old_test = (
+        "    incomplete = Cassette(\n"
+        "        meta=replace(cassette.meta, finish_reason=None),\n"
+        "        response=cassette.response,\n"
+        "        parsed_response=cassette.parsed_response,\n"
+        "    )\n"
+        "    assert any(\n"
+        "        \"finish_reason\" in error for error in cassette_payload_errors(incomplete, {\"ok\": True})\n"
+        "    )\n"
+    )
+    new_test = (
+        "    with pytest.raises(ValueError, match=\"finish_reason\"):\n"
+        "        replace(cassette.meta, finish_reason=None)\n"
+    )
+    replace_once(test_path, old_test, new_test)
+
 
 if __name__ == "__main__":
     main()
