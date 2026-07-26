@@ -4,7 +4,7 @@ meta:
   provider: openrouter
   requested_model: mistralai/mistral-small-24b-instruct-2501
   returned_model: mistralai/mistral-small-24b-instruct-2501
-  fingerprint: canonical_d8042e330a7c47a4794adca166c5097023fa3e81005a97306413b0ef7440ecb9
+  fingerprint: canonical-source_69f0da7dba8cddbd93cd04a8b3de1af3b0025d5c9bbf8a900865ae2deb4a6439
   request_hash: 489520dcb9aff9332023e2a779a50ee446d8457866b80c63123fb2f84bf48dba
   recorded_at: '2026-07-26T00:03:49.330803+00:00'
   request_id: gen-1785024228-DynQoTsyvx60xKKcN1GR
@@ -30,8 +30,9 @@ parsed_response:
     - MF_HEALTH
     - MF_IPBOX_BR
     input_hash: ed084620341d66772bdd468b5f5dacb695b36e2083108c86ad580a0cb72eea2d
+    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
     calculated_at: '2026-07-26T00:03:49Z'
-    code_revision: unavailable
+    code_revision: engine:0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
   result:
     rok: 2025
     przychody_roczne:

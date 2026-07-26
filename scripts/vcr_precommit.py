@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Validate cassette completeness and exact request identity."""
 
+# ruff: noqa: E402
+
 from __future__ import annotations
 
 import argparse
@@ -14,16 +16,17 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from tests.llm.models import BENCHMARK_MODELS  # noqa: E402
-from tests.llm.oracle import validate_scenario  # noqa: E402
-from tests.llm.runner import LLMTestRunner  # noqa: E402
+from python_helper.report_metadata import engine_source_hash
+from tests.llm.models import BENCHMARK_MODELS
+from tests.llm.oracle import validate_scenario
+from tests.llm.runner import LLMTestRunner
 from tests.llm.vcr.cassette import (
     Cassette,
     CassetteManifest,
     parsed_response_equal_ignoring_meta_timestamp,
-)  # noqa: E402
-from tests.llm.vcr.config import VCRConfig  # noqa: E402
-from tests.llm.vcr.fingerprint import compute_fingerprint  # noqa: E402
+)
+from tests.llm.vcr.config import VCRConfig
+from tests.llm.vcr.fingerprint import compute_fingerprint
 
 
 def orphan_cassette_ids(model_directory: Path, expected_ids: set[str]) -> set[str]:
@@ -70,6 +73,7 @@ def validate_model(model: str) -> list[str]:
         return [f"{model}: invalid/missing manifest: {exc}"]
 
     expected_ids: set[str] = set()
+    expected_engine_hash = engine_source_hash(ROOT)
     algorithm = (ROOT / "ipbox_algorytm.md").read_text(encoding="utf-8")
     for path in paths:
         scenario = yaml.safe_load(path.read_text(encoding="utf-8"))
@@ -92,6 +96,14 @@ def validate_model(model: str) -> list[str]:
                 errors.append(f"{model}/{scenario_id}: request hash mismatch")
             if cassette.meta.fingerprint != fingerprint:
                 errors.append(f"{model}/{scenario_id}: fingerprint mismatch")
+            stored_calculation_meta = cassette.parsed_response.get("calculation_meta")
+            stored_engine_hash = (
+                stored_calculation_meta.get("engine_source_hash")
+                if isinstance(stored_calculation_meta, dict)
+                else None
+            )
+            if stored_engine_hash != expected_engine_hash:
+                errors.append(f"{model}/{scenario_id}: engine_source_hash mismatch")
             reparsed = runner.validate_semantics(cassette.response, scenario)
             errors.extend(
                 f"{model}/{scenario_id}: {error}"
@@ -107,6 +119,8 @@ def validate_model(model: str) -> list[str]:
                     errors.append(f"{model}/{scenario_id}: manifest request hash mismatch")
                 if entry.get("fingerprint") != fingerprint:
                     errors.append(f"{model}/{scenario_id}: manifest fingerprint mismatch")
+                if entry.get("engine_source_hash") != expected_engine_hash:
+                    errors.append(f"{model}/{scenario_id}: manifest engine_source_hash mismatch")
                 if entry.get("returned_model") != cassette.meta.returned_model:
                     errors.append(f"{model}/{scenario_id}: manifest returned_model mismatch")
                 if entry.get("recorded_at") != cassette.meta.recorded_at:

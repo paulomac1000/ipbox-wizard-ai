@@ -4,7 +4,7 @@ meta:
   provider: openrouter
   requested_model: anthropic/claude-haiku-4.5
   returned_model: anthropic/claude-haiku-4.5
-  fingerprint: canonical_e2ef5eddd9427e8775945b27409fa7281682f42e942c4ba7006feda51e2c8c9f
+  fingerprint: canonical-source_5438e1797a95c951331f13e00b40ea3a7769357b4d72ab21c4153915f2553c85
   request_hash: 3bcfd0fe9cc23fd8a8b342c08e31b8f18c22d380f8974c1f39afd425cec3ccd0
   recorded_at: '2026-07-25T23:24:22.487685+00:00'
   request_id: gen-1785021861-4vOhrvyrPWg9OM1rxkJz
@@ -30,8 +30,9 @@ parsed_response:
     - MF_HEALTH
     - MF_IPBOX_BR
     input_hash: 14179e7bd4dd7b1755836586d288d4876d51dee2325f724709261132da04aa35
+    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
     calculated_at: '2026-07-25T23:24:22Z'
-    code_revision: unavailable
+    code_revision: engine:0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
   result:
     rok: 2025
     przychody_roczne:

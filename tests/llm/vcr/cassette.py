@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from dataclasses import asdict, dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
@@ -10,19 +11,13 @@ from typing import Any
 import yaml
 
 CASSETTE_FORMAT_VERSION = 4
-MANIFEST_FORMAT_VERSION = 2
+MANIFEST_FORMAT_VERSION = 3
 
 
-def _meta_equal_without_calculated_at(
-    ma: dict | None, mb: dict | None
-) -> bool:
+def _meta_equal_without_calculated_at(ma: dict | None, mb: dict | None) -> bool:
     ma = ma or {}
     mb = mb or {}
-    return all(
-        ma.get(k) == mb.get(k)
-        for k in set(ma.keys()) | set(mb.keys())
-        if k != "calculated_at"
-    )
+    return all(ma.get(key) == mb.get(key) for key in set(ma) | set(mb) if key != "calculated_at")
 
 
 def parsed_response_equal_ignoring_meta_timestamp(a: dict, b: dict) -> bool:
@@ -30,26 +25,46 @@ def parsed_response_equal_ignoring_meta_timestamp(a: dict, b: dict) -> bool:
         return False
     if a.keys() != b.keys():
         return False
-    for k in a:
-        if isinstance(a[k], dict):
-            if k == "calculation_meta":
-                if not _meta_equal_without_calculated_at(a[k], b[k]):
+    for key in a:
+        if isinstance(a[key], dict):
+            if key == "calculation_meta":
+                if not _meta_equal_without_calculated_at(a[key], b[key]):
                     return False
                 continue
-            if not parsed_response_equal_ignoring_meta_timestamp(a[k], b[k]):
+            if not parsed_response_equal_ignoring_meta_timestamp(a[key], b[key]):
                 return False
-        elif isinstance(a[k], list):
-            if len(a[k]) != len(b[k]):
+        elif isinstance(a[key], list):
+            if len(a[key]) != len(b[key]):
                 return False
-            for va, vb in zip(a[k], b[k]):
-                if isinstance(va, (dict, list)):
-                    if not parsed_response_equal_ignoring_meta_timestamp(va, vb):
+            for value_a, value_b in zip(a[key], b[key], strict=False):
+                if isinstance(value_a, dict | list):
+                    if not parsed_response_equal_ignoring_meta_timestamp(value_a, value_b):
                         return False
-                elif va != vb:
+                elif value_a != value_b:
                     return False
-        elif a[k] != b[k]:
+        elif a[key] != b[key]:
             return False
     return True
+
+
+def _require_nonempty_text(name: str, value: Any) -> None:
+    if not isinstance(value, str) or not value.strip():
+        raise ValueError(f"cassette meta {name} must be a non-empty string")
+
+
+def _require_optional_nonnegative_int(name: str, value: Any) -> None:
+    if value is not None and (type(value) is not int or value < 0):
+        raise ValueError(f"cassette meta {name} must be a non-negative integer or null")
+
+
+def _require_nonnegative_finite_number(name: str, value: Any, *, optional: bool) -> None:
+    if optional and value is None:
+        return
+    if isinstance(value, bool) or not isinstance(value, int | float):
+        raise ValueError(f"cassette meta {name} must be a finite non-negative number")
+    number = float(value)
+    if not math.isfinite(number) or number < 0:
+        raise ValueError(f"cassette meta {name} must be a finite non-negative number")
 
 
 @dataclass(frozen=True, slots=True)
@@ -72,6 +87,42 @@ class CassetteMeta:
     cost: float | None
     recording_duration_seconds: float
     cassette_format_version: int = CASSETTE_FORMAT_VERSION
+
+    def __post_init__(self) -> None:
+        if type(self.cassette_format_version) is not int or (
+            self.cassette_format_version != CASSETTE_FORMAT_VERSION
+        ):
+            raise ValueError(f"cassette_format_version must equal {CASSETTE_FORMAT_VERSION}")
+        for name in (
+            "scenario_id",
+            "scenario_name",
+            "provider",
+            "requested_model",
+            "returned_model",
+            "fingerprint",
+            "request_hash",
+            "recorded_at",
+            "finish_reason",
+        ):
+            _require_nonempty_text(name, getattr(self, name))
+        if len(self.request_hash) != 64 or any(
+            character not in "0123456789abcdef" for character in self.request_hash
+        ):
+            raise ValueError("cassette meta request_hash must be 64 lowercase hex characters")
+        try:
+            recorded = datetime.fromisoformat(self.recorded_at.replace("Z", "+00:00"))
+        except ValueError as exc:
+            raise ValueError("cassette meta recorded_at must be ISO-8601") from exc
+        if recorded.tzinfo is None:
+            raise ValueError("cassette meta recorded_at must include a timezone")
+        for name in ("prompt_tokens", "completion_tokens", "total_tokens"):
+            _require_optional_nonnegative_int(name, getattr(self, name))
+        _require_nonnegative_finite_number("cost", self.cost, optional=True)
+        _require_nonnegative_finite_number(
+            "recording_duration_seconds",
+            self.recording_duration_seconds,
+            optional=False,
+        )
 
 
 @dataclass(frozen=True, slots=True)
@@ -141,10 +192,19 @@ class CassetteManifest:
         return cls(model=model, entries=entries)
 
     def update(self, cassette: Cassette, filename: str) -> None:
+        calculation_meta = cassette.parsed_response.get("calculation_meta")
+        engine_hash = (
+            calculation_meta.get("engine_source_hash")
+            if isinstance(calculation_meta, dict)
+            else None
+        )
+        if engine_hash is not None and (not isinstance(engine_hash, str) or len(engine_hash) != 64):
+            raise ValueError("cassette calculation_meta has invalid engine_source_hash")
         self.entries[cassette.meta.scenario_id] = {
             "file": filename,
             "fingerprint": cassette.meta.fingerprint,
             "request_hash": cassette.meta.request_hash,
+            "engine_source_hash": engine_hash,
             "recorded_at": cassette.meta.recorded_at,
             "returned_model": cassette.meta.returned_model,
             "cost": cassette.meta.cost,

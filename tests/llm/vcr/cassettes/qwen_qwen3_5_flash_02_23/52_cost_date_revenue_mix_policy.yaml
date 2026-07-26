@@ -4,7 +4,7 @@ meta:
   provider: openrouter
   requested_model: qwen/qwen3.5-flash-02-23
   returned_model: qwen/qwen3.5-flash-02-23
-  fingerprint: canonical_47b566963059f576a7dc110231dfdb438bb6c080f97df59d26ab29a5c48ac7d0
+  fingerprint: canonical-source_88cc20a94e4a1b20f4cfb89c9f20184700ee6002cd8cd3b24f22d383df01c119
   request_hash: 2e18f2894bc8152427cdd3076e733c7772ad2d0af0026f65c29088e822ac6c4c
   recorded_at: '2026-07-25T23:53:43.841100+00:00'
   request_id: gen-1785023619-lryg7DOGcTWdIXUk5M04
@@ -30,8 +30,9 @@ parsed_response:
     - MF_HEALTH
     - MF_IPBOX_BR
     input_hash: 9e1bb1e0830bd5ae4c182993a654b7dcb33aa161508e15edda07d13514dfcf41
+    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
     calculated_at: '2026-07-25T23:53:43Z'
-    code_revision: unavailable
+    code_revision: engine:0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
   result:
     rok: 2025
     przychody_roczne:

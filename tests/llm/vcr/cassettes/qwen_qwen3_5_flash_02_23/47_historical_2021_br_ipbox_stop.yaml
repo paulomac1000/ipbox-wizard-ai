@@ -4,7 +4,7 @@ meta:
   provider: openrouter
   requested_model: qwen/qwen3.5-flash-02-23
   returned_model: qwen/qwen3.5-flash-02-23
-  fingerprint: canonical_fdfcd30ca8c3d504a79703e5cc04f98e11a588571c054457e445b36e1c317073
+  fingerprint: canonical-source_d7aeaec6eab0df9977f97f11b914be7b6ef6358a49b4c12780c0b4b0859a077a
   request_hash: 9c4ee8d35e707fedf8309a18ddba936bd5e60e81ea6da264a5fc1094adde842b
   recorded_at: '2026-07-25T23:52:39.528141+00:00'
   request_id: gen-1785023556-JCPRHBC1IDdjSOkbgqCE
@@ -29,8 +29,9 @@ parsed_response:
     - MF_SCALE_HISTORY
     - MF_HEALTH_HISTORY
     input_hash: 747f5d6d048cfbaf5a3ed4e804407e5c873a47854c72c43a600e5337984a5eae
+    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
     calculated_at: '2026-07-25T23:52:39Z'
-    code_revision: unavailable
+    code_revision: engine:0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
   result:
     rok: 2021
     przychody_roczne:

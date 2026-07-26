@@ -4,7 +4,7 @@ meta:
   provider: openrouter
   requested_model: moonshotai/kimi-k2.5
   returned_model: moonshotai/kimi-k2.5
-  fingerprint: canonical_fe903d785491d48e12bda9b0de38dbb66b8b2c892d703f76eaa062034299dc1f
+  fingerprint: canonical-source_2f398cbdb50252ac1bf2abdacc0e4e1e5b04ae3cf75ef130357a5a28fdcce419
   request_hash: c7507a9c2aa5478ec8a56149424d06cb87634b2259ecc61a7914c02fe38850dd
   recorded_at: '2026-07-25T23:44:07.807420+00:00'
   request_id: gen-1785023042-i9LNY8VIhs7vEHr1xSef
@@ -29,8 +29,9 @@ parsed_response:
     - MF_SCALE_HISTORY
     - MF_HEALTH_HISTORY
     input_hash: 747f5d6d048cfbaf5a3ed4e804407e5c873a47854c72c43a600e5337984a5eae
+    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
     calculated_at: '2026-07-25T23:44:07Z'
-    code_revision: unavailable
+    code_revision: engine:0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
   result:
     rok: 2021
     przychody_roczne:

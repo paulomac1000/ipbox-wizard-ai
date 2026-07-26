@@ -105,6 +105,14 @@ class VCRRecorder:
         if entry.get("request_hash") != request_hash or entry.get("fingerprint") != fingerprint:
             raise CassetteStaleError("Manifest identity mismatch")
         parsed = validate_response(cassette.response)
+        calculation_meta = parsed.get("calculation_meta")
+        engine_hash = (
+            calculation_meta.get("engine_source_hash")
+            if isinstance(calculation_meta, dict)
+            else None
+        )
+        if entry.get("engine_source_hash") != engine_hash:
+            raise CassetteStaleError("Manifest engine_source_hash mismatch")
         if not parsed_response_equal_ignoring_meta_timestamp(parsed, cassette.parsed_response):
             raise CassetteStaleError("Stored parsed_response differs from reparsed response")
         response = LLMResponse(

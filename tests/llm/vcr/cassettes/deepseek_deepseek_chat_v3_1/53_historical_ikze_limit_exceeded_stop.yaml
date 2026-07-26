@@ -4,7 +4,7 @@ meta:
   provider: openrouter
   requested_model: deepseek/deepseek-chat-v3.1
   returned_model: deepseek/deepseek-chat-v3.1
-  fingerprint: canonical_c0bc251bd82a4d4c918bc0298924f320b42d7f85fa8eb93d87ed93fe39c9f541
+  fingerprint: canonical-source_b8f4937f9ee5eb1bada0328b6a4de1a4b946a912755daf1cb0cd507d82704581
   request_hash: 083080f78c2afccc7b5899d4ac380e67011dcb7d6a132d963048971f402403e9
   recorded_at: '2026-07-25T23:31:13.924459+00:00'
   request_id: gen-1785022270-8UfN3qHgvj7KRyTXVLwF
@@ -29,8 +29,9 @@ parsed_response:
     - MF_SCALE_HISTORY
     - MF_HEALTH_HISTORY
     input_hash: aea3cee73a63b94e4b1532c732d429fba0997ea7be30b4238d091b731e31ca53
+    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
     calculated_at: '2026-07-25T23:31:13Z'
-    code_revision: unavailable
+    code_revision: engine:0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
   result:
     rok: 2019
     przychody_roczne:

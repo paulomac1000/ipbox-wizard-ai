@@ -4,7 +4,7 @@ meta:
   provider: openrouter
   requested_model: qwen/qwen3.5-flash-02-23
   returned_model: qwen/qwen3.5-flash-02-23
-  fingerprint: canonical_20e30fc7d2d9636348f7fd97aee3b13a855d80cf992fd782fe25fdd3ecdca4d5
+  fingerprint: canonical-source_17792adee0360cc1b1c26a194b1bf31e9448ddc4ebe42d9b4fc5d4e8dfd846e1
   request_hash: acd2b771ae3241e824bd88efc2b8ea1e4290a389ff17da257986cc7609817648
   recorded_at: '2026-07-25T23:54:07.646055+00:00'
   request_id: gen-1785023642-liNBPdLp4PE1qmpEmbx8
@@ -26,8 +26,9 @@ parsed_response:
     rules_source_ids:
     - UNVERIFIED_YEAR
     input_hash: 027f2f907cd374b0d6ef7c0a68d6625eb1af4e1a42769ec3c92629ac793cb211
+    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
     calculated_at: '2026-07-25T23:54:07Z'
-    code_revision: unavailable
+    code_revision: engine:0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
   result:
     rok: 2018
     przychody_roczne:

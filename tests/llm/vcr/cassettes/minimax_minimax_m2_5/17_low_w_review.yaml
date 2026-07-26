@@ -4,7 +4,7 @@ meta:
   provider: openrouter
   requested_model: minimax/minimax-m2.5
   returned_model: minimax/minimax-m2.5
-  fingerprint: canonical_a317d645861e68698d87799be2f29a529539ed48fb484ce17de81975327a86a2
+  fingerprint: canonical-source_f88afea10182e012c34a24a8b0bfbf6ffe9dc92bbb9d17eaf10451d8c9943540
   request_hash: 7c738c84a4aec499ac0550b87847bffc9d231a417845828a76e9a32f73b70a51
   recorded_at: '2026-07-25T23:32:42.185059+00:00'
   request_id: gen-1785022360-CjjFVLthnLUBQlFxbyGq
@@ -30,8 +30,9 @@ parsed_response:
     - MF_HEALTH
     - MF_IPBOX_BR
     input_hash: 7958f87f9ff46b4ec91b860d6354ba9aa950f50a26285eb519a388c325878dec
+    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
     calculated_at: '2026-07-25T23:32:42Z'
-    code_revision: unavailable
+    code_revision: engine:0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
   result:
     rok: 2025
     przychody_roczne:

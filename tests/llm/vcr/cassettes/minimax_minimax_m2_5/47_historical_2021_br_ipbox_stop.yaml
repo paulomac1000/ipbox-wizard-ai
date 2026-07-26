@@ -4,7 +4,7 @@ meta:
   provider: openrouter
   requested_model: minimax/minimax-m2.5
   returned_model: minimax/minimax-m2.5
-  fingerprint: canonical_1946a168f5dc65556df9c5263da24017c0091618a707fa6db76af41772e211b8
+  fingerprint: canonical-source_49ecda09fad6c78d47874de3fbbba90cd9adfecdfcbdb3ac8f767f7a0acc06b0
   request_hash: a8aa5ec240c7f2b32376dfb46394a48a7d0b47659f4b8c7a17432f98f6ef96b9
   recorded_at: '2026-07-25T23:36:35.927759+00:00'
   request_id: gen-1785022594-XAi5gaOuPtMKRsIJEW11
@@ -29,8 +29,9 @@ parsed_response:
     - MF_SCALE_HISTORY
     - MF_HEALTH_HISTORY
     input_hash: 747f5d6d048cfbaf5a3ed4e804407e5c873a47854c72c43a600e5337984a5eae
+    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
     calculated_at: '2026-07-25T23:36:35Z'
-    code_revision: unavailable
+    code_revision: engine:0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
   result:
     rok: 2021
     przychody_roczne:

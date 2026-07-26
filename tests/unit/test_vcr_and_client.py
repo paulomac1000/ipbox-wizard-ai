@@ -507,14 +507,8 @@ def test_vcr_precommit_rejects_incomplete_or_tampered_payload(monkeypatch, tmp_p
     cassette = Cassette.load(recorder.config.cassette_path("s"))
     assert cassette_payload_errors(cassette, {"ok": True}) == []
 
-    incomplete = Cassette(
-        meta=replace(cassette.meta, finish_reason=None),
-        response=cassette.response,
-        parsed_response=cassette.parsed_response,
-    )
-    assert any(
-        "finish_reason" in error for error in cassette_payload_errors(incomplete, {"ok": True})
-    )
+    with pytest.raises(ValueError, match="finish_reason"):
+        replace(cassette.meta, finish_reason=None)
     assert any(
         "parsed_response" in error for error in cassette_payload_errors(cassette, {"ok": False})
     )

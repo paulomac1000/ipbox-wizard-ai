@@ -5,6 +5,7 @@
 - Opis, nazwa kontrahenta i sama kwota nie mogą nadpisać jawnego koszyka ani samodzielnie ustalić KUP, składki czy środka trwałego.
 - Pola liczbowe odrzucają booleany i teksty wyglądające jak liczby.
 - Finalny raport musi zawierać `calculation_meta` z hashem wejścia, źródłami reguł i rewizją kodu.
+- Semantyczną tożsamością wersji jest `engine_source_hash`; nie używaj chwilowego `GITHUB_SHA` jako fingerprintu wyniku ani kasety.
 - Dodatnia przeniesiona kwota termomodernizacji wymaga osobnego lotu z `origin_year` i `evidence_ref`; zbiorcza pula jest wyłącznie trybem zgodnościowym `PROVISIONAL`.
 
 ## Misja

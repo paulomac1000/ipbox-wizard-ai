@@ -4,7 +4,7 @@ meta:
   provider: openrouter
   requested_model: anthropic/claude-haiku-4.5
   returned_model: anthropic/claude-haiku-4.5
-  fingerprint: canonical_f438d62879614e2c5a7fe6e817472712484ae75686f80c76c99011ba20741654
+  fingerprint: canonical-source_437cd4f302fe27709b0fdca608c5d8d6b1d6ac762d582ac0ec7eb6d216ab4a9d
   request_hash: 047806c2b55752da03998c85df71c128d8f4bde72f67f89485bbbb04b7992d50
   recorded_at: '2026-07-25T23:26:13.005990+00:00'
   request_id: gen-1785021970-KHHQFJ7X86bYIlG7WpRe
@@ -26,8 +26,9 @@ parsed_response:
     rules_source_ids:
     - UNVERIFIED_YEAR
     input_hash: 027f2f907cd374b0d6ef7c0a68d6625eb1af4e1a42769ec3c92629ac793cb211
+    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
     calculated_at: '2026-07-25T23:26:13Z'
-    code_revision: unavailable
+    code_revision: engine:0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
   result:
     rok: 2018
     przychody_roczne:

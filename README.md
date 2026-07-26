@@ -45,6 +45,8 @@ Najważniejszy invariant z issue #1: **przychód IP/NIE, alokacja kosztów pośr
 
 Każdy raport zawiera `calculation_meta`: identyfikator silnika, rule pack roku, źródła reguł, SHA-256 wejścia, czas obliczenia i rewizję kodu.
 
+`calculation_meta.engine_source_hash` jest autorytatywną, stabilną tożsamością treści silnika i kontraktu raportu. `code_revision` domyślnie używa tej tożsamości w formie `engine:<hash>`; chwilowy `GITHUB_SHA` nie wpływa na semantyczny playback kaset.
+
 ## Granica wejścia
 
 Silnik przyjmuje znormalizowany YAML/dict. Repozytorium nie zawiera kompletnego, deterministycznego importera PDF/XLSX/KPiR/PIT. Odczyt dokumentów musi zachować jawne fakty źródłowe, w szczególności `KUP`, `source_ledger_included`, kwalifikację prawa, podział faktury i referencje dowodów. Poprawny kalkulator nie naprawi błędnie wyekstrahowanych danych.

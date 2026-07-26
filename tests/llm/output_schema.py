@@ -115,6 +115,7 @@ _report_root["properties"]["calculation_meta"] = {
         "rule_pack",
         "rules_source_ids",
         "input_hash",
+        "engine_source_hash",
         "calculated_at",
         "code_revision",
     ],
@@ -128,8 +129,13 @@ _report_root["properties"]["calculation_meta"] = {
             "uniqueItems": True,
         },
         "input_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "engine_source_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
         "calculated_at": {"type": "string", "format": "date-time"},
-        "code_revision": {"type": "string", "minLength": 1},
+        "code_revision": {
+            "type": "string",
+            "minLength": 1,
+            "not": {"const": "unavailable"},
+        },
     },
 }
 
