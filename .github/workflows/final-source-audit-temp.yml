@@ -26,7 +26,7 @@ jobs:
           ref: fix/decouple-mix-allocation-from-w
           fetch-depth: 0
 
-      - name: Apply reviewed source bundle and remove scaffolding
+      - name: Apply reviewed source bundle and remove payload scaffolding
         run: |
           set -euo pipefail
           cat .audit/final-fix.part-* > /tmp/final-fix.tar.gz.b64
@@ -35,7 +35,6 @@ jobs:
           base64 --decode /tmp/final-fix.tar.gz.b64 | tar -xzf -
           rm -f /tmp/final-fix.tar.gz.b64
           rm -rf .audit
-          rm -f .github/workflows/final-source-audit-temp.yml
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -80,11 +79,10 @@ jobs:
           unset OPENROUTER_API_KEY || true
           ./scripts/verify_all_models.sh
 
-      - name: Verify clean canonical repository layout
+      - name: Verify canonical repository layout
         run: |
           set -euo pipefail
           test ! -e .audit
-          test ! -e .github/workflows/final-source-audit-temp.yml
           if find . -path ./.git -prune -o -type f \
               \( -iname '*.tmp' -o -iname '*.bak' -o -iname '*.orig' -o -iname '*.rej' \) \
               -print | grep -q .; then
