@@ -54,8 +54,11 @@ jobs:
           PY
           python scripts/apply_final_vcr_audit_fixes.py
 
-      - name: Format sources
-        run: ruff format .
+      - name: Format and apply safe lint fixes
+        run: |
+          ruff format .
+          ruff check . --fix
+          ruff format .
 
       - name: Refresh cassette metadata without API calls
         env:
