@@ -47,6 +47,7 @@ jobs:
     env:
       OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
       LLM_PROVIDER: openrouter
+      LLM_PAID_RUN_CONFIRMATION: ${{ inputs.confirmation }}
       BENCHMARK_MODEL: ${{ inputs.model }}
       MAX_COST_PER_MODEL_USD: ${{ inputs.max-cost-per-model-usd }}
       MAX_TOTAL_COST_USD: ${{ inputs.max-total-cost-usd }}
