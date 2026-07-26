@@ -4,7 +4,7 @@ meta:
   provider: openrouter
   requested_model: deepseek/deepseek-chat-v3.1
   returned_model: deepseek/deepseek-chat-v3.1
-  fingerprint: canonical-source_05b717f93f8a48450e181cb16626396206c319b2c9fc2aa12fee1ee3cce93eef
+  fingerprint: canonical-source_700c8121fa7bb1fb9dcbf27e2f227789771bf650c1b943c00fc1fab09cfc5f04
   request_hash: 749ef237a7480a7bd3114865d289d7858a43fded45e0c962f1f413b9d877fd8c
   recorded_at: '2026-07-25T23:29:52.285223+00:00'
   request_id: gen-1785022189-REXY0ffQBuP2muJSVsB6
@@ -29,9 +29,9 @@ parsed_response:
     - MF_HEALTH
     - MF_IPBOX_BR
     input_hash: 4145e83c6189ea09e73e61bceea48770c122b09737f93dcf6cd62c79de194462
-    engine_source_hash: 285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
+    engine_source_hash: 15f46d2c48027b2043e147826d6d249570212e15194590bf8c2590ef758fae17
     calculated_at: '2026-07-25T23:29:52Z'
-    code_revision: engine:285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
+    code_revision: engine:15f46d2c48027b2043e147826d6d249570212e15194590bf8c2590ef758fae17
   result:
     rok: 2025
     przychody_roczne:

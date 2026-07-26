@@ -4,7 +4,7 @@ meta:
   provider: openrouter
   requested_model: google/gemini-3-flash-preview
   returned_model: google/gemini-3-flash-preview
-  fingerprint: canonical-source_455c3da23ee8b27d5389d8c1068028e7b7eb2cba2b210e32b081a203b55d00d8
+  fingerprint: canonical-source_c0a807558cc204348f2f713a25fa6956d3a8eb757750d1ad0089daf627a6af3d
   request_hash: c27995394153f71803c7f25074871207855b12e49b1296f7633e78d728e55e60
   recorded_at: '2026-07-25T23:22:16.974000+00:00'
   request_id: gen-1785021736-0cwOYnBfizzleHSlOewy
@@ -29,9 +29,9 @@ parsed_response:
     - MF_HEALTH
     - MF_IPBOX_BR
     input_hash: d389329b415f36570714687a745bf16281eb9d7a9dc1ad0d500f4549989eee72
-    engine_source_hash: 285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
+    engine_source_hash: 15f46d2c48027b2043e147826d6d249570212e15194590bf8c2590ef758fae17
     calculated_at: '2026-07-25T23:22:16Z'
-    code_revision: engine:285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
+    code_revision: engine:15f46d2c48027b2043e147826d6d249570212e15194590bf8c2590ef758fae17
   result:
     rok: 2025
     przychody_roczne:
