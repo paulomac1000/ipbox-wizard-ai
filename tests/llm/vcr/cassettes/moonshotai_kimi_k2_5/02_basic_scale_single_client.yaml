@@ -4,7 +4,7 @@ meta:
   provider: openrouter
   requested_model: moonshotai/kimi-k2.5
   returned_model: moonshotai/kimi-k2.5
-  fingerprint: canonical-source_15ac563b4a7d1831d772297fd8cf374d35718cea6ba55b447bdcf429ae1861ab
+  fingerprint: canonical-source_3ea5dd90a00feda8b4e75f58d7e88420a577ee4391f724e466aec3eecc47af7d
   request_hash: d7f1c95999b75d9a9e36ae64475bb885a53de09defcc0004413df13900946077
   recorded_at: '2026-07-25T23:37:56.298413+00:00'
   request_id: gen-1785022672-tajwfv9gd8tuDtxBXM5T

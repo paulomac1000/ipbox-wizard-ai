@@ -2,7 +2,25 @@
 
 Deterministyczny-first wizard wspierający przygotowanie danych do rozliczenia IP Box programisty B2B.
 
-> To nie jest porada podatkowa ani generator gotowego zeznania. Wynik wymaga sprawdzenia z księgową lub doradcą. Audyt techniczny i semantyczny wykonano 25 lipca 2026 r.; reguły podatkowe są jawnie przypisane do wszystkich lat obowiązywania IP Box 2019–2026.
+> To nie jest porada podatkowa ani generator gotowego zeznania. Wynik wymaga sprawdzenia z księgową lub doradcą. Audyt techniczny i semantyczny wykonano 26 lipca 2026 r.; reguły podatkowe są jawnie przypisane do wszystkich lat obowiązywania IP Box 2019–2026.
+
+## Pierwsze 5 minut
+
+1. Przeczytaj najpierw tę stronę, potem [`AGENTS.md`](AGENTS.md) i [`ipbox_algorytm.md`](ipbox_algorytm.md).
+2. Uruchom bezpłatną bramkę z sekcji „Szybki start”. Standardowy CI nie wykonuje płatnych requestów.
+3. Przekazuj do silnika wyłącznie znormalizowany YAML/dict. Surowe PDF-y, XLSX-y, KPiR i formularze PIT wymagają osobnej warstwy ekstrakcji oraz kontroli człowieka.
+4. Traktuj Python i testy deterministyczne jako źródło prawdy. Benchmark LLM sprawdza wyłącznie jednoznaczność protokołu i integrację providerów.
+5. Nie używaj starych dumpów repozytorium. Aktualny snapshot twórz lokalnie przez `./dump-to-md.sh`; dump jest materiałem pomocniczym, nie źródłem prawdy.
+
+| Potrzeba | Zacznij od |
+|---|---|
+| zrozumienie ograniczeń i uruchomienie projektu | `README.md` |
+| reguły pracy agenta i zakazy | `AGENTS.md` |
+| kontrakt domenowy i kolejność decyzji | `ipbox_algorytm.md` |
+| testy, VCR, limity kosztów i wydanie | `docs/testing.md` |
+| reguły podatkowe per rok | `docs/historical-tax-rules.md` |
+| klasy błędów z praktyki, na danych syntetycznych | `docs/real-world-regressions.md` |
+| wykonywalne przykłady | `tests/llm/scenarios/`, `tests/unit/` i `examples/przykladowy_output_yaml.yaml` |
 
 ## Architektura
 
@@ -69,7 +87,7 @@ python scripts/check_cassette_policy.py
 for script in scripts/*.sh dump-to-md.sh; do bash -n "$script"; done
 ```
 
-Bramka deterministyczna obejmuje co najmniej **256 testów jednostkowych**, coverage `python_helper` powyżej wymaganych **90%**, pełny bezpłatny suite i Python 3.11–3.13. Dokładne wartości raportuje CI.
+Bramka deterministyczna obejmuje pełny zestaw testów jednostkowych, coverage `python_helper` powyżej wymaganych **90%**, pełny bezpłatny suite i Python 3.11–3.13. Dokładną liczbę testów oraz coverage raportuje CI; dokumentacja nie utrwala liczby, która szybko staje się nieaktualna.
 
 ## Benchmark wielorodzinny
 
@@ -87,7 +105,7 @@ Benchmark używa siedmiu modeli z siedmiu niezależnych rodzin:
 
 To jest **test przenośności protokołu**, nie dowód poprawności podatkowej i nie matematyczna gwarancja zachowania każdego mocniejszego modelu. Jeżeli małe modele różnych dostawców przechodzą identyczny lokalny kontrakt bez naprawiania odpowiedzi, rośnie wiarygodność, że interfejs jest jednoznaczny i niezależny od jednej rodziny. Prawdą podatkową nadal pozostają Python, oracle i testy deterministyczne.
 
-Nagrywanie jest jawne i płatne. Wybór scenariusza jest dokładny, a koszty zaakceptowanych i odrzuconych odpowiedzi wliczają się do limitu przebiegu:
+Nagrywanie jest jawne i płatne. Wybór scenariusza jest dokładny, oba limity kosztu są obowiązkowe, skończone i ściśle dodatnie, a koszty zaakceptowanych oraz wszystkich odrzuconych prób wliczają się do limitu przebiegu:
 
 ```bash
 # `.env` jest ignorowany przez Git; skrypty czytają go jako dane, bez `source` i bez ewaluacji powłoki.
@@ -99,7 +117,7 @@ chmod 600 .env
   --max-total-cost-usd 5
 ```
 
-Ręczny workflow `Paid multi-model LLM benchmark` wymaga wpisania tekstu potwierdzenia oraz podania obu limitów. Standardowy CI nigdy nie wykonuje płatnych requestów. Limit globalny jest sprawdzany przed i po każdym requestcie; ponieważ provider raportuje koszt po odpowiedzi, pojedyncza odpowiedź może przekroczyć próg, lecz po jej zaksięgowaniu żaden kolejny request nie zostanie uruchomiony.
+Ręczny workflow `Paid multi-model LLM benchmark` wymaga wpisania tekstu potwierdzenia oraz podania obu dodatnich limitów. Standardowy CI nigdy nie wykonuje płatnych requestów. Każda odrzucona płatna próba jest zapisywana jako osobny, niezmienny rekord. Limit globalny jest sprawdzany przed i po każdym requestcie; ponieważ provider raportuje koszt po odpowiedzi, pojedyncza odpowiedź może przekroczyć próg, lecz po jej zaksięgowaniu żaden kolejny request nie zostanie uruchomiony.
 
 Pełna procedura: [`docs/testing.md`](docs/testing.md). Dobór modeli i ograniczenia wnioskowania: [`docs/model-diversity-benchmark.md`](docs/model-diversity-benchmark.md).
 
@@ -121,4 +139,4 @@ PR jest gotowy do merge wyłącznie wtedy, gdy aktualny HEAD spełnia jednocześ
 - nie ma nierozwiązanych uwag do bieżącego HEAD;
 - niezależny audyt wydaje werdykt `READY`.
 
-Zmiana `ipbox_algorytm.md`, scenariusza, requestu, profilu modelu lub schema unieważnia odpowiednie fingerprinty. Takich kaset nie wolno poprawiać ręcznie — trzeba je usunąć i nagrać ponownie.
+Zmiana `ipbox_algorytm.md`, scenariusza, requestu, profilu modelu, schema albo harnessu VCR unieważnia odpowiednie fingerprinty. Kaset nie wolno poprawiać ręcznie. Gdy zmieniła się wyłącznie deterministyczna implementacja lub metadane, uruchom `python scripts/refresh_vcr_metadata.py --all-models --write`: skrypt ponownie waliduje istniejące surowe odpowiedzi i kończy się błędem przy zmianie semantyki. Płatne nagranie jest potrzebne dopiero wtedy, gdy surowa odpowiedź nie przechodzi aktualnego kontraktu albo zmienił się request do modelu.

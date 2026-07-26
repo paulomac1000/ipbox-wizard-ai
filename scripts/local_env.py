@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
+import argparse
 import ast
 import os
 import re
 import stat
 import sys
-from collections.abc import MutableMapping
+from collections.abc import Mapping, MutableMapping, Sequence
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -25,6 +26,7 @@ _ALLOWED_KEYS = frozenset(
         "VCR_REJECTED_ROOT",
     }
 )
+_PRINTABLE_KEYS = _ALLOWED_KEYS - {"OPENROUTER_API_KEY"}
 _KEY_PATTERN = re.compile(r"^[A-Z][A-Z0-9_]*$")
 
 
@@ -88,3 +90,35 @@ def load_local_env(
         target[key] = _parse_value(raw_value, line_number=line_number)
         loaded.append(key)
     return tuple(loaded)
+
+
+def effective_local_value(
+    name: str,
+    *,
+    default: str,
+    path: Path = DEFAULT_ENV_PATH,
+    environ: Mapping[str, str] | None = None,
+) -> str:
+    """Return one non-secret effective setting with process environment precedence."""
+    if name not in _PRINTABLE_KEYS:
+        raise ValueError(f"{name} is not an allowed printable local setting")
+    effective = dict(os.environ if environ is None else environ)
+    load_local_env(path, environ=effective)
+    return effective.get(name, default)
+
+
+def main(argv: Sequence[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--get", choices=sorted(_PRINTABLE_KEYS), required=True)
+    parser.add_argument("--default", required=True)
+    parser.add_argument("--env-file", type=Path, default=DEFAULT_ENV_PATH)
+    args = parser.parse_args(argv)
+    value = effective_local_value(args.get, default=args.default, path=args.env_file)
+    if not value:
+        parser.error(f"{args.get} must not be empty")
+    print(value, end="")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

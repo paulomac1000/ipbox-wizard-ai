@@ -1,36 +1,93 @@
+# Kompletny syntetyczny raport wygenerowany przez kanoniczny oracle dla scenariusza 01.
+# To przykład kontraktu technicznego, nie porada podatkowa ani gotowe zeznanie.
 status: FINAL
-rok: 2025
-polityka_alokacji:
-  policy_id: kis-annual-revenue
-  przychody:
-    metoda: dokumentowa
-  koszty_MIX:
+result:
+  rok: 2025
+  przychody_roczne:
+    IP: 22620.0
+    NIE: 2380.0
+  koszty_roczne:
+    IP: 199.53
+    NIE: 8.47
+    MIX: 89.0
+    WYKLUCZONE: 0.0
+  nexus_koszty:
+    A: 119.0
+    B: 0.0
+    C: 0.0
+    D: 0.0
+    poza_nexus: 89.0
+  nexus: 1.0
+  dochód_IP: 22420.47
+  dochód_NIE: 2371.53
+  klucz_MIX:
     metoda: przychodowa_roczna
-    źródło: interpretacja_KIS
-    uzasadnienie: "Treść interpretacji wymaga rocznego klucza przychodowego"
-klucz_MIX:
-  wartość: 0.80
-  status: FINAL
-nexus:
-  wzór: "min(1, ((A+B) * 1.3) / (A+B+C+D))"
-  A: 1000.00
-  B: 500.00
-  C: 500.00
-  D: 0.00
-  poza_nexus: 500.00
-  wartość: 0.975
-podatek:
-  podstawa_IP: 18525
-  podstawa_NIE: 10000
-  podatek_IP: 926
-  podatek_NIE_finalny: 1900
-  podatek_całościowy: 2826
-  ulga_BR_IP_wykorzystana: 1000.00
-  ulga_BR_NIE_wykorzystana: 500.00
-  ulga_BR_carry_over: 0.00
-  dochód_dodatkowy_skala: 0.00
-  termomodernization_carry_over: 0.00
-testy:
+    źródło: domyślna_wizard
+    wartość: 0.9048
+    status: FINAL
+    źródło_ref: null
+    rounding_granularity: per_cost_item
+  alokacja_multi_ip: null
+  podatek:
+    podstawa_IP: 22420
+    podstawa_NIE: 2372
+    podstawa_zwykła: 2372
+    dochód_IP_po_uldze_BR: 22420.47
+    dochód_IP_kwalifikowany: 22420.47
+    dochód_IP_poza_preferencją: 0.0
+    podatek_IP: 1121
+    podatek_NIE_finalny: 451
+    podatek_całościowy: 1572
+    nadpłata_lub_dopłata: -1572.0
+    thermomodernization_used: 0.0
+    termomodernization_carry_over: 0.0
+    termomodernization_expired: 0.0
+    thermomodernization_mode: none
+    thermomodernization_evidence_status: NOT_APPLICABLE
+    thermomodernization_rules_source_id: MF_THERMOMODERNIZATION
+    thermomodernization_limit: 53000.0
+    health_tax_credit_used: 0.0
+    ulga_BR_IP_wykorzystana: 0.0
+    ulga_BR_NIE_wykorzystana: 0.0
+    ulga_BR_carry_over: 0.0
+    dochód_dodatkowy_skala: 0.0
+classifications:
+- opis: Licencja JetBrains
+  amount: 119.0
+  basket: IP
+  allocation_method: direct
+  allocation_source: ewidencja_kosztu_IP
+  allocation_key: 1.0
+  ip_amount: 119.0
+  non_ip_amount: 0.0
+  nexus_source: own_br
+  nexus_basket: A
+  nexus_amount: 119.0
+  allocation_period: 2025-01
+  rounding_granularity: per_cost_item
+  rounding_adjustment: 0.0
+  nexus_evidence: synthetic-nexus-01_basic_linear-1
+  nexus_basis: explicit_amount
+- opis: Internet firmowy
+  amount: 89.0
+  basket: MIX
+  allocation_method: przychodowa_roczna
+  allocation_source: domyślna_wizard
+  allocation_key: 0.9048
+  ip_amount: 80.53
+  non_ip_amount: 8.47
+  nexus_source: outside_nexus
+  nexus_basket: poza_nexus
+  nexus_amount: 0.0
+  allocation_period: 2025-01
+  rounding_granularity: per_cost_item
+  rounding_adjustment: 0.0
+  nexus_evidence: ''
+  nexus_basis: explicit_amount
+monthly_W:
+- miesiąc: 2025-01
+  wartość: 90.48
+tests:
   TEST_1: PASS
   TEST_2: PASS
   TEST_3: PASS
@@ -40,6 +97,67 @@ testy:
   TEST_7: PASS
   TEST_8: PASS
   TEST_9: PASS
-uwagi:
-  - "Kwoty przykładowe; raport wymaga zgodności ze źródłowymi dokumentami."
-  - "Wiele IP wymaga osobnej ewidencji per kwalifikowane prawo."
+stops_reviews:
+  stops: []
+  reviews:
+  - REVIEW_09
+  warnings: []
+decision_facts:
+  unsupported_tax_form: false
+  claimed_ip_without_qualified_right: false
+  no_qualifying_ip_income_after_complete_evidence: false
+  source_coverage_incomplete: false
+  rd_work_absent: false
+  ip_claim_without_required_records: false
+  social_contributions_double_counted: false
+  health_contribution_double_counted: false
+  w_above_95: false
+  w_below_50: false
+  multiple_projects_or_ips: false
+  w_jump_above_30pp: false
+  single_positive_revenue_client: true
+  uses_kis_interpretation: false
+  kis_implementation_requires_confirmation: false
+  revenue_allocation_inconsistent: false
+  invoice_percentage_double_applied: false
+  allocation_method_changed_without_evidence: false
+  return_ledger_reconciliation_failed: false
+  unsupported_tax_year: false
+  rd_ip_relief_not_available_for_year: false
+  year_limit_exceeded: false
+  health_deduction_mode_invalid_for_year: false
+  legacy_thermomodernization_pool_requires_review: false
+  asset_classification_requires_review: false
+  contribution_classification_requires_review: false
+  source_kpir_requires_correction: false
+  nexus_evidence_missing: false
+calculation_meta:
+  engine_version: ipbox-wizard-ai
+  rule_pack: PL-PIT-IPBOX-2025
+  rules_source_ids:
+  - MF_IPBOX_2019
+  - KNF_IKZE
+  - MF_SCALE_CURRENT
+  - MF_HEALTH
+  - MF_IPBOX_BR
+  input_hash: 3df48db7ac21f15c571b42b9349a4ef5b47d34aa727481a587c2b53fa4a8f8b0
+  engine_source_hash: 285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
+  calculated_at: '2026-07-26T14:28:23Z'
+  code_revision: engine:285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
+source_ledger_audit:
+  status: NOT_PROVIDED
+  reported_costs: null
+  raw_input_costs: 208.0
+  deductible_costs: 208.0
+  excluded_recorded_costs: 0.0
+  correction_delta: 0.0
+correction_preview:
+  status: NOT_NEEDED
+  source_kpir_correction_required: false
+  return_correction_required: false
+  relief_adjustment_required: false
+  tax_unchanged_only_if_reliefs_updated: false
+  corrected_total_tax: 1572.0
+  corrected_overpayment: -1572.0
+  thermomodernization_used: 0.0
+  thermomodernization_carry_over: 0.0

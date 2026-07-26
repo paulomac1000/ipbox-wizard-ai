@@ -4,6 +4,7 @@
 
 ### Added
 
+- Bezpieczny, allowlistowy odczyt lokalnego `.env` bez wykonywania składni powłoki.
 - Atomowy kontrakt `decision_facts`; model zwraca wyłącznie `status/stops/reviews`.
 - Autorytatywną kopertę `expected_decision`, która nie pokazuje modelowi faktów podatkowych ani nie wymaga klasyfikowania kodów do kanałów.
 - Fail-closed oracle, evaluator, strict JSON Schema i kanoniczny, ściśle walidowany kontrakt VCR.
@@ -47,6 +48,9 @@
 
 ### Fixed
 
+- Płatny recorder wymaga jednocześnie skończonego, ściśle dodatniego limitu per model i limitu całej sesji przed pierwszym requestem.
+- Każda odrzucona płatna próba jest zapisywana jako osobny, niezmienny plik i pozostaje w sumie kosztów sesji.
+- `record_all_models.sh` respektuje `VCR_REJECTED_ROOT` z lokalnego `.env`, zachowując pierwszeństwo jawnych zmiennych procesu i ścieżki zawierające spacje.
 - Rozdzielono przychód, koszty `MIX` i NEXUS zgodnie z issue #1.
 - Poprawiono NEXUS z `(A×1,3+B)` na `((A+B)×1,3)`.
 - Część dochodu IP niewchodząca do preferencji po zastosowaniu NEXUS jest opodatkowana zwykłą stawką zamiast znikać z podstawy.

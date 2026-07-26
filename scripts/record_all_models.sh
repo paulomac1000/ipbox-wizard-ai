@@ -1,17 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-python - <<'PY_ENV'
-import os
-
-from scripts.local_env import load_local_env
-
-load_local_env()
-if not os.environ.get("OPENROUTER_API_KEY"):
-    raise SystemExit(
-        "OPENROUTER_API_KEY is missing. Set it in the process environment or in an ignored .env file."
-    )
-PY_ENV
 
 ruff format --check .
 ruff check .
@@ -25,7 +14,17 @@ import time
 print(time.time())
 PY_TIME
 )}"
-export VCR_REJECTED_ROOT="${VCR_REJECTED_ROOT:-/tmp/ipbox_llm_rejected}"
+if [[ ! -v VCR_REJECTED_ROOT ]]; then
+  export VCR_REJECTED_ROOT="$(
+    python scripts/local_env.py \
+      --get VCR_REJECTED_ROOT \
+      --default /tmp/ipbox_llm_rejected
+  )"
+fi
+if [[ -z "$VCR_REJECTED_ROOT" ]]; then
+  echo 'VCR_REJECTED_ROOT must not be empty' >&2
+  exit 2
+fi
 printf 'Recording session started at %s; rejected responses: %s\n' \
   "$LLM_RECORDING_STARTED_AT" "$VCR_REJECTED_ROOT"
 

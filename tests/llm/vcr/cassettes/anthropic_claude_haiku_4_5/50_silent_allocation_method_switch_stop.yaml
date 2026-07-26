@@ -4,7 +4,7 @@ meta:
   provider: openrouter
   requested_model: anthropic/claude-haiku-4.5
   returned_model: anthropic/claude-haiku-4.5
-  fingerprint: canonical-source_8f5c78e24ac36c5d1fde22f8ab9fd1e141ec674973c5f06f253ef4368b21bac5
+  fingerprint: canonical-source_aa5b9213d4c88468cf9e86274bbbd53a602e00cf7030b08404ca68474620a0cb
   request_hash: e6a10570419bc34a6ba11932960083d81abcb51243fd1703fc55618601941296
   recorded_at: '2026-07-25T23:25:53.455203+00:00'
   request_id: gen-1785021952-RDCO0uB7sHpfda5seRIO

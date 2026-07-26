@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import time
+import uuid
 from collections.abc import Callable
 from datetime import UTC, datetime
 from pathlib import Path
@@ -257,28 +258,37 @@ class VCRRecorder:
         model_dir = self.config.rejected_root / self.config.model_slug
         model_dir.mkdir(parents=True, exist_ok=True)
         scenario_id = str(scenario["meta"]["id"])
-        path = model_dir / f"{scenario_id}.json"
-        path.write_text(
-            json.dumps(
-                {
-                    "scenario_id": scenario_id,
-                    "model": self.config.model,
-                    "request_hash": request_hash,
-                    "reason": reason,
-                    "response": response.content,
-                    "metadata": {
-                        "request_id": response.request_id,
-                        "returned_model": response.returned_model,
-                        "finish_reason": response.finish_reason,
-                        "native_finish_reason": response.native_finish_reason,
-                        "prompt_tokens": response.prompt_tokens,
-                        "completion_tokens": response.completion_tokens,
-                        "total_tokens": response.total_tokens,
-                        "cost": response.cost,
-                    },
-                },
-                ensure_ascii=False,
-                indent=2,
-            ),
-            encoding="utf-8",
+        safe_scenario_id = "".join(
+            character if character.isalnum() or character in {"-", "_"} else "_"
+            for character in scenario_id
+        ).strip("_")
+        if not safe_scenario_id:
+            raise RecordingRejectedError("scenario id cannot produce a safe rejected-record name")
+        recorded_at = datetime.now(UTC)
+        attempt_id = uuid.uuid4().hex
+        filename = (
+            f"{safe_scenario_id}__{recorded_at.strftime('%Y%m%dT%H%M%S.%fZ')}__{attempt_id}.json"
         )
+        path = model_dir / filename
+        payload = {
+            "attempt_id": attempt_id,
+            "recorded_at": recorded_at.isoformat(),
+            "scenario_id": scenario_id,
+            "model": self.config.model,
+            "request_hash": request_hash,
+            "reason": reason,
+            "response": response.content,
+            "metadata": {
+                "request_id": response.request_id,
+                "returned_model": response.returned_model,
+                "finish_reason": response.finish_reason,
+                "native_finish_reason": response.native_finish_reason,
+                "prompt_tokens": response.prompt_tokens,
+                "completion_tokens": response.completion_tokens,
+                "total_tokens": response.total_tokens,
+                "cost": response.cost,
+            },
+        }
+        with path.open("x", encoding="utf-8") as handle:
+            json.dump(payload, handle, ensure_ascii=False, indent=2)
+            handle.write("\n")

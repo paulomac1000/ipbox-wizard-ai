@@ -42,6 +42,13 @@ def _finite_nonnegative(name: str, value: object) -> float:
     return number
 
 
+def _finite_positive(name: str, value: object) -> float:
+    number = _finite_nonnegative(name, value)
+    if number <= 0:
+        raise ValueError(f"{name} must be a finite number greater than zero")
+    return number
+
+
 def _manifest_cost(manifest: Path, model: str) -> float:
     loaded = CassetteManifest.load(manifest, model)
     return sum(entry.cost for entry in loaded.entries.values())
@@ -139,15 +146,18 @@ def _resolve_limit(
         except ValueError as exc:
             parser.error(f"{environment_name} must be a number: {exc}")
     else:
-        value = 0.0
+        parser.error(
+            f"{environment_name} is required; set it in the process environment, "
+            ".env, or the matching CLI option"
+        )
     try:
-        return _finite_nonnegative(f"{environment_name} / CLI limit", value)
+        return _finite_positive(f"{environment_name} / CLI limit", value)
     except ValueError as exc:
         parser.error(str(exc))
 
 
 def _budget_blocked(label: str, current: float, limit: float) -> bool:
-    if not limit or current < limit:
+    if current < limit:
         return False
     print(
         f"COST GUARD: {label} has paid ${current:.6f}; limit is ${limit:.6f}",
@@ -157,7 +167,7 @@ def _budget_blocked(label: str, current: float, limit: float) -> bool:
 
 
 def _budget_exceeded(label: str, current: float, limit: float) -> bool:
-    if not limit or current <= limit:
+    if current <= limit:
         return False
     print(
         f"COST GUARD EXCEEDED: {label} paid ${current:.6f}; limit is ${limit:.6f}. "
@@ -176,13 +186,13 @@ def main() -> int:
         "--max-cost-per-model-usd",
         type=float,
         default=None,
-        help="Per-model paid-cost guard; accepted and rejected responses both count.",
+        help="Required positive per-model paid-cost guard; accepted and rejected responses count.",
     )
     parser.add_argument(
         "--max-total-cost-usd",
         type=float,
         default=None,
-        help="Whole-session paid-cost guard across all models; 0 disables it.",
+        help="Required positive whole-session paid-cost guard across all models.",
     )
     args = parser.parse_args()
     load_local_env()

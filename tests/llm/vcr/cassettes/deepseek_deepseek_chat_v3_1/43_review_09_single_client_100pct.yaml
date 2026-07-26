@@ -4,7 +4,7 @@ meta:
   provider: openrouter
   requested_model: deepseek/deepseek-chat-v3.1
   returned_model: deepseek/deepseek-chat-v3.1
-  fingerprint: canonical-source_6f415651937fb7379f13c1d9f5f52c0fd1e7b6743b131399b4f0cdf788517bd0
+  fingerprint: canonical-source_05b717f93f8a48450e181cb16626396206c319b2c9fc2aa12fee1ee3cce93eef
   request_hash: 749ef237a7480a7bd3114865d289d7858a43fded45e0c962f1f413b9d877fd8c
   recorded_at: '2026-07-25T23:29:52.285223+00:00'
   request_id: gen-1785022189-REXY0ffQBuP2muJSVsB6

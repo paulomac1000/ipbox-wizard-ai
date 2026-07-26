@@ -16,8 +16,8 @@ Utrzymuj wiarygodne, fail-closed narzędzie wspierające przygotowanie danych do
 
 1. `ipbox_algorytm.md` — reguły i granice zakresu.
 2. `python_helper/ipbox_calculator.py`, `tax_year_rules.py` i `allocation_audit.py` — deterministyczna matematyka, reguły roczne i strażniki alokacji.
-3. `tests/llm/oracle.py` — kanoniczny wynik referencyjny harnessu; `oracle_legacy.py` jest wyłącznie jawnym adapterem zgodności.
-4. `tests/llm/output_schema.py` — kanoniczny kontrakt raportu; `output_schema_legacy.py` jest bazą zgodności.
+3. `tests/llm/oracle.py` — kanoniczny entrypoint wyniku referencyjnego; `oracle_legacy.py` jest nadal używaną tymczasową bazą zgodności pod wrapperem i nie jest miejscem dla nowych reguł.
+4. `tests/llm/output_schema.py` — kanoniczny kontrakt raportu; `output_schema_legacy.py` pozostaje używaną bazą zgodności do czasu osobnej migracji.
 5. `tests/llm/scenarios/` — przypadki biznesowe.
 6. `tests/unit/` — wykonywalna specyfikacja.
 7. `docs/testing.md` — procedura wydania i VCR.
@@ -65,7 +65,7 @@ Sprzeczność między źródłami jest błędem. Nie wybieraj wygodniejszego źr
 - wymyślać kursów, limitów, NEXUS A/B lub dowodów kwalifikacji;
 - używać niejednoznacznych pól `ulga_BR` albo `straty_poprzednie`;
 - włączać płatnych requestów do standardowego CI;
-- uruchamiać płatnej macierzy bez jawnego potwierdzenia oraz limitu per model i limitu całego przebiegu;
+- uruchamiać płatnej macierzy bez jawnego potwierdzenia oraz dwóch skończonych, ściśle dodatnich limitów: per model i całego przebiegu;
 - nadpisywać poprawnych kaset;
 - deklarować gotowości bez 322/322, raportu kompletności i playbacku offline.
 
@@ -84,8 +84,8 @@ unset OPENROUTER_API_KEY
 for script in scripts/*.sh dump-to-md.sh; do bash -n "$script"; done
 ```
 
-Stan bazowy: co najmniej 256 testów jednostkowych, coverage powyżej wymaganych 90% i 46 scenariuszy LLM. CI na Pythonie 3.13 wymaga kompletnej aktualnej macierzy i wykonuje playback bez sekretu.
+Stan bazowy: pełny zestaw testów jednostkowych, coverage powyżej wymaganych 90% i 46 scenariuszy LLM; dokładną liczbę testów raportuje CI. CI na Pythonie 3.13 wymaga kompletnej aktualnej macierzy i wykonuje playback bez sekretu.
 
 ## Nagrywanie
 
-Lokalnie `scripts/record_model.py` i `scripts/record_all_models.sh` bezpiecznie wczytują wyłącznie dozwolone ustawienia z ignorowanego przez Git pliku `.env`; istniejące zmienne procesu mają pierwszeństwo. Nigdy nie loguj wartości sekretu. Nagrywaj przez `scripts/record_model.py` lub ręczny workflow `Paid multi-model LLM benchmark`. Wybór scenariusza jest dokładny, a literówka kończy proces przed requestem sieciowym. Każdy płatny przebieg musi mieć osobny limit per model i limit globalny obejmujący odpowiedzi zaakceptowane oraz odrzucone. Po zmianie requestu, algorytmu, scenariusza lub schematu usuń wyłącznie unieważnione kasety. Wydanie wymaga 46/46 dla każdego z siedmiu modeli (322/322), czystego JSON bez Markdown fences, zgodnego modelu zwróconego, playbacku bez sekretu, kontroli manifestu i raportu niezależnego agenta.
+Lokalnie `scripts/record_model.py` i `scripts/record_all_models.sh` bezpiecznie wczytują wyłącznie dozwolone ustawienia z ignorowanego przez Git pliku `.env`; istniejące zmienne procesu mają pierwszeństwo. Nigdy nie loguj wartości sekretu. Nagrywaj przez `scripts/record_model.py` lub ręczny workflow `Paid multi-model LLM benchmark`. Wybór scenariusza jest dokładny, a literówka kończy proces przed requestem sieciowym. Każdy płatny przebieg musi mieć skończony, ściśle dodatni limit per model i skończony, ściśle dodatni limit globalny. Brak limitu lub zero kończy proces przed requestem. Każda odrzucona płatna próba ma osobny, niezmienny rekord i jest uwzględniana w obu limitach. Po zmianie deterministycznego kodu najpierw użyj `scripts/refresh_vcr_metadata.py`, które ponownie waliduje surowe odpowiedzi bez API. Po zmianie requestu lub niezgodności semantycznej usuń wyłącznie unieważnione kasety i nagraj je ponownie. Wydanie wymaga 46/46 dla każdego z siedmiu modeli (322/322), czystego JSON bez Markdown fences, zgodnego modelu zwróconego, playbacku bez sekretu, kontroli manifestu i raportu niezależnego agenta.

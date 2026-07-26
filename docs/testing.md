@@ -39,7 +39,7 @@ for script in scripts/*.sh dump-to-md.sh; do bash -n "$script"; done
 
 Stan referencyjny przed końcowym nagraniem:
 
-- co najmniej 256 testów jednostkowych PASS;
+- wszystkie testy jednostkowe PASS; dokładną liczbę raportuje CI;
 - coverage `python_helper` powyżej wymaganego progu 90%;
 - pełny suite: wszystkie bezpłatne testy PASS i 46 kontrolowanych skipów LLM;
 - pusty katalog kaset jest dozwolony lokalnie, ale nie spełnia merge gate.
@@ -101,7 +101,20 @@ Wykonywalna lista znajduje się wyłącznie w `tests/llm/models.py`.
 
 Adapter zmienia wyłącznie transport. Parser, `DECISION_JSON_SCHEMA`, output schema i evaluator są wspólne dla wszystkich modeli.
 
-## 6. Nagranie
+## 6. Odświeżenie lub nagranie
+
+Po zmianie deterministycznego kodu albo metadanych zacznij bez requestów API:
+
+```bash
+python scripts/refresh_vcr_metadata.py --all-models --write
+python scripts/vcr_precommit.py --all-models
+unset OPENROUTER_API_KEY
+./scripts/verify_all_models.sh
+```
+
+Skrypt zachowuje surowe odpowiedzi, przelicza tożsamość i ponownie wykonuje pełną walidację. Jeżeli choć jedna odpowiedź nie odpowiada aktualnej semantyce, proces zatrzymuje się — wtedy usuń tylko wskazane, unieważnione kasety i nagraj je ponownie. Nie kasuj całej macierzy rutynowo.
+
+Płatne nagranie pełnej lub brakującej części macierzy:
 
 ```bash
 git switch fix/decouple-mix-allocation-from-w
@@ -110,12 +123,9 @@ python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt -r requirements-test.txt
 
-find tests/llm/vcr/cassettes -mindepth 1 -maxdepth 1 -type d -exec rm -rf {} +
-find tests/llm/vcr/cassettes -maxdepth 1 -type f ! -name '.gitkeep' -delete
-
 cp .env.example .env
 chmod 600 .env
-# wpisz OPENROUTER_API_KEY w .env
+# wpisz OPENROUTER_API_KEY oraz dwa dodatnie limity w .env albo przekaż je przez CLI
 ./scripts/record_all_models.sh \
   --max-cost-per-model-usd 5 \
   --max-total-cost-usd 5
@@ -132,7 +142,7 @@ python scripts/record_model.py \
   --max-cost-per-model-usd 5 --max-total-cost-usd 5
 ```
 
-Skrypty lokalne automatycznie czytają tylko dozwolone ustawienia z `.env`. Plik nie jest wykonywany przez powłokę, nieznane klucze są ignorowane, a jawnie ustawione zmienne procesu mają pierwszeństwo. `.env` pozostaje w `.gitignore`; ustaw prawa `chmod 600`. Skrypt nie nadpisuje istniejącej kasety. Przy błędzie transportowym uruchom ponownie dopiero po sprawdzeniu, że plik nie powstał i przyczyna została sklasyfikowana. Odrzucenia trafiają do `/tmp/ipbox_llm_rejected/`, a wyniki do `/tmp/ipbox_llm_responses/`.
+Skrypty lokalne automatycznie czytają tylko dozwolone ustawienia z `.env`. Plik nie jest wykonywany przez powłokę, nieznane klucze są ignorowane, a jawnie ustawione zmienne procesu mają pierwszeństwo. `.env` pozostaje w `.gitignore`; ustaw prawa `chmod 600`. Skrypt nie nadpisuje istniejącej kasety. Przy błędzie transportowym uruchom ponownie dopiero po sprawdzeniu, że plik nie powstał i przyczyna została sklasyfikowana. Odrzucenia trafiają do skonfigurowanego `VCR_REJECTED_ROOT` (domyślnie `/tmp/ipbox_llm_rejected/`) jako osobne, niezmienne pliki dla każdej płatnej próby, a wyniki do `/tmp/ipbox_llm_responses/`.
 
 Nie ma `--force`. Nie ponawiaj błędu semantycznego aż do uzyskania „szczęśliwej” odpowiedzi.
 

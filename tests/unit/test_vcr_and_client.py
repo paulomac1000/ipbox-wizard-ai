@@ -312,7 +312,10 @@ def test_record_rejects_invalid_or_truncated_response(monkeypatch, tmp_path) -> 
             validate_response=validated,
         )
     assert not recorder.config.cassette_path("s").exists()
-    assert (recorder.config.rejected_root / recorder.config.model_slug / "s.json").exists()
+    rejected_files = list(
+        (recorder.config.rejected_root / recorder.config.model_slug).glob("s__*.json")
+    )
+    assert len(rejected_files) == 1
     with pytest.raises(RecordingRejectedError):
         recorder.get_or_record(
             scenario=scenario,
@@ -321,6 +324,38 @@ def test_record_rejects_invalid_or_truncated_response(monkeypatch, tmp_path) -> 
             api_call=lambda _: response(finish="length"),
             validate_response=validated,
         )
+
+
+def test_rejected_attempts_are_immutable_and_all_costs_are_counted(monkeypatch, tmp_path) -> None:
+    from scripts.record_model import rejected_cost_since
+
+    set_config_env(monkeypatch, tmp_path, "record")
+    scenario, path = scenario_file(tmp_path)
+    recorder = VCRRecorder(VCRConfig())
+    attempts = (
+        replace(response("not json"), request_id="req-one", cost=0.02),
+        replace(response("still not json"), request_id="req-two", cost=0.03),
+    )
+    for rejected in attempts:
+        with pytest.raises(RecordingRejectedError):
+            recorder.get_or_record(
+                scenario=scenario,
+                scenario_path=path,
+                request=spec(),
+                api_call=lambda _, value=rejected: value,
+                validate_response=validated,
+            )
+
+    rejected_dir = recorder.config.rejected_root / recorder.config.model_slug
+    files = sorted(rejected_dir.glob("s__*.json"))
+    assert len(files) == 2
+    assert len({file.name for file in files}) == 2
+    payloads = [json.loads(file.read_text(encoding="utf-8")) for file in files]
+    assert {payload["metadata"]["request_id"] for payload in payloads} == {
+        "req-one",
+        "req-two",
+    }
+    assert rejected_cost_since(recorder.config.rejected_root, since=0) == pytest.approx(0.05)
 
 
 def test_cassette_and_manifest_reject_noncanonical_fields(tmp_path) -> None:
@@ -577,6 +612,8 @@ def test_workflows_harden_checkout_and_shell_inputs() -> None:
     assert "MAX_COST_PER_MODEL_USD: ${{ inputs.max-cost-per-model-usd }}" in paid
     assert "MAX_TOTAL_COST_USD: ${{ inputs.max-total-cost-usd }}" in paid
     assert "inputs.confirmation == 'RUN_PAID_BENCHMARK'" in paid
+    assert "must be finite and > 0" in paid
+    assert "0 disables" not in paid
     assert 'if [ "${{ inputs.model }}"' not in paid
 
 
@@ -599,7 +636,19 @@ def test_record_model_refuses_to_overwrite_stale_cassette(monkeypatch, tmp_path)
     monkeypatch.setattr(record_model, "CASSETTE_ROOT", cassette_root)
     monkeypatch.setattr(record_model, "run", lambda command, env: calls.append(command) or 1)
     monkeypatch.setenv("OPENROUTER_API_KEY", "test")
-    monkeypatch.setattr(sys, "argv", ["record_model.py", "--model", model])
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "record_model.py",
+            "--model",
+            model,
+            "--max-cost-per-model-usd",
+            "1",
+            "--max-total-cost-usd",
+            "2",
+        ],
+    )
 
     assert record_model.main() == 1
     assert len(calls) == 1
@@ -738,6 +787,98 @@ def test_paid_entry_points_include_shell_gate_and_make_record_depends_on_test() 
     assert 'bash -n "$script"' in workflow
 
 
+@pytest.mark.parametrize(
+    ("arguments", "message"),
+    (
+        ([], "LLM_MAX_COST_PER_MODEL_USD is required"),
+        (["--max-cost-per-model-usd", "1"], "LLM_MAX_TOTAL_COST_USD is required"),
+        (
+            [
+                "--max-cost-per-model-usd",
+                "0",
+                "--max-total-cost-usd",
+                "1",
+            ],
+            "greater than zero",
+        ),
+        (
+            [
+                "--max-cost-per-model-usd",
+                "1",
+                "--max-total-cost-usd",
+                "0",
+            ],
+            "greater than zero",
+        ),
+    ),
+)
+def test_record_model_requires_two_positive_limits_before_any_subprocess(
+    monkeypatch, capsys, arguments: list[str], message: str
+) -> None:
+    import sys
+
+    import scripts.record_model as record_model
+
+    calls: list[list[str]] = []
+    monkeypatch.setattr(record_model, "load_local_env", lambda: ())
+    monkeypatch.setattr(record_model, "run", lambda command, env: calls.append(command) or 0)
+    monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
+    monkeypatch.delenv("LLM_MAX_COST_PER_MODEL_USD", raising=False)
+    monkeypatch.delenv("LLM_MAX_TOTAL_COST_USD", raising=False)
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "record_model.py",
+            "--model",
+            "google/gemini-3-flash-preview",
+            *arguments,
+        ],
+    )
+    with pytest.raises(SystemExit) as exc:
+        record_model.main()
+    assert exc.value.code == 2
+    assert calls == []
+    assert message in capsys.readouterr().err
+
+
+def test_positive_limits_are_accepted_before_api_key_validation(monkeypatch, capsys) -> None:
+    import sys
+
+    import scripts.record_model as record_model
+
+    calls: list[list[str]] = []
+    monkeypatch.setattr(record_model, "load_local_env", lambda: ())
+    monkeypatch.setattr(record_model, "run", lambda command, env: calls.append(command) or 0)
+    monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "record_model.py",
+            "--model",
+            "google/gemini-3-flash-preview",
+            "--max-cost-per-model-usd",
+            "1",
+            "--max-total-cost-usd",
+            "2",
+        ],
+    )
+    with pytest.raises(SystemExit) as exc:
+        record_model.main()
+    assert exc.value.code == 2
+    assert "OPENROUTER_API_KEY is required" in capsys.readouterr().err
+    assert calls == []
+
+
+@pytest.mark.parametrize("value", [0, float("nan"), float("inf"), float("-inf"), -1])
+def test_paid_limits_require_finite_positive_values(value: float) -> None:
+    from scripts.record_model import _finite_positive
+
+    with pytest.raises(ValueError, match="finite|greater than zero"):
+        _finite_positive("limit", value)
+
+
 @pytest.mark.parametrize("value", [float("nan"), float("inf"), float("-inf"), -1])
 def test_paid_cost_guards_reject_nonfinite_or_negative_values(value: float) -> None:
     from scripts.record_model import _finite_nonnegative
@@ -759,6 +900,7 @@ def test_record_model_cli_rejects_nonfinite_limits(raw: str) -> None:
             "--model",
             "google/gemini-3-flash-preview",
             f"--max-cost-per-model-usd={raw}",
+            "--max-total-cost-usd=1",
         ],
         cwd=root,
         capture_output=True,
@@ -780,7 +922,15 @@ def test_record_model_rejects_nonfinite_session_timestamp(monkeypatch) -> None:
     monkeypatch.setattr(
         sys,
         "argv",
-        ["record_model.py", "--model", "google/gemini-3-flash-preview"],
+        [
+            "record_model.py",
+            "--model",
+            "google/gemini-3-flash-preview",
+            "--max-cost-per-model-usd",
+            "1",
+            "--max-total-cost-usd",
+            "2",
+        ],
     )
     with pytest.raises(SystemExit) as exc:
         record_model.main()
@@ -828,6 +978,88 @@ def test_local_env_loads_only_allowlisted_missing_values_without_shell_execution
     assert environ["LLM_MAX_TOTAL_COST_USD"] == "7"
     assert "UNRELATED_SECRET" not in environ
     assert not marker.exists()
+
+
+def test_local_env_effective_value_preserves_process_precedence_and_never_prints_key(
+    tmp_path: Path, capsys
+) -> None:
+    from scripts.local_env import effective_local_value
+
+    env_path = tmp_path / ".env"
+    configured_root = tmp_path / "rejected records with spaces"
+    env_path.write_text(
+        f'VCR_REJECTED_ROOT="{configured_root}"\n'
+        "OPENROUTER_API_KEY=secret-that-must-not-be-printed\n",
+        encoding="utf-8",
+    )
+    env_path.chmod(0o600)
+    assert effective_local_value(
+        "VCR_REJECTED_ROOT",
+        default="/tmp/default",
+        path=env_path,
+        environ={},
+    ) == str(configured_root)
+    assert (
+        effective_local_value(
+            "VCR_REJECTED_ROOT",
+            default="/tmp/default",
+            path=env_path,
+            environ={"VCR_REJECTED_ROOT": "/already/set"},
+        )
+        == "/already/set"
+    )
+    with pytest.raises(ValueError, match="not an allowed printable"):
+        effective_local_value(
+            "OPENROUTER_API_KEY",
+            default="",
+            path=env_path,
+            environ={},
+        )
+    captured = capsys.readouterr()
+    assert "secret-that-must-not-be-printed" not in captured.out + captured.err
+
+
+def test_local_env_cli_returns_only_requested_nonsecret_value(tmp_path: Path) -> None:
+    import subprocess
+    import sys
+
+    root = Path(__file__).parents[2]
+    env_path = tmp_path / ".env"
+    configured_root = tmp_path / "directory with spaces"
+    env_path.write_text(
+        f'VCR_REJECTED_ROOT="{configured_root}"\nOPENROUTER_API_KEY=never-print-this-value\n',
+        encoding="utf-8",
+    )
+    env_path.chmod(0o600)
+    process = subprocess.run(
+        [
+            sys.executable,
+            str(root / "scripts/local_env.py"),
+            "--get",
+            "VCR_REJECTED_ROOT",
+            "--default",
+            "/tmp/default",
+            "--env-file",
+            str(env_path),
+        ],
+        cwd=root,
+        capture_output=True,
+        text=True,
+        check=False,
+        env={"PATH": __import__("os").environ.get("PATH", "")},
+    )
+    assert process.returncode == 0, process.stderr
+    assert process.stdout == str(configured_root)
+    assert "never-print-this-value" not in process.stdout + process.stderr
+
+
+def test_record_all_models_resolves_rejected_root_without_sourcing_env() -> None:
+    root = Path(__file__).parents[2]
+    shell = (root / "scripts/record_all_models.sh").read_text(encoding="utf-8")
+    assert "python scripts/local_env.py" in shell
+    assert "--get VCR_REJECTED_ROOT" in shell
+    assert "source .env" not in shell
+    assert "eval " not in shell
 
 
 def test_local_env_rejects_malformed_data(tmp_path: Path) -> None:

@@ -1,6 +1,6 @@
 # Onboarding agenta
 
-Repozytorium jest narzędziem **decision-support**, a nie automatycznym doradcą podatkowym. Kontrakt roczny zweryfikowano 18 lipca 2026 r. dla wszystkich lat obowiązywania IP Box 2019–2026; każdy kolejny rok musi mieć urzędowe źródło i test.
+Repozytorium jest narzędziem **decision-support**, a nie automatycznym doradcą podatkowym. Kontrakt roczny i procedurę wydania ostatnio zweryfikowano 26 lipca 2026 r. dla wszystkich lat obowiązywania IP Box 2019–2026; każdy kolejny rok musi mieć urzędowe źródło i test.
 
 ## Kolejność pracy
 
@@ -9,9 +9,9 @@ Repozytorium jest narzędziem **decision-support**, a nie automatycznym doradcą
 3. Błąd semantyczny najpierw odtwórz testem deterministycznym.
 4. Popraw kalkulator/oracle, potem scenariusz, schema i dokumentację.
 5. Nie dopasowuj prawdy testowej do odpowiedzi modelu.
-6. Nagrywanie LLM rozpocznij dopiero po zielonych bramkach deterministycznych i czystym drzewie.
+6. Najpierw spróbuj bezpłatnego odświeżenia metadanych istniejących kaset. Nagrywanie LLM rozpocznij dopiero wtedy, gdy surowa odpowiedź nie przechodzi aktualnego kontraktu, po zielonych bramkach deterministycznych i przy czystym drzewie.
 7. Używaj dokładnych modeli z `tests/llm/models.py`.
-8. Odrzucenia analizuj w `/tmp/ipbox_llm_rejected/<model>/`; wznawiaj tylko brakujące nagrania po sklasyfikowaniu przyczyny.
+8. Odrzucenia analizuj w `${VCR_REJECTED_ROOT:-/tmp/ipbox_llm_rejected}/<model>/`; każda próba ma osobny plik. Wznawiaj tylko brakujące nagrania po sklasyfikowaniu przyczyny.
 9. Zakończenie wymaga 322/322 dla siedmiu rodzin, czystego JSON bez Markdown fences, playbacku bez sekretu i raportu `scripts/benchmark_report.py` oraz procedury z `docs/testing.md`.
 
 ## Model odpowiedzialności
@@ -39,4 +39,4 @@ Nie przywracaj pełnej mapy `true/false` ani listy wymagającej ponownej klasyfi
 
 ## Stan bazowy
 
-Bramka deterministyczna obejmuje Python 3.11–3.13, co najmniej 256 testów jednostkowych, coverage powyżej 90%, pełny bezpłatny suite, politykę kaset i składnię shell. Na Pythonie 3.13 CI dodatkowo wymaga kompletnego raportu macierzy i wykonuje pełny playback offline bez `OPENROUTER_API_KEY`.
+Bramka deterministyczna obejmuje Python 3.11–3.13, pełny zestaw testów jednostkowych, coverage powyżej 90%, pełny bezpłatny suite, politykę kaset i składnię shell. Dokładną liczbę testów raportuje CI. Na Pythonie 3.13 CI dodatkowo wymaga kompletnego raportu macierzy i wykonuje pełny playback offline bez `OPENROUTER_API_KEY`.
