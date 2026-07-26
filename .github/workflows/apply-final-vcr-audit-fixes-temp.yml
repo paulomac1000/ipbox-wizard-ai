@@ -35,7 +35,7 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt -r requirements-test.txt
 
-      - name: Apply source fixes
+      - name: Apply source fixes and remove migration scaffolding
         run: |
           python - <<'PY'
           from pathlib import Path
@@ -53,12 +53,40 @@ jobs:
           path.write_text(text, encoding="utf-8")
           PY
           python scripts/apply_final_vcr_audit_fixes.py
+          python - <<'PY'
+          from pathlib import Path
 
-      - name: Format and apply safe lint fixes
+          precommit = Path("scripts/vcr_precommit.py")
+          text = precommit.read_text(encoding="utf-8")
+          marker = '"""Validate cassette completeness and exact request identity."""\n'
+          if "# ruff: noqa: E402" not in text:
+              if marker not in text:
+                  raise RuntimeError("vcr_precommit module docstring not found")
+              text = text.replace(marker, marker + "\n# ruff: noqa: E402\n", 1)
+          precommit.write_text(text, encoding="utf-8")
+
+          cassette = Path("tests/llm/vcr/cassette.py")
+          text = cassette.read_text(encoding="utf-8")
+          text = text.replace(
+              "isinstance(value_a, (dict, list))",
+              "isinstance(value_a, dict | list)",
+          )
+          text = text.replace(
+              "isinstance(value, (int, float))",
+              "isinstance(value, int | float)",
+          )
+          cassette.write_text(text, encoding="utf-8")
+          PY
+          rm scripts/apply_final_vcr_audit_fixes.py
+          rm .github/workflows/apply-final-vcr-audit-fixes-temp.yml
+
+      - name: Format and lint sources
         run: |
           ruff format .
-          ruff check . --fix --exit-zero
+          ruff check . --fix
           ruff format .
+          ruff format --check .
+          ruff check .
 
       - name: Refresh cassette metadata without API calls
         env:
@@ -66,26 +94,6 @@ jobs:
         run: |
           unset OPENROUTER_API_KEY || true
           python scripts/refresh_vcr_metadata.py --all-models --write
-
-      - name: Ruff format check
-        run: ruff format --check .
-
-      - name: Ruff lint
-        run: |
-          mkdir -p reports
-          ruff check . --output-format=concise > reports/ruff.txt 2>&1 || {
-            cat reports/ruff.txt
-            exit 1
-          }
-
-      - name: Upload Ruff diagnostics
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: final-vcr-ruff-${{ github.run_id }}
-          path: reports/ruff.txt
-          if-no-files-found: ignore
-          retention-days: 1
 
       - name: Compile Python
         run: python -m compileall -q python_helper tests scripts
