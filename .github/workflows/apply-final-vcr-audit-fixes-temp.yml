@@ -99,7 +99,22 @@ jobs:
         run: python -m compileall -q python_helper tests scripts
 
       - name: Unit tests with coverage
-        run: pytest tests/unit --cov=python_helper --cov-report=term-missing --cov-fail-under=90
+        run: |
+          mkdir -p reports
+          pytest tests/unit --cov=python_helper --cov-report=term-missing --cov-fail-under=90 \
+            > reports/unit.txt 2>&1 || {
+              cat reports/unit.txt
+              exit 1
+            }
+
+      - name: Upload unit diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: final-vcr-unit-${{ github.run_id }}
+          path: reports/unit.txt
+          if-no-files-found: ignore
+          retention-days: 1
 
       - name: Full free suite
         run: pytest -q
