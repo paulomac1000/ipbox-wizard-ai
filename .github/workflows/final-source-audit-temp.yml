@@ -34,6 +34,9 @@ jobs:
             | sha256sum --check --strict
           base64 --decode /tmp/final-fix.tar.gz.b64 | tar -xzf -
           rm -rf .audit /tmp/final-fix.tar.gz.b64
+          # GITHUB_TOKEN has no workflows scope. This file is published separately
+          # through the GitHub connector after the verified source commit lands.
+          git checkout HEAD -- .github/workflows/llm-benchmark.yml
 
       - uses: actions/setup-python@v5
         with:
