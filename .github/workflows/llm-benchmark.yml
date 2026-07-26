@@ -22,12 +22,12 @@ on:
           - "qwen/qwen3.5-flash-02-23"
           - "mistralai/mistral-small-24b-instruct-2501"
       max-cost-per-model-usd:
-        description: "Per-model paid-cost guard in USD (0 disables it)"
+        description: "Required positive per-model paid-cost guard in USD"
         required: true
         type: string
         default: "5"
       max-total-cost-usd:
-        description: "Whole-run paid-cost guard in USD (0 disables it)"
+        description: "Required positive whole-run paid-cost guard in USD"
         required: true
         type: string
         default: "5"
@@ -72,30 +72,30 @@ jobs:
       - name: Validate API key and cost guards
         run: |
           set -euo pipefail
-          test -n "$OPENROUTER_API_KEY" || {
-            echo "::error::OPENROUTER_API_KEY secret is not configured"
-            exit 1
-          }
           python - <<'PY'
           import math
           import os
           import sys
 
           for name in ("MAX_COST_PER_MODEL_USD", "MAX_TOTAL_COST_USD"):
-              raw = os.environ.get(name, "0").strip()
+              raw = os.environ.get(name, "").strip()
               try:
                   value = float(raw)
               except ValueError as exc:
                   print(f"::error::{name} must be a number, got {raw!r}", file=sys.stderr)
                   raise SystemExit(1) from exc
-              if not math.isfinite(value) or value < 0:
+              if not math.isfinite(value) or value <= 0:
                   print(
-                      f"::error::{name} must be finite and >= 0, got {value}",
+                      f"::error::{name} must be finite and > 0, got {value}",
                       file=sys.stderr,
                   )
                   raise SystemExit(1)
               print(f"{name}: ${value:.6f}")
           PY
+          test -n "$OPENROUTER_API_KEY" || {
+            echo "::error::OPENROUTER_API_KEY secret is not configured"
+            exit 1
+          }
 
       - name: Deterministic gates before paid calls
         run: |
