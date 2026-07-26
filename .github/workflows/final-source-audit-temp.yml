@@ -96,7 +96,7 @@ jobs:
             exit 1
           fi
 
-      - name: Commit verified final tree
+      - name: Publish verified commit on technical branch
         run: |
           set -euo pipefail
           rm -rf .pytest_cache .coverage reports
@@ -107,4 +107,4 @@ jobs:
           git add -A
           git diff --cached --check
           git commit -m 'fix: close final paid benchmark safety gaps'
-          git push origin HEAD:fix/decouple-mix-allocation-from-w
+          git push --force origin HEAD:refs/heads/automation/final-ipbox-audit
