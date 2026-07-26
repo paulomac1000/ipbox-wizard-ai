@@ -11,7 +11,12 @@ from typing import Any
 
 from ..client import LLMResponse
 from ..request_spec import LLMRequestSpec
-from .cassette import Cassette, CassetteManifest, CassetteMeta
+from .cassette import (
+    Cassette,
+    CassetteManifest,
+    CassetteMeta,
+    parsed_response_equal_ignoring_meta_timestamp,
+)
 from .config import VCRConfig
 from .fingerprint import compute_fingerprint
 
@@ -100,7 +105,7 @@ class VCRRecorder:
         if entry.get("request_hash") != request_hash or entry.get("fingerprint") != fingerprint:
             raise CassetteStaleError("Manifest identity mismatch")
         parsed = validate_response(cassette.response)
-        if parsed != cassette.parsed_response:
+        if not parsed_response_equal_ignoring_meta_timestamp(parsed, cassette.parsed_response):
             raise CassetteStaleError("Stored parsed_response differs from reparsed response")
         response = LLMResponse(
             content=cassette.response,

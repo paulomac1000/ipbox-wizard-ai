@@ -13,6 +13,45 @@ CASSETTE_FORMAT_VERSION = 4
 MANIFEST_FORMAT_VERSION = 2
 
 
+def _meta_equal_without_calculated_at(
+    ma: dict | None, mb: dict | None
+) -> bool:
+    ma = ma or {}
+    mb = mb or {}
+    return all(
+        ma.get(k) == mb.get(k)
+        for k in set(ma.keys()) | set(mb.keys())
+        if k != "calculated_at"
+    )
+
+
+def parsed_response_equal_ignoring_meta_timestamp(a: dict, b: dict) -> bool:
+    if type(a) is not type(b):
+        return False
+    if a.keys() != b.keys():
+        return False
+    for k in a:
+        if isinstance(a[k], dict):
+            if k == "calculation_meta":
+                if not _meta_equal_without_calculated_at(a[k], b[k]):
+                    return False
+                continue
+            if not parsed_response_equal_ignoring_meta_timestamp(a[k], b[k]):
+                return False
+        elif isinstance(a[k], list):
+            if len(a[k]) != len(b[k]):
+                return False
+            for va, vb in zip(a[k], b[k]):
+                if isinstance(va, (dict, list)):
+                    if not parsed_response_equal_ignoring_meta_timestamp(va, vb):
+                        return False
+                elif va != vb:
+                    return False
+        elif a[k] != b[k]:
+            return False
+    return True
+
+
 @dataclass(frozen=True, slots=True)
 class CassetteMeta:
     scenario_id: str
