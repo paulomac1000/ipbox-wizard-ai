@@ -1,4 +1,4 @@
-# Wersjonowane reguły podatkowe 2019–2026
+# Reguły podatkowe przypisane do lat 2019–2026
 
 Stan źródeł zweryfikowany: 18 lipca 2026 r.
 

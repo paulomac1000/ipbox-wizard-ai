@@ -4,7 +4,7 @@ meta:
   provider: openrouter
   requested_model: mistralai/mistral-small-24b-instruct-2501
   returned_model: mistralai/mistral-small-24b-instruct-2501
-  fingerprint: canonical-source_c73ac828ce84304e7fb0851895fd67bd69380bc856d123364d8949af7c36c755
+  fingerprint: canonical-source_589c887c08e9a8778166d229085067844b1dc75af92608f7b13e3fc806ed1034
   request_hash: 266ed25cdfa54ec9292e170c13b953813cc71ee1e2390f441f35570966c66e5d
   recorded_at: '2026-07-26T00:03:54.005108+00:00'
   request_id: gen-1785024233-xYkr7jNK3tVJbqp5fLNc
@@ -16,7 +16,6 @@ meta:
   total_tokens: 275
   cost: 1.441e-05
   recording_duration_seconds: 0.88
-  cassette_format_version: 4
 response: '{"status":"FINAL","stops":[],"reviews":["REVIEW_01"]}'
 parsed_response:
   status: FINAL
@@ -30,9 +29,9 @@ parsed_response:
     - MF_HEALTH
     - MF_IPBOX_BR
     input_hash: 13252a1ff90ba5847283849df106e08c486e2f152202e07abf08751b5d20a0fe
-    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    engine_source_hash: 285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
     calculated_at: '2026-07-26T00:03:54Z'
-    code_revision: engine:0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    code_revision: engine:285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
   result:
     rok: 2025
     przychody_roczne:

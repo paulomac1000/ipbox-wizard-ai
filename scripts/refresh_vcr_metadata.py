@@ -18,11 +18,7 @@ from python_helper.report_metadata import engine_source_hash  # noqa: E402
 from tests.llm.models import BENCHMARK_MODELS  # noqa: E402
 from tests.llm.oracle import validate_scenario  # noqa: E402
 from tests.llm.runner import LLMTestRunner  # noqa: E402
-from tests.llm.vcr.cassette import (  # noqa: E402
-    CASSETTE_FORMAT_VERSION,
-    Cassette,
-    CassetteManifest,
-)
+from tests.llm.vcr.cassette import Cassette, CassetteManifest  # noqa: E402
 from tests.llm.vcr.config import VCRConfig  # noqa: E402
 from tests.llm.vcr.fingerprint import compute_fingerprint  # noqa: E402
 
@@ -71,7 +67,6 @@ def refresh_model(model: str, *, write: bool) -> int:
                 cassette.meta,
                 request_hash=request_hash,
                 fingerprint=compute_fingerprint(scenario_path, request_hash),
-                cassette_format_version=CASSETTE_FORMAT_VERSION,
             ),
             response=cassette.response,
             parsed_response=parsed,

@@ -4,7 +4,7 @@ meta:
   provider: openrouter
   requested_model: minimax/minimax-m2.5
   returned_model: minimax/minimax-m2.5
-  fingerprint: canonical-source_02bd274289ede9600d390a7c9cec9632b13bf294fc5b345d0f42ee1947fb94b0
+  fingerprint: canonical-source_91fdf1921cf22854213d2aee85e6c0ce6f4b69a6c87d007048b74bf6ed3bd72e
   request_hash: af7f2788be3e1f68684c3c67342da8a9feb7a3f5f9d46310d4920cbc4b316936
   recorded_at: '2026-07-25T23:36:50.025199+00:00'
   request_id: gen-1785022608-q1Ijv3qltORyeNi55bnu
@@ -16,7 +16,6 @@ meta:
   total_tokens: 705
   cost: 0.0002979
   recording_duration_seconds: 1.673
-  cassette_format_version: 4
 response: '{"status":"STOPPED","stops":["STOP_09","STOP_10"],"reviews":["REVIEW_09"]}'
 parsed_response:
   status: STOPPED
@@ -30,9 +29,9 @@ parsed_response:
     - MF_HEALTH
     - MF_IPBOX_BR
     input_hash: e315286a2736844e0d7f63f2f6800fcfa6ed7af8c7bab9504ff23fc9a5dc52b2
-    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    engine_source_hash: 285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
     calculated_at: '2026-07-25T23:36:50Z'
-    code_revision: engine:0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    code_revision: engine:285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
   result:
     rok: 2025
     przychody_roczne:

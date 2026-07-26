@@ -47,7 +47,7 @@ MODEL_PROFILES: dict[str, ModelProfile] = {
     ),
     "deepseek/deepseek-chat-v3.1": ModelProfile(
         model_id="deepseek/deepseek-chat-v3.1",
-        label="DeepSeek V3.1",
+        label="DeepSeek",
         family="DeepSeek",
         temperature=0.0,
         reasoning={"enabled": False},

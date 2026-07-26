@@ -19,6 +19,17 @@ from tests.llm.vcr.recorder import (
     VCRRecorder,
 )
 
+TEST_ENGINE_HASH = "a" * 64
+
+
+def validated(content: str) -> dict:
+    parsed = json.loads(content)
+    parsed["calculation_meta"] = {
+        "engine_source_hash": TEST_ENGINE_HASH,
+        "calculated_at": "2026-01-01T00:00:00Z",
+    }
+    return parsed
+
 
 def response(content='{"ok":true}', finish="stop") -> LLMResponse:
     return LLMResponse(
@@ -74,7 +85,7 @@ def record_valid_cassette(monkeypatch, tmp_path: Path) -> tuple[dict, Path, VCRR
         scenario_path=path,
         request=spec(),
         api_call=lambda _: response(),
-        validate_response=lambda content: json.loads(content),
+        validate_response=validated,
     )
     return scenario, path, recorder
 
@@ -141,7 +152,7 @@ def test_playback_missing_never_calls_api(monkeypatch, tmp_path) -> None:
             scenario_path=path,
             request=spec(),
             api_call=api,
-            validate_response=lambda content: json.loads(content),
+            validate_response=validated,
         )
     assert called is False
 
@@ -155,9 +166,9 @@ def test_record_then_offline_playback(monkeypatch, tmp_path) -> None:
         scenario_path=path,
         request=spec(),
         api_call=lambda _: response(),
-        validate_response=lambda content: json.loads(content),
+        validate_response=validated,
     )
-    assert parsed == {"ok": True}
+    assert parsed == validated('{"ok":true}')
     assert recorder.config.cassette_path("s").exists()
     assert recorder.config.manifest_path.exists()
     monkeypatch.setenv("VCR_MODE", "playback")
@@ -166,55 +177,46 @@ def test_record_then_offline_playback(monkeypatch, tmp_path) -> None:
         scenario_path=path,
         request=spec(),
         api_call=None,
-        validate_response=lambda content: json.loads(content),
+        validate_response=validated,
     )
     assert playback.content == live.content
     assert parsed2 == parsed
 
 
-def test_playback_rejects_incomplete_finish_reason(monkeypatch, tmp_path) -> None:
-    scenario, path, recorder = record_valid_cassette(monkeypatch, tmp_path)
-    cassette_path = recorder.config.cassette_path("s")
-    cassette = Cassette.load(cassette_path)
-    Cassette(
-        meta=replace(cassette.meta, finish_reason="length"),
-        response=cassette.response,
-        parsed_response=cassette.parsed_response,
-    ).save(cassette_path)
+def test_cassette_meta_rejects_incomplete_finish_reason(monkeypatch, tmp_path) -> None:
+    _, _, recorder = record_valid_cassette(monkeypatch, tmp_path)
+    cassette = Cassette.load(recorder.config.cassette_path("s"))
+    with pytest.raises(ValueError, match="finish_reason"):
+        replace(cassette.meta, finish_reason="length")
 
+
+def _tamper_manifest(path: Path, scenario_id: str, field: str, value: object) -> None:
+    payload = yaml.safe_load(path.read_text(encoding="utf-8"))
+    payload["entries"][scenario_id][field] = value
+    path.write_text(yaml.safe_dump(payload, sort_keys=False), encoding="utf-8")
+
+
+@pytest.mark.parametrize(
+    ("field", "value", "message"),
+    (
+        ("returned_model", "provider/substituted-model", "returned_model"),
+        ("recorded_at", "2026-01-02T00:00:00+00:00", "recorded_at"),
+        ("cost", 0.02, "cost"),
+    ),
+)
+def test_playback_rejects_manifest_identity_tampering(
+    monkeypatch, tmp_path, field: str, value: object, message: str
+) -> None:
+    scenario, path, recorder = record_valid_cassette(monkeypatch, tmp_path)
+    _tamper_manifest(recorder.config.manifest_path, "s", field, value)
     monkeypatch.setenv("VCR_MODE", "playback")
-    with pytest.raises(CassetteStaleError, match="finish_reason"):
+    with pytest.raises(CassetteStaleError, match=message):
         VCRRecorder(VCRConfig()).get_or_record(
             scenario=scenario,
             scenario_path=path,
             request=spec(),
             api_call=None,
-            validate_response=json.loads,
-        )
-
-
-def test_playback_rejects_returned_model_substitution(monkeypatch, tmp_path) -> None:
-    scenario, path, recorder = record_valid_cassette(monkeypatch, tmp_path)
-    cassette_path = recorder.config.cassette_path("s")
-    cassette = Cassette.load(cassette_path)
-    substituted = "provider/substituted-model"
-    Cassette(
-        meta=replace(cassette.meta, returned_model=substituted),
-        response=cassette.response,
-        parsed_response=cassette.parsed_response,
-    ).save(cassette_path)
-    manifest = CassetteManifest.load(recorder.config.manifest_path, recorder.config.model)
-    manifest.entries["s"]["returned_model"] = substituted
-    manifest.save(recorder.config.manifest_path)
-
-    monkeypatch.setenv("VCR_MODE", "playback")
-    with pytest.raises(CassetteStaleError, match="returned_model"):
-        VCRRecorder(VCRConfig()).get_or_record(
-            scenario=scenario,
-            scenario_path=path,
-            request=spec(),
-            api_call=None,
-            validate_response=json.loads,
+            validate_response=validated,
         )
 
 
@@ -234,10 +236,10 @@ def test_record_mode_reuses_valid_cassette_without_calling_api(monkeypatch, tmp_
         scenario_path=path,
         request=spec(),
         api_call=api,
-        validate_response=json.loads,
+        validate_response=validated,
     )
     assert called is False
-    assert parsed == {"ok": True}
+    assert parsed == validated('{"ok":true}')
     assert played.content == '{"ok":true}'
     assert cassette_path.read_bytes() == original
 
@@ -269,7 +271,7 @@ def test_record_mode_refuses_to_overwrite_stale_cassette(monkeypatch, tmp_path) 
             scenario_path=path,
             request=changed,
             api_call=api,
-            validate_response=json.loads,
+            validate_response=validated,
         )
     assert called is False
     assert cassette_path.read_bytes() == original
@@ -293,7 +295,7 @@ def test_playback_detects_stale_request(monkeypatch, tmp_path) -> None:
                 reasoning={"effort": "minimal"},
             ),
             api_call=None,
-            validate_response=lambda content: json.loads(content),
+            validate_response=validated,
         )
 
 
@@ -307,7 +309,7 @@ def test_record_rejects_invalid_or_truncated_response(monkeypatch, tmp_path) -> 
             scenario_path=path,
             request=spec(),
             api_call=lambda _: response("not json"),
-            validate_response=json.loads,
+            validate_response=validated,
         )
     assert not recorder.config.cassette_path("s").exists()
     assert (recorder.config.rejected_root / recorder.config.model_slug / "s.json").exists()
@@ -317,18 +319,24 @@ def test_record_rejects_invalid_or_truncated_response(monkeypatch, tmp_path) -> 
             scenario_path=path,
             request=spec(),
             api_call=lambda _: response(finish="length"),
-            validate_response=json.loads,
+            validate_response=validated,
         )
 
 
-def test_cassette_and_manifest_reject_bad_versions(tmp_path) -> None:
+def test_cassette_and_manifest_reject_noncanonical_fields(tmp_path) -> None:
     path = tmp_path / "c.yaml"
-    path.write_text("meta: {}\nresponse: x\nparsed_response: {}\n", encoding="utf-8")
-    with pytest.raises((TypeError, ValueError)):
+    path.write_text(
+        "meta: {}\nresponse: x\nparsed_response: {}\nunexpected: true\n",
+        encoding="utf-8",
+    )
+    with pytest.raises(ValueError, match="fields mismatch"):
         Cassette.load(path)
     manifest = tmp_path / "m.yaml"
-    manifest.write_text("manifest_format_version: 1\nmodel: x\nentries: {}\n", encoding="utf-8")
-    with pytest.raises(ValueError):
+    manifest.write_text(
+        "model: x\ngenerated_at: '2026-01-01T00:00:00Z'\nentries: {}\nunexpected: true\n",
+        encoding="utf-8",
+    )
+    with pytest.raises(ValueError, match="fields mismatch"):
         CassetteManifest.load(manifest, "x")
 
 
@@ -382,7 +390,7 @@ def test_none_mode_requires_complete_finish_reason(monkeypatch, tmp_path) -> Non
             scenario_path=path,
             request=spec(),
             api_call=lambda _: response(finish=None),
-            validate_response=json.loads,
+            validate_response=validated,
         )
 
 
@@ -396,7 +404,7 @@ def test_none_mode_rejects_returned_model_substitution(monkeypatch, tmp_path) ->
             scenario_path=path,
             request=spec(),
             api_call=lambda _: substituted,
-            validate_response=json.loads,
+            validate_response=validated,
         )
 
 
@@ -409,14 +417,14 @@ def test_playback_rejects_tampered_parsed_response(monkeypatch, tmp_path) -> Non
         scenario_path=path,
         request=spec(),
         api_call=lambda _: response(),
-        validate_response=json.loads,
+        validate_response=validated,
     )
     cassette_path = recorder.config.cassette_path("s")
     cassette = Cassette.load(cassette_path)
     Cassette(
         meta=cassette.meta,
         response=cassette.response,
-        parsed_response={"ok": False},
+        parsed_response=validated('{"ok":false}'),
     ).save(cassette_path)
 
     monkeypatch.setenv("VCR_MODE", "playback")
@@ -426,7 +434,7 @@ def test_playback_rejects_tampered_parsed_response(monkeypatch, tmp_path) -> Non
             scenario_path=path,
             request=spec(),
             api_call=None,
-            validate_response=json.loads,
+            validate_response=validated,
         )
 
 
@@ -505,12 +513,13 @@ def test_vcr_precommit_rejects_incomplete_or_tampered_payload(monkeypatch, tmp_p
 
     _, _, recorder = record_valid_cassette(monkeypatch, tmp_path)
     cassette = Cassette.load(recorder.config.cassette_path("s"))
-    assert cassette_payload_errors(cassette, {"ok": True}) == []
+    assert cassette_payload_errors(cassette, validated('{"ok":true}')) == []
 
     with pytest.raises(ValueError, match="finish_reason"):
         replace(cassette.meta, finish_reason=None)
     assert any(
-        "parsed_response" in error for error in cassette_payload_errors(cassette, {"ok": False})
+        "parsed_response" in error
+        for error in cassette_payload_errors(cassette, validated('{"ok":false}'))
     )
     substituted = Cassette(
         meta=replace(cassette.meta, returned_model="provider/substituted-model"),
@@ -520,7 +529,7 @@ def test_vcr_precommit_rejects_incomplete_or_tampered_payload(monkeypatch, tmp_p
     assert any(
         "returned_model" in error
         for error in cassette_payload_errors(
-            substituted, {"ok": True}, "google/gemini-3-flash-preview"
+            substituted, validated('{"ok":true}'), "google/gemini-3-flash-preview"
         )
     )
 
@@ -658,37 +667,32 @@ def test_runner_rejects_markdown_fenced_json() -> None:
         )
 
 
-def test_cassette_requires_explicit_format_version(tmp_path) -> None:
-    path = tmp_path / "unversioned.yaml"
-    path.write_text(
-        yaml.safe_dump(
-            {
-                "meta": {
-                    "scenario_id": "s",
-                    "scenario_name": "S",
-                    "provider": "openrouter",
-                    "requested_model": "google/gemini-3-flash-preview",
-                    "returned_model": "google/gemini-3-flash-preview",
-                    "fingerprint": "f",
-                    "request_hash": "h",
-                    "recorded_at": "2026-01-01T00:00:00+00:00",
-                    "request_id": "r",
-                    "finish_reason": "stop",
-                    "native_finish_reason": "STOP",
-                    "system_fingerprint": None,
-                    "prompt_tokens": 1,
-                    "completion_tokens": 1,
-                    "total_tokens": 2,
-                    "cost": 0.0,
-                    "recording_duration_seconds": 0.1,
-                },
-                "response": '{"ok":true}',
-                "parsed_response": {"ok": True},
-            }
-        ),
-        encoding="utf-8",
-    )
-    with pytest.raises(ValueError, match="Unsupported cassette version None"):
+def test_cassette_rejects_missing_canonical_metadata(tmp_path) -> None:
+    path = tmp_path / "invalid.yaml"
+    payload = {
+        "meta": {
+            "scenario_id": "s",
+            "scenario_name": "S",
+            "provider": "openrouter",
+            "requested_model": "google/gemini-3-flash-preview",
+            "returned_model": "google/gemini-3-flash-preview",
+            "fingerprint": "canonical-source_" + "a" * 64,
+            "request_hash": "b" * 64,
+            "recorded_at": "2026-01-01T00:00:00+00:00",
+            "request_id": "r",
+            "finish_reason": "stop",
+            "native_finish_reason": "STOP",
+            "system_fingerprint": None,
+            "prompt_tokens": 1,
+            "completion_tokens": 1,
+            "total_tokens": 2,
+            "recording_duration_seconds": 0.1,
+        },
+        "response": '{"ok":true}',
+        "parsed_response": validated('{"ok":true}'),
+    }
+    path.write_text(yaml.safe_dump(payload), encoding="utf-8")
+    with pytest.raises(ValueError, match="missing=.*cost"):
         Cassette.load(path)
 
 
@@ -702,7 +706,7 @@ def test_record_rejects_provider_model_substitution(monkeypatch, tmp_path) -> No
             scenario_path=path,
             request=spec(),
             api_call=lambda _: substituted,
-            validate_response=json.loads,
+            validate_response=validated,
         )
 
 
@@ -732,3 +736,153 @@ def test_paid_entry_points_include_shell_gate_and_make_record_depends_on_test() 
     assert "record: test" in makefile
     assert 'bash -n "$$script"' in makefile
     assert 'bash -n "$script"' in workflow
+
+
+@pytest.mark.parametrize("value", [float("nan"), float("inf"), float("-inf"), -1])
+def test_paid_cost_guards_reject_nonfinite_or_negative_values(value: float) -> None:
+    from scripts.record_model import _finite_nonnegative
+
+    with pytest.raises(ValueError, match="finite non-negative"):
+        _finite_nonnegative("limit", value)
+
+
+@pytest.mark.parametrize("raw", ["nan", "inf", "+inf", "-inf"])
+def test_record_model_cli_rejects_nonfinite_limits(raw: str) -> None:
+    import subprocess
+    import sys
+
+    root = Path(__file__).parents[2]
+    process = subprocess.run(
+        [
+            sys.executable,
+            str(root / "scripts/record_model.py"),
+            "--model",
+            "google/gemini-3-flash-preview",
+            f"--max-cost-per-model-usd={raw}",
+        ],
+        cwd=root,
+        capture_output=True,
+        text=True,
+        check=False,
+        env={"PATH": __import__("os").environ.get("PATH", "")},
+    )
+    assert process.returncode == 2
+    assert "finite non-negative" in process.stderr
+
+
+def test_record_model_rejects_nonfinite_session_timestamp(monkeypatch) -> None:
+    import sys
+
+    import scripts.record_model as record_model
+
+    monkeypatch.setenv("OPENROUTER_API_KEY", "test")
+    monkeypatch.setenv("LLM_RECORDING_STARTED_AT", "inf")
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["record_model.py", "--model", "google/gemini-3-flash-preview"],
+    )
+    with pytest.raises(SystemExit) as exc:
+        record_model.main()
+    assert exc.value.code == 2
+
+
+@pytest.mark.parametrize("kind", ["accepted", "rejected"])
+def test_cost_accounting_rejects_nonfinite_metadata(tmp_path: Path, kind: str) -> None:
+    from scripts.record_model import accepted_cost_since, rejected_cost_since
+
+    if kind == "accepted":
+        root = tmp_path / "cassettes"
+        model_dir = root / "model"
+        model_dir.mkdir(parents=True)
+        path = model_dir / "case.yaml"
+        path.write_text("meta:\n  cost: .inf\n", encoding="utf-8")
+        with pytest.raises(ValueError, match="invalid paid-cost metadata"):
+            accepted_cost_since(root, since=0)
+    else:
+        root = tmp_path / "rejected"
+        root.mkdir()
+        path = root / "case.json"
+        path.write_text('{"metadata":{"cost":Infinity}}', encoding="utf-8")
+        with pytest.raises(ValueError, match="invalid paid-cost metadata"):
+            rejected_cost_since(root, since=0)
+
+
+def test_local_env_loads_only_allowlisted_missing_values_without_shell_execution(
+    tmp_path: Path,
+) -> None:
+    from scripts.local_env import load_local_env
+
+    marker = tmp_path / "should-not-exist"
+    env_path = tmp_path / ".env"
+    env_path.write_text(
+        "OPENROUTER_API_KEY=$(touch " + str(marker) + ")\n"
+        "LLM_MAX_TOTAL_COST_USD=5\n"
+        "UNRELATED_SECRET=ignored\n",
+        encoding="utf-8",
+    )
+    environ = {"LLM_MAX_TOTAL_COST_USD": "7"}
+    loaded = load_local_env(env_path, environ=environ)
+    assert loaded == ("OPENROUTER_API_KEY",)
+    assert environ["OPENROUTER_API_KEY"].startswith("$(touch ")
+    assert environ["LLM_MAX_TOTAL_COST_USD"] == "7"
+    assert "UNRELATED_SECRET" not in environ
+    assert not marker.exists()
+
+
+def test_local_env_rejects_malformed_data(tmp_path: Path) -> None:
+    from scripts.local_env import load_local_env
+
+    path = tmp_path / ".env"
+    path.write_text("not an assignment\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="expected KEY=VALUE"):
+        load_local_env(path, environ={})
+
+
+@pytest.mark.parametrize(
+    ("mutation", "message"),
+    (
+        (lambda payload: payload.pop("generated_at"), "missing=.*generated_at"),
+        (lambda payload: payload.__setitem__("generated_at", "not-a-date"), "ISO-8601"),
+        (
+            lambda payload: payload["entries"]["s"].__setitem__("request_hash", "bad"),
+            "64 lowercase",
+        ),
+        (
+            lambda payload: payload["entries"]["s"].__setitem__("cost", float("nan")),
+            "finite non-negative",
+        ),
+        (
+            lambda payload: payload["entries"]["s"].__setitem__("file", "other.yaml"),
+            "file stem",
+        ),
+        (
+            lambda payload: payload["entries"]["s"].__setitem__("unexpected", True),
+            "fields mismatch",
+        ),
+    ),
+)
+def test_manifest_loader_rejects_invalid_schema(
+    monkeypatch, tmp_path: Path, mutation, message: str
+) -> None:
+    _, _, recorder = record_valid_cassette(monkeypatch, tmp_path)
+    path = recorder.config.manifest_path
+    payload = yaml.safe_load(path.read_text(encoding="utf-8"))
+    mutation(payload)
+    path.write_text(yaml.safe_dump(payload, sort_keys=False), encoding="utf-8")
+    with pytest.raises(ValueError, match=message):
+        CassetteManifest.load(path, recorder.config.model)
+
+
+def test_policy_detects_unexpected_root_file(tmp_path: Path) -> None:
+    from scripts.check_cassette_policy import unexpected_root_entries
+
+    (tmp_path / "unexpected.yaml").write_text("x", encoding="utf-8")
+    assert unexpected_root_entries(tmp_path) == {"unexpected.yaml"}
+
+
+def test_paid_workflow_reports_only_selected_model_and_checks_finite_limits() -> None:
+    root = Path(__file__).parents[2]
+    workflow = (root / ".github/workflows/llm-benchmark.yml").read_text(encoding="utf-8")
+    assert 'python scripts/benchmark_report.py --model "$BENCHMARK_MODEL"' in workflow
+    assert "math.isfinite(value)" in workflow

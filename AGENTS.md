@@ -5,7 +5,7 @@
 - Opis, nazwa kontrahenta i sama kwota nie mogą nadpisać jawnego koszyka ani samodzielnie ustalić KUP, składki czy środka trwałego.
 - Pola liczbowe odrzucają booleany i teksty wyglądające jak liczby.
 - Finalny raport musi zawierać `calculation_meta` z hashem wejścia, źródłami reguł i rewizją kodu.
-- Semantyczną tożsamością wersji jest `engine_source_hash`; nie używaj chwilowego `GITHUB_SHA` jako fingerprintu wyniku ani kasety.
+- Semantyczną tożsamością treści jest `engine_source_hash`; nie używaj chwilowego `GITHUB_SHA` jako fingerprintu wyniku ani kasety.
 - Dodatnia przeniesiona kwota termomodernizacji wymaga osobnego lotu z `origin_year` i `evidence_ref`; zbiorcza pula jest wyłącznie trybem zgodnościowym `PROVISIONAL`.
 
 ## Misja
@@ -22,7 +22,7 @@ Utrzymuj wiarygodne, fail-closed narzędzie wspierające przygotowanie danych do
 6. `tests/unit/` — wykonywalna specyfikacja.
 7. `docs/testing.md` — procedura wydania i VCR.
 
-Sprzeczność między źródłami jest błędem. Nie wybieraj wygodniejszej wersji.
+Sprzeczność między źródłami jest błędem. Nie wybieraj wygodniejszego źródła.
 
 ## Invarianty
 
@@ -88,4 +88,4 @@ Stan bazowy: co najmniej 256 testów jednostkowych, coverage powyżej wymaganych
 
 ## Nagrywanie
 
-Nagrywaj przez `scripts/record_model.py` lub ręczny workflow `Paid multi-model LLM benchmark`. Wybór scenariusza jest dokładny, a literówka kończy proces przed requestem sieciowym. Każdy płatny przebieg musi mieć osobny limit per model i limit globalny obejmujący odpowiedzi zaakceptowane oraz odrzucone. Po zmianie requestu, algorytmu, scenariusza lub schematu usuń wyłącznie unieważnione kasety. Wydanie wymaga 46/46 dla każdego z siedmiu modeli (322/322), czystego JSON bez Markdown fences, zgodnego modelu zwróconego, playbacku bez sekretu, kontroli manifestu i raportu niezależnego agenta.
+Lokalnie `scripts/record_model.py` i `scripts/record_all_models.sh` bezpiecznie wczytują wyłącznie dozwolone ustawienia z ignorowanego przez Git pliku `.env`; istniejące zmienne procesu mają pierwszeństwo. Nigdy nie loguj wartości sekretu. Nagrywaj przez `scripts/record_model.py` lub ręczny workflow `Paid multi-model LLM benchmark`. Wybór scenariusza jest dokładny, a literówka kończy proces przed requestem sieciowym. Każdy płatny przebieg musi mieć osobny limit per model i limit globalny obejmujący odpowiedzi zaakceptowane oraz odrzucone. Po zmianie requestu, algorytmu, scenariusza lub schematu usuń wyłącznie unieważnione kasety. Wydanie wymaga 46/46 dla każdego z siedmiu modeli (322/322), czystego JSON bez Markdown fences, zgodnego modelu zwróconego, playbacku bez sekretu, kontroli manifestu i raportu niezależnego agenta.

@@ -4,7 +4,7 @@ meta:
   provider: openrouter
   requested_model: qwen/qwen3.5-flash-02-23
   returned_model: qwen/qwen3.5-flash-02-23
-  fingerprint: canonical-source_f3e129e87bf975091ccb8e7339790442877d4bf633571a09c561b98a791d185c
+  fingerprint: canonical-source_778ec94c5e00626c09f4c7b20b8b0c20b23ca4d072346c35fb37b37c7658a93e
   request_hash: dc07723d175f687a22c0ff34b05291bc02268ab1286dcb72512f18adc29ea7cc
   recorded_at: '2026-07-25T23:53:55.804674+00:00'
   request_id: gen-1785023630-hcD7AJKbmEo15IEaBHBs
@@ -16,7 +16,6 @@ meta:
   total_tokens: 966
   cost: 0.000202215
   recording_duration_seconds: 4.945
-  cassette_format_version: 4
 response: '{"status":"STOPPED","stops":["STOP_14"],"reviews":["REVIEW_09"]}'
 parsed_response:
   status: STOPPED
@@ -29,9 +28,9 @@ parsed_response:
     - MF_SCALE_HISTORY
     - MF_HEALTH_HISTORY
     input_hash: aea3cee73a63b94e4b1532c732d429fba0997ea7be30b4238d091b731e31ca53
-    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    engine_source_hash: 285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
     calculated_at: '2026-07-25T23:53:55Z'
-    code_revision: engine:0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    code_revision: engine:285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
   result:
     rok: 2019
     przychody_roczne:

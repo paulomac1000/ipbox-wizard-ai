@@ -1,6 +1,6 @@
 # Algorytm IP Box — kontrakt deterministyczny-first
 
-> Narzędzie wspiera przygotowanie i kontrolę danych. Nie zastępuje interpretacji indywidualnej ani porady podatkowej. Reguły roczne są wersjonowane dla lat 2019–2026; rok spoza zweryfikowanego zakresu jest blokowany.
+> Narzędzie wspiera przygotowanie i kontrolę danych. Nie zastępuje interpretacji indywidualnej ani porady podatkowej. Reguły są jawnie przypisane do lat 2019–2026; rok spoza zweryfikowanego zakresu jest blokowany.
 
 ## 1. Zasady nadrzędne
 
@@ -244,7 +244,7 @@ Dla faktur walutowych zapisz walutę, daty wystawienia i płatności, kursy NBP 
 
 ## 10. Reguły roczne i ulgi
 
-Obsługiwane są lata 2019–2026. Limity IKZE, sposób rozliczenia zdrowotnej, skala podatkowa oraz dopuszczalność jednoczesnego B+R/IP Box pochodzą z wersjonowanego katalogu reguł.
+Obsługiwane są lata 2019–2026. Limity IKZE, sposób rozliczenia zdrowotnej, skala podatkowa oraz dopuszczalność jednoczesnego B+R/IP Box pochodzą z katalogu reguł przypisanych do roku.
 
 Kwoty ponad limit nie są cicho obcinane. Nieobsługiwany rok nie używa zasad roku sąsiedniego. Dodatnia darowizna wymaga jawnego, zweryfikowanego limitu kwotowego właściwego dla jej kategorii; kalkulator odrzuca brak limitu i jego przekroczenie.
 

@@ -4,7 +4,7 @@ meta:
   provider: openrouter
   requested_model: deepseek/deepseek-chat-v3.1
   returned_model: deepseek/deepseek-chat-v3.1
-  fingerprint: canonical-source_0480ca17772d75f14aa37431a1d20fd14137101a0b4decfa6b004aa395b37d4d
+  fingerprint: canonical-source_cd82b137a3508746e8ef3172534e57132f2b5494c838c84bf8599d2854ab6b28
   request_hash: 749ef237a7480a7bd3114865d289d7858a43fded45e0c962f1f413b9d877fd8c
   recorded_at: '2026-07-25T23:28:16.041238+00:00'
   request_id: gen-1785022092-VZ4yrGe8RE35ukTYVofL
@@ -16,7 +16,6 @@ meta:
   total_tokens: 672
   cost: 0.00013714
   recording_duration_seconds: 3.279
-  cassette_format_version: 4
 response: "{\n    \"status\": \"FINAL\",\n    \"stops\": [],\n    \"reviews\": [\"REVIEW_01\", \"REVIEW_09\"]\n}"
 parsed_response:
   status: FINAL
@@ -30,9 +29,9 @@ parsed_response:
     - MF_HEALTH
     - MF_IPBOX_BR
     input_hash: 0a6367a4884e5d9f9e0428df08c6adf4451383a7b4176dea1c00f4cc87aa115c
-    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    engine_source_hash: 285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
     calculated_at: '2026-07-25T23:28:16Z'
-    code_revision: engine:0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    code_revision: engine:285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
   result:
     rok: 2025
     przychody_roczne:

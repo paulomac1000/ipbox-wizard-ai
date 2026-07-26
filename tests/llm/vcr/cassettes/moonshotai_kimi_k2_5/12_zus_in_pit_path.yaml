@@ -4,7 +4,7 @@ meta:
   provider: openrouter
   requested_model: moonshotai/kimi-k2.5
   returned_model: moonshotai/kimi-k2.5
-  fingerprint: canonical-source_9c8aa9f2aee6b7d22cb21d7304415c2e57610a52609fe930c1574fdaa76024bf
+  fingerprint: canonical-source_e3f57206b3efb77794696ce86cdbbf04e8c67cbd46c8ef7c05dcc2e60eaedb5c
   request_hash: 46f9f9acf2799539568764f846a71e6c5f6bc63f27d434681a769577242f22dd
   recorded_at: '2026-07-25T23:38:22.285027+00:00'
   request_id: gen-1785022698-BvGYZw7txDYG5V3fMr2R
@@ -16,7 +16,6 @@ meta:
   total_tokens: 424
   cost: 0.00044544
   recording_duration_seconds: 4.186
-  cassette_format_version: 4
 response: '{"reviews":["REVIEW_01"],"status":"FINAL","stops":[]}'
 parsed_response:
   status: FINAL
@@ -30,9 +29,9 @@ parsed_response:
     - MF_HEALTH
     - MF_IPBOX_BR
     input_hash: 118ecc32a6c4c9762398c9062f6abe272ec35b0ada7817620c3283af28b59668
-    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    engine_source_hash: 285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
     calculated_at: '2026-07-25T23:38:22Z'
-    code_revision: engine:0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    code_revision: engine:285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
   result:
     rok: 2025
     przychody_roczne:

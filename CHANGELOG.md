@@ -1,12 +1,12 @@
 # Changelog
 
-## 0.2.0 — Unreleased
+## Unreleased
 
 ### Added
 
 - Atomowy kontrakt `decision_facts`; model zwraca wyłącznie `status/stops/reviews`.
 - Autorytatywną kopertę `expected_decision`, która nie pokazuje modelowi faktów podatkowych ani nie wymaga klasyfikowania kodów do kanałów.
-- Fail-closed oracle, evaluator, strict JSON Schema i VCR format 4.
+- Fail-closed oracle, evaluator, strict JSON Schema i kanoniczny, ściśle walidowany kontrakt VCR.
 - Siedmiorodzinny benchmark tanich modeli; rozmiar macierzy jest wyliczany dynamicznie z liczby scenariuszy.
 - Jawne profile transportowe providerów, odseparowane od pełnej lokalnej schema i evaluatora.
 - Regresje gwarantujące, że adapter transportowy nie mutuje ani nie osłabia lokalnego kontraktu.
@@ -19,7 +19,7 @@
 - `REVIEW_18` dla kosztu deklarowanego jako NEXUS bez wystarczającego dowodu.
 - Regresje dla NEXUS `0`, NEXUS częściowego, zwykłego opodatkowania reszty i niejednoznacznej semantyki W.
 - Pełne połączenie działalności na skali z `dochody_dodatkowe_skala`.
-- Wersjonowane reguły każdego roku istnienia IP Box: 2019–2026.
+- Reguły przypisane do każdego roku istnienia IP Box: 2019–2026.
 - Historyczne limity IKZE przedsiębiorcy dla 2019–2026.
 - Historyczne zasady zdrowotnej: odliczenie od podatku do 2021 r. oraz limity liniowe 2022–2026.
 - Historyczne skale podatkowe 2019, 2020–2021 oraz 2022–2026.
@@ -43,7 +43,7 @@
 - Syntetyczne scenariusze LLM/VCR `46`–`55` odtwarzające klasy błędów znalezionych w rozliczeniach rzeczywistych bez kopiowania danych podatnika.
 - Syntetyczne rozszerzenia scenariuszy 32 i 52 dla korekty KPiR oraz miesięcznej puli zaokrągleń.
 - Test blokujący oczywiste identyfikatory osobowe w nowych scenariuszach regresyjnych.
-- Dokumentację historycznych źródeł, regresji rzeczywistych oraz brief pełnej odbudowy kaset.
+- Dokumentację historycznych źródeł, regresji rzeczywistych oraz procedurę odbudowy kaset.
 
 ### Fixed
 

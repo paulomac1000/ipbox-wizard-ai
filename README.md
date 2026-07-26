@@ -51,7 +51,7 @@ Każdy raport zawiera `calculation_meta`: identyfikator silnika, rule pack roku,
 
 Silnik przyjmuje znormalizowany YAML/dict. Repozytorium nie zawiera kompletnego, deterministycznego importera PDF/XLSX/KPiR/PIT. Odczyt dokumentów musi zachować jawne fakty źródłowe, w szczególności `KUP`, `source_ledger_included`, kwalifikację prawa, podział faktury i referencje dowodów. Poprawny kalkulator nie naprawi błędnie wyekstrahowanych danych.
 
-Szczegółowy kontrakt: [`ipbox_algorytm.md`](ipbox_algorytm.md). Raport audytu: [`docs/audit-2026-07-17.md`](docs/audit-2026-07-17.md).
+Szczegółowy kontrakt: [`ipbox_algorytm.md`](ipbox_algorytm.md). Procedura weryfikacji: [`docs/testing.md`](docs/testing.md).
 
 ## Szybki start
 
@@ -90,7 +90,10 @@ To jest **test przenośności protokołu**, nie dowód poprawności podatkowej i
 Nagrywanie jest jawne i płatne. Wybór scenariusza jest dokładny, a koszty zaakceptowanych i odrzuconych odpowiedzi wliczają się do limitu przebiegu:
 
 ```bash
-export OPENROUTER_API_KEY='...'
+# `.env` jest ignorowany przez Git; skrypty czytają go jako dane, bez `source` i bez ewaluacji powłoki.
+cp .env.example .env
+chmod 600 .env
+# wpisz OPENROUTER_API_KEY w .env
 ./scripts/record_all_models.sh \
   --max-cost-per-model-usd 5 \
   --max-total-cost-usd 5
@@ -98,7 +101,7 @@ export OPENROUTER_API_KEY='...'
 
 Ręczny workflow `Paid multi-model LLM benchmark` wymaga wpisania tekstu potwierdzenia oraz podania obu limitów. Standardowy CI nigdy nie wykonuje płatnych requestów. Limit globalny jest sprawdzany przed i po każdym requestcie; ponieważ provider raportuje koszt po odpowiedzi, pojedyncza odpowiedź może przekroczyć próg, lecz po jej zaksięgowaniu żaden kolejny request nie zostanie uruchomiony.
 
-Pełna procedura: [`docs/testing.md`](docs/testing.md). Dobór modeli i ograniczenia wnioskowania: [`docs/model-diversity-benchmark.md`](docs/model-diversity-benchmark.md). Niezależny audyt: [`docs/independent-audit-brief.md`](docs/independent-audit-brief.md).
+Pełna procedura: [`docs/testing.md`](docs/testing.md). Dobór modeli i ograniczenia wnioskowania: [`docs/model-diversity-benchmark.md`](docs/model-diversity-benchmark.md).
 
 ## Zakres multi-IP
 

@@ -4,7 +4,7 @@ meta:
   provider: openrouter
   requested_model: minimax/minimax-m2.5
   returned_model: minimax/minimax-m2.5
-  fingerprint: canonical-source_aec5112b816545ac413598b8727546ad207cf407454a23f46d0d8889550ad65b
+  fingerprint: canonical-source_3af08b0e60b0ae9359bbd22d340dbe30dd59b5dafd8a1c3caed7d7b89e740d03
   request_hash: d23c40a77dde5a4e27cb35d33fefc5f674840347cd9e300fa1385ac0bf6b2abd
   recorded_at: '2026-07-25T23:36:29.643317+00:00'
   request_id: gen-1785022584-PI4rpDv0VajmW0EbfMRQ
@@ -16,7 +16,6 @@ meta:
   total_tokens: 835
   cost: 0.000225825
   recording_duration_seconds: 4.8
-  cassette_format_version: 4
 response: '{"status":"FINAL","stops":[],"reviews":["REVIEW_09"]}'
 parsed_response:
   status: FINAL
@@ -29,9 +28,9 @@ parsed_response:
     - MF_SCALE_HISTORY
     - MF_HEALTH_HISTORY
     input_hash: 4983651992a4943a9af94f60c9178301e6b498c5c941f135aabdac81838cbbaf
-    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    engine_source_hash: 285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
     calculated_at: '2026-07-25T23:36:29Z'
-    code_revision: engine:0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    code_revision: engine:285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
   result:
     rok: 2019
     przychody_roczne:

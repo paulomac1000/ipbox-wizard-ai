@@ -83,9 +83,7 @@ Szczególnie chronione regresje:
 
 ## 4. Fingerprint i unieważnienie
 
-Fingerprint obejmuje wersję formatu, hash `ipbox_algorytm.md`, scenariusz oraz pełny request hash. Zmiana któregokolwiek elementu unieważnia nagranie. Nie kopiuj odpowiedzi, hashy, fingerprintów, manifestu ani `parsed_response` ze starszego kontraktu.
-
-Macierz 322/322 nagrana na HEAD `be22ebb` udowodniła przenośność poprawionego requestu, ale końcowy audyt wykrył, że sekcja kontraktu w `ipbox_algorytm.md` nadal opisywała starszą listę reguł zamiast `expected_decision`. Ponieważ algorytm jest źródłem prawdy i częścią fingerprintu, po synchronizacji dokumentu trzeba nagrać wszystkie **322 kasety od nowa**. Nie jest dopuszczalne ręczne przepisanie fingerprintów.
+Fingerprint obejmuje treściowy hash silnika, treściowy hash harnessu VCR, scenariusz oraz pełny request hash. Zmiana któregokolwiek elementu unieważnia nagranie. Nie kopiuj ręcznie odpowiedzi, hashy, fingerprintów, manifestu ani `parsed_response`. Jeżeli zmienia się wyłącznie deterministyczny kod lub metadane, `scripts/refresh_vcr_metadata.py --all-models --write` może ponownie zwalidować istniejące surowe odpowiedzi bez requestów API; każda niezgodna odpowiedź zatrzymuje proces.
 
 ## 5. Modele i adaptery transportowe
 
@@ -115,20 +113,26 @@ pip install -r requirements.txt -r requirements-test.txt
 find tests/llm/vcr/cassettes -mindepth 1 -maxdepth 1 -type d -exec rm -rf {} +
 find tests/llm/vcr/cassettes -maxdepth 1 -type f ! -name '.gitkeep' -delete
 
-export OPENROUTER_API_KEY='WKLEJ_KLUCZ'
-./scripts/record_all_models.sh --max-cost-usd 5
+cp .env.example .env
+chmod 600 .env
+# wpisz OPENROUTER_API_KEY w .env
+./scripts/record_all_models.sh \
+  --max-cost-per-model-usd 5 \
+  --max-total-cost-usd 5
 ```
 
 Pojedynczy model lub scenariusz:
 
 ```bash
-python scripts/record_model.py --model google/gemini-3-flash-preview --max-cost-usd 5
+python scripts/record_model.py --model google/gemini-3-flash-preview \
+  --max-cost-per-model-usd 5 --max-total-cost-usd 5
 python scripts/record_model.py \
+  --model google/gemini-3-flash-preview \
   --scenario 45_multi_ip_two_stage \
-  --max-cost-usd 5
+  --max-cost-per-model-usd 5 --max-total-cost-usd 5
 ```
 
-Skrypt nie nadpisuje istniejącej kasety. Przy błędzie transportowym uruchom ponownie dopiero po sprawdzeniu, że plik nie powstał i przyczyna została sklasyfikowana. Odrzucenia trafiają do `/tmp/ipbox_llm_rejected/`, a wyniki do `/tmp/ipbox_llm_responses/`.
+Skrypty lokalne automatycznie czytają tylko dozwolone ustawienia z `.env`. Plik nie jest wykonywany przez powłokę, nieznane klucze są ignorowane, a jawnie ustawione zmienne procesu mają pierwszeństwo. `.env` pozostaje w `.gitignore`; ustaw prawa `chmod 600`. Skrypt nie nadpisuje istniejącej kasety. Przy błędzie transportowym uruchom ponownie dopiero po sprawdzeniu, że plik nie powstał i przyczyna została sklasyfikowana. Odrzucenia trafiają do `/tmp/ipbox_llm_rejected/`, a wyniki do `/tmp/ipbox_llm_responses/`.
 
 Nie ma `--force`. Nie ponawiaj błędu semantycznego aż do uzyskania „szczęśliwej” odpowiedzi.
 

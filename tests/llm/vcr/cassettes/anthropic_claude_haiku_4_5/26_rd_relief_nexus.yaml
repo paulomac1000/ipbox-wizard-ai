@@ -4,7 +4,7 @@ meta:
   provider: openrouter
   requested_model: anthropic/claude-haiku-4.5
   returned_model: anthropic/claude-haiku-4.5
-  fingerprint: canonical-source_e21dd3b158689625d914c286d644a6f0dea8f3b2a6474bea35d79fdb26f7683d
+  fingerprint: canonical-source_b45e9e3c7b5006be08c7faf1a548590d57c7da7a144f19f3245c7a4d5d23f11a
   request_hash: b03223a96bf977f3d05d1a1b20b40481314e1aabec1534bc4bd0f0f43e20e63d
   recorded_at: '2026-07-25T23:24:15.483870+00:00'
   request_id: gen-1785021854-1UJ0J9cJwPoPKnpi2sZh
@@ -16,7 +16,6 @@ meta:
   total_tokens: 783
   cost: 0.000871
   recording_duration_seconds: 1.354
-  cassette_format_version: 4
 response: '{"status":"FINAL","stops":[],"reviews":["REVIEW_09"]}'
 parsed_response:
   status: FINAL
@@ -30,9 +29,9 @@ parsed_response:
     - MF_HEALTH
     - MF_IPBOX_BR
     input_hash: 3d399397bedb6b46d8c5c37001d38f7fb571645e912fe0a1e0d7ae31f5932038
-    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    engine_source_hash: 285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
     calculated_at: '2026-07-25T23:24:15Z'
-    code_revision: engine:0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    code_revision: engine:285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
   result:
     rok: 2025
     przychody_roczne:

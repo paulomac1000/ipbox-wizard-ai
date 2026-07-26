@@ -4,7 +4,7 @@ meta:
   provider: openrouter
   requested_model: deepseek/deepseek-chat-v3.1
   returned_model: deepseek/deepseek-chat-v3.1
-  fingerprint: canonical-source_e7eeb32bdeb77008c6948a44e30b83b818be30bdfdbf221350fae7dafa419a24
+  fingerprint: canonical-source_68dbce62f81195132185aa84b4ad306693450ca949fcb25a6f66ec1082be5c0b
   request_hash: a4cb669e641a583cd5691cb8f81b1976e7ff9da75b84a8decee5ad5926d3b2ee
   recorded_at: '2026-07-25T23:30:16.997755+00:00'
   request_id: gen-1785022212-gbp4HM9NPU4tbr5L2nWh
@@ -16,7 +16,6 @@ meta:
   total_tokens: 268
   cost: 5.792e-05
   recording_duration_seconds: 4.927
-  cassette_format_version: 4
 response: "{\n  \"status\": \"FINAL\",\n  \"stops\": [],\n  \"reviews\": [\"REVIEW_09\"]\n}"
 parsed_response:
   status: FINAL
@@ -29,9 +28,9 @@ parsed_response:
     - MF_SCALE_HISTORY
     - MF_HEALTH_HISTORY
     input_hash: 4983651992a4943a9af94f60c9178301e6b498c5c941f135aabdac81838cbbaf
-    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    engine_source_hash: 285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
     calculated_at: '2026-07-25T23:30:16Z'
-    code_revision: engine:0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    code_revision: engine:285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
   result:
     rok: 2019
     przychody_roczne:

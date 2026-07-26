@@ -15,6 +15,7 @@ from .cassette import (
     Cassette,
     CassetteManifest,
     CassetteMeta,
+    manifest_entry_errors,
     parsed_response_equal_ignoring_meta_timestamp,
 )
 from .config import VCRConfig
@@ -40,7 +41,10 @@ class RecordingRejectedError(CassetteError):
 class VCRRecorder:
     def __init__(self, config: VCRConfig):
         self.config = config
-        self.manifest = CassetteManifest.load(config.manifest_path, config.model)
+        try:
+            self.manifest = CassetteManifest.load(config.manifest_path, config.model)
+        except (TypeError, ValueError) as exc:
+            raise CassetteStaleError(f"Invalid cassette manifest: {exc}") from exc
 
     def get_or_record(
         self,
@@ -98,12 +102,8 @@ class VCRRecorder:
         if cassette.meta.fingerprint != fingerprint:
             raise CassetteStaleError("Cassette fingerprint is stale")
         entry = self.manifest.entries.get(scenario_id)
-        if not isinstance(entry, dict):
+        if entry is None:
             raise CassetteStaleError("Cassette is missing from the model manifest")
-        if entry.get("file") != path.name:
-            raise CassetteStaleError("Manifest filename mismatch")
-        if entry.get("request_hash") != request_hash or entry.get("fingerprint") != fingerprint:
-            raise CassetteStaleError("Manifest identity mismatch")
         parsed = validate_response(cassette.response)
         calculation_meta = parsed.get("calculation_meta")
         engine_hash = (
@@ -111,8 +111,18 @@ class VCRRecorder:
             if isinstance(calculation_meta, dict)
             else None
         )
-        if entry.get("engine_source_hash") != engine_hash:
-            raise CassetteStaleError("Manifest engine_source_hash mismatch")
+        if not isinstance(engine_hash, str):
+            raise CassetteStaleError("Parsed response has no engine_source_hash")
+        entry_errors = manifest_entry_errors(
+            entry,
+            cassette,
+            expected_file=path.name,
+            expected_request_hash=request_hash,
+            expected_fingerprint=fingerprint,
+            expected_engine_hash=engine_hash,
+        )
+        if entry_errors:
+            raise CassetteStaleError("; ".join(entry_errors))
         if not parsed_response_equal_ignoring_meta_timestamp(parsed, cassette.parsed_response):
             raise CassetteStaleError("Stored parsed_response differs from reparsed response")
         response = LLMResponse(
@@ -191,26 +201,32 @@ class VCRRecorder:
                 f"Response failed schema/semantic validation; cassette not saved: {exc}"
             ) from exc
 
-        meta = CassetteMeta(
-            scenario_id=scenario_id,
-            scenario_name=str(scenario["meta"]["name"]),
-            provider=self.config.provider,
-            requested_model=request.model,
-            returned_model=response.returned_model,
-            fingerprint=fingerprint,
-            request_hash=request_hash,
-            recorded_at=datetime.now(UTC).isoformat(),
-            request_id=response.request_id,
-            finish_reason=response.finish_reason,
-            native_finish_reason=response.native_finish_reason,
-            system_fingerprint=response.system_fingerprint,
-            prompt_tokens=response.prompt_tokens,
-            completion_tokens=response.completion_tokens,
-            total_tokens=response.total_tokens,
-            cost=response.cost,
-            recording_duration_seconds=round(duration, 3),
-        )
-        cassette = Cassette(meta=meta, response=response.content, parsed_response=parsed)
+        try:
+            meta = CassetteMeta(
+                scenario_id=scenario_id,
+                scenario_name=str(scenario["meta"]["name"]),
+                provider=self.config.provider,
+                requested_model=request.model,
+                returned_model=response.returned_model,
+                fingerprint=fingerprint,
+                request_hash=request_hash,
+                recorded_at=datetime.now(UTC).isoformat(),
+                request_id=response.request_id,
+                finish_reason=response.finish_reason,
+                native_finish_reason=response.native_finish_reason,
+                system_fingerprint=response.system_fingerprint,
+                prompt_tokens=response.prompt_tokens,
+                completion_tokens=response.completion_tokens,
+                total_tokens=response.total_tokens,
+                cost=response.cost,
+                recording_duration_seconds=round(duration, 3),
+            )
+            cassette = Cassette(meta=meta, response=response.content, parsed_response=parsed)
+        except (TypeError, ValueError) as exc:
+            self._save_rejected(scenario, request_hash, response, str(exc))
+            raise RecordingRejectedError(
+                f"Response metadata failed fail-closed validation; cassette not saved: {exc}"
+            ) from exc
         cassette.save(path)
         self.manifest.update(cassette, path.name)
         self.manifest.save(self.config.manifest_path)

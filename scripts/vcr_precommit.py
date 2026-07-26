@@ -23,6 +23,7 @@ from tests.llm.runner import LLMTestRunner
 from tests.llm.vcr.cassette import (
     Cassette,
     CassetteManifest,
+    manifest_entry_errors,
     parsed_response_equal_ignoring_meta_timestamp,
 )
 from tests.llm.vcr.config import VCRConfig
@@ -110,23 +111,20 @@ def validate_model(model: str) -> list[str]:
                 for error in cassette_payload_errors(cassette, reparsed, model)
             )
             entry = manifest.entries.get(scenario_id)
-            if not isinstance(entry, dict):
+            if entry is None:
                 errors.append(f"{model}/{scenario_id}: manifest entry missing")
             else:
-                if entry.get("file") != cassette_path.name:
-                    errors.append(f"{model}/{scenario_id}: manifest filename mismatch")
-                if entry.get("request_hash") != request_hash:
-                    errors.append(f"{model}/{scenario_id}: manifest request hash mismatch")
-                if entry.get("fingerprint") != fingerprint:
-                    errors.append(f"{model}/{scenario_id}: manifest fingerprint mismatch")
-                if entry.get("engine_source_hash") != expected_engine_hash:
-                    errors.append(f"{model}/{scenario_id}: manifest engine_source_hash mismatch")
-                if entry.get("returned_model") != cassette.meta.returned_model:
-                    errors.append(f"{model}/{scenario_id}: manifest returned_model mismatch")
-                if entry.get("recorded_at") != cassette.meta.recorded_at:
-                    errors.append(f"{model}/{scenario_id}: manifest recorded_at mismatch")
-                if entry.get("cost") != cassette.meta.cost:
-                    errors.append(f"{model}/{scenario_id}: manifest cost mismatch")
+                errors.extend(
+                    f"{model}/{scenario_id}: {error}"
+                    for error in manifest_entry_errors(
+                        entry,
+                        cassette,
+                        expected_file=cassette_path.name,
+                        expected_request_hash=request_hash,
+                        expected_fingerprint=fingerprint,
+                        expected_engine_hash=expected_engine_hash,
+                    )
+                )
         except Exception as exc:
             errors.append(f"{model}/{scenario_id}: {exc}")
 

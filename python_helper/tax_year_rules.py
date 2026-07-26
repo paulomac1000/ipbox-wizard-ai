@@ -1,4 +1,4 @@
-"""Versioned PIT rules for every year in which Polish IP Box exists.
+"""Year-specific PIT rules for every year in which Polish IP Box exists.
 
 The module deliberately contains only rules that are year-dependent and have an
 identified official source. It does not infer eligibility. Values passed to it
@@ -54,7 +54,12 @@ class ThermomodernizationLot:
         object.__setattr__(self, "origin_year", origin_year)
         if origin_year < 2019:
             raise ValueError("thermomodernization origin_year cannot precede 2019")
-        amount = money(self.remaining_amount)
+        amount = money(
+            _nonnegative(
+                "thermomodernization remaining_amount",
+                self.remaining_amount,
+            )
+        )
         object.__setattr__(self, "remaining_amount", amount)
         if not isinstance(self.evidence_ref, str):
             raise ValueError("thermomodernization evidence_ref must be a string")

@@ -15,6 +15,7 @@ sys.path.insert(0, str(ROOT))
 
 from scripts.vcr_precommit import validate_model  # noqa: E402
 from tests.llm.models import BENCHMARK_MODELS, get_model_profile, model_slug  # noqa: E402
+from tests.llm.vcr.cassette import CassetteManifest  # noqa: E402
 
 
 def slug(model: str) -> str:
@@ -39,21 +40,18 @@ def scenario_ids_from_yaml() -> set[str]:
 def summarize_model(model: str, scenario_ids: set[str]) -> dict[str, object]:
     directory = ROOT / "tests/llm/vcr/cassettes" / slug(model)
     manifest_path = directory / "_manifest.yaml"
-    entries: dict[str, object] = {}
-    if manifest_path.exists():
-        data = yaml.safe_load(manifest_path.read_text(encoding="utf-8")) or {}
-        raw_entries = data.get("entries")
-        if isinstance(raw_entries, dict):
-            entries = raw_entries
+    manifest_errors: list[str] = []
+    try:
+        manifest = CassetteManifest.load(manifest_path, model)
+        entries = manifest.entries
+    except (OSError, TypeError, ValueError, yaml.YAMLError) as exc:
+        entries = {}
+        manifest_errors.append(f"{model}: invalid/missing manifest: {exc}")
 
     cassette_ids = {path.stem for path in directory.glob("*.yaml") if path.name != "_manifest.yaml"}
     recorded = scenario_ids & set(entries) & cassette_ids
-    cost = sum(
-        float(entry.get("cost") or 0)
-        for scenario_id, entry in entries.items()
-        if scenario_id in recorded and isinstance(entry, dict)
-    )
-    errors = validate_model(model)
+    cost = sum(entries[scenario_id].cost for scenario_id in recorded)
+    errors = [*manifest_errors, *validate_model(model)]
     return {
         "model": model,
         "recorded": len(recorded),

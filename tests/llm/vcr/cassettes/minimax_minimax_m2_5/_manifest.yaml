@@ -1,372 +1,371 @@
-manifest_format_version: 3
 model: minimax/minimax-m2.5
-generated_at: '2026-07-26T01:20:49.620539+00:00'
+generated_at: '2026-07-26T12:41:34.829238+00:00'
 entries:
   01_basic_linear:
     file: 01_basic_linear.yaml
-    fingerprint: canonical-source_c7f441823072e230d29f50ae612ff46fd4d469f7ed5dc1d0c483d4ca962f424e
+    fingerprint: canonical-source_03c6e9cbf1fc27295f224aa0fbba0e19789587e2a9dbb0caf2fc3d8d9c08aa76
     request_hash: d23c40a77dde5a4e27cb35d33fefc5f674840347cd9e300fa1385ac0bf6b2abd
-    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    engine_source_hash: 285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
     recorded_at: '2026-07-25T23:31:36.484583+00:00'
     returned_model: minimax/minimax-m2.5
     cost: 0.00016935
   02_basic_scale_single_client:
     file: 02_basic_scale_single_client.yaml
-    fingerprint: canonical-source_b26b44bd691742364217eaa64ff8059dd1061b276c7ecd48aba2964cb2b26a65
+    fingerprint: canonical-source_f05d1c19e4be596c61e54722b15c72f6d1faeacb251403ef81752895aa46ca63
     request_hash: 53e5b014dbe60673eccede86fc86eb67be951f41caee31cc5bdf3f52b366283c
-    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    engine_source_hash: 285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
     recorded_at: '2026-07-25T23:31:45.065919+00:00'
     returned_model: minimax/minimax-m2.5
     cost: 0.000215475
   03_fx_usd_single_client:
     file: 03_fx_usd_single_client.yaml
-    fingerprint: canonical-source_01f922ae88eeb1bf626b931e05154b0c29de58632d96995b2ecf2c19e5356b54
+    fingerprint: canonical-source_3a142f006380621a0641c127282f65d1ee447ef5fc2b37aa85a7101c3abf9c08
     request_hash: 53e5b014dbe60673eccede86fc86eb67be951f41caee31cc5bdf3f52b366283c
-    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    engine_source_hash: 285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
     recorded_at: '2026-07-25T23:31:52.728389+00:00'
     returned_model: minimax/minimax-m2.5
     cost: 0.0001638
   11_multi_client_mixed_currencies:
     file: 11_multi_client_mixed_currencies.yaml
-    fingerprint: canonical-source_7c09e42e6880adf731247fff43502c9538b91f0b44fd95c1a9b1190a7f915d7c
+    fingerprint: canonical-source_c3ed47981fa3f4fa264a634840954368d4007d3d0465d8637c9424bd56170195
     request_hash: fe631b71e4d7575e227e9dfb6dcd97c56891e54121652c362cb20af9c7be84e8
-    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    engine_source_hash: 285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
     recorded_at: '2026-07-25T23:31:58.389575+00:00'
     returned_model: minimax/minimax-m2.5
     cost: 0.00011675
   12_zus_in_pit_path:
     file: 12_zus_in_pit_path.yaml
-    fingerprint: canonical-source_fe68fe4be5129fbfad42917c66c742c87eab0cd436f6212b4e6ca901e474a075
+    fingerprint: canonical-source_26daee3fb4557b7e64a5bd659a2ba480868d393a56d459b2e4d65566ba09f0af
     request_hash: fe631b71e4d7575e227e9dfb6dcd97c56891e54121652c362cb20af9c7be84e8
-    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    engine_source_hash: 285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
     recorded_at: '2026-07-25T23:32:03.726602+00:00'
     returned_model: minimax/minimax-m2.5
     cost: 0.00012905
   13_income_from_employment_impact:
     file: 13_income_from_employment_impact.yaml
-    fingerprint: canonical-source_3dc32d1caef6c7856ed999600c6792b35fa7ea62d5d339d3ca386a0eb59f3c5c
+    fingerprint: canonical-source_3f4958b9b95578ceba6a97ef1ca854cbf00423ab7e6dd3b05e8382e3b9863efe
     request_hash: fe631b71e4d7575e227e9dfb6dcd97c56891e54121652c362cb20af9c7be84e8
-    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    engine_source_hash: 285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
     recorded_at: '2026-07-25T23:32:09.113566+00:00'
     returned_model: minimax/minimax-m2.5
     cost: 0.00010385
   14_lump_sum_ineligible_check:
     file: 14_lump_sum_ineligible_check.yaml
-    fingerprint: canonical-source_36cf64d642a2d64ea782bd00a5278c18fb22276c307f015281afff93aef001de
+    fingerprint: canonical-source_adb0ce801effe65d232c8227ca1e47361d9ae9e778a79a64dd7eb6ce1e1ea521
     request_hash: e40057465fb364ab1006cde43bdd11ead826a422301f99d6083c81d90f5409bb
-    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    engine_source_hash: 285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
     recorded_at: '2026-07-25T23:32:16.530371+00:00'
     returned_model: minimax/minimax-m2.5
     cost: 0.0001142
   15_vacation_sick_mix:
     file: 15_vacation_sick_mix.yaml
-    fingerprint: canonical-source_cab27074064d2e0ce200eab3976ab05ce272c76659c3a8b55a46e6e0160e0e29
+    fingerprint: canonical-source_0c9990d27808b392b41e6d4952192c1e0818eb596998364692ece844f2c72193
     request_hash: d23c40a77dde5a4e27cb35d33fefc5f674840347cd9e300fa1385ac0bf6b2abd
-    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    engine_source_hash: 285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
     recorded_at: '2026-07-25T23:32:27.803347+00:00'
     returned_model: minimax/minimax-m2.5
     cost: 0.000354225
   16_high_w_review:
     file: 16_high_w_review.yaml
-    fingerprint: canonical-source_6fe634f7b0ffb2453d79176fd6658082d86b95cc41c92844fc04bba87dd99e69
+    fingerprint: canonical-source_e92b1d115c4671afa5b3039773d4321556a6e8048d084d2cef3e2b934ac42659
     request_hash: 53e5b014dbe60673eccede86fc86eb67be951f41caee31cc5bdf3f52b366283c
-    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    engine_source_hash: 285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
     recorded_at: '2026-07-25T23:32:36.402158+00:00'
     returned_model: minimax/minimax-m2.5
     cost: 0.000165
   17_low_w_review:
     file: 17_low_w_review.yaml
-    fingerprint: canonical-source_f88afea10182e012c34a24a8b0bfbf6ffe9dc92bbb9d17eaf10451d8c9943540
+    fingerprint: canonical-source_8e786a3004bfdcdf628d4c04df40649c304c8841664f089307e173d587f524ed
     request_hash: 7c738c84a4aec499ac0550b87847bffc9d231a417845828a76e9a32f73b70a51
-    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    engine_source_hash: 285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
     recorded_at: '2026-07-25T23:32:42.185059+00:00'
     returned_model: minimax/minimax-m2.5
     cost: 0.00022095
   18_logic_zero_work_hours:
     file: 18_logic_zero_work_hours.yaml
-    fingerprint: canonical-source_aa39b83ee2faddd26b2b6007a93ec3b16f44f8bab2060eb29a124f4f4a8f01fc
+    fingerprint: canonical-source_d846b0e648665faa4ce661a1e7c0f7ab92a18dd903e997acc7a0104c2601f0b4
     request_hash: 13fc2797bb71a57415e6225632d3894566dcf80097164d0963fdb449fa3d2a92
-    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    engine_source_hash: 285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
     recorded_at: '2026-07-25T23:32:53.828703+00:00'
     returned_model: minimax/minimax-m2.5
     cost: 0.000170925
   21_monthly_loss_impact:
     file: 21_monthly_loss_impact.yaml
-    fingerprint: canonical-source_dd8e85253d18a07724572c1d82c8a67280b4162af6ada34acd326b62db94ccdb
+    fingerprint: canonical-source_fb1dfe3cbec0ac8815ca4e7a483e2573ae7070ebe28ff12dff22eca6bec624cd
     request_hash: 53e5b014dbe60673eccede86fc86eb67be951f41caee31cc5bdf3f52b366283c
-    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    engine_source_hash: 285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
     recorded_at: '2026-07-25T23:33:02.281720+00:00'
     returned_model: minimax/minimax-m2.5
     cost: 0.000165
   22_related_parties_nexus_reduction:
     file: 22_related_parties_nexus_reduction.yaml
-    fingerprint: canonical-source_d02879112222c7af09033aaee740c0227f970d761fb9f38824388b02e295777a
+    fingerprint: canonical-source_a13a8f7f8b0255db02b7823f3e8b247e1e26f5aa870d7e7e16672175b50297b7
     request_hash: 53e5b014dbe60673eccede86fc86eb67be951f41caee31cc5bdf3f52b366283c
-    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    engine_source_hash: 285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
     recorded_at: '2026-07-25T23:33:10.772532+00:00'
     returned_model: minimax/minimax-m2.5
     cost: 0.000165
   23_loss_carry_forward:
     file: 23_loss_carry_forward.yaml
-    fingerprint: canonical-source_a48bab2e7a118ad6457f57327fffe9a84670483e3b198f6e67e1f673f06135da
+    fingerprint: canonical-source_3bbd13feb1b61bcd64cbc21e5e40bdc1cb574ad4ad3706554ddc2cad62ce3b09
     request_hash: 5f44fd475f47bd31f123f4ca69b45fe7b7a50c1a9045b573b9404d6df10d6b25
-    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    engine_source_hash: 285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
     recorded_at: '2026-07-25T23:33:16.196438+00:00'
     returned_model: minimax/minimax-m2.5
     cost: 0.0002934
   24_donations_relief:
     file: 24_donations_relief.yaml
-    fingerprint: canonical-source_67cc4fdca556731cbd4af5a9458f2c34603c5f5dcd5cfd979cf088b03f601bf0
+    fingerprint: canonical-source_bcece03f3afb007bda5ba1e2027a59667901407d8c83612dd7eac80a3f8f5385
     request_hash: 5f44fd475f47bd31f123f4ca69b45fe7b7a50c1a9045b573b9404d6df10d6b25
-    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    engine_source_hash: 285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
     recorded_at: '2026-07-25T23:33:24.944788+00:00'
     returned_model: minimax/minimax-m2.5
     cost: 0.00042001
   25_rehab_relief:
     file: 25_rehab_relief.yaml
-    fingerprint: canonical-source_f68ad3beebb75ca9a2dffd07a466e403fad44076ae27002d20267fc6913016a9
+    fingerprint: canonical-source_e0c768b7259356fe5bd24408acea9f1d3a5caace06d1c556b08d9b429aafd732
     request_hash: 5f44fd475f47bd31f123f4ca69b45fe7b7a50c1a9045b573b9404d6df10d6b25
-    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    engine_source_hash: 285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
     recorded_at: '2026-07-25T23:33:33.438808+00:00'
     returned_model: minimax/minimax-m2.5
     cost: 0.0003696
   26_rd_relief_nexus:
     file: 26_rd_relief_nexus.yaml
-    fingerprint: canonical-source_18ead81ebe10d47fe1568e2376b9d37f2ed0a30dadfb84c3ffb8ffd61d7bdec4
+    fingerprint: canonical-source_d481df9a2eb3e1c0a723ef5a11ca7eda420892d0b32121c89d3dd3eaaeecc15c
     request_hash: d23c40a77dde5a4e27cb35d33fefc5f674840347cd9e300fa1385ac0bf6b2abd
-    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    engine_source_hash: 285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
     recorded_at: '2026-07-25T23:33:44.193070+00:00'
     returned_model: minimax/minimax-m2.5
     cost: 0.000289425
   27_termomodernizacja_full:
     file: 27_termomodernizacja_full.yaml
-    fingerprint: canonical-source_f088eee0b7cb5b4160c759820272598c5846cf3ade696eae4d9bf228a4a1f2c8
+    fingerprint: canonical-source_dacde2eca5ca715b15fd611bdbe8c4c1fc345b2cb4f76d1122376e135be78e16
     request_hash: d23c40a77dde5a4e27cb35d33fefc5f674840347cd9e300fa1385ac0bf6b2abd
-    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    engine_source_hash: 285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
     recorded_at: '2026-07-25T23:33:52.143642+00:00'
     returned_model: minimax/minimax-m2.5
     cost: 0.000151425
   28_edge_multiple_carry-overs:
     file: 28_edge_multiple_carry-overs.yaml
-    fingerprint: canonical-source_76e8c4794e88a85b0980ec62cd3276cdb998f1adac1f2ff697ad43d269743744
+    fingerprint: canonical-source_7dc0836c583a2219d236cbf489c952c9b0b67a547c56de9693b796febbcba6a4
     request_hash: 53e5b014dbe60673eccede86fc86eb67be951f41caee31cc5bdf3f52b366283c
-    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    engine_source_hash: 285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
     recorded_at: '2026-07-25T23:34:00.689049+00:00'
     returned_model: minimax/minimax-m2.5
     cost: 0.000165
   29_edge_related_parties_nexus_0:
     file: 29_edge_related_parties_nexus_0.yaml
-    fingerprint: canonical-source_e3ec4f16bb71931dae624527d9301a6dbb40111895d6bcdba16fd55fb2dac43f
+    fingerprint: canonical-source_07e95c6bcd36943b3e2c8ad61535e6328c196cbff4c8ec0ffa996639fcbd61ef
     request_hash: 53e5b014dbe60673eccede86fc86eb67be951f41caee31cc5bdf3f52b366283c
-    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    engine_source_hash: 285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
     recorded_at: '2026-07-25T23:34:08.229717+00:00'
     returned_model: minimax/minimax-m2.5
     cost: 0.000165
   30_edge_related_parties_nexus_mixed:
     file: 30_edge_related_parties_nexus_mixed.yaml
-    fingerprint: canonical-source_dbbcd236a6ef5b228bdfdca6bc13f4173bb9fecc553fd01c2b96d111eaa06e5c
+    fingerprint: canonical-source_650d79c8882b6af63f11813042be35813a3ff87fb2c0c490a930af07f8d82486
     request_hash: 53e5b014dbe60673eccede86fc86eb67be951f41caee31cc5bdf3f52b366283c
-    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    engine_source_hash: 285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
     recorded_at: '2026-07-25T23:34:17.358765+00:00'
     returned_model: minimax/minimax-m2.5
     cost: 0.000165
   31_zus_double_dip_fail:
     file: 31_zus_double_dip_fail.yaml
-    fingerprint: canonical-source_2785d41466b9635119769e724e3a00ba96745bda214ca6c09197c277c32d1bc9
+    fingerprint: canonical-source_ed04376f9c9d0c1c5bc1947414eb00868705160c09e51f8a6e55a95d27363b88
     request_hash: 4cbb0c998a926ab746cc73cef084f52209def1a6489ec98e4f190c1e5ea85f5d
-    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    engine_source_hash: 285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
     recorded_at: '2026-07-25T23:34:23.556045+00:00'
     returned_model: minimax/minimax-m2.5
     cost: 0.00019149
   32_private_costs_ip_fail:
     file: 32_private_costs_ip_fail.yaml
-    fingerprint: canonical-source_b56672f3f50d3150f0530d037135fcc2cc751b21f724412d55b4823975d7158b
+    fingerprint: canonical-source_397d07e05fb30a524e11b4b09df6c650839dacbe60c0577456726cbea464ba68
     request_hash: 83c4b210fa102f9f4ff361c79631fff50376d2c82cfa0cc62ce0729140451079
-    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    engine_source_hash: 285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
     recorded_at: '2026-07-25T23:34:30.282789+00:00'
     returned_model: minimax/minimax-m2.5
     cost: 0.00014765
   33_kpir_balance_fail:
     file: 33_kpir_balance_fail.yaml
-    fingerprint: canonical-source_edf36abe57e82c33489b42abb548b833aa658ad8311297816130835391fc85f5
+    fingerprint: canonical-source_6011719b13dfdcdc0d560a516f31f391c4aee0117408193ab3c832d19ef490d0
     request_hash: 53e5b014dbe60673eccede86fc86eb67be951f41caee31cc5bdf3f52b366283c
-    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    engine_source_hash: 285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
     recorded_at: '2026-07-25T23:34:38.043312+00:00'
     returned_model: minimax/minimax-m2.5
     cost: 0.000165
   34_verify_fixed_asset_threshold_fail:
     file: 34_verify_fixed_asset_threshold_fail.yaml
-    fingerprint: canonical-source_e59d0ace4c4fed87be4e7b8eea81e779ba43fa973b60a9e3720990f34efe5b49
+    fingerprint: canonical-source_2fdd3a6b99937dafb31f67fab33b3fced6891987e5561f90d3217b09af84881a
     request_hash: 53e5b014dbe60673eccede86fc86eb67be951f41caee31cc5bdf3f52b366283c
-    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    engine_source_hash: 285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
     recorded_at: '2026-07-25T23:34:48.500611+00:00'
     returned_model: minimax/minimax-m2.5
     cost: 0.000255
   35_verify_monthly_w_jump_inconsistency:
     file: 35_verify_monthly_w_jump_inconsistency.yaml
-    fingerprint: canonical-source_4e3843a1b2591c1edf36c56c5066f2dc489c2f464350639ee28f872689f1dc21
+    fingerprint: canonical-source_3d63d1a3a0b36ccbe8fbda284940fb443baad56d21bef736d8f798fb63f714e7
     request_hash: e6920e33da91a16b416187e4303341877925f5c07574dbc434b4b1c230c08ed8
-    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    engine_source_hash: 285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
     recorded_at: '2026-07-25T23:34:55.866487+00:00'
     returned_model: minimax/minimax-m2.5
     cost: 0.000188325
   36_verify_negative_income_error:
     file: 36_verify_negative_income_error.yaml
-    fingerprint: canonical-source_6f693ca281f4286a9cfa2968eec0314697a65616430fa0a3576885ccba149c72
+    fingerprint: canonical-source_50f2d86b4004d1fdb27749bcf8dfb6d93a2a6a086d68ab723a7c6dfb641196f4
     request_hash: 53e5b014dbe60673eccede86fc86eb67be951f41caee31cc5bdf3f52b366283c
-    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    engine_source_hash: 285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
     recorded_at: '2026-07-25T23:35:04.722225+00:00'
     returned_model: minimax/minimax-m2.5
     cost: 0.0001638
   37_verify_invalid_tax_form_stop:
     file: 37_verify_invalid_tax_form_stop.yaml
-    fingerprint: canonical-source_16c7f4897637030087e2162b3a5a2bfaff9fc2409f7b99ad6c8a50901757ec01
+    fingerprint: canonical-source_5b8c6a14fdc2f0a987710ad5fb2430118e49aa3c640d6bccbf0f3893ead86df4
     request_hash: fbcec5fbaebe1fa75222483c56735107545fbee4db16e525034b74cd140b6c98
-    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    engine_source_hash: 285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
     recorded_at: '2026-07-25T23:35:11.481451+00:00'
     returned_model: minimax/minimax-m2.5
     cost: 0.00013659
   38_verify_missing_kpir_data:
     file: 38_verify_missing_kpir_data.yaml
-    fingerprint: canonical-source_cae51748da08c8531e08ed2c43c14369dedcd623e07ec2ddff659bf73fa139e2
+    fingerprint: canonical-source_a02b6c05db620bf0bca659f1761ce64faa880ce62deaea2cccdc89a67ba2aaa5
     request_hash: 012505143241055287cafee12eacc1ba330488abd7a5120f5a034211458fb196
-    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    engine_source_hash: 285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
     recorded_at: '2026-07-25T23:35:17.651408+00:00'
     returned_model: minimax/minimax-m2.5
     cost: 0.00025839
   39_multi_project_weighted_W:
     file: 39_multi_project_weighted_W.yaml
-    fingerprint: canonical-source_3ee258c73e37ea61abef8c45995f57c8d28e8b9c8b87f76163cc980dbb878bab
+    fingerprint: canonical-source_a8d9f5154769e3bc3de7e79818094863f3c429f1e7cbdc9ceb58657be5246a54
     request_hash: ebabec567dc3c107de360e45b0ec7f05efd5b4828312ad3e956c04409768cbe6
-    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    engine_source_hash: 285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
     recorded_at: '2026-07-25T23:35:25.601267+00:00'
     returned_model: minimax/minimax-m2.5
     cost: 0.00043695
   40_mixed_ip_clause:
     file: 40_mixed_ip_clause.yaml
-    fingerprint: canonical-source_8050c78bbf4856eebfc1106e8355ad61fc0d8b51bdaae87e888c9b2a3d8de953
+    fingerprint: canonical-source_d14a605843c1e59e3bef75e28f86bcc32dde0a812d3fd90126e508fb92ae8784
     request_hash: fe631b71e4d7575e227e9dfb6dcd97c56891e54121652c362cb20af9c7be84e8
-    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    engine_source_hash: 285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
     recorded_at: '2026-07-25T23:35:32.647568+00:00'
     returned_model: minimax/minimax-m2.5
     cost: 0.00014825
   41_ikze_cascade:
     file: 41_ikze_cascade.yaml
-    fingerprint: canonical-source_01e4edd5f52cefa3c38ceaeb1093cf481abe713dbfef36de216be7245ef4d8b6
+    fingerprint: canonical-source_728b59f46cea9ca0055be54db341557341627b974096b3cc32610b6f0cab178d
     request_hash: d23c40a77dde5a4e27cb35d33fefc5f674840347cd9e300fa1385ac0bf6b2abd
-    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    engine_source_hash: 285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
     recorded_at: '2026-07-25T23:35:44.803158+00:00'
     returned_model: minimax/minimax-m2.5
     cost: 0.000278625
   42_stop_08_no_documentation:
     file: 42_stop_08_no_documentation.yaml
-    fingerprint: canonical-source_348ba04f83259b5b88da878edb5647130c4b8e924c43c81b3ebd0221c615409e
+    fingerprint: canonical-source_d9abc59f5ebb0fc5d431ab9d3b0051ecb83ac506578bf6c385c856a0b1f886e0
     request_hash: 012505143241055287cafee12eacc1ba330488abd7a5120f5a034211458fb196
-    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    engine_source_hash: 285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
     recorded_at: '2026-07-25T23:35:51.758490+00:00'
     returned_model: minimax/minimax-m2.5
     cost: 0.000166155
   43_review_09_single_client_100pct:
     file: 43_review_09_single_client_100pct.yaml
-    fingerprint: canonical-source_3a740b4db7a1d94fbcd9e2045614e397c7083cbc7ec3e895698a7aeac8e07393
+    fingerprint: canonical-source_023e27bbca8bcad474139a9c4717faa2f803eb3d36e3e8263bae4703bce497db
     request_hash: 53e5b014dbe60673eccede86fc86eb67be951f41caee31cc5bdf3f52b366283c
-    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    engine_source_hash: 285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
     recorded_at: '2026-07-25T23:36:02.036079+00:00'
     returned_model: minimax/minimax-m2.5
     cost: 0.0002658
   44_mix_revenue_key_kis:
     file: 44_mix_revenue_key_kis.yaml
-    fingerprint: canonical-source_f31abff0a2c4dbb8262103d9da736b62814716a40d3c88fd3d3c6ef5df041e9a
+    fingerprint: canonical-source_838aac440988cb3242bad96ddbba1115aa5e10a0a068a2d3b4af038e2d57dfd6
     request_hash: b3868d64cb1854425b13d29c0fc608b58454b46ca6f060b30f6f0290aca73a0b
-    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    engine_source_hash: 285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
     recorded_at: '2026-07-25T23:36:11.488374+00:00'
     returned_model: minimax/minimax-m2.5
     cost: 0.00020465
   45_multi_ip_two_stage:
     file: 45_multi_ip_two_stage.yaml
-    fingerprint: canonical-source_d8251f6311069d915b3b5b0fdc16b57fdb7524a612c7efc764ac45cb9b1df636
+    fingerprint: canonical-source_b49d684fcb04db180657644b01912d0b2ebbe94b75026f90eaf6dc34c7ec836c
     request_hash: e67c513a43a5b35ff1f8e4b8cdfbb93ee8b7ded3ea106d300ac2cf6a3930418b
-    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    engine_source_hash: 285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
     recorded_at: '2026-07-25T23:36:20.006037+00:00'
     returned_model: minimax/minimax-m2.5
     cost: 0.000188325
   46_historical_2019_health_credit:
     file: 46_historical_2019_health_credit.yaml
-    fingerprint: canonical-source_aec5112b816545ac413598b8727546ad207cf407454a23f46d0d8889550ad65b
+    fingerprint: canonical-source_3af08b0e60b0ae9359bbd22d340dbe30dd59b5dafd8a1c3caed7d7b89e740d03
     request_hash: d23c40a77dde5a4e27cb35d33fefc5f674840347cd9e300fa1385ac0bf6b2abd
-    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    engine_source_hash: 285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
     recorded_at: '2026-07-25T23:36:29.643317+00:00'
     returned_model: minimax/minimax-m2.5
     cost: 0.000225825
   47_historical_2021_br_ipbox_stop:
     file: 47_historical_2021_br_ipbox_stop.yaml
-    fingerprint: canonical-source_49ecda09fad6c78d47874de3fbbba90cd9adfecdfcbdb3ac8f767f7a0acc06b0
+    fingerprint: canonical-source_31f89f7b72825fe5c6001876efc9b466893627104f5a4ce36e3640be3649cf79
     request_hash: a8aa5ec240c7f2b32376dfb46394a48a7d0b47659f4b8c7a17432f98f6ef96b9
-    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    engine_source_hash: 285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
     recorded_at: '2026-07-25T23:36:35.927759+00:00'
     returned_model: minimax/minimax-m2.5
     cost: 0.000125565
   48_historical_2024_pit_like_cascade:
     file: 48_historical_2024_pit_like_cascade.yaml
-    fingerprint: canonical-source_afe1dd53b7192de55adef49f345f4161365f932bde9953f82cd5117a8c06496f
+    fingerprint: canonical-source_fc88493685fd830069dc103282b52979ceddc09339813bc97875bca9400b532a
     request_hash: d23c40a77dde5a4e27cb35d33fefc5f674840347cd9e300fa1385ac0bf6b2abd
-    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    engine_source_hash: 285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
     recorded_at: '2026-07-25T23:36:43.518732+00:00'
     returned_model: minimax/minimax-m2.5
     cost: 0.000150225
   49_double_invoice_percentage_stop:
     file: 49_double_invoice_percentage_stop.yaml
-    fingerprint: canonical-source_02bd274289ede9600d390a7c9cec9632b13bf294fc5b345d0f42ee1947fb94b0
+    fingerprint: canonical-source_91fdf1921cf22854213d2aee85e6c0ce6f4b69a6c87d007048b74bf6ed3bd72e
     request_hash: af7f2788be3e1f68684c3c67342da8a9feb7a3f5f9d46310d4920cbc4b316936
-    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    engine_source_hash: 285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
     recorded_at: '2026-07-25T23:36:50.025199+00:00'
     returned_model: minimax/minimax-m2.5
     cost: 0.0002979
   50_silent_allocation_method_switch_stop:
     file: 50_silent_allocation_method_switch_stop.yaml
-    fingerprint: canonical-source_5f7784f36b3c22ad7f8afc9425077aa52d880e5f469ab501df5194dd4fb0eb8e
+    fingerprint: canonical-source_302c499ff4c29145227fda6c558efc75e03ff82eb09fe2d9028a940a3b145577
     request_hash: 3ac533b072c91b586d2b5d4504a99e72a18392196ef022e50d006e45b58f0f3b
-    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    engine_source_hash: 285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
     recorded_at: '2026-07-25T23:36:57.027159+00:00'
     returned_model: minimax/minimax-m2.5
     cost: 0.000140925
   51_return_ledger_classification_shift_stop:
     file: 51_return_ledger_classification_shift_stop.yaml
-    fingerprint: canonical-source_45b9551dd590bb8580283bb4f93db96197404d99664671a3f766bc308e53afe9
+    fingerprint: canonical-source_f2b40631ee0435e8ad24c116cbca5238a5b5d44bd1a039cca2a840cce2758dc1
     request_hash: 9a5903eaffacec583c9ebcfa11a107d8deade57a418122d7d816e441cfdb16c6
-    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    engine_source_hash: 285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
     recorded_at: '2026-07-25T23:37:05.135698+00:00'
     returned_model: minimax/minimax-m2.5
     cost: 0.00016065
   52_cost_date_revenue_mix_policy:
     file: 52_cost_date_revenue_mix_policy.yaml
-    fingerprint: canonical-source_a014ee19d600f6c41bb75190314305d2fc52659a7fcfec7cfb867f27e41dfbd7
+    fingerprint: canonical-source_3799bc2cd663ec964dfbdc2937fcafe3b8ee2682c00ead2b706a1cb5b5cf7de9
     request_hash: b3868d64cb1854425b13d29c0fc608b58454b46ca6f060b30f6f0290aca73a0b
-    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    engine_source_hash: 285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
     recorded_at: '2026-07-25T23:37:13.928769+00:00'
     returned_model: minimax/minimax-m2.5
     cost: 0.000196145
   53_historical_ikze_limit_exceeded_stop:
     file: 53_historical_ikze_limit_exceeded_stop.yaml
-    fingerprint: canonical-source_2da19ef10ba03f8cabac02075e1d833118f3322fdf1f59fae715531f2e84009e
+    fingerprint: canonical-source_c07cab03117c7cec1fe9211155162d061f53fbdeb03593497fc2bd7ca5062e59
     request_hash: b4986658f6451bf01d01ea5ceee19fd94f3d246cdf16581c2b2ba1077c729923
-    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    engine_source_hash: 285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
     recorded_at: '2026-07-25T23:37:19.923426+00:00'
     returned_model: minimax/minimax-m2.5
     cost: 0.0003084
   54_pre_ipbox_year_stop:
     file: 54_pre_ipbox_year_stop.yaml
-    fingerprint: canonical-source_696cd63d2d27f2fdd26550cbbec260162b0a2b0d195f200004c465ddf8684666
+    fingerprint: canonical-source_a9209a9ff4a27aea183fb772342d5acc88b742dc4a4125f45fd3f333f63e35c6
     request_hash: 2315ffda02f4b217b60a801c354abd49e47c72d46b1260ded64fb82b1e5ebcc1
-    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    engine_source_hash: 285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
     recorded_at: '2026-07-25T23:37:27.988601+00:00'
     returned_model: minimax/minimax-m2.5
     cost: 0.000284625
   55_disjoint_w_semantics_clean:
     file: 55_disjoint_w_semantics_clean.yaml
-    fingerprint: canonical-source_42b523c05156c59fcb06bc085216700889e4f8da6edd437977e7bdbeab97ab38
+    fingerprint: canonical-source_361e9f120f0be73e72d99f40d94512dd5991f16220f4624d5deda04bbc6f4763
     request_hash: 5f44fd475f47bd31f123f4ca69b45fe7b7a50c1a9045b573b9404d6df10d6b25
-    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    engine_source_hash: 285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
     recorded_at: '2026-07-25T23:37:35.074538+00:00'
     returned_model: minimax/minimax-m2.5
     cost: 0.00011409

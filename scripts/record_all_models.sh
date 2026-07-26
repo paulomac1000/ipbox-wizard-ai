@@ -1,7 +1,17 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-: "${OPENROUTER_API_KEY:?Set OPENROUTER_API_KEY before recording}"
+python - <<'PY_ENV'
+import os
+
+from scripts.local_env import load_local_env
+
+load_local_env()
+if not os.environ.get("OPENROUTER_API_KEY"):
+    raise SystemExit(
+        "OPENROUTER_API_KEY is missing. Set it in the process environment or in an ignored .env file."
+    )
+PY_ENV
 
 ruff format --check .
 ruff check .

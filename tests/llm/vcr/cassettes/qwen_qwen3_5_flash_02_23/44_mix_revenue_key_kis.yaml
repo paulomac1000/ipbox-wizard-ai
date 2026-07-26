@@ -4,7 +4,7 @@ meta:
   provider: openrouter
   requested_model: qwen/qwen3.5-flash-02-23
   returned_model: qwen/qwen3.5-flash-02-23
-  fingerprint: canonical-source_e76996f2be19da8141885c55de7fdbf71eddac29d5408471dd6f8732a2ae926b
+  fingerprint: canonical-source_0df9d76a539b7fbf84797a14616fa1cefe9a46b6b02c819d9e71d5ead8f99564
   request_hash: 2e18f2894bc8152427cdd3076e733c7772ad2d0af0026f65c29088e822ac6c4c
   recorded_at: '2026-07-25T23:52:07.379732+00:00'
   request_id: gen-1785023522-tdPWWNaSsqRgMiB8iE7L
@@ -16,7 +16,6 @@ meta:
   total_tokens: 1139
   cost: 0.00024583
   recording_duration_seconds: 4.572
-  cassette_format_version: 4
 response: '{"status":"FINAL","stops":[],"reviews":["REVIEW_09","REVIEW_16","REVIEW_17"]}'
 parsed_response:
   status: FINAL
@@ -30,9 +29,9 @@ parsed_response:
     - MF_HEALTH
     - MF_IPBOX_BR
     input_hash: 690ed30e12af6c0267f5d2296644c0cd4e848e075cdca4b89975a5aecbecdfb9
-    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    engine_source_hash: 285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
     calculated_at: '2026-07-25T23:52:07Z'
-    code_revision: engine:0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    code_revision: engine:285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
   result:
     rok: 2025
     przychody_roczne:

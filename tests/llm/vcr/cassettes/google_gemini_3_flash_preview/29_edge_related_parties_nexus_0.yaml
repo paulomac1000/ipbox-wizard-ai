@@ -4,7 +4,7 @@ meta:
   provider: openrouter
   requested_model: google/gemini-3-flash-preview
   returned_model: google/gemini-3-flash-preview
-  fingerprint: canonical-source_57729270e0ac28c44749f3c3f7a94b63eddb85d0394f50f1ebdce268bbe78d69
+  fingerprint: canonical-source_67dcf0dade374c90a8d0fe3d856e0c9e8bfe8a20adf845430d86f811e450d6ee
   request_hash: 605d32f11501d35dce75c9688b9116954efb962b413ba2fd83a7a9f528d23edf
   recorded_at: '2026-07-25T23:21:45.786952+00:00'
   request_id: gen-1785021704-3Mtp7GeCszlHedKDGzMR
@@ -16,7 +16,6 @@ meta:
   total_tokens: 633
   cost: 0.0004215
   recording_duration_seconds: 1.483
-  cassette_format_version: 4
 response: "{\n  \"status\": \"FINAL\",\n  \"stops\": [],\n  \"reviews\": [\n    \"REVIEW_01\",\n    \"REVIEW_09\"\n  ]\n}"
 parsed_response:
   status: FINAL
@@ -30,9 +29,9 @@ parsed_response:
     - MF_HEALTH
     - MF_IPBOX_BR
     input_hash: 0a6367a4884e5d9f9e0428df08c6adf4451383a7b4176dea1c00f4cc87aa115c
-    engine_source_hash: 0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    engine_source_hash: 285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
     calculated_at: '2026-07-25T23:21:45Z'
-    code_revision: engine:0ad1d8509ee82bd3ca33db628f0f94a2bf57560b5de1e33c39d0735ec36f8bfa
+    code_revision: engine:285223b1ea41b9fb5abe33433ade1b11c1e946da99db6fa2bef2bc29b071f24e
   result:
     rok: 2025
     przychody_roczne:

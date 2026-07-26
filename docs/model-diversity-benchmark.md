@@ -52,7 +52,7 @@ Ceny są informacyjne, za milion tokenów wejścia/wyjścia, według katalogu Op
 | Gemini 3 Flash Preview | 0,50 | 3,00 |
 | GPT-5 Nano | 0,05 | 0,40 |
 | Claude Haiku 4.5 | 1,00 | 5,00 |
-| DeepSeek V3.1 | 0,21 | 0,79 |
+| DeepSeek | 0,21 | 0,79 |
 | MiniMax M2.5 | 0,15 | 0,90 |
 | Kimi K2.5 | 0,375 | 2,025 |
 | GLM 4.7 Flash | 0,06 | 0,40 |
@@ -76,7 +76,7 @@ Sama liczba „46/46” nie wystarcza bez audytu surowych odpowiedzi, request ha
 
 - katalog OpenRouter i strona Gemini 3 Flash Preview;
 - strony modelowe GPT-5 Nano i Claude Haiku 4.5;
-- strony modelowe DeepSeek V3.1, MiniMax M2.5, Kimi K2.5 i GLM 4.7 Flash;
+- strony modelowe DeepSeek, MiniMax M2.5, Kimi K2.5 i GLM 4.7 Flash;
 - strony modelowe Qwen 3.5 Flash i Ministral 3B.
 
 Przed kolejnym nagraniem należy sprawdzić, czy slugi, ceny i obsługiwane parametry nadal są aktualne. Kod celowo nie wybiera modelu automatycznie na podstawie ceny, aby zmiana katalogu nie modyfikowała bramki bez review.

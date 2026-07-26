@@ -12,7 +12,7 @@ Repozytorium jest narzędziem **decision-support**, a nie automatycznym doradcą
 6. Nagrywanie LLM rozpocznij dopiero po zielonych bramkach deterministycznych i czystym drzewie.
 7. Używaj dokładnych modeli z `tests/llm/models.py`.
 8. Odrzucenia analizuj w `/tmp/ipbox_llm_rejected/<model>/`; wznawiaj tylko brakujące nagrania po sklasyfikowaniu przyczyny.
-9. Zakończenie wymaga 322/322 dla siedmiu rodzin, czystego JSON bez Markdown fences, playbacku bez sekretu i raportu według `docs/independent-audit-brief.md`.
+9. Zakończenie wymaga 322/322 dla siedmiu rodzin, czystego JSON bez Markdown fences, playbacku bez sekretu i raportu `scripts/benchmark_report.py` oraz procedury z `docs/testing.md`.
 
 ## Model odpowiedzialności
 

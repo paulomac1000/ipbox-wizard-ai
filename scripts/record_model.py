@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import os
 import subprocess
 import sys
@@ -18,7 +19,9 @@ SCENARIO_DIR = ROOT / "tests/llm/scenarios"
 CASSETTE_ROOT = ROOT / "tests/llm/vcr/cassettes"
 sys.path.insert(0, str(ROOT))
 
+from scripts.local_env import load_local_env  # noqa: E402
 from tests.llm.models import get_model_profile, model_slug  # noqa: E402
+from tests.llm.vcr.cassette import CassetteManifest  # noqa: E402
 
 
 def slug(model: str) -> str:
@@ -30,21 +33,30 @@ def run(command: list[str], env: dict[str, str]) -> int:
     return subprocess.run(command, cwd=ROOT, env=env, check=False).returncode
 
 
-def _manifest_cost(manifest: Path) -> float:
-    if not manifest.exists():
-        return 0.0
-    data = yaml.safe_load(manifest.read_text(encoding="utf-8")) or {}
-    entries = data.get("entries") or {}
-    if not isinstance(entries, dict):
-        return 0.0
-    return sum(
-        float(entry.get("cost") or 0) for entry in entries.values() if isinstance(entry, dict)
-    )
+def _finite_nonnegative(name: str, value: object) -> float:
+    if isinstance(value, bool) or not isinstance(value, int | float):
+        raise ValueError(f"{name} must be a finite non-negative number")
+    number = float(value)
+    if not math.isfinite(number) or number < 0:
+        raise ValueError(f"{name} must be a finite non-negative number")
+    return number
 
 
-def recorded_cost(model_dir: Path) -> float:
+def _manifest_cost(manifest: Path, model: str) -> float:
+    loaded = CassetteManifest.load(manifest, model)
+    return sum(entry.cost for entry in loaded.entries.values())
+
+
+def recorded_cost(model_dir: Path, model: str) -> float:
     """Return the accepted cost represented by one model manifest."""
-    return _manifest_cost(model_dir / "_manifest.yaml")
+    return _manifest_cost(model_dir / "_manifest.yaml", model)
+
+
+def _cost_from_mapping(value: object, *, source: Path) -> float:
+    try:
+        return _finite_nonnegative(f"cost in {source}", value)
+    except ValueError as exc:
+        raise ValueError(f"invalid paid-cost metadata: {exc}") from exc
 
 
 def accepted_cost_since(cassette_root: Path, *, since: float, model: str | None = None) -> float:
@@ -58,10 +70,13 @@ def accepted_cost_since(cassette_root: Path, *, since: float, model: str | None 
             if path.name == "_manifest.yaml" or path.stat().st_mtime < since:
                 continue
             try:
-                payload = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
-                total += float((payload.get("meta") or {}).get("cost") or 0)
-            except (OSError, TypeError, ValueError, yaml.YAMLError):
-                continue
+                payload = yaml.safe_load(path.read_text(encoding="utf-8"))
+            except (OSError, yaml.YAMLError) as exc:
+                raise ValueError(f"cannot read accepted cost from {path}: {exc}") from exc
+            if not isinstance(payload, dict) or not isinstance(payload.get("meta"), dict):
+                raise ValueError(f"accepted cassette {path} has no meta mapping")
+            total += _cost_from_mapping(payload["meta"].get("cost"), source=path)
+            total = _finite_nonnegative("accepted session cost", total)
     return total
 
 
@@ -76,9 +91,13 @@ def rejected_cost_since(rejected_root: Path, *, since: float, model: str | None 
             continue
         try:
             payload = json.loads(path.read_text(encoding="utf-8"))
-            total += float((payload.get("metadata") or {}).get("cost") or 0)
-        except (OSError, TypeError, ValueError, json.JSONDecodeError):
-            continue
+        except (OSError, json.JSONDecodeError) as exc:
+            raise ValueError(f"cannot read rejected cost from {path}: {exc}") from exc
+        metadata = payload.get("metadata") if isinstance(payload, dict) else None
+        if not isinstance(metadata, dict):
+            raise ValueError(f"rejected response {path} has no metadata mapping")
+        total += _cost_from_mapping(metadata.get("cost"), source=path)
+        total = _finite_nonnegative("rejected session cost", total)
     return total
 
 
@@ -90,11 +109,9 @@ def paid_cost_since(
     model: str | None = None,
 ) -> float:
     """Return accepted plus rejected billed cost for this session."""
-    return accepted_cost_since(cassette_root, since=since, model=model) + rejected_cost_since(
-        rejected_root,
-        since=since,
-        model=model,
-    )
+    accepted = accepted_cost_since(cassette_root, since=since, model=model)
+    rejected = rejected_cost_since(rejected_root, since=since, model=model)
+    return _finite_nonnegative("whole session cost", accepted + rejected)
 
 
 def select_scenarios(paths: list[Path], requested: str | None) -> list[Path]:
@@ -113,7 +130,6 @@ def _resolve_limit(
     *,
     explicit: float | None,
     environment_name: str,
-    fallback: float | None = None,
 ) -> float:
     if explicit is not None:
         value = explicit
@@ -122,13 +138,12 @@ def _resolve_limit(
             value = float(os.environ[environment_name])
         except ValueError as exc:
             parser.error(f"{environment_name} must be a number: {exc}")
-    elif fallback is not None:
-        value = fallback
     else:
         value = 0.0
-    if value < 0:
-        parser.error(f"{environment_name} / CLI limit must be >= 0")
-    return value
+    try:
+        return _finite_nonnegative(f"{environment_name} / CLI limit", value)
+    except ValueError as exc:
+        parser.error(str(exc))
 
 
 def _budget_blocked(label: str, current: float, limit: float) -> bool:
@@ -169,28 +184,14 @@ def main() -> int:
         default=None,
         help="Whole-session paid-cost guard across all models; 0 disables it.",
     )
-    parser.add_argument(
-        "--max-cost-usd",
-        type=float,
-        default=None,
-        help=argparse.SUPPRESS,
-    )
     args = parser.parse_args()
+    load_local_env()
     get_model_profile(args.model)
 
-    if args.max_cost_usd is not None and args.max_cost_per_model_usd is not None:
-        parser.error("use --max-cost-per-model-usd instead of combining it with --max-cost-usd")
-    legacy_limit = args.max_cost_usd
-    if legacy_limit is None and "LLM_MAX_COST_USD" in os.environ:
-        try:
-            legacy_limit = float(os.environ["LLM_MAX_COST_USD"])
-        except ValueError as exc:
-            parser.error(f"LLM_MAX_COST_USD must be a number: {exc}")
     per_model_limit = _resolve_limit(
         parser,
         explicit=args.max_cost_per_model_usd,
         environment_name="LLM_MAX_COST_PER_MODEL_USD",
-        fallback=legacy_limit,
     )
     total_limit = _resolve_limit(
         parser,
@@ -214,9 +215,13 @@ def main() -> int:
     rejected_root = Path(env.get("VCR_REJECTED_ROOT", "/tmp/ipbox_llm_rejected"))
     started_at = time.time()
     try:
-        session_started_at = float(env.get("LLM_RECORDING_STARTED_AT", started_at))
+        raw_session_started_at = float(env.get("LLM_RECORDING_STARTED_AT", started_at))
+        session_started_at = _finite_nonnegative(
+            "LLM_RECORDING_STARTED_AT",
+            raw_session_started_at,
+        )
     except ValueError as exc:
-        parser.error(f"LLM_RECORDING_STARTED_AT must be an epoch number: {exc}")
+        parser.error(f"LLM_RECORDING_STARTED_AT must be a finite epoch number: {exc}")
     if session_started_at > started_at + 1:
         parser.error("LLM_RECORDING_STARTED_AT cannot be in the future")
 
@@ -308,7 +313,7 @@ def main() -> int:
             failures.append(path.stem)
             break
 
-    accepted_total = recorded_cost(model_dir)
+    accepted_total = recorded_cost(model_dir, args.model)
     model_session_paid = paid_cost_since(
         CASSETTE_ROOT,
         rejected_root,

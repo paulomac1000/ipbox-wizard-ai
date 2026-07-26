@@ -334,3 +334,66 @@ def test_thermomodernization_result_exposes_rule_source_and_mode() -> None:
     assert result["thermomodernization_evidence_status"] == "VERIFIED"
     assert result["thermomodernization_rules_source_id"] == "MF_THERMOMODERNIZATION"
     assert result["thermomodernization_limit"] == 53000.0
+
+
+def test_negative_thermomodernization_lot_is_rejected_at_construction() -> None:
+    from python_helper.tax_year_rules import ThermomodernizationLot
+
+    with pytest.raises(ValueError, match="remaining_amount must be non-negative"):
+        ThermomodernizationLot(
+            origin_year=2025,
+            remaining_amount=-1,
+            evidence_ref="negative-lot",
+        )
+
+
+def test_negative_thermomodernization_mapping_is_rejected_before_use() -> None:
+    from python_helper.tax_year_rules import apply_thermomodernization_lots
+
+    with pytest.raises(ValueError, match="remaining_amount must be non-negative"):
+        apply_thermomodernization_lots(
+            2025,
+            [
+                {
+                    "origin_year": 2024,
+                    "remaining_amount": -1000,
+                    "evidence_ref": "negative-mapping",
+                }
+            ],
+            3000,
+        )
+
+
+def test_negative_expired_thermomodernization_lot_is_rejected() -> None:
+    from python_helper.tax_year_rules import apply_thermomodernization_lots
+
+    with pytest.raises(ValueError, match="remaining_amount must be non-negative"):
+        apply_thermomodernization_lots(
+            2026,
+            [
+                {
+                    "origin_year": 2019,
+                    "remaining_amount": -1000,
+                    "evidence_ref": "negative-expired",
+                }
+            ],
+            3000,
+        )
+
+
+def test_tax_cascade_rejects_negative_thermomodernization_without_increasing_base() -> None:
+    with pytest.raises(ValueError, match="remaining_amount must be non-negative"):
+        calculate_tax_for_year(
+            2025,
+            non_ip_income=3000,
+            ip_income=0,
+            nexus=0,
+            tax_form="liniowy_19%",
+            thermomodernization_lots=[
+                {
+                    "origin_year": 2025,
+                    "remaining_amount": -1000,
+                    "evidence_ref": "negative-cascade",
+                }
+            ],
+        )

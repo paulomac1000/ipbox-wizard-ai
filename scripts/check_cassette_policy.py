@@ -21,6 +21,22 @@ def unexpected_model_directories(root: Path) -> set[str]:
     return discovered - expected
 
 
+def unexpected_root_entries(root: Path) -> set[str]:
+    """Return files or directories outside the canonical benchmark layout."""
+    if not root.exists():
+        return set()
+    expected_directories = {model_slug(model) for model in BENCHMARK_MODELS}
+    allowed_files = {".gitkeep"}
+    unexpected: set[str] = set()
+    for path in root.iterdir():
+        if path.is_dir() and path.name in expected_directories:
+            continue
+        if path.is_file() and path.name in allowed_files:
+            continue
+        unexpected.add(path.name)
+    return unexpected
+
+
 def main(root: Path | None = None) -> int:
     root = root or ROOT / "tests/llm/vcr/cassettes"
     if not root.exists():
@@ -29,11 +45,13 @@ def main(root: Path | None = None) -> int:
     cassette_files = [path for path in root.glob("*/*.yaml") if path.name != "_manifest.yaml"]
     manifests = list(root.glob("*/_manifest.yaml"))
     extras = unexpected_model_directories(root)
-    if not cassette_files and not manifests and not extras:
+    root_extras = unexpected_root_entries(root)
+    if not cassette_files and not manifests and not extras and not root_extras:
         print("Cassette policy: no cassette matrix committed yet — deterministic CI only")
         return 0
 
     errors = [f"unexpected model directory: {name}" for name in sorted(extras)]
+    errors.extend(f"unexpected cassette root entry: {name}" for name in sorted(root_extras))
     errors.extend(error for model in BENCHMARK_MODELS for error in validate_model(model))
     if errors:
         print(
