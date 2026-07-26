@@ -89,7 +89,20 @@ jobs:
       - name: Unit tests with coverage
         run: |
           set -euo pipefail
-          pytest tests/unit --cov=python_helper --cov-report=term-missing --cov-fail-under=90
+          mkdir -p reports
+          pytest -q tests/unit --tb=short --cov=python_helper --cov-report=term-missing --cov-fail-under=90 > reports/final-audit-unit.txt 2>&1 || {
+            cat reports/final-audit-unit.txt
+            exit 1
+          }
+
+      - name: Upload unit diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: final-audit-unit-${{ github.run_id }}
+          path: reports/final-audit-unit.txt
+          if-no-files-found: ignore
+          retention-days: 1
 
       - name: Full free suite
         run: pytest -q
