@@ -105,19 +105,20 @@ Benchmark używa siedmiu modeli z siedmiu niezależnych rodzin:
 
 To jest **test przenośności protokołu**, nie dowód poprawności podatkowej i nie matematyczna gwarancja zachowania każdego mocniejszego modelu. Jeżeli małe modele różnych dostawców przechodzą identyczny lokalny kontrakt bez naprawiania odpowiedzi, rośnie wiarygodność, że interfejs jest jednoznaczny i niezależny od jednej rodziny. Prawdą podatkową nadal pozostają Python, oracle i testy deterministyczne.
 
-Nagrywanie jest jawne i płatne. Wybór scenariusza jest dokładny, oba limity kosztu są obowiązkowe, skończone i ściśle dodatnie, a koszty zaakceptowanych oraz wszystkich odrzuconych prób wliczają się do limitu przebiegu:
+Nagrywanie jest jawne i płatne. Wybór scenariusza jest dokładny, oba limity kosztu są obowiązkowe, skończone i ściśle dodatnie, a koszty zaakceptowanych oraz wszystkich odrzuconych prób wliczają się do limitu przebiegu. Osobne potwierdzenie musi być ustawione jawnie w środowisku bieżącego procesu; nie zapisuj go w `.env`, ponieważ ma chronić przed przypadkowym ponownym uruchomieniem:
 
 ```bash
 # `.env` jest ignorowany przez Git; skrypty czytają go jako dane, bez `source` i bez ewaluacji powłoki.
 cp .env.example .env
 chmod 600 .env
 # wpisz OPENROUTER_API_KEY w .env
+LLM_PAID_RUN_CONFIRMATION=RUN_PAID_BENCHMARK \
 ./scripts/record_all_models.sh \
   --max-cost-per-model-usd 5 \
   --max-total-cost-usd 5
 ```
 
-Ręczny workflow `Paid multi-model LLM benchmark` wymaga wpisania tekstu potwierdzenia oraz podania obu dodatnich limitów. Standardowy CI nigdy nie wykonuje płatnych requestów. Każda odrzucona płatna próba jest zapisywana jako osobny, niezmienny rekord. Limit globalny jest sprawdzany przed i po każdym requestcie; ponieważ provider raportuje koszt po odpowiedzi, pojedyncza odpowiedź może przekroczyć próg, lecz po jej zaksięgowaniu żaden kolejny request nie zostanie uruchomiony.
+Ręczny workflow `Paid multi-model LLM benchmark` wymaga wpisania tekstu potwierdzenia oraz podania obu dodatnich limitów. Standardowy CI nigdy nie wykonuje płatnych requestów. Każda odrzucona płatna próba — również odpowiedź HTTP 200 z naliczonym kosztem, ale pustą lub odrzuconą treścią — jest zapisywana jako osobny, niezmienny rekord. Limit globalny jest sprawdzany przed i po każdym requestcie; ponieważ provider raportuje koszt po odpowiedzi, pojedyncza odpowiedź może przekroczyć próg, lecz po jej zaksięgowaniu żaden kolejny request nie zostanie uruchomiony.
 
 Pełna procedura: [`docs/testing.md`](docs/testing.md). Dobór modeli i ograniczenia wnioskowania: [`docs/model-diversity-benchmark.md`](docs/model-diversity-benchmark.md).
 
