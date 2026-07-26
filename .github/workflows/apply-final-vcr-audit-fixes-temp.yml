@@ -57,7 +57,7 @@ jobs:
       - name: Format and apply safe lint fixes
         run: |
           ruff format .
-          ruff check . --fix
+          ruff check . --fix --exit-zero
           ruff format .
 
       - name: Refresh cassette metadata without API calls
@@ -71,7 +71,21 @@ jobs:
         run: ruff format --check .
 
       - name: Ruff lint
-        run: ruff check .
+        run: |
+          mkdir -p reports
+          ruff check . --output-format=concise > reports/ruff.txt 2>&1 || {
+            cat reports/ruff.txt
+            exit 1
+          }
+
+      - name: Upload Ruff diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: final-vcr-ruff-${{ github.run_id }}
+          path: reports/ruff.txt
+          if-no-files-found: ignore
+          retention-days: 1
 
       - name: Compile Python
         run: python -m compileall -q python_helper tests scripts
