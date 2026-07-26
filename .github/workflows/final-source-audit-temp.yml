@@ -23,12 +23,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: fix/decouple-mix-allocation-from-w
           fetch-depth: 0
 
       - name: Apply reviewed source bundle and remove scaffolding
         run: |
           set -euo pipefail
-          base64 --decode .audit/final-fix.tar.gz.b64 | tar -xzf -
+          cat .audit/final-fix.part-* > /tmp/final-fix.tar.gz.b64
+          echo 'd2cf1cb70ae42b5f7d16c6d9bb099a2697f9f13a2d1311f2f6b77f5a26e60ba3  /tmp/final-fix.tar.gz.b64' \
+            | sha256sum --check --strict
+          base64 --decode /tmp/final-fix.tar.gz.b64 | tar -xzf -
+          rm -f /tmp/final-fix.tar.gz.b64
           rm -rf .audit
           rm -f .github/workflows/final-source-audit-temp.yml
 
