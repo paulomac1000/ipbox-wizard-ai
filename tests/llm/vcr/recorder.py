@@ -68,6 +68,7 @@ class VCRRecorder:
         if self.config.is_none:
             response = api_call(request)
             self._require_complete(response)
+            self._require_content(response)
             self._require_requested_model(response, request.model)
             parsed = validate_response(response.content)
             return response, parsed
@@ -141,10 +142,9 @@ class VCRRecorder:
         )
         try:
             self._require_complete(response)
+            self._require_content(response)
         except RecordingRejectedError as exc:
-            raise CassetteStaleError(
-                f"Cassette finish_reason must be 'stop', got {response.finish_reason!r}"
-            ) from exc
+            raise CassetteStaleError(str(exc)) from exc
         return response, parsed
 
     def _record(
@@ -184,8 +184,9 @@ class VCRRecorder:
         duration = time.monotonic() - started
         try:
             self._require_complete(response)
-        except RecordingRejectedError:
-            self._save_rejected(scenario, request_hash, response, "incomplete finish reason")
+            self._require_content(response)
+        except RecordingRejectedError as exc:
+            self._save_rejected(scenario, request_hash, response, str(exc))
             raise
         if response.returned_model != request.model:
             reason = (
@@ -241,6 +242,12 @@ class VCRRecorder:
             )
 
     @staticmethod
+    def _require_content(response: LLMResponse) -> None:
+        if not response.content.strip():
+            detail = f"; provider_error={response.provider_error}" if response.provider_error else ""
+            raise RecordingRejectedError(f"Response content is empty{detail}; response rejected")
+
+    @staticmethod
     def _require_requested_model(response: LLMResponse, requested_model: str) -> None:
         if response.returned_model != requested_model:
             raise RecordingRejectedError(
@@ -287,6 +294,7 @@ class VCRRecorder:
                 "completion_tokens": response.completion_tokens,
                 "total_tokens": response.total_tokens,
                 "cost": response.cost,
+                "provider_error": response.provider_error,
             },
         }
         with path.open("x", encoding="utf-8") as handle:
