@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+EXPECTED_CONFIRMATION='RUN_PAID_BENCHMARK'
+if [[ "${LLM_PAID_RUN_CONFIRMATION:-}" != "$EXPECTED_CONFIRMATION" ]]; then
+  echo "Refusing paid recording: set LLM_PAID_RUN_CONFIRMATION=$EXPECTED_CONFIRMATION explicitly in the process environment" >&2
+  exit 2
+fi
 
 ruff format --check .
 ruff check .
