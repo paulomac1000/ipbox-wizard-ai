@@ -17,7 +17,11 @@ sys.path.insert(0, str(ROOT))
 from tests.llm.models import BENCHMARK_MODELS  # noqa: E402
 from tests.llm.oracle import validate_scenario  # noqa: E402
 from tests.llm.runner import LLMTestRunner  # noqa: E402
-from tests.llm.vcr.cassette import Cassette, CassetteManifest  # noqa: E402
+from tests.llm.vcr.cassette import (
+    Cassette,
+    CassetteManifest,
+    parsed_response_equal_ignoring_meta_timestamp,
+)  # noqa: E402
 from tests.llm.vcr.config import VCRConfig  # noqa: E402
 from tests.llm.vcr.fingerprint import compute_fingerprint  # noqa: E402
 
@@ -42,7 +46,7 @@ def cassette_payload_errors(
             f"returned_model must equal requested model {expected_model!r}, "
             f"got {cassette.meta.returned_model!r}"
         )
-    if reparsed != cassette.parsed_response:
+    if not parsed_response_equal_ignoring_meta_timestamp(reparsed, cassette.parsed_response):
         errors.append("stored parsed_response differs from reparsed response")
     return errors
 
