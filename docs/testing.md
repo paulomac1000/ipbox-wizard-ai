@@ -79,7 +79,9 @@ Szczególnie chronione regresje:
 - jawna semantyka W odróżnia iloczyn warunkowy, rozłączne składniki i sam czas;
 - podwójny procent faktury oraz nieudokumentowana zmiana metody w roku aktywują STOP;
 - ewidencja i zeznanie uzgadniają się osobno w IP/NIE nawet przy równych sumach globalnych;
-- reguły roczne 2019–2026 obejmują IKZE, zdrowotną, skalę i granicę jednoczesnego B+R/IP Box.
+- reguły roczne 2019–2026 obejmują IKZE, zdrowotną, skalę i granicę jednoczesnego B+R/IP Box;
+- `rounding_steps` przyjmuje wyłącznie rzeczywisty dodatni `int`, bez booleanów, stringów i obcinania floatów;
+- naliczona odpowiedź HTTP 200 z pustą albo odrzuconą treścią trafia do niezmiennego rejestru odrzuceń wraz z kosztem.
 
 ## 4. Fingerprint i unieważnienie
 
@@ -126,6 +128,8 @@ pip install -r requirements.txt -r requirements-test.txt
 cp .env.example .env
 chmod 600 .env
 # wpisz OPENROUTER_API_KEY oraz dwa dodatnie limity w .env albo przekaż je przez CLI
+# potwierdzenia nie zapisuj w .env — ustaw je tylko dla świadomie uruchamianego polecenia
+LLM_PAID_RUN_CONFIRMATION=RUN_PAID_BENCHMARK \
 ./scripts/record_all_models.sh \
   --max-cost-per-model-usd 5 \
   --max-total-cost-usd 5
@@ -134,15 +138,17 @@ chmod 600 .env
 Pojedynczy model lub scenariusz:
 
 ```bash
+LLM_PAID_RUN_CONFIRMATION=RUN_PAID_BENCHMARK \
 python scripts/record_model.py --model google/gemini-3-flash-preview \
   --max-cost-per-model-usd 5 --max-total-cost-usd 5
+LLM_PAID_RUN_CONFIRMATION=RUN_PAID_BENCHMARK \
 python scripts/record_model.py \
   --model google/gemini-3-flash-preview \
   --scenario 45_multi_ip_two_stage \
   --max-cost-per-model-usd 5 --max-total-cost-usd 5
 ```
 
-Skrypty lokalne automatycznie czytają tylko dozwolone ustawienia z `.env`. Plik nie jest wykonywany przez powłokę, nieznane klucze są ignorowane, a jawnie ustawione zmienne procesu mają pierwszeństwo. `.env` pozostaje w `.gitignore`; ustaw prawa `chmod 600`. Skrypt nie nadpisuje istniejącej kasety. Przy błędzie transportowym uruchom ponownie dopiero po sprawdzeniu, że plik nie powstał i przyczyna została sklasyfikowana. Odrzucenia trafiają do skonfigurowanego `VCR_REJECTED_ROOT` (domyślnie `/tmp/ipbox_llm_rejected/`) jako osobne, niezmienne pliki dla każdej płatnej próby, a wyniki do `/tmp/ipbox_llm_responses/`.
+Skrypty lokalne automatycznie czytają tylko dozwolone ustawienia z `.env`. Plik nie jest wykonywany przez powłokę, nieznane klucze są ignorowane, a jawnie ustawione zmienne procesu mają pierwszeństwo. `.env` pozostaje w `.gitignore`; ustaw prawa `chmod 600`. Potwierdzenie płatnego przebiegu celowo nie jest czytane z `.env`: ma być nową, świadomą decyzją dla bieżącego polecenia lub sesji powłoki. Skrypt nie nadpisuje istniejącej kasety. Przy błędzie transportowym uruchom ponownie dopiero po sprawdzeniu, że plik nie powstał i przyczyna została sklasyfikowana. Odrzucenia trafiają do skonfigurowanego `VCR_REJECTED_ROOT` (domyślnie `/tmp/ipbox_llm_rejected/`) jako osobne, niezmienne pliki dla każdej płatnej próby, a wyniki do `/tmp/ipbox_llm_responses/`. Odpowiedź z naliczonym `usage.cost`, lecz pustą albo odrzuconą treścią, również musi pozostać w tym rejestrze.
 
 Nie ma `--force`. Nie ponawiaj błędu semantycznego aż do uzyskania „szczęśliwej” odpowiedzi.
 
