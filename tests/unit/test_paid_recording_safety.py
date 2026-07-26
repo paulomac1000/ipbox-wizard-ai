@@ -5,12 +5,13 @@ import json
 import os
 import subprocess
 from pathlib import Path
+from typing import ClassVar
 
 import pytest
 
 from python_helper.allocation_precision import audit_revenue_allocation
 from scripts.record_model import PAID_RUN_CONFIRMATION, _require_paid_confirmation
-from tests.llm.client import LLMClient, LLMResponse
+from tests.llm.client import LLMClient
 from tests.llm.request_spec import LLMRequestSpec
 from tests.llm.vcr.config import VCRConfig
 from tests.llm.vcr.recorder import RecordingRejectedError, VCRRecorder
@@ -71,7 +72,7 @@ def test_record_model_requires_exact_process_confirmation(
 
 
 class _Response:
-    headers = {"x-request-id": "req-billed-empty"}
+    headers: ClassVar[dict[str, str]] = {"x-request-id": "req-billed-empty"}
 
     @staticmethod
     def raise_for_status() -> None:
