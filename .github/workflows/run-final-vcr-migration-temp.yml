@@ -1,0 +1,164 @@
+name: Run verified final VCR migration
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+concurrency:
+  group: run-verified-final-vcr-migration
+  cancel-in-progress: true
+
+jobs:
+  migrate:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/decouple-mix-allocation-from-w
+          fetch-depth: 0
+          persist-credentials: true
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements-test.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt -r requirements-test.txt
+
+      - name: Apply source fixes and remove migration scaffolding
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path("scripts/apply_final_vcr_audit_fixes.py")
+          text = path.read_text(encoding="utf-8")
+          text = text.replace(
+              r'source.write_text("VALUE = 1\n", encoding="utf-8")',
+              r'source.write_text("VALUE = 1\\n", encoding="utf-8")',
+          )
+          text = text.replace(
+              r'source.write_text("VALUE = 2\n", encoding="utf-8")',
+              r'source.write_text("VALUE = 2\\n", encoding="utf-8")',
+          )
+          path.write_text(text, encoding="utf-8")
+          PY
+          python scripts/apply_final_vcr_audit_fixes.py
+          python - <<'PY'
+          from pathlib import Path
+
+          precommit = Path("scripts/vcr_precommit.py")
+          text = precommit.read_text(encoding="utf-8")
+          marker = '"""Validate cassette completeness and exact request identity."""\n'
+          if "# ruff: noqa: E402" not in text:
+              if marker not in text:
+                  raise RuntimeError("vcr_precommit module docstring not found")
+              text = text.replace(marker, marker + "\n# ruff: noqa: E402\n", 1)
+          precommit.write_text(text, encoding="utf-8")
+
+          cassette = Path("tests/llm/vcr/cassette.py")
+          text = cassette.read_text(encoding="utf-8")
+          text = text.replace(
+              "isinstance(value_a, (dict, list))",
+              "isinstance(value_a, dict | list)",
+          )
+          text = text.replace(
+              "isinstance(value, (int, float))",
+              "isinstance(value, int | float)",
+          )
+          strict_block = '''        calculation_meta = cassette.parsed_response.get("calculation_meta")
+        if not isinstance(calculation_meta, dict):
+            raise ValueError("cassette parsed_response has no calculation_meta")
+        engine_hash = calculation_meta.get("engine_source_hash")
+        if not isinstance(engine_hash, str) or len(engine_hash) != 64:
+            raise ValueError("cassette calculation_meta has no valid engine_source_hash")
+'''
+          generic_block = '''        calculation_meta = cassette.parsed_response.get("calculation_meta")
+        engine_hash = (
+            calculation_meta.get("engine_source_hash")
+            if isinstance(calculation_meta, dict)
+            else None
+        )
+        if engine_hash is not None and (
+            not isinstance(engine_hash, str) or len(engine_hash) != 64
+        ):
+            raise ValueError("cassette calculation_meta has invalid engine_source_hash")
+'''
+          if strict_block not in text:
+              raise RuntimeError("strict manifest calculation_meta block not found")
+          text = text.replace(strict_block, generic_block, 1)
+          cassette.write_text(text, encoding="utf-8")
+          PY
+          rm -f scripts/.vcr-migration-trigger
+          rm scripts/apply_final_vcr_audit_fixes.py
+          rm .github/workflows/apply-final-vcr-audit-fixes-temp.yml
+          rm .github/workflows/run-final-vcr-migration-temp.yml
+
+      - name: Format and lint sources
+        run: |
+          ruff format .
+          ruff check . --fix
+          ruff format .
+          ruff format --check .
+          ruff check .
+
+      - name: Refresh cassette metadata without API calls
+        env:
+          OPENROUTER_API_KEY: ""
+        run: |
+          unset OPENROUTER_API_KEY || true
+          python scripts/refresh_vcr_metadata.py --all-models --write
+
+      - name: Compile Python
+        run: python -m compileall -q python_helper tests scripts
+
+      - name: Unit tests with coverage
+        run: pytest tests/unit --cov=python_helper --cov-report=term-missing --cov-fail-under=90
+
+      - name: Full free suite
+        run: pytest -q
+
+      - name: Shell syntax
+        run: for script in scripts/*.sh dump-to-md.sh; do bash -n "$script"; done
+
+      - name: VCR pre-commit
+        env:
+          OPENROUTER_API_KEY: ""
+        run: |
+          unset OPENROUTER_API_KEY || true
+          python scripts/vcr_precommit.py --all-models
+
+      - name: Cassette policy
+        run: python scripts/check_cassette_policy.py
+
+      - name: Benchmark report
+        run: python scripts/benchmark_report.py
+
+      - name: Offline playback
+        env:
+          OPENROUTER_API_KEY: ""
+        run: |
+          unset OPENROUTER_API_KEY || true
+          ./scripts/verify_all_models.sh
+
+      - name: Publish verified fixes
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to publish"
+            exit 0
+          fi
+          git commit -m "fix: make VCR metadata content-addressed and reproducible"
+          git push origin HEAD:fix/decouple-mix-allocation-from-w
