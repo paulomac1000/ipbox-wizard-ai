@@ -1,75 +1,59 @@
-# ipbox-wizard-ai
+# IP Box Wizard AI
 
-Deterministyczny-first wizard wspierający przygotowanie danych do rozliczenia IP Box programisty B2B.
+**Deterministyczny silnik wspierający przygotowanie rozliczenia IP Box programisty B2B.**
 
-> To nie jest porada podatkowa ani generator gotowego zeznania. Wynik wymaga sprawdzenia z księgową lub doradcą. Audyt techniczny i semantyczny wykonano 26 lipca 2026 r.; reguły podatkowe są jawnie przypisane do wszystkich lat obowiązywania IP Box 2019–2026.
+Projekt przyjmuje znormalizowane dane o przychodach, czasie pracy, kosztach, dowodach i ulgach, a następnie tworzy audytowalny raport z alokacją IP/NIE, współczynnikiem `W`, kosztami `MIX`, NEXUS, podatkiem, testami kontrolnymi oraz śladem decyzji.
 
-## Pierwsze 5 minut
+Najważniejsza zasada projektu jest prosta:
 
-1. Przeczytaj najpierw tę stronę, potem [`AGENTS.md`](AGENTS.md) i [`ipbox_algorytm.md`](ipbox_algorytm.md).
-2. Uruchom bezpłatną bramkę z sekcji „Szybki start”. Standardowy CI nie wykonuje płatnych requestów.
-3. Przekazuj do silnika wyłącznie znormalizowany YAML/dict. Surowe PDF-y, XLSX-y, KPiR i formularze PIT wymagają osobnej warstwy ekstrakcji oraz kontroli człowieka.
-4. Traktuj Python i testy deterministyczne jako źródło prawdy. Benchmark LLM sprawdza wyłącznie jednoznaczność protokołu i integrację providerów.
-5. Nie używaj starych dumpów repozytorium. Aktualny snapshot twórz lokalnie przez `./dump-to-md.sh`; dump jest materiałem pomocniczym, nie źródłem prawdy.
+> **Python liczy i ustala wynik. Model językowy nie wykonuje krytycznej arytmetyki ani klasyfikacji podatkowej.**
 
-| Potrzeba | Zacznij od |
-|---|---|
-| zrozumienie ograniczeń i uruchomienie projektu | `README.md` |
-| reguły pracy agenta i zakazy | `AGENTS.md` |
-| kontrakt domenowy i kolejność decyzji | `ipbox_algorytm.md` |
-| testy, VCR, limity kosztów i wydanie | `docs/testing.md` |
-| reguły podatkowe per rok | `docs/historical-tax-rules.md` |
-| klasy błędów z praktyki, na danych syntetycznych | `docs/real-world-regressions.md` |
-| wykonywalne przykłady | `tests/llm/scenarios/`, `tests/unit/` i `examples/przykladowy_output_yaml.yaml` |
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/python-3.11–3.13-blue.svg)](pyproject.toml)
 
-## Architektura
+> [!IMPORTANT]
+> To narzędzie pomocnicze, nie porada podatkowa ani generator gotowego zeznania. Dane wejściowe i wynik powinny zostać sprawdzone przez księgową lub doradcę podatkowego przed użyciem w rozliczeniu.
 
-Model językowy nie wykonuje krytycznej arytmetyki:
+## Co dostajesz
 
-1. `python_helper/ipbox_calculator.py`, `tax_year_rules.py` i `allocation_audit.py` walidują dane, liczą W, alokacje, NEXUS, reguły roczne, ulgi i podatek.
-2. `tests/llm/oracle.py` tworzy niezależny wynik referencyjny i atomowe `decision_facts`.
-3. Python składa kompletną autorytatywną kopertę `expected_decision` z rozdzielonymi kanałami STOP i REVIEW.
-4. LLM kopiuje bez zmian `status/stops/reviews`; nie klasyfikuje kodów i nie widzi faktów podatkowych ani nazw predykatów.
-5. Runner składa kopertę z raportem deterministycznym.
-6. Evaluator i lokalna strict JSON Schema porównują wynik fail-closed.
-7. Adapter providera może zmienić wyłącznie reprezentację transportową. Pełna lokalna schema i evaluator pozostają niezmienione.
-8. VCR zapisuje tylko odpowiedź, która przeszła schema, semantykę i ponowne parsowanie.
+Dla kompletnego, znormalizowanego wejścia silnik potrafi przygotować:
 
-Najważniejszy invariant z issue #1: **przychód IP/NIE, alokacja kosztów pośrednich `MIX` i klasyfikacja NEXUS są trzema niezależnymi decyzjami**. Współczynnik czasu `W` nie jest domyślnym kluczem `MIX`.
+- podział przychodów na IP i NIE;
+- miesięczny współczynnik czasu `W` z jawną metodą;
+- klasyfikację kosztów jako IP, NIE, MIX albo WYKLUCZONE;
+- alokację kosztów pośrednich z zachowaniem każdego grosza;
+- koszyki NEXUS A/B/C/D i współczynnik NEXUS;
+- dochód kwalifikowany oraz część IP opodatkowaną zwykłą stawką;
+- kaskadę podatku i ulg właściwą dla roku 2019–2026;
+- TEST 1–9, statusy STOP i REVIEW oraz ostrzeżenia;
+- audyt źródłowej KPiR, ewidencji i zeznania;
+- `correction_preview` pokazujący skutki korekty bez udawania finalnego wyniku;
+- `calculation_meta` z hashem wejścia, źródłami reguł i tożsamością silnika.
 
-## Twarde reguły
+Projekt jest szczególnie przydatny, gdy trzeba jasno odpowiedzieć na pytania:
 
-- NEXUS: `min(1, ((A+B) × 1,3) / (A+B+C+D))`.
-- Brak kosztów A/B/C/D daje NEXUS `0`, nie `1`.
-- Koszt bez dowodu wyłącznego związku nie staje się automatycznie `IP`.
-- Kwota powyżej 10 000 zł sama nie rozstrzyga klasyfikacji. Bez jawnego statusu aktywa i udokumentowanego sposobu ujęcia koszt pozostaje `MIX`, raport jest `PROVISIONAL` i wymaga `REVIEW_20`.
-- Zwykłe darowizny, ulga internetowa, rehabilitacyjna i na dziecko są odrzucane dla podatku liniowego.
-- Ulga B+R jest rozdzielana jawnie na `ulga_BR_IP` i `ulga_BR_NIE`; część IP pomniejsza dochód kwalifikowany przed NEXUS.
-- `strata_NIE_z_lat_poprzednich` dotyczy wyłącznie pozostałej działalności. Straty kwalifikowanego IP wymagają osobnej ewidencji per IP.
-- Działalność na skali łączy `dochody_dodatkowe_skala` z pozostałym dochodem skali i liczy pełny podatek od wspólnej podstawy.
-- Działalność liniowa i dodatkowe dochody na skali wymagają dwóch odrębnych kaskad/zeznań; oracle odmawia ich mieszania.
-- Limity zdrowotnej i IKZE są przypisane per rok; nieznany rok z dodatnim odliczeniem kończy się błędem.
-- Miesiąc musi mieć ścisły format `YYYY-MM` i rok zgodny z `input.rok`.
-- Limit termomodernizacji pochodzi z reguł roku. Dodatni lot wymaga `origin_year` i niepustego `evidence_ref`; zbiorcza `termomodernizacja_pula` jest wyłącznie trybem zgodnościowym `PROVISIONAL` z `REVIEW_22`.
-- Odpowiedź z modelem innym niż żądany jest odrzucana podczas live runu, playbacku i pre-commit.
-- Brak kursu, daty płatności, dowodu kwalifikacji lub ujemna faktura jest błędem danych, nie wartością zero.
-- Rok i flagi kwalifikacji mają ścisłe typy; stringi nie są konwertowane na boolean ani rok.
-- Metoda `dokumentowa` wymaga jawnego `kwota_IP` albo `całość_IP: true`.
-- Opis wydatku może utworzyć sygnał do przeglądu, ale nie ustala samodzielnie `KUP: false`.
+- czy przychód rzeczywiście kwalifikuje się do IP Box;
+- czy współczynnik `W` został policzony właściwą metodą;
+- czy koszt `MIX` nie został błędnie rozdzielony według `W`;
+- czy koszt ma dowód pozwalający przypisać go bezpośrednio do IP;
+- czy NEXUS uwzględnia poprawne koszyki i wzór;
+- czy rozliczenie źródłowe wymaga korekty;
+- która część dochodu podlega 5%, a która zwykłej stawce.
 
-## Kompletność i reprodukowalność
+## Zakres i granice
 
-`STOP_03` oznacza brak kwalifikowanego przychodu dopiero po jawnym potwierdzeniu kompletności źródeł w `input.coverage`. Brak potwierdzenia nie tworzy fałszywego STOP-u: wynik ma status `PROVISIONAL` i `REVIEW_19`. Podobnie nierozstrzygnięta klasyfikacja składki lub aktywa generuje review zamiast automatycznego wyzerowania kosztu.
+Silnik przyjmuje **znormalizowany YAML/dict**. Repozytorium nie zawiera kompletnego importera surowych PDF, XLSX, KPiR ani formularzy PIT.
 
-Każdy raport zawiera `calculation_meta`: identyfikator silnika, rule pack roku, źródła reguł, SHA-256 wejścia, czas obliczenia i rewizję kodu.
+Warstwa ekstrakcji dokumentów musi zachować jawne fakty źródłowe, takie jak:
 
-`calculation_meta.engine_source_hash` jest autorytatywną, stabilną tożsamością treści silnika i kontraktu raportu. `code_revision` domyślnie używa tej tożsamości w formie `engine:<hash>`; chwilowy `GITHUB_SHA` nie wpływa na semantyczny playback kaset.
+- kwalifikacja prawa i faktury;
+- `KUP` i informacja, czy koszt pozostał w KPiR;
+- metoda podziału przychodu i kosztów;
+- czas pracy i część NIE-IP;
+- dowody alokacji oraz dowody NEXUS;
+- limity i dokumenty dotyczące ulg.
 
-## Granica wejścia
-
-Silnik przyjmuje znormalizowany YAML/dict. Repozytorium nie zawiera kompletnego, deterministycznego importera PDF/XLSX/KPiR/PIT. Odczyt dokumentów musi zachować jawne fakty źródłowe, w szczególności `KUP`, `source_ledger_included`, kwalifikację prawa, podział faktury i referencje dowodów. Poprawny kalkulator nie naprawi błędnie wyekstrahowanych danych.
-
-Szczegółowy kontrakt: [`ipbox_algorytm.md`](ipbox_algorytm.md). Procedura weryfikacji: [`docs/testing.md`](docs/testing.md).
+Brak danych nie jest interpretowany jako zero ani korzystne `true`. Niepewność prowadzi do błędu, STOP albo REVIEW.
 
 ## Szybki start
 
@@ -81,63 +65,216 @@ pip install -r requirements.txt -r requirements-test.txt
 ruff format --check .
 ruff check .
 python -m compileall -q python_helper tests scripts
+pytest -q
+```
+
+Standardowa bramka nie wykonuje płatnych requestów do modeli.
+
+## Uruchom pełny przykład
+
+Repozytorium zawiera syntetyczny scenariusz podstawowego rozliczenia liniowego. Poniższe polecenie uruchamia kanoniczny pipeline referencyjny i zapisuje raport YAML:
+
+```bash
+python - <<'PY'
+from pathlib import Path
+
+import yaml
+
+from tests.llm.oracle import compute_reference
+
+scenario_path = Path("tests/llm/scenarios/01_basic_linear.yaml")
+scenario = yaml.safe_load(scenario_path.read_text(encoding="utf-8"))
+report = compute_reference(scenario)
+
+Path("report.yaml").write_text(
+    yaml.safe_dump(report, allow_unicode=True, sort_keys=False),
+    encoding="utf-8",
+)
+print("Zapisano report.yaml")
+PY
+```
+
+Pełny przykładowy wynik znajduje się w [`examples/przykladowy_output_yaml.yaml`](examples/przykladowy_output_yaml.yaml).
+
+### Minimalny fragment wejścia
+
+```yaml
+input:
+  coverage:
+    expected_months: 1
+    imported_months: 1
+    invoices_complete: true
+    kpir_complete: true
+    work_records_complete: true
+    period_closed: true
+    confirmed_by: example
+  rok: 2025
+  forma_opodatkowania: liniowy_19%
+  kwalifikowane_IP: true
+  polityka_alokacji:
+    przychody:
+      metoda: czasowa_W
+    koszty_MIX:
+      metoda: przychodowa_roczna
+      źródło: jawna_polityka
+      uzasadnienie: Przychód, W, MIX i NEXUS są rozdzielone.
+  miesiace:
+    - miesiac: 2025-01
+      faktury:
+        - kwota_PLN: 25000
+          kontrahent: ClientA
+          kwalifikuje_IP: true
+      ewidencja:
+        godziny_pracy: 168
+        godziny_nie_IP: 16
+        procent_faktury_IP: 100
+```
+
+W realnym przypadku należy uzupełnić pełne dane o kontrahentach, kosztach, dowodach, składkach, ulgach i kompletności źródeł. Najlepszym punktem odniesienia są scenariusze w [`tests/llm/scenarios/`](tests/llm/scenarios/).
+
+## Używanie deterministycznych helperów
+
+Poszczególne elementy silnika można wykorzystywać bez pipeline'u LLM:
+
+```python
+from python_helper import calculate_w_percent
+
+w = calculate_w_percent(
+    work_hours=168,
+    non_ip_hours=16,
+    invoice_percentage=100,
+    method="time_only",
+)
+
+assert w == 90.48
+```
+
+Publiczne helpery obejmują między innymi obliczanie `W`, audyt alokacji, reguły podatkowe per rok, podatek skali, termomodernizację i uzgodnienie ewidencji.
+
+## Jak działa architektura
+
+```text
+YAML/dict
+   ↓
+ścisła walidacja typów, kompletności i dowodów
+   ↓
+python_helper
+W → przychód IP/NIE → koszty i MIX → NEXUS → ulgi → podatek
+   ↓
+kanoniczny oracle tworzy raport i decision_facts
+   ↓
+expected_decision: status / stops / reviews
+   ↓
+LLM kopiuje wyłącznie ograniczoną decyzję protokołu
+   ↓
+strict JSON Schema + evaluator
+   ↓
+VCR playback / zweryfikowana kaseta
+```
+
+Model nie widzi nazw predykatów podatkowych i nie ustala kodów na podstawie własnej interpretacji. Dzięki temu benchmark mierzy jednoznaczność protokołu i zgodność integracji, a nie zdolność modelu do liczenia podatku.
+
+## Kluczowe invarianty
+
+- przychód IP/NIE, `W`, alokacja `MIX` i NEXUS są niezależnymi decyzjami;
+- `W` nie jest domyślnym ani uniwersalnym kluczem `MIX`;
+- NEXUS wynosi `min(1, ((A+B)×1,3)/(A+B+C+D))`;
+- brak A/B/C/D daje NEXUS `0`, nie `1`;
+- część dochodu IP poza preferencją trafia do zwykłej podstawy;
+- koszt bez dowodu wyłączności nie staje się kosztem IP;
+- opis lub kwota kosztu nie mogą samodzielnie ustalić KUP ani koszyka;
+- alokacje zachowują każdy grosz;
+- STOP zeruje finalne liczby i klasyfikacje;
+- dodatnie odliczenie wymaga zweryfikowanego limitu i dowodu;
+- rok, liczby i flagi kwalifikacji mają ścisłe typy;
+- odpowiedź modelu musi być czystym JSON-em i zakończyć się `finish_reason=stop`.
+
+Szczegółowy kontrakt znajduje się w [`ipbox_algorytm.md`](ipbox_algorytm.md).
+
+## Mapa repozytorium
+
+| Ścieżka | Rola |
+|---|---|
+| [`ipbox_algorytm.md`](ipbox_algorytm.md) | kontrakt domenowy i kolejność decyzji |
+| [`python_helper/`](python_helper/) | deterministyczna matematyka, walidacja i reguły roczne |
+| [`tests/unit/`](tests/unit/) | wykonywalna specyfikacja i regresje |
+| [`tests/llm/oracle.py`](tests/llm/oracle.py) | pełny wynik referencyjny |
+| [`tests/llm/scenarios/`](tests/llm/scenarios/) | syntetyczne przypadki biznesowe |
+| [`tests/llm/vcr/`](tests/llm/vcr/) | fingerprinty, kasety, manifesty i playback |
+| [`scripts/`](scripts/) | bramki jakości, raport benchmarku i nagrywanie |
+| [`docs/testing.md`](docs/testing.md) | procedura testów, VCR i wydania |
+| [`AGENTS.md`](AGENTS.md) | onboarding oraz reguły pracy agenta |
+| [`CHANGELOG.md`](CHANGELOG.md) | najważniejsze różnice między wersjami 0.1 i 0.2 |
+
+## Testy i reprodukowalność
+
+Projekt utrzymuje trzy warstwy kontroli:
+
+1. **Testy jednostkowe** — matematyka, walidacja, reguły roczne i przypadki brzegowe.
+2. **Scenariusze referencyjne** — kompletne syntetyczne przypadki biznesowe.
+3. **VCR** — zweryfikowane odpowiedzi siedmiu rodzin modeli, odtwarzane offline.
+
+Aktualna macierz wersji 0.2 obejmuje 46 scenariuszy × 7 rodzin modeli, czyli 322 kasety i 7 manifestów. Fingerprint wiąże każdą kasetę z kodem silnika, scenariuszem, requestem i harness VCR.
+
+Pełna bezpłatna bramka:
+
+```bash
+ruff format --check .
+ruff check .
+python -m compileall -q python_helper tests scripts
 pytest tests/unit --cov=python_helper --cov-report=term-missing --cov-fail-under=90
 pytest -q
 python scripts/check_cassette_policy.py
+python scripts/vcr_precommit.py --all-models
+python scripts/benchmark_report.py
+unset OPENROUTER_API_KEY
+./scripts/verify_all_models.sh
 for script in scripts/*.sh dump-to-md.sh; do bash -n "$script"; done
 ```
 
-Bramka deterministyczna obejmuje pełny zestaw testów jednostkowych, coverage `python_helper` powyżej wymaganych **90%**, pełny bezpłatny suite i Python 3.11–3.13. Dokładną liczbę testów oraz coverage raportuje CI; dokumentacja nie utrwala liczby, która szybko staje się nieaktualna.
+CI uruchamia bezpłatne kontrole na Pythonie 3.11, 3.12 i 3.13. Playback nie ma live fallbacku i nie potrzebuje sekretu.
 
-## Benchmark wielorodzinny
+## Płatne nagrywanie modeli
 
-Benchmark używa siedmiu modeli z siedmiu niezależnych rodzin:
+Nagrywanie jest opcjonalne, jawne i płatne. Nie wykonuj go po każdej zmianie.
 
-| Rodzina | Model OpenRouter | Transport |
-|---|---|---|
-| Google Gemini | `google/gemini-3-flash-preview` | strict `json_schema` |
-| Anthropic Claude | `anthropic/claude-haiku-4.5` | `json_schema` bez nieobsługiwanego przez endpoint keywordu `uniqueItems`; lokalna schema pozostaje pełna |
-| DeepSeek | `deepseek/deepseek-chat-v3.1` | strict `json_schema` |
-| MiniMax | `minimax/minimax-m2.5` | `json_object` z pełną lokalną schema, ponieważ routing DigitalOcean zwracał `content: null` dla `json_schema` |
-| Moonshot Kimi | `moonshotai/kimi-k2.5` | strict `json_schema` |
-| Qwen | `qwen/qwen3.5-flash-02-23` | strict `json_schema` |
-| Mistral | `mistralai/mistral-small-24b-instruct-2501` | strict `json_schema` |
-
-To jest **test przenośności protokołu**, nie dowód poprawności podatkowej i nie matematyczna gwarancja zachowania każdego mocniejszego modelu. Jeżeli małe modele różnych dostawców przechodzą identyczny lokalny kontrakt bez naprawiania odpowiedzi, rośnie wiarygodność, że interfejs jest jednoznaczny i niezależny od jednej rodziny. Prawdą podatkową nadal pozostają Python, oracle i testy deterministyczne.
-
-Nagrywanie jest jawne i płatne. Wybór scenariusza jest dokładny, oba limity kosztu są obowiązkowe, skończone i ściśle dodatnie, a koszty zaakceptowanych oraz wszystkich odrzuconych prób wliczają się do limitu przebiegu. Osobne potwierdzenie musi być ustawione jawnie w środowisku bieżącego procesu; nie zapisuj go w `.env`, ponieważ ma chronić przed przypadkowym ponownym uruchomieniem:
+Najpierw odśwież metadane i sprawdź istniejące odpowiedzi bez API:
 
 ```bash
-# `.env` jest ignorowany przez Git; skrypty czytają go jako dane, bez `source` i bez ewaluacji powłoki.
-cp .env.example .env
-chmod 600 .env
-# wpisz OPENROUTER_API_KEY w .env
-LLM_PAID_RUN_CONFIRMATION=RUN_PAID_BENCHMARK \
-./scripts/record_all_models.sh \
-  --max-cost-per-model-usd 5 \
-  --max-total-cost-usd 5
+python scripts/refresh_vcr_metadata.py --all-models --write
+python scripts/vcr_precommit.py --all-models
+unset OPENROUTER_API_KEY
+./scripts/verify_all_models.sh
 ```
 
-Ręczny workflow `Paid multi-model LLM benchmark` wymaga wpisania tekstu potwierdzenia oraz podania obu dodatnich limitów. Standardowy CI nigdy nie wykonuje płatnych requestów. Każda odrzucona płatna próba — również odpowiedź HTTP 200 z naliczonym kosztem, ale pustą lub odrzuconą treścią — jest zapisywana jako osobny, niezmienny rekord. Limit globalny jest sprawdzany przed i po każdym requestcie; ponieważ provider raportuje koszt po odpowiedzi, pojedyncza odpowiedź może przekroczyć próg, lecz po jej zaksięgowaniu żaden kolejny request nie zostanie uruchomiony.
+Płatnie nagrywaj wyłącznie kasetę rzeczywiście unieważnioną przez zmianę requestu lub semantyki. Każdy przebieg wymaga jawnego potwierdzenia oraz dwóch dodatnich limitów kosztu. Szczegóły: [`docs/testing.md`](docs/testing.md).
 
-Pełna procedura: [`docs/testing.md`](docs/testing.md). Dobór modeli i ograniczenia wnioskowania: [`docs/model-diversity-benchmark.md`](docs/model-diversity-benchmark.md).
+## Rozwój projektu
 
-## Zakres multi-IP
+Przed zmianą kodu przeczytaj [`AGENTS.md`](AGENTS.md). Dokument zawiera:
 
-`allocate_multi_ip()` wykonuje dwustopniowy podział wspólnych kosztów z zachowaniem groszy. Nie zastępuje pełnej ewidencji PIT/IP dla każdego kwalifikowanego prawa. Finalne rozliczenie wielu IP wymaga osobnych przychodów, kosztów bezpośrednich, kosztów NEXUS, dochodu i straty dla każdego IP.
+- topologię modułów;
+- przepływ danych;
+- hierarchię źródeł prawdy;
+- procedury dodawania reguły, scenariusza i poprawki;
+- typowe ścieżki debugowania;
+- zasady bezpiecznego nagrywania;
+- Definition of Done.
 
-## Stan wydania
+Dobry wkład do projektu zaczyna się od minimalnego testu odtwarzającego problem i kończy pełną bramką jakości. Nie osłabiaj testów ani schemy pod zachowanie konkretnego modelu.
 
-Docelowa macierz VCR obejmuje 46 scenariuszy dla siedmiu rodzin modeli, czyli dokładnie 322 kasety i 7 manifestów. Jej aktualność nie wynika z tekstu dokumentacji: fingerprinty wiążą kasety z algorytmem, scenariuszem, requestem, schemą i profilem modelu, a CI odrzuca stan niepełny lub nieaktualny.
+## Status wersji 0.2
 
-PR jest gotowy do merge wyłącznie wtedy, gdy aktualny HEAD spełnia jednocześnie:
+Wersja 0.2 skupia się na deterministycznym obliczaniu, audytowalności, bezpiecznych domyślnych zachowaniach i odtwarzalnym benchmarku. Nie próbuje jeszcze rozwiązać pełnego importu dokumentów ani automatycznego przygotowania gotowego zeznania.
 
-- 46/46 kaset dla każdego z siedmiu modeli, czyli dokładnie 322 aktualne nagrania i 7 manifestów;
-- `python scripts/benchmark_report.py` zwraca `all_complete_and_valid=true`;
-- `python scripts/vcr_precommit.py --all-models` przechodzi bez błędów;
-- playback wszystkich modeli przechodzi bez `OPENROUTER_API_KEY`;
-- CI na Pythonie 3.11–3.13 jest zielone, a job Python 3.13 wykonuje pełny playback offline;
-- nie ma nierozwiązanych uwag do bieżącego HEAD;
-- niezależny audyt wydaje werdykt `READY`.
+Planowane kierunki dalszego rozwoju mogą obejmować:
 
-Zmiana `ipbox_algorytm.md`, scenariusza, requestu, profilu modelu, schema albo harnessu VCR unieważnia odpowiednie fingerprinty. Kaset nie wolno poprawiać ręcznie. Gdy zmieniła się wyłącznie deterministyczna implementacja lub metadane, uruchom `python scripts/refresh_vcr_metadata.py --all-models --write`: skrypt ponownie waliduje istniejące surowe odpowiedzi i kończy się błędem przy zmianie semantyki. Płatne nagranie jest potrzebne dopiero wtedy, gdy surowa odpowiedź nie przechodzi aktualnego kontraktu albo zmienił się request do modelu.
+- deterministyczny importer KPiR/PIT/XLSX z pełnym lineage danych;
+- stabilne identyfikatory dokumentów i decyzji;
+- osobny publiczny CLI/API dla pełnego raportu;
+- model zdarzeń korekt i certyfikat decyzji;
+- dalsze upraszczanie aktywnych warstw zgodności `_legacy`.
+
+## Licencja
+
+Projekt jest udostępniany na licencji [MIT](LICENSE).
