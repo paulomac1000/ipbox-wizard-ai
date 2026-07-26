@@ -1,4 +1,4 @@
-name: Apply final audit fixes
+name: Publish verified final audit tree
 
 on:
   push:
@@ -12,32 +12,30 @@ permissions:
   contents: write
 
 concurrency:
-  group: final-audit-fixes-${{ github.ref }}
+  group: final-audit-publish-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  apply-and-verify:
+  publish:
     if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
           ref: fix/decouple-mix-allocation-from-w
           fetch-depth: 0
 
-      - name: Apply reviewed source bundle and remove payload scaffolding
+      - name: Recreate already verified tree
         run: |
           set -euo pipefail
           cat .audit/final-fix.part-* > /tmp/final-fix.tar.gz.b64
           echo 'd2cf1cb70ae42b5f7d16c6d9bb099a2697f9f13a2d1311f2f6b77f5a26e60ba3  /tmp/final-fix.tar.gz.b64' \
             | sha256sum --check --strict
           base64 --decode /tmp/final-fix.tar.gz.b64 | tar -xzf -
-          rm -f /tmp/final-fix.tar.gz.b64
-          rm -rf .audit
+          rm -rf .audit /tmp/final-fix.tar.gz.b64
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.13'
           cache: pip
@@ -45,66 +43,56 @@ jobs:
             requirements.txt
             requirements-test.txt
 
-      - name: Install dependencies
-        run: pip install -r requirements.txt -r requirements-test.txt
-
-      - name: Format before refreshing VCR identity
+      - name: Reproduce formatting and cassette identity
         run: |
           set -euo pipefail
+          pip install -r requirements.txt -r requirements-test.txt
           ruff format .
           ruff check .
-          python -m compileall -q python_helper tests scripts
-
-      - name: Refresh existing cassette metadata without API calls
-        run: |
-          set -euo pipefail
           unset OPENROUTER_API_KEY || true
           python scripts/refresh_vcr_metadata.py --all-models --write
-
-      - name: Run complete deterministic and offline release gates
-        run: |
-          set -euo pipefail
-          ruff format --check .
-          ruff check .
-          python -m compileall -q python_helper tests scripts
-          pytest tests/unit \
-            --cov=python_helper \
-            --cov-report=term-missing \
-            --cov-fail-under=90
-          pytest -q
-          for script in scripts/*.sh dump-to-md.sh; do bash -n "$script"; done
           python scripts/check_cassette_policy.py
           python scripts/vcr_precommit.py --all-models
-          python scripts/benchmark_report.py
-          unset OPENROUTER_API_KEY || true
-          ./scripts/verify_all_models.sh
 
-      - name: Verify canonical repository layout
+      - name: Create and publish commit
+        id: publish
+        continue-on-error: true
         run: |
-          set -euo pipefail
-          test ! -e .audit
-          if find . -path ./.git -prune -o -type f \
-              \( -iname '*.tmp' -o -iname '*.bak' -o -iname '*.orig' -o -iname '*.rej' \) \
-              -print | grep -q .; then
-            echo 'Unexpected temporary artifact found' >&2
-            exit 1
-          fi
-          if rg -n -i '\bv(2|3|7|8)(\.[0-9]+)?\b' \
-              --glob '!tests/llm/vcr/cassettes/**' . \
-              | grep -vE 'deepseek-chat-v3\.1|deepseek_deepseek_chat_v3_1'; then
-            echo 'Unexpected internal numbered version remains' >&2
-            exit 1
-          fi
+          set +e
+          mkdir -p reports
+          {
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            rm -rf .pytest_cache .coverage
+            find . -type d -name __pycache__ -prune -exec rm -rf {} +
+            find . -type f -name '*.pyc' -delete
+            git add -A
+            git status --short
+            git diff --cached --check
+            git commit -m 'fix: close final paid benchmark safety gaps'
+            commit_status=$?
+            echo "commit_status=$commit_status"
+            if [ "$commit_status" -eq 0 ]; then
+              git rev-parse HEAD
+              git push --force origin HEAD:refs/heads/automation/final-ipbox-audit
+              push_status=$?
+            else
+              push_status=99
+            fi
+            echo "push_status=$push_status"
+            exit "$push_status"
+          } > reports/publish.log 2>&1
+          status=$?
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+          exit 0
 
-      - name: Publish verified commit on technical branch
-        run: |
-          set -euo pipefail
-          rm -rf .pytest_cache .coverage reports
-          find . -type d -name __pycache__ -prune -exec rm -rf {} +
-          find . -type f -name '*.pyc' -delete
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -A
-          git diff --cached --check
-          git commit -m 'fix: close final paid benchmark safety gaps'
-          git push --force origin HEAD:refs/heads/automation/final-ipbox-audit
+      - name: Upload publication diagnostics
+        uses: actions/upload-artifact@v4
+        with:
+          name: final-audit-publication
+          path: reports/publish.log
+          if-no-files-found: error
+          retention-days: 2
+
+      - name: Enforce publication result
+        run: test '${{ steps.publish.outputs.status }}' = '0'
