@@ -1,0 +1,326 @@
+manifest_format_version: 2
+model: mistralai/mistral-small-24b-instruct-2501
+generated_at: '2026-07-26T00:05:46.727662+00:00'
+entries:
+  01_basic_linear:
+    file: 01_basic_linear.yaml
+    fingerprint: canonical_7f710f5464853c694bd0c201ba1eaa91b6f499894bd280edfcce24339ca46875
+    request_hash: 76e4162102258765235dc9f7247201b88f73e11a2d2936e75bd43c130dabcfc3
+    recorded_at: '2026-07-26T00:03:45.488982+00:00'
+    returned_model: mistralai/mistral-small-24b-instruct-2501
+    cost: 1.441e-05
+  02_basic_scale_single_client:
+    file: 02_basic_scale_single_client.yaml
+    fingerprint: canonical_6f3d7af0f72ca9ea32a15f9aad4c2238d0a62863a53aa53327c255e7769d9ed4
+    request_hash: 489520dcb9aff9332023e2a779a50ee446d8457866b80c63123fb2f84bf48dba
+    recorded_at: '2026-07-26T00:03:47.257652+00:00'
+    returned_model: mistralai/mistral-small-24b-instruct-2501
+    cost: 1.519e-05
+  03_fx_usd_single_client:
+    file: 03_fx_usd_single_client.yaml
+    fingerprint: canonical_d8042e330a7c47a4794adca166c5097023fa3e81005a97306413b0ef7440ecb9
+    request_hash: 489520dcb9aff9332023e2a779a50ee446d8457866b80c63123fb2f84bf48dba
+    recorded_at: '2026-07-26T00:03:49.330803+00:00'
+    returned_model: mistralai/mistral-small-24b-instruct-2501
+    cost: 1.519e-05
+  11_multi_client_mixed_currencies:
+    file: 11_multi_client_mixed_currencies.yaml
+    fingerprint: canonical_05c040bf43b2a75fc5dd4f8d0b09b300557fbb457c9dd7b2e40abf0e82104c45
+    request_hash: 266ed25cdfa54ec9292e170c13b953813cc71ee1e2390f441f35570966c66e5d
+    recorded_at: '2026-07-26T00:03:50.829431+00:00'
+    returned_model: mistralai/mistral-small-24b-instruct-2501
+    cost: 1.441e-05
+  12_zus_in_pit_path:
+    file: 12_zus_in_pit_path.yaml
+    fingerprint: canonical_4c86d224775db1a74808e8679402e1179af28b6a010e328dea6c721aaac64050
+    request_hash: 266ed25cdfa54ec9292e170c13b953813cc71ee1e2390f441f35570966c66e5d
+    recorded_at: '2026-07-26T00:03:52.271497+00:00'
+    returned_model: mistralai/mistral-small-24b-instruct-2501
+    cost: 1.441e-05
+  13_income_from_employment_impact:
+    file: 13_income_from_employment_impact.yaml
+    fingerprint: canonical_bb3d896d83445a809d8c9898f7b451ead0f0ca5dd8147222b8f38e91b09e597d
+    request_hash: 266ed25cdfa54ec9292e170c13b953813cc71ee1e2390f441f35570966c66e5d
+    recorded_at: '2026-07-26T00:03:54.005108+00:00'
+    returned_model: mistralai/mistral-small-24b-instruct-2501
+    cost: 1.441e-05
+  14_lump_sum_ineligible_check:
+    file: 14_lump_sum_ineligible_check.yaml
+    fingerprint: canonical_0ee7858c2df48acc2fb08701b12feac15baa5d92d0fa96859bb782dcd8e86bdf
+    request_hash: 09c2e9230cb444c6fb3f4f2684bc4b88c1b034e4a1501d799f119b1923ea1b1c
+    recorded_at: '2026-07-26T00:03:56.197538+00:00'
+    returned_model: mistralai/mistral-small-24b-instruct-2501
+    cost: 1.467e-05
+  15_vacation_sick_mix:
+    file: 15_vacation_sick_mix.yaml
+    fingerprint: canonical_8cac233c7f9099e75acdea4d38e902bfb8b8d1eae16d0aecc372498d4dca0202
+    request_hash: 76e4162102258765235dc9f7247201b88f73e11a2d2936e75bd43c130dabcfc3
+    recorded_at: '2026-07-26T00:03:58.409488+00:00'
+    returned_model: mistralai/mistral-small-24b-instruct-2501
+    cost: 1.441e-05
+  16_high_w_review:
+    file: 16_high_w_review.yaml
+    fingerprint: canonical_929bb23fe1deaf9dc617a2d3447e2b7af74936a88c807dfb22ec715123ea87ca
+    request_hash: 489520dcb9aff9332023e2a779a50ee446d8457866b80c63123fb2f84bf48dba
+    recorded_at: '2026-07-26T00:04:00.209586+00:00'
+    returned_model: mistralai/mistral-small-24b-instruct-2501
+    cost: 1.519e-05
+  17_low_w_review:
+    file: 17_low_w_review.yaml
+    fingerprint: canonical_c5e837ac42cfe73075e7648c08e06adc106878386692fe298753b4a9dbd7834b
+    request_hash: 92ac3bbe967452f6257f38bdc68d188a0448a0b1db23f236830d98be85061560
+    recorded_at: '2026-07-26T00:04:03.119335+00:00'
+    returned_model: mistralai/mistral-small-24b-instruct-2501
+    cost: 1.519e-05
+  18_logic_zero_work_hours:
+    file: 18_logic_zero_work_hours.yaml
+    fingerprint: canonical_3398757b81c31b3d107ae5220bf528289fbe425e4b75c05e783e901596b6d7d5
+    request_hash: c3063da7d69c34575d51ecf852a91de3413bc84522b6469c889af9b81119344e
+    recorded_at: '2026-07-26T00:04:04.939779+00:00'
+    returned_model: mistralai/mistral-small-24b-instruct-2501
+    cost: 1.545e-05
+  21_monthly_loss_impact:
+    file: 21_monthly_loss_impact.yaml
+    fingerprint: canonical_084df21fc3145e5dfd1b4d8ede1737fd06d936d0551675bcea1ccabecb3d1ce6
+    request_hash: 489520dcb9aff9332023e2a779a50ee446d8457866b80c63123fb2f84bf48dba
+    recorded_at: '2026-07-26T00:04:07.536427+00:00'
+    returned_model: mistralai/mistral-small-24b-instruct-2501
+    cost: 1.519e-05
+  22_related_parties_nexus_reduction:
+    file: 22_related_parties_nexus_reduction.yaml
+    fingerprint: canonical_c02d27efb5665a61179903cdf311f2bde42e2ea1177eef9e05e33c0bb712ec5e
+    request_hash: 489520dcb9aff9332023e2a779a50ee446d8457866b80c63123fb2f84bf48dba
+    recorded_at: '2026-07-26T00:04:09.340293+00:00'
+    returned_model: mistralai/mistral-small-24b-instruct-2501
+    cost: 1.519e-05
+  23_loss_carry_forward:
+    file: 23_loss_carry_forward.yaml
+    fingerprint: canonical_6fb62bcc697d2475bec2958996deb5fccc86252d0d68d300050843da6917eed1
+    request_hash: 9bd91b83c90bf3922f0f439ebe66aac47ad1609a50e47c2c1d4c404a2a85815e
+    recorded_at: '2026-07-26T00:04:11.131384+00:00'
+    returned_model: mistralai/mistral-small-24b-instruct-2501
+    cost: 1.363e-05
+  24_donations_relief:
+    file: 24_donations_relief.yaml
+    fingerprint: canonical_3e0a914b5c37687a5af2682eb2d677f7d28d17cf2c4216251912495b39c50886
+    request_hash: 9bd91b83c90bf3922f0f439ebe66aac47ad1609a50e47c2c1d4c404a2a85815e
+    recorded_at: '2026-07-26T00:04:13.211388+00:00'
+    returned_model: mistralai/mistral-small-24b-instruct-2501
+    cost: 1.363e-05
+  25_rehab_relief:
+    file: 25_rehab_relief.yaml
+    fingerprint: canonical_730de5ec5dcf4e46c952183dcd1c6309b33bf678128c90e79418b7f7bc0c21b0
+    request_hash: 9bd91b83c90bf3922f0f439ebe66aac47ad1609a50e47c2c1d4c404a2a85815e
+    recorded_at: '2026-07-26T00:04:15.141177+00:00'
+    returned_model: mistralai/mistral-small-24b-instruct-2501
+    cost: 1.363e-05
+  26_rd_relief_nexus:
+    file: 26_rd_relief_nexus.yaml
+    fingerprint: canonical_b7979dc854a747aadeb65e59418949853da14a83b6cc31c933c4c1e18d948f5e
+    request_hash: 76e4162102258765235dc9f7247201b88f73e11a2d2936e75bd43c130dabcfc3
+    recorded_at: '2026-07-26T00:04:18.590080+00:00'
+    returned_model: mistralai/mistral-small-24b-instruct-2501
+    cost: 1.441e-05
+  27_termomodernizacja_full:
+    file: 27_termomodernizacja_full.yaml
+    fingerprint: canonical_999cfa47bf94b02ad49e2a41b0120e23025b145e8fd81f570c03b216271cac09
+    request_hash: 76e4162102258765235dc9f7247201b88f73e11a2d2936e75bd43c130dabcfc3
+    recorded_at: '2026-07-26T00:04:20.719659+00:00'
+    returned_model: mistralai/mistral-small-24b-instruct-2501
+    cost: 1.441e-05
+  28_edge_multiple_carry-overs:
+    file: 28_edge_multiple_carry-overs.yaml
+    fingerprint: canonical_5ce86d162c5e9464b83417f945df8c518f3c2082cd005aa94ee33ab3a5315cab
+    request_hash: 489520dcb9aff9332023e2a779a50ee446d8457866b80c63123fb2f84bf48dba
+    recorded_at: '2026-07-26T00:04:25.014389+00:00'
+    returned_model: mistralai/mistral-small-24b-instruct-2501
+    cost: 1.519e-05
+  29_edge_related_parties_nexus_0:
+    file: 29_edge_related_parties_nexus_0.yaml
+    fingerprint: canonical_ec3d5272a2e70edeb1d0601b9ccbb6efc9c25e99ba9ada8b460846ba269e2823
+    request_hash: 489520dcb9aff9332023e2a779a50ee446d8457866b80c63123fb2f84bf48dba
+    recorded_at: '2026-07-26T00:04:27.203331+00:00'
+    returned_model: mistralai/mistral-small-24b-instruct-2501
+    cost: 1.519e-05
+  30_edge_related_parties_nexus_mixed:
+    file: 30_edge_related_parties_nexus_mixed.yaml
+    fingerprint: canonical_e25a1482504dd48ed8b1f32e29d7b17b1e60a868322340913dc92520500114e2
+    request_hash: 489520dcb9aff9332023e2a779a50ee446d8457866b80c63123fb2f84bf48dba
+    recorded_at: '2026-07-26T00:04:29.386458+00:00'
+    returned_model: mistralai/mistral-small-24b-instruct-2501
+    cost: 1.519e-05
+  31_zus_double_dip_fail:
+    file: 31_zus_double_dip_fail.yaml
+    fingerprint: canonical_e36a3a0ccf1a9dc3835da0af8bc20293335dcf4f47decb413535c82d3272e013
+    request_hash: c7003e2eed6cdd96ba90052659dac325c79e8e0b262e5c914a4934c14ae7f216
+    recorded_at: '2026-07-26T00:04:31.863327+00:00'
+    returned_model: mistralai/mistral-small-24b-instruct-2501
+    cost: 1.636e-05
+  32_private_costs_ip_fail:
+    file: 32_private_costs_ip_fail.yaml
+    fingerprint: canonical_731352c3813497f1550b81ea2a9bb63b3bedc6f0953a07f9d68bebea567b46b4
+    request_hash: 9d9762485b44a44199ba2fccfece441ec2443eb8c4460b697a39a0865e5c0dad
+    recorded_at: '2026-07-26T00:04:34.608308+00:00'
+    returned_model: mistralai/mistral-small-24b-instruct-2501
+    cost: 1.779e-05
+  33_kpir_balance_fail:
+    file: 33_kpir_balance_fail.yaml
+    fingerprint: canonical_0792d8de239ec9f503ff866132b02b8817729dabd2ac26ab07e27bb37642366c
+    request_hash: 489520dcb9aff9332023e2a779a50ee446d8457866b80c63123fb2f84bf48dba
+    recorded_at: '2026-07-26T00:04:37.039156+00:00'
+    returned_model: mistralai/mistral-small-24b-instruct-2501
+    cost: 1.519e-05
+  34_verify_fixed_asset_threshold_fail:
+    file: 34_verify_fixed_asset_threshold_fail.yaml
+    fingerprint: canonical_4dca859c30dba56de78daaa0a873a4a868807bca6af993fae47137266d78b3d3
+    request_hash: 489520dcb9aff9332023e2a779a50ee446d8457866b80c63123fb2f84bf48dba
+    recorded_at: '2026-07-26T00:04:39.507260+00:00'
+    returned_model: mistralai/mistral-small-24b-instruct-2501
+    cost: 1.519e-05
+  35_verify_monthly_w_jump_inconsistency:
+    file: 35_verify_monthly_w_jump_inconsistency.yaml
+    fingerprint: canonical_f98dc20b5065ec1d6c8b0d62397e3f5e944371675218d25f4110c5af11ac99e2
+    request_hash: 77b3b499158862afd14d2c62575710e6c5926295f1039b64c3c36b1a01c7dc26
+    recorded_at: '2026-07-26T00:04:42.614553+00:00'
+    returned_model: mistralai/mistral-small-24b-instruct-2501
+    cost: 1.597e-05
+  36_verify_negative_income_error:
+    file: 36_verify_negative_income_error.yaml
+    fingerprint: canonical_4b4bae43ee2cab2121a0c31afdb8cd2db57e95e7fda5965a8b4a35c0aef4ba88
+    request_hash: 489520dcb9aff9332023e2a779a50ee446d8457866b80c63123fb2f84bf48dba
+    recorded_at: '2026-07-26T00:04:45.630546+00:00'
+    returned_model: mistralai/mistral-small-24b-instruct-2501
+    cost: 1.519e-05
+  37_verify_invalid_tax_form_stop:
+    file: 37_verify_invalid_tax_form_stop.yaml
+    fingerprint: canonical_e35dd074423b08ed37b65df7e46ade4a3610109e448bf0b6d3d377cdf83a0dde
+    request_hash: f3fdb1f0d5a1c493d1f856abbe9e5e07ad154c1f7278b5ea56deafc0790e61e8
+    recorded_at: '2026-07-26T00:04:48.377499+00:00'
+    returned_model: mistralai/mistral-small-24b-instruct-2501
+    cost: 1.623e-05
+  38_verify_missing_kpir_data:
+    file: 38_verify_missing_kpir_data.yaml
+    fingerprint: canonical_8eaef06c72465c585b6b8aac4545992707815d7a9015aa79ed3d2f2209d2e2df
+    request_hash: d77f1675e541d21e75bc3714f0a86524e208e3402c08ea2cd68f36e7e52053fc
+    recorded_at: '2026-07-26T00:04:52.006062+00:00'
+    returned_model: mistralai/mistral-small-24b-instruct-2501
+    cost: 1.545e-05
+  39_multi_project_weighted_W:
+    file: 39_multi_project_weighted_W.yaml
+    fingerprint: canonical_4ddca2da6a78ee20a1364c3cad439eec11f7d65aeee12658f9bf2184f7ea5f4b
+    request_hash: 08efd4103e14f20ca382312ea3279338c16104ede4cd6eb47dd4d49630374c37
+    recorded_at: '2026-07-26T00:04:54.564396+00:00'
+    returned_model: mistralai/mistral-small-24b-instruct-2501
+    cost: 1.441e-05
+  40_mixed_ip_clause:
+    file: 40_mixed_ip_clause.yaml
+    fingerprint: canonical_d9267bfa0e866fbb0fc5a6a62a9dc6ec4d3df26ca417578d31f2796112ab7a64
+    request_hash: 266ed25cdfa54ec9292e170c13b953813cc71ee1e2390f441f35570966c66e5d
+    recorded_at: '2026-07-26T00:04:57.423797+00:00'
+    returned_model: mistralai/mistral-small-24b-instruct-2501
+    cost: 1.441e-05
+  41_ikze_cascade:
+    file: 41_ikze_cascade.yaml
+    fingerprint: canonical_13ca2ae0804548ef1106ca70a5eb7f74a382b58d59c66283793ea92f2ab6d6ee
+    request_hash: 76e4162102258765235dc9f7247201b88f73e11a2d2936e75bd43c130dabcfc3
+    recorded_at: '2026-07-26T00:05:00.400461+00:00'
+    returned_model: mistralai/mistral-small-24b-instruct-2501
+    cost: 1.441e-05
+  42_stop_08_no_documentation:
+    file: 42_stop_08_no_documentation.yaml
+    fingerprint: canonical_cb10474cc834c359583034b408d8855a27376b88e621fa7a019fbdc18d0e724c
+    request_hash: d77f1675e541d21e75bc3714f0a86524e208e3402c08ea2cd68f36e7e52053fc
+    recorded_at: '2026-07-26T00:05:03.387503+00:00'
+    returned_model: mistralai/mistral-small-24b-instruct-2501
+    cost: 1.545e-05
+  43_review_09_single_client_100pct:
+    file: 43_review_09_single_client_100pct.yaml
+    fingerprint: canonical_468bf0e1f105067088b5c1ac7c55fbb6633241457800104ea651369d36d326cf
+    request_hash: 489520dcb9aff9332023e2a779a50ee446d8457866b80c63123fb2f84bf48dba
+    recorded_at: '2026-07-26T00:05:06.425536+00:00'
+    returned_model: mistralai/mistral-small-24b-instruct-2501
+    cost: 1.519e-05
+  44_mix_revenue_key_kis:
+    file: 44_mix_revenue_key_kis.yaml
+    fingerprint: canonical_490bf9f3685543dd00066c997689ed7d6ccdc1a69362c3f4c74c52e5a65bbdd6
+    request_hash: 4fe52067843ff2a32cb968534ffd5bc928b7dfb0bb87b6b6632e8c117c189d56
+    recorded_at: '2026-07-26T00:05:09.506561+00:00'
+    returned_model: mistralai/mistral-small-24b-instruct-2501
+    cost: 1.597e-05
+  45_multi_ip_two_stage:
+    file: 45_multi_ip_two_stage.yaml
+    fingerprint: canonical_2d4bc8302eb0dd2a9a0c3e13a792f020874e3c1733dbba1f91cb6531e2b3f944
+    request_hash: 9d874a9bf01441bb19b099707ff69d64185a5c542534d93efbd67c896168aa55
+    recorded_at: '2026-07-26T00:05:12.998219+00:00'
+    returned_model: mistralai/mistral-small-24b-instruct-2501
+    cost: 1.597e-05
+  46_historical_2019_health_credit:
+    file: 46_historical_2019_health_credit.yaml
+    fingerprint: canonical_1dfa0df9bb4f392f3600bd25d806bfcc7562169446f8a27a8a60adacb437e73f
+    request_hash: 76e4162102258765235dc9f7247201b88f73e11a2d2936e75bd43c130dabcfc3
+    recorded_at: '2026-07-26T00:05:15.941201+00:00'
+    returned_model: mistralai/mistral-small-24b-instruct-2501
+    cost: 1.441e-05
+  47_historical_2021_br_ipbox_stop:
+    file: 47_historical_2021_br_ipbox_stop.yaml
+    fingerprint: canonical_d8a039cba20a92610f6a53fea28fbc9730c453d920bfd2ad152f010d4ac9b619
+    request_hash: 2aefd1009416c0c6bb2f5ce6785501b502b18d3eda419960d578833f2522589a
+    recorded_at: '2026-07-26T00:05:19.118884+00:00'
+    returned_model: mistralai/mistral-small-24b-instruct-2501
+    cost: 1.545e-05
+  48_historical_2024_pit_like_cascade:
+    file: 48_historical_2024_pit_like_cascade.yaml
+    fingerprint: canonical_3e8e5b8b01da132f3ccdaa106e7afbd2a35772f83d82fc1c98a5dc8be6bbba7f
+    request_hash: 76e4162102258765235dc9f7247201b88f73e11a2d2936e75bd43c130dabcfc3
+    recorded_at: '2026-07-26T00:05:22.864198+00:00'
+    returned_model: mistralai/mistral-small-24b-instruct-2501
+    cost: 1.441e-05
+  49_double_invoice_percentage_stop:
+    file: 49_double_invoice_percentage_stop.yaml
+    fingerprint: canonical_682c8f63c382bd87cad87a1ae1aff02c044578f7e6ff44339f7601bcee0f4cf9
+    request_hash: 5a2fa9cd77d27465cb4551de0e27e6d897d2eea8349127ccea0c2300bfdee8e9
+    recorded_at: '2026-07-26T00:05:26.664086+00:00'
+    returned_model: mistralai/mistral-small-24b-instruct-2501
+    cost: 1.623e-05
+  50_silent_allocation_method_switch_stop:
+    file: 50_silent_allocation_method_switch_stop.yaml
+    fingerprint: canonical_dadcfec055a720c786078c0d97720311f96663a83a7c230ca6093ba3cf2a20f7
+    request_hash: f688452815015a0367118bd9a919799b861761a18de39e924cc869b4d90b8e5c
+    recorded_at: '2026-07-26T00:05:29.962712+00:00'
+    returned_model: mistralai/mistral-small-24b-instruct-2501
+    cost: 1.701e-05
+  51_return_ledger_classification_shift_stop:
+    file: 51_return_ledger_classification_shift_stop.yaml
+    fingerprint: canonical_c61498e962b8c53a38d989961616c5dc0630ccd48a714be4f3c8dcf5d9eec7b4
+    request_hash: 20110b0ab0e752a98caa9071ac0b3879cf973404a966b403fd6e5882b8a57eea
+    recorded_at: '2026-07-26T00:05:33.024627+00:00'
+    returned_model: mistralai/mistral-small-24b-instruct-2501
+    cost: 1.545e-05
+  52_cost_date_revenue_mix_policy:
+    file: 52_cost_date_revenue_mix_policy.yaml
+    fingerprint: canonical_b5a990c9bc984f42873747c86ecbbae2558e47f0ac8304c529f4fd2e9c29edb8
+    request_hash: 4fe52067843ff2a32cb968534ffd5bc928b7dfb0bb87b6b6632e8c117c189d56
+    recorded_at: '2026-07-26T00:05:36.516225+00:00'
+    returned_model: mistralai/mistral-small-24b-instruct-2501
+    cost: 1.597e-05
+  53_historical_ikze_limit_exceeded_stop:
+    file: 53_historical_ikze_limit_exceeded_stop.yaml
+    fingerprint: canonical_43a6679ae0203be055e919cf757aa1f0b0979fc5c9095ac8901262b4f441ab49
+    request_hash: c9d4dd0f0f338871aec22cbade78001c39c66383d51f762b212da3fb19d11a24
+    recorded_at: '2026-07-26T00:05:39.953586+00:00'
+    returned_model: mistralai/mistral-small-24b-instruct-2501
+    cost: 1.545e-05
+  54_pre_ipbox_year_stop:
+    file: 54_pre_ipbox_year_stop.yaml
+    fingerprint: canonical_dfcba0ec3018ceb12d97cf9a37e0bdda23663fe68e492cb4b2491414700a99ab
+    request_hash: 2557dc7521df248e66b867ff300895043245d700ce141909eb0457be03713725
+    recorded_at: '2026-07-26T00:05:43.235929+00:00'
+    returned_model: mistralai/mistral-small-24b-instruct-2501
+    cost: 1.545e-05
+  55_disjoint_w_semantics_clean:
+    file: 55_disjoint_w_semantics_clean.yaml
+    fingerprint: canonical_afecbf5f1754f2eb67764b2481b4ccdb3e7cb1800fda5f31fd549d6249bf7791
+    request_hash: 9bd91b83c90bf3922f0f439ebe66aac47ad1609a50e47c2c1d4c404a2a85815e
+    recorded_at: '2026-07-26T00:05:46.720616+00:00'
+    returned_model: mistralai/mistral-small-24b-instruct-2501
+    cost: 1.363e-05

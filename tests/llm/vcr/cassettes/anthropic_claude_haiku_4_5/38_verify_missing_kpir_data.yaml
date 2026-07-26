@@ -1,0 +1,121 @@
+meta:
+  scenario_id: 38_verify_missing_kpir_data
+  scenario_name: Brak ewidencji przy deklarowanym IP
+  provider: openrouter
+  requested_model: anthropic/claude-haiku-4.5
+  returned_model: anthropic/claude-haiku-4.5
+  fingerprint: canonical_81104423f812c6d35b31ef6b85ee2befb97d6120570d20cc0c037950d9a49a96
+  request_hash: 262d21b70433853af1b64ad38ad1b61ff55a3fc1c2d53aefb8a9ba076e89eef2
+  recorded_at: '2026-07-25T23:25:00.632430+00:00'
+  request_id: gen-1785021899-N7a5i6ocRb7eAMrFhbXG
+  finish_reason: stop
+  native_finish_reason: end_turn
+  system_fingerprint: null
+  prompt_tokens: 766
+  completion_tokens: 27
+  total_tokens: 793
+  cost: 0.000901
+  recording_duration_seconds: 1.112
+  cassette_format_version: 4
+response: '{"status":"STOPPED","stops":["STOP_08"],"reviews":["REVIEW_09"]}'
+parsed_response:
+  status: STOPPED
+  calculation_meta:
+    engine_version: ipbox-wizard-ai
+    rule_pack: PL-PIT-IPBOX-2025
+    rules_source_ids:
+    - MF_IPBOX_2019
+    - KNF_IKZE
+    - MF_SCALE_CURRENT
+    - MF_HEALTH
+    - MF_IPBOX_BR
+    input_hash: 90c8bced06ab45719c44d8513b81df1ccfdfe007c306bfcd5132b507378c1c9e
+    calculated_at: '2026-07-25T23:25:00Z'
+    code_revision: unavailable
+  result:
+    rok: 2025
+    przychody_roczne:
+      IP: 0.0
+      NIE: 0.0
+    koszty_roczne:
+      IP: 0.0
+      NIE: 0.0
+      MIX: 0.0
+      WYKLUCZONE: 0.0
+    nexus_koszty:
+      A: 0.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 0.0
+    nexus: 0.0
+    dochód_IP: 0.0
+    dochód_NIE: 0.0
+    klucz_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      wartość: null
+      status: NOT_APPLICABLE
+      źródło_ref: null
+      rounding_granularity: per_cost_item
+    alokacja_multi_ip: null
+    podatek:
+      podstawa_IP: 0
+      podstawa_NIE: 0
+      podstawa_zwykła: 0
+      dochód_IP_po_uldze_BR: 0.0
+      dochód_IP_kwalifikowany: 0.0
+      dochód_IP_poza_preferencją: 0.0
+      podatek_IP: 0
+      podatek_NIE_finalny: 0
+      podatek_całościowy: 0
+      nadpłata_lub_dopłata: 0.0
+      thermomodernization_used: 0.0
+      termomodernization_carry_over: 0.0
+      termomodernization_expired: 0.0
+      thermomodernization_mode: none
+      thermomodernization_evidence_status: NOT_APPLICABLE
+      thermomodernization_rules_source_id: MF_THERMOMODERNIZATION
+      thermomodernization_limit: 53000.0
+      health_tax_credit_used: 0.0
+      ulga_BR_IP_wykorzystana: 0.0
+      ulga_BR_NIE_wykorzystana: 0.0
+      ulga_BR_carry_over: 0.0
+      dochód_dodatkowy_skala: 0.0
+  classifications: []
+  monthly_W:
+  - miesiąc: 2025-01
+    wartość: 0.0
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+    TEST_3: PASS
+    TEST_4: PASS
+    TEST_5: PASS
+    TEST_6: PASS
+    TEST_7: PASS
+    TEST_8: PASS
+    TEST_9: PASS
+  source_ledger_audit:
+    status: NOT_PROVIDED
+    reported_costs: null
+    raw_input_costs: 0.0
+    deductible_costs: 0.0
+    excluded_recorded_costs: 0.0
+    correction_delta: 0.0
+  correction_preview:
+    status: UNAVAILABLE
+    source_kpir_correction_required: false
+    return_correction_required: false
+    relief_adjustment_required: false
+    tax_unchanged_only_if_reliefs_updated: false
+    corrected_total_tax: null
+    corrected_overpayment: null
+    thermomodernization_used: null
+    thermomodernization_carry_over: null
+  stops_reviews:
+    stops:
+    - STOP_08
+    reviews:
+    - REVIEW_09
+    warnings: []
