@@ -1,1 +1,1 @@
-Run the content-addressed VCR migration once; the workflow removes this marker before publishing.
+Execute the registered content-addressed VCR migration job once; the job removes this marker before publishing.
