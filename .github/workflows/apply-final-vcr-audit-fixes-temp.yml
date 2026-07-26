@@ -64,19 +64,42 @@ jobs:
           unset OPENROUTER_API_KEY || true
           python scripts/refresh_vcr_metadata.py --all-models --write
 
-      - name: Verify deterministic and VCR gates
+      - name: Ruff format check
+        run: ruff format --check .
+
+      - name: Ruff lint
+        run: ruff check .
+
+      - name: Compile Python
+        run: python -m compileall -q python_helper tests scripts
+
+      - name: Unit tests with coverage
+        run: pytest tests/unit --cov=python_helper --cov-report=term-missing --cov-fail-under=90
+
+      - name: Full free suite
+        run: pytest -q
+
+      - name: Shell syntax
+        run: for script in scripts/*.sh dump-to-md.sh; do bash -n "$script"; done
+
+      - name: VCR pre-commit
+        env:
+          OPENROUTER_API_KEY: ""
         run: |
-          set -euo pipefail
           unset OPENROUTER_API_KEY || true
-          ruff format --check .
-          ruff check .
-          python -m compileall -q python_helper tests scripts
-          pytest tests/unit --cov=python_helper --cov-report=term-missing --cov-fail-under=90
-          pytest -q
-          for script in scripts/*.sh dump-to-md.sh; do bash -n "$script"; done
           python scripts/vcr_precommit.py --all-models
-          python scripts/check_cassette_policy.py
-          python scripts/benchmark_report.py
+
+      - name: Cassette policy
+        run: python scripts/check_cassette_policy.py
+
+      - name: Benchmark report
+        run: python scripts/benchmark_report.py
+
+      - name: Offline playback
+        env:
+          OPENROUTER_API_KEY: ""
+        run: |
+          unset OPENROUTER_API_KEY || true
           ./scripts/verify_all_models.sh
 
       - name: Publish verified fixes
