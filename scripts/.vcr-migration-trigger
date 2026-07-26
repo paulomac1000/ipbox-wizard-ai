@@ -1,1 +1,1 @@
-Execute the registered content-addressed VCR migration job once; the job removes this marker before publishing.
+Start the syntax-valid registered VCR migration job once; the job removes this marker before publishing.
