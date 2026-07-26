@@ -1,4 +1,4 @@
-name: Run verified final VCR migration
+name: Run verified final VCR migration now
 
 on:
   pull_request:
