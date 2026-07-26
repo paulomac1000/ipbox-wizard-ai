@@ -1,136 +1,47 @@
 # Changelog
 
-## Unreleased
+Najważniejsze zmiany w kolejnych wydaniach projektu. Changelog opisuje możliwości produktu i istotne zmiany kontraktu, a nie historię wszystkich commitów.
 
-### Added
+## 0.2 — deterministyczny silnik i audytowalny benchmark
 
-- Bezpieczny, allowlistowy odczyt lokalnego `.env` bez wykonywania składni powłoki.
-- Atomowy kontrakt `decision_facts`; model zwraca wyłącznie `status/stops/reviews`.
-- Autorytatywną kopertę `expected_decision`, która nie pokazuje modelowi faktów podatkowych ani nie wymaga klasyfikowania kodów do kanałów.
-- Fail-closed oracle, evaluator, strict JSON Schema i kanoniczny, ściśle walidowany kontrakt VCR.
-- Siedmiorodzinny benchmark tanich modeli; rozmiar macierzy jest wyliczany dynamicznie z liczby scenariuszy.
-- Jawne profile transportowe providerów, odseparowane od pełnej lokalnej schema i evaluatora.
-- Regresje gwarantujące, że adapter transportowy nie mutuje ani nie osłabia lokalnego kontraktu.
-- Automatyczną bramkę kompletności macierzy i pełny playback offline bez sekretu w standardowym CI na Pythonie 3.13.
-- Test zgodności dokumentacji kontraktu z wykonywalnym protokołem `expected_decision`.
-- Regresje dla wzoru NEXUS podwyższającego A+B.
-- Jawny podział ulgi B+R na część IP i NIE wraz z odliczeniem IP przed NEXUS.
-- Jawny podział dochodu IP na `dochód_IP_kwalifikowany` i `dochód_IP_poza_preferencją`.
-- Pole `podstawa_zwykła`, które obejmuje dochód NIE oraz część dochodu IP nieobjętą preferencją.
-- `REVIEW_18` dla kosztu deklarowanego jako NEXUS bez wystarczającego dowodu.
-- Regresje dla NEXUS `0`, NEXUS częściowego, zwykłego opodatkowania reszty i niejednoznacznej semantyki W.
-- Pełne połączenie działalności na skali z `dochody_dodatkowe_skala`.
-- Reguły przypisane do każdego roku istnienia IP Box: 2019–2026.
-- Historyczne limity IKZE przedsiębiorcy dla 2019–2026.
-- Historyczne zasady zdrowotnej: odliczenie od podatku do 2021 r. oraz limity liniowe 2022–2026.
-- Historyczne skale podatkowe 2019, 2020–2021 oraz 2022–2026.
-- Granicę jednoczesnego B+R i IP Box: niedozwolone do 2021 r., obsługiwane od 2022 r.
-- Jawne semantyki W: `conditional_product`, `disjoint_components` i `time_only`.
-- Audyt miesięcznej alokacji wykrywający podwójny procent, przypisanie 100% mimo części NIE-IP i nieudokumentowaną zmianę metody w roku.
-- Precyzyjny audyt W z tolerancją zależną od zadeklarowanej dokładności procentu i wartości kontrolowanego przychodu.
-- Kontrolę alokacji na poziomie niezależnej faktury lub projektu, z miesięcznym agregatem wyłącznie jako fallbackiem.
-- Walidację, że suma kontrolowanych strumieni odpowiada sumie faktur kwalifikujących się, a jawne faktury NIE-IP pozostają poza W.
-- Metodę MIX `przychodowa_w_dacie_kosztu` z kluczem właściwym dla miesiąca kosztu.
-- Jawne polityki zaokrąglania `per_cost_item` i `monthly_pool` oraz rozdział groszy metodą największych reszt.
-- `source_ledger_audit` rozróżniający poprawną KPiR, brak danych, rozbieżność i źródło wymagające korekty.
-- `correction_preview`, który przy korekcyjnym STOP-ie pokazuje poprawiony podatek, rozliczenie oraz wykorzystanie ulg bez odblokowania finalnego wyniku.
-- Kod `SOURCE_KPIR_REQUIRES_CORRECTION` dla wykluczonych wydatków pozostawionych w źródłowej KPiR.
-- Obowiązkowy `źródło_ref` dla polityki deklarowanej jako pochodząca z interpretacji KIS.
-- Dowód `nexus_evidence` i podstawę `nexus_basis` oddzielające kwalifikację KUP od kwalifikacji NEXUS.
-- Uzgodnienie ewidencji i zeznania osobno dla przychodów i kosztów IP/NIE, także gdy sumy globalne są identyczne.
-- Uzgodnienie wykorzystanej termomodernizacji, podatku łącznego i nadpłaty, gdy te wartości są dostępne w danych zeznania.
-- Rocznikowe pule termomodernizacji z kontrolą limitu 53 000 zł, kolejnością wykorzystania i wygaśnięciem po sześciu latach.
-- Rozliczenie korekty odróżniające poprawioną nadpłatę od zwrotu już wypłaconego.
-- Syntetyczne scenariusze LLM/VCR `46`–`55` odtwarzające klasy błędów znalezionych w rozliczeniach rzeczywistych bez kopiowania danych podatnika.
-- Syntetyczne rozszerzenia scenariuszy 32 i 52 dla korekty KPiR oraz miesięcznej puli zaokrągleń.
-- Test blokujący oczywiste identyfikatory osobowe w nowych scenariuszach regresyjnych.
-- Dokumentację historycznych źródeł, regresji rzeczywistych oraz procedurę odbudowy kaset.
+Wersja rozwijana w PR #2 przebudowuje projekt z instrukcji wspomaganej kodem w deterministyczny, testowalny silnik przygotowania danych do IP Box.
 
-### Fixed
+### Najważniejsze zmiany
 
-- Lokalny pełny i pojedynczy recorder wymaga osobnego `LLM_PAID_RUN_CONFIRMATION=RUN_PAID_BENCHMARK` ustawionego jawnie w środowisku bieżącego procesu.
-- Naliczona odpowiedź HTTP 200 z pustą albo odrzuconą treścią zachowuje metadane kosztu i trafia do niezmiennego rejestru odrzuceń.
-- `rounding_steps` przyjmuje wyłącznie rzeczywisty dodatni `int`; booleany, stringi i ułamkowe floaty nie poszerzają tolerancji bilansu.
-- Płatny recorder wymaga jednocześnie skończonego, ściśle dodatniego limitu per model i limitu całej sesji przed pierwszym requestem.
-- Każda odrzucona płatna próba jest zapisywana jako osobny, niezmienny plik i pozostaje w sumie kosztów sesji.
-- `record_all_models.sh` respektuje `VCR_REJECTED_ROOT` z lokalnego `.env`, zachowując pierwszeństwo jawnych zmiennych procesu i ścieżki zawierające spacje.
-- Rozdzielono przychód, koszty `MIX` i NEXUS zgodnie z issue #1.
-- Poprawiono NEXUS z `(A×1,3+B)` na `((A+B)×1,3)`.
-- Część dochodu IP niewchodząca do preferencji po zastosowaniu NEXUS jest opodatkowana zwykłą stawką zamiast znikać z podstawy.
-- `NEXUS = 0` nie prowadzi już do zerowego podatku od całego dochodu IP.
-- Brak jawnej metody W jest odrzucany, gdy jednocześnie aktywne są godziny NIE-IP i procent faktury różny od 100%.
-- Brak dowodu NEXUS nie jest już cichym `false`: daje `REVIEW_18`, a nieudowodniona część dochodu trafia do zwykłego opodatkowania.
-- Usunięto martwą, starszą implementację kaskady podatkowej; historyczna ścieżka importu deleguje do jednego kanonicznego kalkulatora.
-- Nieudokumentowane IDE, chmura, sprzęt i repozytoria nie są automatycznie kosztami IP.
-- Niesklasyfikowany zakup powyżej 10 000 zł jest wyłączany do udokumentowania odpisu.
-- Jawne `KUP: false` zawsze usuwa wydatek z kosztów IP i NIE zamiast przenosić go do `NON`.
-- Wyłączenie kosztu z kalkulacji nie ukrywa już konieczności korekty źródłowej KPiR.
-- Koszt NEXUS bez osobnego dowodu nie trafia automatycznie do A/B/C/D; jest raportowany jako `poza_nexus`.
-- Miesięczna pula MIX zachowuje dokładnie zaokrągloną kwotę źródłową, eliminując fałszywe różnice groszowe wynikające z zaokrąglania każdej pozycji osobno.
-- Niezmieniony podatek po korekcie jest raportowany jako warunkowy, jeżeli wymaga aktualizacji wykorzystanej ulgi.
-- Osobiste ulgi niedostępne przy podatku liniowym są odrzucane.
-- Ulga internetowa ma limit 760 zł, a dodatnia darowizna wymaga jawnego, zweryfikowanego limitu właściwego dla kategorii.
-- Ulga B+R nie jest już błędnie ograniczona do dochodu NIE-IP.
-- Podatek skali obejmuje pełną wspólną podstawę z innymi dochodami skali.
-- Niejednoznaczne `ulga_BR` i `straty_poprzednie` są odrzucane; używane są pola rozdzielone semantycznie.
-- Ujemne faktury, ujemne odliczenia, błędne mapy ZUS/zaliczek i nieznane limity roczne są odrzucane przed raportem.
-- Faktury walutowe zawierają walutę, daty i źródłowe kursy; różnice kursowe są wyliczane, nie wpisywane ręcznie.
-- Dodatnie ulgi osobiste i B+R wymagają jawnego, zweryfikowanego śladu dowodowego.
-- Bezpośredni koszt IP wymaga `allocation_source`, zamiast syntetycznego źródła „dokument”.
-- STOP zeruje cały wynik, brak danych FX nie staje się zerem, W=0/ERROR i carry-over są fail-closed.
-- Multi-IP zachowuje każdy grosz metodą największych reszt.
-- Kwoty historycznych odliczeń nie są już blokowane tylko dlatego, że rok jest wcześniejszy niż 2025.
-- Kwoty ponad limit roczny nie są cicho obcinane do limitu.
-- Procent faktury nie może zostać zastosowany dwukrotnie bez aktywacji `STOP_10`.
-- Zaokrąglenie W do 0,01 pp nie powoduje już fałszywego `STOP_09` przy większych fakturach.
-- Zaokrąglony procent faktury nie ukrywa już sygnatury zastosowania procentu dwukrotnie ani późniejszego `STOP_11`.
-- Osobne faktury NIE-IP nie są już sumowane z fakturami kwalifikującymi się przed zastosowaniem jednego W.
-- Niejawne przejście pomiędzy metodami alokacji w jednym roku aktywuje `STOP_11`.
-- Równe sumy przychodów/kosztów nie maskują przesunięcia pomiędzy IP i NIE; aktywowany jest `STOP_12`.
-- Rok sprzed IP Box lub po ostatnim zweryfikowanym roku nie używa zasad sąsiedniego roku.
-- Retry respektuje `Retry-After`, odpowiedź wymaga `finish_reason=stop`, a playback nie ma live fallbacku.
-- Playback i pre-commit odrzucają niekompletne kasety, a recorder nie nadpisuje istniejącego nagrania.
-- Parser odrzuca Markdown fences zamiast naprawiać odpowiedź modelu.
-- Decision JSON Schema ma oddzielne enumy STOP i REVIEW oraz odrzuca kody w niewłaściwym kanale przed oceną semantyczną.
-- Profil MiniMax używa temperatury `0.0`; scenariusz 51 ma regresję dokładnej koperty `STOP_12` + `REVIEW_09`.
-- Claude Haiku używa provider-compatible kopii JSON Schema bez nieobsługiwanego `uniqueItems`, przy zachowaniu pełnej lokalnej walidacji.
-- MiniMax używa jawnego transportu `json_object`, gdy routing DigitalOcean zwraca `content: null` dla `json_schema`; odpowiedź nadal przechodzi pełną local schema i evaluator.
-- Profile transportowe są walidowane fail-closed i nie pozwalają łączyć sprzecznych ustawień.
-- Manifest jest porównywany z kasetą także dla `returned_model`, `recorded_at` i kosztu.
-- Recorder odrzuca podmianę zwróconego modelu i wlicza odrzucone płatne wywołania do limitu kosztu.
-- Walidacja wiąże każdy miesiąc z rokiem rozliczenia i egzekwuje limit termomodernizacji 53 000 zł.
-- Dokumentacja źródeł prawdy została zsynchronizowana z wykonywalną kopertą `expected_decision`; starsze opisy `active_rules` są blokowane regresją.
-- Workflowy używają minimalnych uprawnień i `persist-credentials: false`.
-- Rok, lata pochodzenia termomodernizacji i flagi kwalifikacji są walidowane bez konwersji truthy/string/float.
-- Dodatnia różnica kursowa zwiększa również miesięczny mianownik metody MIX `przychodowa_w_dacie_kosztu`.
-- Lookup NBP zapisuje rzeczywistą datę użytej tabeli po cofnięciu przez dzień wolny.
-- Roczna metoda przychodowa odrzuca pozycyjne klucze i metody dla kosztów MIX.
-- `allocation_source` nie jest już używany jako zastępczy `nexus_evidence`.
-- Metoda przychodowa `dokumentowa` nie zakłada już automatycznie 100% IP.
-- Brak jawnego potwierdzenia kwalifikowanego prawa nie jest już zamieniany na `true`.
-- Opis kosztu nie ustala już automatycznie `KUP: false`; tworzy wyłącznie kandydaturę do przeglądu.
-- Publiczna zgodnościowa funkcja `tax_cascade` deleguje do rocznego kalkulatora i zachowuje zwykłe opodatkowanie części IP poza NEXUS.
-- Zerowa suma wag projektów jest błędem wejścia zamiast poprawnego `W=0`.
+- Python stał się źródłem prawdy dla arytmetyki, klasyfikacji, reguł rocznych oraz TEST 1–9. Model językowy obsługuje wyłącznie ograniczony kontrakt `status/stops/reviews`.
+- Rozdzielono cztery niezależne decyzje: kwalifikację przychodu, współczynnik czasu `W`, alokację kosztów pośrednich `MIX` oraz NEXUS.
+- Poprawiono wzór NEXUS do `min(1, ((A+B)×1,3)/(A+B+C+D))` i zachowano zwykłe opodatkowanie części dochodu IP nieobjętej preferencją.
+- Dodano ścisłą walidację typów, kompletności danych i dowodów. Braki nie są zamieniane na korzystne wartości domyślne; wynik zatrzymuje się lub wymaga review.
+- Zakodowano reguły podatkowe dla lat 2019–2026, w tym historyczne skale, IKZE, składkę zdrowotną, B+R oraz termomodernizację.
+- Dodano audyt źródłowej KPiR, uzgodnienie ewidencji i zeznania oraz `correction_preview` pokazujący skutki korekty bez odblokowania niepewnego wyniku.
+- Uporządkowano obsługę walut, kursów NBP, zaokrągleń do grosza, wieloprojektowości i wielu kwalifikowanych praw IP.
+- Wprowadzono reprodukowalne `calculation_meta`, `engine_source_hash`, fingerprinty requestów i ściśle walidowane manifesty VCR.
+- Rozszerzono benchmark do 46 syntetycznych scenariuszy uruchamianych na siedmiu rodzinach modeli — łącznie 322 kasety — z pełnym playbackiem offline.
+- Zabezpieczono płatne nagrywanie przez jawne potwierdzenie, obowiązkowe limity kosztów i niezmienny rejestr każdej naliczonej, odrzuconej próby.
+- Standardowy CI waliduje formatowanie, lint, kompilację, testy, coverage, politykę kaset i playback na Pythonie 3.11–3.13 bez wykonywania płatnych requestów.
+- Dane regresyjne i przykłady zostały zastąpione danymi syntetycznymi.
 
-### Changed
+### Zmiany kontraktu
 
-- Standardowy CI jest bezpłatny w zakresie requestów i działa na Pythonie 3.11–3.13; na Pythonie 3.13 wymaga kompletnej commitowanej macierzy i wykonuje playback offline.
-- Provider-specific ograniczenie schema jest obsługiwane wyłącznie w adapterze transportowym; źródłem prawdy pozostaje pełna lokalna schema.
-- Roczna metoda przychodowa odracza `MIX` do finalnego true-up.
-- Polityka W musi opisywać znaczenie procentu faktury względem godzin NIE-IP, zamiast zakładać jeden wzór dla wszystkich umów.
-- Polityka z interpretacji KIS wymaga identyfikatora źródła, jest oznaczana do przeglądu, a jej faktyczne wdrożenie jest porównywane z ewidencją.
-- `strata_NIE_z_lat_poprzednich` pomniejsza zwykły dochód działalności, który obejmuje również część IP poza preferencją.
-- Pole zgodnościowe `podstawa_NIE` oznacza całą podstawę zwykłej stawki, nie wyłącznie przychody oznaczone jako NIE-IP.
-- Działalność liniowa z dodatkowymi dochodami skali wymaga osobnej kaskady dla osobnego zeznania.
-- Kalkulator multi-IP wspiera podział wspólnych kosztów, ale nie udaje pełnej ewidencji PIT/IP per IP.
-- Każda zmiana autorytatywnego algorytmu, scenariusza, requestu, profilu modelu lub schema unieważnia odpowiednie fingerprinty i wymaga ponownego nagrania.
+- Pełny przebieg przyjmuje znormalizowany YAML/dict. Import surowych PDF, XLSX, KPiR i formularzy PIT pozostaje osobną warstwą poza zakresem wersji 0.2.
+- Koszt bez jawnej klasyfikacji i dowodu nie staje się automatycznie kosztem IP.
+- `STOP` zeruje finalne liczby i klasyfikacje; `REVIEW` sygnalizuje niepewność bez udawania wyniku finalnego.
+- Zmiana kodu, scenariusza, schemy lub requestu może unieważnić kasety. Najpierw należy wykonać bezpłatne odświeżenie metadanych i playback; płatnie nagrywa się wyłącznie faktycznie nieaktualne kasety.
 
-### Removed
+## 0.1 — wydanie początkowe
 
-- Wpływ `meta.expected_reviews` na prawdę oracle.
-- Pełny raport finansowy w odpowiedzi LLM.
-- Pełna mapa aktywnych i nieaktywnych faktów w promptcie modelu.
-- Transformacja listy aktywnych kodów do kanałów przez model.
-- Historyczne, częściowe i semantycznie niepoprawne kasety poprzednich kontraktów.
-- VCR auto, nadpisywanie `--force`, aliasy Gemini i live fallback z playbacku.
-- Założenie, że jedyny poprawny wzór W to iloczyn czasu i procentu faktury.
+Pierwsza wersja była operacyjnym wizardem Markdown przeznaczonym do pracy z agentem AI podczas przygotowania rozliczenia IP Box programisty B2B.
+
+### Zakres wydania
+
+- Wielofazowa instrukcja `ipbox_algorytm.md` prowadząca od kwalifikacji prawa i zebrania danych do obliczeń, kontroli i przygotowania danych do formularza.
+- Pomocniczy kalkulator Python dla współczynnika `W`, NEXUS, podstaw podatku, ulg i kontroli matematycznych.
+- Obsługa podstawowych przypadków JDG na podatku liniowym i skali, kosztów IP/MIX/NIE, składek ZUS, ulg, faktur walutowych i różnic kursowych.
+- Przykładowe prompty, struktura danych wejściowych oraz instrukcja użycia projektu z popularnymi modelami językowymi.
+- Początkowy zestaw testów jednostkowych i scenariuszy LLM/VCR chroniących najważniejsze obliczenia.
+
+### Ograniczenia wydania
+
+- Agent mógł uczestniczyć w interpretacji i arytmetyce, dlatego poprawność zależała w większym stopniu od modelu i ręcznej kontroli.
+- Warstwy przychodu, `W`, `MIX` i NEXUS nie były jeszcze wystarczająco rozdzielone.
+- Walidacja danych, odtwarzalność i procedura wydania były znacznie słabsze niż w wersji 0.2.
