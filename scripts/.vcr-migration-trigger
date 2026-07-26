@@ -1,1 +1,1 @@
-Run the final VCR migration with early-validation tests aligned; the job removes this marker before publishing.
+Publish only verified durable VCR files; workflow scaffolding is cleaned separately after the bot push.
