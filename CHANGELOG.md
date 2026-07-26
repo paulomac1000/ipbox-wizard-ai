@@ -48,6 +48,9 @@
 
 ### Fixed
 
+- Lokalny pełny i pojedynczy recorder wymaga osobnego `LLM_PAID_RUN_CONFIRMATION=RUN_PAID_BENCHMARK` ustawionego jawnie w środowisku bieżącego procesu.
+- Naliczona odpowiedź HTTP 200 z pustą albo odrzuconą treścią zachowuje metadane kosztu i trafia do niezmiennego rejestru odrzuceń.
+- `rounding_steps` przyjmuje wyłącznie rzeczywisty dodatni `int`; booleany, stringi i ułamkowe floaty nie poszerzają tolerancji bilansu.
 - Płatny recorder wymaga jednocześnie skończonego, ściśle dodatniego limitu per model i limitu całej sesji przed pierwszym requestem.
 - Każda odrzucona płatna próba jest zapisywana jako osobny, niezmienny plik i pozostaje w sumie kosztów sesji.
 - `record_all_models.sh` respektuje `VCR_REJECTED_ROOT` z lokalnego `.env`, zachowując pierwszeństwo jawnych zmiennych procesu i ścieżki zawierające spacje.
