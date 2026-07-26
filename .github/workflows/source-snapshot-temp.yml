@@ -1,0 +1,28 @@
+name: Source snapshot temporary
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Create source archive
+        run: |
+          set -euo pipefail
+          tar --exclude=.git --exclude=.venv --exclude='**/__pycache__' -czf /tmp/ipbox-source.tar.gz .
+      - name: Upload source archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: source-snapshot-${{ github.sha }}
+          path: /tmp/ipbox-source.tar.gz
+          if-no-files-found: error
+          retention-days: 1
