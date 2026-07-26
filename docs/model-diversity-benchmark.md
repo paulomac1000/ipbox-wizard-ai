@@ -28,7 +28,7 @@ Model trafia do macierzy, gdy na dzień 19 lipca 2026 r.:
 | MiniMax | `minimax/minimax-m2.5` | `json_object`; pełna schema jest nadal egzekwowana lokalnie |
 | Moonshot Kimi | `moonshotai/kimi-k2.5` | strict `json_schema` |
 | Qwen | `qwen/qwen3.5-flash-02-23` | strict `json_schema` |
-| Mistral | `mistralai/ministral-3b-2512` | strict `json_schema` |
+| Mistral | `mistralai/mistral-small-24b-instruct-2501` | strict `json_schema` |
 
 Łącznie wydanie wymaga **322 kaset** i siedmiu manifestów. Każdy model musi osiągnąć 46/46. Wynik częściowy jest wyłącznie diagnostyką.
 
@@ -57,7 +57,7 @@ Ceny są informacyjne, za milion tokenów wejścia/wyjścia, według katalogu Op
 | Kimi K2.5 | 0,375 | 2,025 |
 | GLM 4.7 Flash | 0,06 | 0,40 |
 | Qwen 3.5 Flash | 0,065 | 0,26 |
-| Ministral 3B | 0,10 | 0,10 |
+| Mistral Small 24B | 0,20 | 0,30 |
 
 GPT-5 Nano i GLM pozostają w tabeli historycznej ceny, ale nie należą do wykonywalnej macierzy. Jedynym źródłem listy modeli jest `tests/llm/models.py`.
 

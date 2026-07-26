@@ -99,7 +99,7 @@ Wykonywalna lista znajduje się wyłącznie w `tests/llm/models.py`.
 | `minimax/minimax-m2.5` | `json_object` | routing DigitalOcean zwracał `content: null` dla `json_schema`; lokalna schema nadal jest pełna |
 | `moonshotai/kimi-k2.5` | `json_schema` | — |
 | `qwen/qwen3.5-flash-02-23` | `json_schema` | — |
-| `mistralai/ministral-3b-2512` | `json_schema` | — |
+| `mistralai/mistral-small-24b-instruct-2501` | `json_schema` | — |
 
 Adapter zmienia wyłącznie transport. Parser, `DECISION_JSON_SCHEMA`, output schema i evaluator są wspólne dla wszystkich modeli.
 

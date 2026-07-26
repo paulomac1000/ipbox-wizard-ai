@@ -70,9 +70,9 @@ MODEL_PROFILES: dict[str, ModelProfile] = {
         family="Qwen",
         temperature=0.0,
     ),
-    "mistralai/ministral-3b-2512": ModelProfile(
-        model_id="mistralai/ministral-3b-2512",
-        label="Mistral Ministral 3B",
+    "mistralai/mistral-small-24b-instruct-2501": ModelProfile(
+        model_id="mistralai/mistral-small-24b-instruct-2501",
+        label="Mistral Small 24B 2501",
         family="Mistral",
         temperature=0.0,
     ),

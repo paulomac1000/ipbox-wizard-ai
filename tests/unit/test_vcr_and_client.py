@@ -87,7 +87,7 @@ def test_model_profiles_cover_seven_distinct_families() -> None:
         "minimax/minimax-m2.5",
         "moonshotai/kimi-k2.5",
         "qwen/qwen3.5-flash-02-23",
-        "mistralai/ministral-3b-2512",
+        "mistralai/mistral-small-24b-instruct-2501",
     )
     assert len({get_model_profile(model).family for model in BENCHMARK_MODELS}) == 7
     json_object_models = {

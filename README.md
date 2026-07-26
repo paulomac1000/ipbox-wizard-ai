@@ -81,7 +81,7 @@ Benchmark używa siedmiu modeli z siedmiu niezależnych rodzin:
 | MiniMax | `minimax/minimax-m2.5` | `json_object` z pełną lokalną schema, ponieważ routing DigitalOcean zwracał `content: null` dla `json_schema` |
 | Moonshot Kimi | `moonshotai/kimi-k2.5` | strict `json_schema` |
 | Qwen | `qwen/qwen3.5-flash-02-23` | strict `json_schema` |
-| Mistral | `mistralai/ministral-3b-2512` | strict `json_schema` |
+| Mistral | `mistralai/mistral-small-24b-instruct-2501` | strict `json_schema` |
 
 To jest **test przenośności protokołu**, nie dowód poprawności podatkowej i nie matematyczna gwarancja zachowania każdego mocniejszego modelu. Jeżeli małe modele różnych dostawców przechodzą identyczny lokalny kontrakt bez naprawiania odpowiedzi, rośnie wiarygodność, że interfejs jest jednoznaczny i niezależny od jednej rodziny. Prawdą podatkową nadal pozostają Python, oracle i testy deterministyczne.
 
