@@ -27,6 +27,7 @@ class LLMResponse:
     completion_tokens: int | None
     total_tokens: int | None
     cost: float | None
+    provider_error: str | None = None
 
 
 class LLMClient:
@@ -59,10 +60,24 @@ class LLMClient:
             raise ValueError("OpenRouter returned no choices")
         choice = choices[0]
         message = choice.get("message") or {}
-        content = message.get("content")
-        if not isinstance(content, str) or not content.strip():
-            refusal = message.get("refusal")
-            raise ValueError(f"LLM returned empty content; refusal={refusal!r}")
+        raw_content = message.get("content")
+        refusal = message.get("refusal")
+        provider_error: str | None = None
+        if isinstance(raw_content, str):
+            content = raw_content
+            if not content.strip():
+                provider_error = (
+                    f"empty content; refusal={refusal!r}"
+                    if refusal is not None
+                    else "empty content"
+                )
+        else:
+            content = ""
+            provider_error = (
+                f"non-string content; refusal={refusal!r}"
+                if refusal is not None
+                else f"non-string content: {type(raw_content).__name__}"
+            )
         usage = data.get("usage") or {}
         return LLMResponse(
             content=content,
@@ -76,6 +91,7 @@ class LLMClient:
             completion_tokens=usage.get("completion_tokens"),
             total_tokens=usage.get("total_tokens"),
             cost=usage.get("cost"),
+            provider_error=provider_error,
         )
 
     @staticmethod
