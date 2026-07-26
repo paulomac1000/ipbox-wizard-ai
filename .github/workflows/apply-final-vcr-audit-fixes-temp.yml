@@ -98,6 +98,7 @@ jobs:
           text = text.replace(strict_block, generic_block, 1)
           cassette.write_text(text, encoding="utf-8")
           PY
+          rm -f scripts/.vcr-migration-trigger
           rm scripts/apply_final_vcr_audit_fixes.py
           rm .github/workflows/apply-final-vcr-audit-fixes-temp.yml
 
