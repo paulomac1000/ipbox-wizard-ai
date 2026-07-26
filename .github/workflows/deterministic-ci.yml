@@ -112,14 +112,23 @@ jobs:
           unset OPENROUTER_API_KEY || true
           ./scripts/verify_all_models.sh
 
-      - name: Publish verified fixes
+      - name: Publish verified durable files
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
+          git reset -- \
+            .github/workflows/deterministic-ci.yml \
+            .github/workflows/llm-benchmark.yml \
+            .github/workflows/apply-final-vcr-audit-fixes-temp.yml \
+            .github/workflows/run-final-vcr-migration-temp.yml \
+            scripts/.vcr-migration-trigger \
+            scripts/apply_final_vcr_audit_fixes.py \
+            scripts/final_vcr_postpatch.py \
+            scripts/deterministic-ci.original.yml || true
           if git diff --cached --quiet; then
-            echo "No changes to publish"
+            echo "No durable changes to publish"
             exit 0
           fi
           git commit -m "fix: make VCR metadata content-addressed and reproducible"
