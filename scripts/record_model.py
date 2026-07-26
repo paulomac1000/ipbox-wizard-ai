@@ -205,7 +205,6 @@ def main() -> int:
         help="Required positive whole-session paid-cost guard across all models.",
     )
     args = parser.parse_args()
-    _require_paid_confirmation(parser)
     load_local_env()
     get_model_profile(args.model)
 
@@ -284,6 +283,10 @@ def main() -> int:
             failures.append(path.stem)
             break
 
+        # Existing cassettes may be validated offline without acknowledgement.
+        # Require a fresh process-level decision immediately before any missing
+        # cassette can lead to a paid provider request.
+        _require_paid_confirmation(parser)
         model_paid = paid_cost_since(
             CASSETTE_ROOT,
             rejected_root,
