@@ -1,1 +1,1 @@
-Start the syntax-valid registered VCR migration job once; the job removes this marker before publishing.
+Rerun the registered VCR migration with unit diagnostics; the job removes this marker before publishing.
