@@ -20,7 +20,7 @@ on:
           - "minimax/minimax-m2.5"
           - "moonshotai/kimi-k2.5"
           - "qwen/qwen3.5-flash-02-23"
-          - "mistralai/ministral-3b-2512"
+          - "mistralai/mistral-small-24b-instruct-2501"
       max-cost-per-model-usd:
         description: "Per-model paid-cost guard in USD (0 disables it)"
         required: true
