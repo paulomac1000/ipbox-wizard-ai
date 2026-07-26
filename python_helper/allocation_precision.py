@@ -32,6 +32,12 @@ def _positive(name: str, value: float | int | Decimal) -> Decimal:
     return result
 
 
+def _positive_integer(name: str, value: object) -> int:
+    if type(value) is not int or value < 1:
+        raise ValueError(f"{name} must be a positive integer")
+    return value
+
+
 def _first(record: Mapping[str, Any], *names: str) -> Any | None:
     for name in names:
         if name in record and record[name] is not None:
@@ -146,7 +152,7 @@ def audit_revenue_allocation(
                 record.get("reported_non_ip_revenue", total - ip),
             )
         )
-        rounding_steps = int(record.get("rounding_steps", 1))
+        rounding_steps = _positive_integer("rounding_steps", record.get("rounding_steps", 1))
         split_allowed = amount_tolerance(total, base=base, rounding_steps=rounding_steps)
         if abs(ip + non - total) > split_allowed:
             findings.append(
