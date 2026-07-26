@@ -51,6 +51,30 @@ jobs:
           ruff format --check .
           ruff check .
 
+      - name: Remove legacy numeric cassette markers before canonical refresh
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          import yaml
+
+          root = Path("tests/llm/vcr/cassettes")
+          changed = 0
+          for path in sorted(root.glob("*/*.yaml")):
+              if path.name == "_manifest.yaml":
+                  continue
+              payload = yaml.safe_load(path.read_text(encoding="utf-8"))
+              if not isinstance(payload, dict) or not isinstance(payload.get("meta"), dict):
+                  raise SystemExit(f"invalid cassette structure before refresh: {path}")
+              if payload["meta"].pop("cassette_format_version", None) is not None:
+                  path.write_text(
+                      yaml.safe_dump(payload, allow_unicode=True, sort_keys=False, width=120),
+                      encoding="utf-8",
+                  )
+                  changed += 1
+          print(f"Removed legacy numeric marker from {changed} cassette(s)")
+          PY
+
       - name: Refresh cassette metadata without API calls
         env:
           OPENROUTER_API_KEY: ""
