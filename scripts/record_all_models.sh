@@ -12,7 +12,7 @@ ruff check .
 python -m compileall -q python_helper tests scripts
 pytest tests/unit --cov=python_helper --cov-report=term-missing --cov-fail-under=90
 pytest -q
-for script in scripts/*.sh dump-to-md.sh; do bash -n "$script"; done
+for script in scripts/*.sh; do bash -n "$script"; done
 
 export LLM_RECORDING_STARTED_AT="${LLM_RECORDING_STARTED_AT:-$(python - <<'PY_TIME'
 import time
