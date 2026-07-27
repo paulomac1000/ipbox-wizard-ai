@@ -1,91 +1,101 @@
 # AGENTS.md
 
-Ten plik jest punktem wejścia dla agenta pracującego w repozytorium. Po jego przeczytaniu agent powinien rozumieć, co projekt robi, gdzie znajduje się logika, jak wprowadzać zmiany i jak uniknąć naruszenia kontraktu podatkowego lub VCR.
+Instrukcja dla agentów pracujących z repozytorium `ipbox-wizard-ai`.
 
-## Misja
+Najpierw ustal, **w jakim trybie pracujesz**. Ten sam projekt może służyć do analizy dokumentów podatnika albo do rozwijania kodu. Nie mieszaj tych zadań.
 
-Utrzymuj audytowalne, fail-closed narzędzie wspierające przygotowanie danych do rozliczenia IP Box programisty B2B.
+## Tryb 1: analiza rozliczenia użytkownika
 
-Projekt nie jest poradą podatkową ani generatorem gotowego zeznania. Wynik musi zostać zweryfikowany przez księgową lub doradcę podatkowego.
+Wybierz ten tryb, gdy użytkownik przekazał dokumenty, archiwum ZIP lub link do repozytorium i chce przygotować albo sprawdzić rozliczenie IP Box.
 
-## Pierwsze 5 minut
+W tym trybie:
+
+1. Przeczytaj `README.md` i `ipbox_algorytm.md`.
+2. Zinwentaryzuj wszystkie dokumenty użytkownika.
+3. Samodzielnie odczytaj PDF, XLSX, CSV i inne załączniki.
+4. Przy każdej ważnej wartości wskaż dokument, stronę, arkusz albo wiersz źródłowy.
+5. Pokaż użytkownikowi wyekstrahowane dane przed finalnym obliczeniem.
+6. Zapytaj o braki. Brak danych nie jest zerem ani korzystnym założeniem.
+7. Przygotuj znormalizowane dane robocze wewnętrznie — użytkownik nie musi pisać YAML-a.
+8. Wykonaj krytyczne obliczenia kodem z `python_helper/`, nie w pamięci modelu.
+9. Porównaj wynik z KPiR, ewidencją IP Box i formularzami PIT.
+10. Oddziel:
+    - błąd dokumentu lub rozliczenia;
+    - brak danych;
+    - obszar wymagający decyzji podatkowej;
+    - możliwy błąd algorytmu.
+11. Nie zmieniaj kodu, nie twórz commitów i nie modyfikuj testów, chyba że użytkownik wyraźnie zleci rozwój projektu.
+12. Nie zapisuj prywatnych dokumentów ani danych podatnika w repozytorium.
+
+Jeżeli odkryjesz możliwy błąd algorytmu, opisz minimalny syntetyczny przypadek odtwarzający. Nie kopiuj rzeczywistych danych podatnika do testów.
+
+## Tryb 2: rozwój kodu w Codex, Claude Code lub podobnym narzędziu
+
+Wybierz ten tryb wyłącznie wtedy, gdy użytkownik wyraźnie prosi o zmianę kodu, testów, dokumentacji albo infrastruktury projektu.
+
+### Pierwsze 5 minut
 
 Przeczytaj w tej kolejności:
 
-1. `README.md` — cel, zakres i uruchomienie projektu.
-2. `AGENTS.md` — zasady pracy i architektura.
-3. `ipbox_algorytm.md` — domenowy kontrakt oraz kolejność decyzji.
-4. Pliki związane z aktualnym zadaniem.
-5. Odpowiadające im testy jednostkowe i scenariusze LLM.
+1. `README.md` — produkt, sposoby użycia i granice wejścia.
+2. `AGENTS.md` — zasady pracy z kodem.
+3. `ipbox_algorytm.md` — domenowy kontrakt i kolejność decyzji.
+4. Pliki związane z zadaniem.
+5. Odpowiadające im testy jednostkowe i scenariusze.
 
-Następnie uruchom przynajmniej test celowany. Przed zakończeniem pracy uruchom pełną bramkę jakości z tego dokumentu.
+Następnie:
 
-## Co robi projekt
+1. sprawdź bieżący branch i SHA;
+2. uruchom test celowany;
+3. odtwórz problem testem regresyjnym;
+4. dopiero potem zmień implementację;
+5. przed zakończeniem uruchom pełną bramkę jakości.
 
-Wejściem jest znormalizowany YAML/dict opisujący rok, formę opodatkowania, kompletność źródeł, faktury, czas pracy, koszty, dowody i ulgi.
+## Misja projektu
 
-Wyjściem jest deterministyczny raport zawierający między innymi:
+Utrzymuj audytowalne, fail-closed narzędzie wspierające przygotowanie i kontrolę danych do rozliczenia IP Box programisty B2B.
 
-- przychody IP i NIE;
-- miesięczny współczynnik `W`;
-- koszty IP, NIE, MIX i WYKLUCZONE;
-- alokację MIX z zachowaniem groszy;
-- koszyki A/B/C/D i NEXUS;
-- dochód kwalifikowany i część opodatkowaną zwykłą stawką;
-- podatek oraz wykorzystanie ulg;
-- TEST 1–9, STOP, REVIEW i ostrzeżenia;
-- audyt źródłowej KPiR i podgląd korekty;
-- metadane odtwarzalności.
+Projekt nie jest poradą podatkową ani generatorem gotowego zeznania. Wynik musi zostać zweryfikowany przez księgową albo doradcę podatkowego.
 
-Repozytorium nie zawiera kompletnego importera surowych PDF, XLSX, KPiR ani PIT. Błędna ekstrakcja danych wejściowych nie może być „naprawiana” domysłami kalkulatora.
+## Granica wejścia
+
+Kod przyjmuje znormalizowany YAML/dict. Repozytorium nie zawiera kompletnego, uniwersalnego importera surowych PDF, XLSX, KPiR ani PIT.
+
+W trybie rozmowy ekstrakcję wykonuje agent. W trybie programistycznym nie zakładaj, że kalkulator naprawi błędnie odczytane dane. Warstwa ekstrakcji musi zachować jawne fakty źródłowe, między innymi:
+
+- rok i formę opodatkowania;
+- kwalifikację prawa i faktury;
+- przychód IP/NIE;
+- czas pracy i semantykę `W`;
+- `KUP`, koszyk kosztu i informację, czy pozycja pozostała w KPiR;
+- metodę i źródło alokacji MIX;
+- dowody NEXUS;
+- ZUS, zdrowotną, ulgi, straty i zaliczki.
 
 ## Topologia projektu
 
 | Obszar | Odpowiedzialność |
 |---|---|
-| `ipbox_algorytm.md` | domenowy kontrakt, kolejność faz, STOP/REVIEW i granice zakresu |
-| `python_helper/ipbox_calculator.py` | podstawowe obliczenia W, MIX, NEXUS, dochodu i rozliczenia |
-| `python_helper/tax_year_rules.py` | reguły i limity przypisane do lat 2019–2026 |
+| `README.md` | główny punkt wejścia dla użytkownika |
+| `ipbox_algorytm.md` | domenowy kontrakt i kolejność decyzji |
+| `python_helper/ipbox_calculator.py` | podstawowe obliczenia W, kosztów, NEXUS i rozliczenia |
+| `python_helper/tax_year_rules.py` | reguły i limity roczne 2019–2026 |
 | `python_helper/tax_cascade.py` | kanoniczna kaskada podatku i ulg |
 | `python_helper/allocation_audit.py` | audyt przychodu i współczynnika W |
-| `python_helper/cost_audit.py` | klasyfikacja kosztów, dowody i audyt KPiR |
-| `python_helper/report_metadata.py` | hash wejścia, źródła reguł i `engine_source_hash` |
-| `tests/llm/oracle.py` | kanoniczny referencyjny przebieg pełnego raportu |
-| `tests/llm/oracle_legacy.py` | aktywna baza zgodności pod wrapperem; nie dodawaj tu nowych reguł |
-| `tests/llm/output_schema.py` | kanoniczny kontrakt raportu |
-| `tests/llm/output_schema_legacy.py` | aktywna baza zgodności do osobnej migracji |
+| `python_helper/cost_audit.py` | KUP, alokacja, dowody NEXUS i audyt KPiR |
+| `python_helper/report_metadata.py` | hash wejścia, źródła reguł i tożsamość silnika |
+| `tests/llm/oracle.py` | kanoniczny przebieg pełnego raportu |
+| `tests/llm/oracle_legacy.py` | aktywna baza zgodności; nie dodawaj tu nowych reguł |
+| `tests/llm/output_schema.py` | kontrakt raportu |
 | `tests/llm/scenarios/` | syntetyczne przypadki biznesowe |
-| `tests/unit/` | wykonywalna specyfikacja zachowania |
-| `tests/llm/evaluator.py` | semantyczne porównanie raportu i odpowiedzi modelu |
-| `tests/llm/vcr/` | fingerprint, nagrywanie, playback, kasety i manifesty |
-| `scripts/` | bramki jakości, raport benchmarku i bezpieczne nagrywanie |
+| `tests/unit/` | wykonywalna specyfikacja i regresje |
+| `tests/llm/evaluator.py` | semantyczna walidacja odpowiedzi modelu |
+| `tests/llm/vcr/` | fingerprinty, kasety, manifesty i playback |
 | `docs/testing.md` | pełna procedura testów i wydania |
 
 Nie używaj numerowanych nazw modułów ani funkcji. Aktualna implementacja ma nazwę kanoniczną, a zachowana baza zgodności jawny sufiks `_legacy`.
 
-## Przepływ danych
-
-```text
-znormalizowany YAML/dict
-        ↓
-walidacja typów, kompletności i dowodów
-        ↓
-python_helper: W, przychód, MIX, NEXUS, reguły roku, ulgi, podatek
-        ↓
-tests/llm/oracle.py: autorytatywny raport + decision_facts
-        ↓
-expected_decision: status / stops / reviews
-        ↓
-LLM kopiuje wyłącznie ograniczoną decyzję protokołu
-        ↓
-evaluator + strict JSON Schema
-        ↓
-VCR zapisuje albo odtwarza zweryfikowaną odpowiedź
-```
-
-**Python jest źródłem prawdy. LLM nie liczy podatku, nie ustala klasyfikacji i nie widzi nazw predykatów podatkowych.**
-
-## Hierarchia źródeł prawdy
+## Źródła prawdy
 
 1. `ipbox_algorytm.md` — znaczenie biznesowe i granice procesu.
 2. `python_helper/**/*.py` — deterministyczna implementacja.
@@ -94,113 +104,91 @@ VCR zapisuje albo odtwarza zweryfikowaną odpowiedź
 5. `tests/llm/scenarios/` — przykłady biznesowe i regresje.
 6. Dokumentacja pomocnicza.
 
-Sprzeczność między źródłami jest błędem. Nie wybieraj wygodniejszej wersji. Ustal prawidłowy kontrakt, popraw implementację i testy razem.
+Sprzeczność między źródłami jest błędem. Nie wybieraj wygodniejszej wersji. Ustal prawidłowy kontrakt, a następnie popraw implementację, testy i dokumentację razem.
+
+## Najważniejsze invarianty domenowe
+
+### Przychód, W, MIX i NEXUS
+
+- kwalifikacja przychodu, podział IP/NIE, `W`, alokacja MIX i NEXUS są niezależnymi decyzjami;
+- `W` nie jest automatycznym ani uniwersalnym kluczem kosztów MIX;
+- koszt `KUP: false` trafia do `WYKLUCZONE`, z kwotami IP, NIE i NEXUS równymi zero;
+- opis kosztu może wywołać review, ale nie ustala samodzielnie KUP ani koszyka;
+- koszt obniżający dochód IP nie staje się automatycznie NEXUS A/B/C/D;
+- `allocation_source` i `nexus_evidence` są odrębnymi dowodami;
+- NEXUS = `min(1, ((A+B)×1,3)/(A+B+C+D))`;
+- `A=B=C=D=0` oznacza NEXUS `0`;
+- część dochodu IP poza preferencją trafia do zwykłej podstawy;
+- alokacje zachowują każdy grosz i jawną politykę zaokrąglania.
+
+### Fail-closed i kompletność
+
+- brak danych nie jest zerem ani korzystnym `true`;
+- rok i flagi kwalifikacji mają ścisłe typy;
+- pola liczbowe odrzucają booleany, tekst i wartości nieskończone;
+- `STOP_03` wymaga jawnie potwierdzonej kompletności źródeł;
+- dodatnie odliczenie wymaga reguły właściwego roku i dowodu;
+- dodatni lot termomodernizacji wymaga `origin_year` i `evidence_ref`;
+- STOP zeruje finalne liczby i klasyfikacje, ale może pozostawić diagnostykę i bezpieczny podgląd korekty;
+- TEST 1–9 ustala wyłącznie Python.
+
+### LLM i VCR
+
+- Python ustala wynik, `decision_facts`, STOP-y i REVIEW-y;
+- model nie wykonuje krytycznej arytmetyki ani klasyfikacji podatkowej;
+- parser nie naprawia Markdown fences ani brakujących pól;
+- odpowiedź musi przejść pełną lokalną schema i evaluator;
+- playback nigdy nie wykonuje live requestu;
+- recorder nie nadpisuje istniejącej kasety;
+- kaseta powstaje dopiero po schema PASS, semantic PASS i ponownym parsowaniu;
+- `engine_source_hash`, request, scenariusz i harness należą do fingerprintu.
 
 ## Jak wprowadzać zmiany
 
 ### Reguła podatkowa lub limit roczny
 
 1. Zmień `tax_year_rules.py` albo `tax_cascade.py`.
-2. Dodaj test roku granicznego i roku sąsiedniego w `tests/unit/`.
+2. Dodaj test roku granicznego i roku sąsiedniego.
 3. Sprawdź wpływ na oracle i scenariusze.
 4. Odśwież metadane VCR offline.
-5. Nagrywaj kasety tylko wtedy, gdy surowa odpowiedź naprawdę stała się niezgodna.
+5. Nagrywaj tylko odpowiedzi rzeczywiście unieważnione zmianą.
 
 ### Błąd kalkulatora lub alokacji
 
 1. Najpierw dodaj minimalny test odtwarzający błąd.
 2. Popraw kanoniczny moduł w `python_helper/`.
-3. Sprawdź zachowanie na wartościach zerowych, granicznych, ujemnych i błędnych typach.
-4. Zweryfikuj zachowanie do grosza i brak mieszania przychodu, W, MIX oraz NEXUS.
-5. Uruchom regresje oracle i evaluator.
+3. Sprawdź wartości zerowe, graniczne, ujemne i błędne typy.
+4. Zweryfikuj zachowanie do grosza.
+5. Sprawdź, że nie pomieszano przychodu, W, MIX i NEXUS.
+6. Uruchom regresje oracle i evaluator.
 
-### Nowy scenariusz biznesowy
+### Nowy realny przypadek
 
-1. Dodaj syntetyczny YAML w `tests/llm/scenarios/`.
-2. Użyj stabilnego, opisowego `meta.id` zgodnego z nazwą pliku.
-3. Dodaj kompletne dowody i jawne polityki. Nie wymyślaj faktów tylko po to, aby scenariusz przeszedł.
-4. Dodaj odpowiednie asercje oraz test jednostkowy, jeśli odkryto nowy invariant.
-5. Najpierw sprawdź oracle lokalnie, potem playback.
-
-### Zmiana schemy lub protokołu LLM
-
-1. Zmień kanoniczną schemę i evaluator razem.
-2. Nie osłabiaj lokalnej walidacji z powodu ograniczeń providera.
-3. Provider może dostać transportową kopię schemy, ale wynik musi przejść pełną lokalną schemę i semantykę.
-4. Załóż, że zmiana unieważnia wszystkie zależne fingerprinty; potwierdź to narzędziami zamiast edytować kasety ręcznie.
+1. Nie kopiuj danych podatnika do repozytorium.
+2. Zredukuj problem do minimalnego syntetycznego scenariusza.
+3. Dodaj test jednostkowy dla nowego invariantu.
+4. Dodaj scenariusz biznesowy tylko wtedy, gdy wnosi nową ścieżkę procesu.
+5. Zachowaj źródła i uzasadnienia, ale użyj fikcyjnych identyfikatorów i kwot.
 
 ### Dokumentacja
 
-- `README.md` opisuje produkt i pierwszy kontakt.
-- `AGENTS.md` opisuje sposób pracy z kodem.
-- `ipbox_algorytm.md` jest kontraktem domenowym, nie marketingowym opisem.
-- `CHANGELOG.md` zawiera tylko najważniejsze różnice między datowanymi wydaniami.
-- Nie wpisuj do dokumentacji ulotnych liczb testów, chyba że opisujesz konkretną, zamkniętą wersję.
+- `README.md` ma być zrozumiały dla użytkownika wrzucającego pliki do rozmowy;
+- `AGENTS.md` opisuje tryb analizy i tryb pracy z kodem;
+- `ipbox_algorytm.md` jest kontraktem domenowym, nie instrukcją marketingową;
+- szczegóły VCR i wydania należą głównie do `docs/testing.md`;
+- nie wpisuj ulotnych liczb testów poza opisem konkretnego wydania.
 
-## Invarianty domenowe
+## Prywatność
 
-### Przychód, W, MIX i NEXUS
-
-- kwalifikacja przychodu, `W`, alokacja `MIX` i NEXUS są niezależnymi decyzjami;
-- `W` nie jest uniwersalnym kluczem `MIX`;
-- NEXUS = `min(1, ((A+B)×1,3)/(A+B+C+D))`;
-- `A=B=C=D=0` oznacza NEXUS `0`;
-- część dochodu IP nieobjęta preferencją trafia do zwykłej podstawy;
-- koszt bez dowodu wyłączności nie staje się `IP`;
-- `allocation_source` i `nexus_evidence` są odrębnymi dowodami;
-- alokacje zachowują każdy grosz;
-- `rounding_steps` jest prawdziwym dodatnim `int`, nie booleanem, stringiem ani floatem.
-
-### Fail-closed i kompletność
-
-- brak danych nie jest zerem ani korzystnym domyślnym `true`;
-- pola liczbowe odrzucają booleany, stringi i wartości nieskończone;
-- rok i flagi kwalifikacji mają ścisłe typy;
-- `STOP_03` wymaga kompletnego `input.coverage`; brak kompletności daje `PROVISIONAL` i REVIEW;
-- dodatnie odliczenie wymaga zweryfikowanego limitu i dowodu;
-- dodatni lot termomodernizacji wymaga `origin_year` i `evidence_ref`;
-- opis kosztu może utworzyć review, lecz nie ustala samodzielnie KUP, koszyka ani środka trwałego;
-- STOP zeruje finalne liczby i klasyfikacje;
-- TEST 1–9 ustala wyłącznie Python.
-
-### LLM, schema i VCR
-
-- model zwraca wyłącznie `status`, `stops`, `reviews`;
-- parser nie naprawia Markdown fences ani nie dopowiada brakujących pól;
-- kanały STOP i REVIEW są rozdzielone w schemie;
-- `returned_model` musi odpowiadać modelowi żądanemu;
-- odpowiedź wymaga `finish_reason=stop`;
-- playback nigdy nie wykonuje live requestu;
-- recorder nie nadpisuje istniejącej kasety;
-- kaseta powstaje dopiero po schema PASS, semantic PASS i ponownym parsowaniu;
-- `engine_source_hash`, request, scenariusz i harness należą do fingerprintu;
-- nie używaj chwilowego `GITHUB_SHA` jako semantycznej tożsamości raportu.
-
-### Prywatność i koszty
-
-- testy, przykłady i kasety używają danych syntetycznych;
-- nie commituj danych podatnika, dokumentów źródłowych, sekretów ani realnych identyfikatorów;
-- standardowy CI nie może wykonywać płatnych requestów;
-- płatny przebieg wymaga jawnego potwierdzenia i dwóch dodatnich, skończonych limitów;
-- potwierdzenia płatnego przebiegu nie zapisuj w `.env`;
-- każda naliczona odrzucona próba musi pozostać w niezmiennym rejestrze kosztów.
-
-## Debugowanie
-
-| Objaw | Najpierw sprawdź |
-|---|---|
-| test jednostkowy nie przechodzi | czy zmienił się kontrakt roku, typ wejścia, kolejność kaskady lub zaokrąglenie |
-| oracle zwraca inny wynik | walidację wejścia, adapter, klasyfikację kosztów i reguły roku |
-| playback nie przechodzi | fingerprint, request hash, model, `finish_reason`, schema i semantykę |
-| cassette policy nie przechodzi | brakujące lub nadmiarowe pliki, manifest, nazwy scenariuszy i katalogów modeli |
-| benchmark ma brakujące rekordy | `meta.id`, nazwa pliku, kompletność manifestu i dokładny wybór scenariusza |
-| koszt nagrywania jest niepełny | katalog odrzuceń, timestamp sesji i metadane `usage.cost` |
-| CI pada tylko na Pythonie 3.13 | odtwórz lokalnie środowisko 3.13, uruchom pełny playback offline i porównaj pierwszy różniący się krok z jobem CI |
-| wynik jest podejrzanie korzystny | domyślne wartości, brak dowodów, koszty prywatne i błędne mieszanie W z MIX |
-
-Nie „naprawiaj” problemu przez rozszerzenie tolerancji, osłabienie asercji, ręczną edycję kasety albo dodanie `skip`.
+- nie commituj dokumentów podatnika, KPiR, PIT-ów, faktur, umów ani interpretacji;
+- nie umieszczaj realnych danych w testach, kasetach, fixture, logach ani komentarzach;
+- katalog `input/` traktuj jako lokalny i prywatny;
+- raporty robocze z danymi użytkownika nie mogą trafiać do Git;
+- przy opisywaniu błędu używaj danych syntetycznych.
 
 ## Bramka jakości
+
+Najpierw uruchom test celowany. Przed zakończeniem zmiany kodu uruchom:
 
 ```bash
 ruff format --check .
@@ -216,7 +204,7 @@ unset OPENROUTER_API_KEY
 for script in scripts/*.sh dump-to-md.sh; do bash -n "$script"; done
 ```
 
-Najpierw uruchamiaj test celowany, ale nie kończ zadania wyłącznie na nim. Finalny raport musi podać sprawdzony SHA, wykonane polecenia, wyniki testów, coverage i stan VCR.
+Raport końcowy podaje sprawdzony SHA, wykonane polecenia, wyniki testów, coverage i stan VCR.
 
 ## Nagrywanie kaset
 
@@ -230,45 +218,32 @@ unset OPENROUTER_API_KEY
 python scripts/benchmark_report.py
 ```
 
-`benchmark_report.py` musi zostać uruchomiony przed decyzją o płatnym nagrywaniu. Jeżeli zwraca `all_complete_and_valid=true`, nie wykonuj żadnego płatnego requestu.
+Jeżeli `benchmark_report.py` zwraca `all_complete_and_valid=true`, nie wykonuj płatnych requestów.
 
-Nie nagrywaj kaset profilaktycznie. Gdy zmiana requestu albo semantyki rzeczywiście unieważniła konkretną kasetę, usuń wyłącznie tę kasetę i nagraj ją przez `scripts/record_model.py`.
-
-Płatny przebieg wymaga:
-
-```bash
-LLM_PAID_RUN_CONFIRMATION=RUN_PAID_BENCHMARK \
-python scripts/record_model.py \
-  --model <MODEL> \
-  --scenario <EXACT_SCENARIO_ID> \
-  --max-cost-per-model-usd <LIMIT> \
-  --max-total-cost-usd <TOTAL_LIMIT>
-```
-
-Nie używaj `--force`. Nie uruchamiaj całej macierzy, gdy zmieniła się jedna kaseta.
+Nie nagrywaj całej macierzy profilaktycznie. Gdy zmiana rzeczywiście unieważniła konkretną kasetę, usuń wyłącznie ją i nagraj dokładny model oraz scenariusz zgodnie z `docs/testing.md`.
 
 ## Nie wolno
 
 - liczyć krytycznej arytmetyki w modelu zamiast w Pythonie;
 - wymyślać kursów NBP, limitów, dowodów lub kwalifikacji;
 - osłabiać asercji, schemy lub evaluatora pod odpowiedź modelu;
-- ręcznie edytować odpowiedzi, hashy, fingerprintów, kosztów lub timestampów kaset;
-- dodawać korzystnych wartości domyślnych dla kwalifikacji IP;
-- łączyć niejednoznacznych pól, np. `ulga_BR` albo `straty_poprzednie`;
+- ręcznie edytować odpowiedzi, hashy, fingerprintów lub kosztów kaset;
+- dodawać korzystnych wartości domyślnych;
 - włączać live fallbacku w playbacku;
-- deklarować gotowości przy niepełnej macierzy lub czerwonym CI;
-- usuwać aktywnych modułów `_legacy` bez osobnego refaktoru, testów i migracji.
+- deklarować gotowości przy czerwonym CI albo niepełnej macierzy;
+- usuwać aktywnych modułów `_legacy` bez osobnego refaktoru i migracji;
+- zmieniać kod podczas zwykłej analizy dokumentów bez wyraźnego polecenia użytkownika.
 
 ## Definition of Done
 
 Zmiana jest gotowa, gdy:
 
-1. zachowanie jest opisane przez test regresyjny;
+1. zachowanie jest opisane testem regresyjnym;
 2. źródła prawdy są spójne;
 3. bramka jakości przechodzi;
 4. coverage pozostaje co najmniej 90%;
 5. VCR jest kompletny, aktualny i odtwarza się bez sekretu;
 6. nie wykonano nieuzasadnionych płatnych requestów;
-7. dokumentacja i changelog są zaktualizowane, jeżeli zmienił się kontrakt użytkownika;
+7. dokumentacja odzwierciedla aktualny sposób użycia;
 8. repozytorium nie zawiera danych podatnika ani sekretów;
-9. raport końcowy jasno rozróżnia to, co sprawdzono, od tego, czego nie można było zweryfikować.
+9. raport końcowy jasno rozróżnia to, co sprawdzono, od tego, czego nie zweryfikowano.
