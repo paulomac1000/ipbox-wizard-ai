@@ -257,7 +257,7 @@ Scenariusz jest twardą granicą jakości: po dodaniu poprawnego testu algorytm 
 
 ### VCR i test przenośności między rodzinami AI
 
-Każdy z 46 scenariuszy został zweryfikowany na siedmiu niezależnych rodzinach modeli:
+Każdy z 46 scenariuszy został zweryfikowany na siedmiu rodzinach modeli objętych aktualnym wydaniem:
 
 - Google Gemini;
 - Anthropic Claude;
@@ -268,6 +268,8 @@ Każdy z 46 scenariuszy został zweryfikowany na siedmiu niezależnych rodzinach
 - Mistral.
 
 Łącznie repozytorium utrzymuje **322 zweryfikowane kasety VCR**. Testy celowo używają mniejszych lub kosztowo oszczędnych modeli reprezentujących każdą rodzinę. Sprawdzają, czy kontrakt jest na tyle jednoznaczny, że różne architektury potrafią zwrócić ten sam ograniczony wynik bez zmiany matematyki ustalonej przez Python.
+
+Aktualna macierz nie obejmuje jeszcze rodziny OpenAI. Dodanie GPT-5 mini jest planowane jako osobna zmiana wymagająca rozszerzenia konfiguracji, manifestu i kompletu kaset; do tego czasu README nie przypisuje tej rodzinie potwierdzonego pokrycia.
 
 To jest dowód przenośności protokołu i przewidywalności integracji, a nie obietnica, że każdy model zawsze poprawnie odczyta każdy dokument. Mocniejszy model może mieć większy margines na analizę plików i kontekstu, ale nadal musi korzystać z deterministycznego silnika i tych samych kontroli.
 
