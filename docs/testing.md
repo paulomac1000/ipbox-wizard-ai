@@ -42,8 +42,9 @@ Stan referencyjny:
 - wszystkie testy jednostkowe PASS; dokładną liczbę raportuje CI;
 - coverage `python_helper` powyżej wymaganego progu 90%;
 - pełny suite: wszystkie bezpłatne testy PASS i kontrolowane skipy LLM;
-- pusty katalog kaset jest dozwolony wyłącznie w początkowym rozwoju, ale nie spełnia merge gate;
-- po dodaniu GPT-5 Mini częściowa macierz 7 × 46 również nie spełnia merge gate.
+- kompletna macierz: 8 rodzin × 46 scenariuszy = 368 kaset i osiem manifestów;
+- każdy model ma 46/46, a pełny playback przechodzi offline;
+- pusty, częściowy albo nieaktualny katalog kaset nie spełnia merge gate.
 
 Standardowy workflow na Pythonie 3.13 dodatkowo uruchamia:
 
@@ -53,7 +54,7 @@ unset OPENROUTER_API_KEY
 ./scripts/verify_all_models.sh
 ```
 
-Dlatego PR z pustą, częściową albo nieaktualną macierzą nie może mieć zielonej bramki wydania.
+PR z pustą, częściową albo nieaktualną macierzą nie może mieć zielonej bramki wydania.
 
 ## 3. Testy semantyczne, które muszą pozostać
 
@@ -72,10 +73,12 @@ Szczególnie chronione regresje:
 - schema odrzuca kod REVIEW w `stops`, kod STOP w `reviews` i duplikaty;
 - dokumentacja kontraktu nie może opisywać starszego protokołu;
 - provider adapter nie mutuje ani nie osłabia lokalnej strict schema;
+- adapter GPT-5 Mini usuwa `uniqueItems` wyłącznie z kopii transportowej, a lokalna schema nadal wymaga unikalności;
 - playback nie wywołuje sieci i odrzuca `finish_reason` inny niż `stop`;
 - live run, playback i pre-commit odrzucają substytucję modelu;
 - pre-commit porównuje zapisane `parsed_response` z ponownym parsowaniem;
 - tryb record nie nadpisuje istniejącej kasety;
+- recorder respektuje `VCR_CASSETTES_ROOT` z procesu i bezpiecznie wczytanego `.env`;
 - miesiące muszą odpowiadać `input.rok`, a termomodernizacja nie przekracza 53 000 zł;
 - jawna semantyka W odróżnia iloczyn warunkowy, rozłączne składniki i sam czas;
 - podwójny procent faktury oraz nieudokumentowana zmiana metody w roku aktywują STOP;
@@ -105,7 +108,7 @@ Wykonywalna lista znajduje się wyłącznie w `tests/llm/models.py`.
 | `moonshotai/kimi-k2.5` | `json_schema` | — |
 | `qwen/qwen3.5-flash-02-23` | `json_schema` | — |
 | `mistralai/mistral-small-24b-instruct-2501` | `json_schema` | — |
-| `openai/gpt-5-mini` | `json_schema`, `reasoning.effort=minimal`, bez temperatury | wspólna strict schema; brak osobnego adaptera scenariuszowego |
+| `openai/gpt-5-mini` | `json_schema` bez `uniqueItems`, `reasoning.effort=minimal`, bez temperatury | endpoint OpenAI odrzuca `uniqueItems` w strict transport; lokalna schema nadal wymaga unikalności |
 
 Adapter zmienia wyłącznie transport. Parser, `DECISION_JSON_SCHEMA`, output schema i evaluator są wspólne dla wszystkich modeli.
 
@@ -122,10 +125,12 @@ unset OPENROUTER_API_KEY
 
 Skrypt zachowuje surowe odpowiedzi, przelicza tożsamość i ponownie wykonuje pełną walidację. Jeżeli choć jedna odpowiedź nie odpowiada aktualnej semantyce, proces zatrzymuje się — wtedy usuń tylko wskazane, unieważnione kasety i nagraj je ponownie. Nie kasuj całej macierzy rutynowo.
 
+Przy dodawaniu całkowicie nowego modelu, który nie ma jeszcze katalogu kaset, najpierw nagraj jego brakujące kasety. Dopiero po skompletowaniu wszystkich rodzin uruchom `refresh_vcr_metadata.py --all-models --write`, ponieważ tryb `--all-models` celowo wymaga kompletnej macierzy.
+
 ### Lokalne przygotowanie
 
 ```bash
-git switch feat/openai-model-family
+git switch <working-branch>
 git pull --ff-only
 python -m venv .venv
 source .venv/bin/activate
