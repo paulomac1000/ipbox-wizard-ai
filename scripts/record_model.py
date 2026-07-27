@@ -33,10 +33,11 @@ def slug(model: str) -> str:
 def _cassette_root() -> Path:
     """Resolve the cassette root after local environment settings are loaded."""
     raw = os.environ.get("VCR_CASSETTES_ROOT")
-    selected = Path(raw) if raw is not None else Path(CASSETTE_ROOT)
-    if not str(selected).strip():
-        raise ValueError("VCR_CASSETTES_ROOT must not be empty")
-    return selected
+    if raw is not None:
+        if not raw.strip():
+            raise ValueError("VCR_CASSETTES_ROOT must not be empty")
+        return Path(raw)
+    return Path(CASSETTE_ROOT)
 
 
 def run(command: list[str], env: dict[str, str]) -> int:
