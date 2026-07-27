@@ -8,7 +8,7 @@ on:
         required: true
         type: string
       model:
-        description: "Benchmark model (or 'all' for the full seven-family matrix)"
+        description: "Benchmark model ('all' runs the current release matrix; candidates run individually)"
         required: true
         type: choice
         default: "all"
@@ -21,6 +21,7 @@ on:
           - "moonshotai/kimi-k2.5"
           - "qwen/qwen3.5-flash-02-23"
           - "mistralai/mistral-small-24b-instruct-2501"
+          - "openai/gpt-5-mini"
       max-cost-per-model-usd:
         description: "Required positive per-model paid-cost guard in USD"
         required: true
