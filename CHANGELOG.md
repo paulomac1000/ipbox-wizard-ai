@@ -5,8 +5,11 @@ Najważniejsze zmiany w kolejnych wydaniach projektu. Changelog opisuje możliwo
 ## Unreleased
 
 - Rozszerzono kanoniczną macierz benchmarkową o rodzinę OpenAI przez `openai/gpt-5-mini`.
-- GPT-5 Mini używa tego samego recordera, manifestu, pre-commit, raportu i playbacku co pozostałe modele; pełna bramka wymaga 8 × 46, czyli 368 kaset.
+- Nagrano i zweryfikowano 46/46 kaset GPT-5 Mini; pełna macierz obejmuje obecnie 8 rodzin × 46 scenariuszy, czyli 368 kaset i osiem manifestów z playbackiem offline.
+- GPT-5 Mini używa tego samego recordera, manifestu, pre-commit, raportu i playbacku co pozostałe modele — bez osobnego rejestru kandydatów ani alternatywnej bramki.
+- Profil OpenAI używa strict `json_schema`, `reasoning.effort=minimal` i nie wysyła temperatury. Nieobsługiwane przez endpoint `uniqueItems` jest usuwane wyłącznie z kopii transportowej; lokalna schema nadal wymaga unikalnych kodów.
 - Profile modeli oddzielono od `engine_source_hash` silnika podatkowego. Parametry każdego modelu pozostają chronione przez pełny `request_hash` jego kaset.
+- Recorder respektuje `VCR_CASSETTES_ROOT` zarówno z procesu, jak i z bezpiecznie wczytanego lokalnego `.env`.
 - Dodano instrukcję lokalnego nagrywania i code review przed dopuszczeniem nowej rodziny do wydania.
 
 ## 0.2 — 27 lipca 2026
