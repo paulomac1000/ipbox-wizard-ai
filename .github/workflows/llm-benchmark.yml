@@ -122,6 +122,11 @@ jobs:
             ./scripts/record_all_models.sh \
               --max-cost-per-model-usd "$MAX_COST_PER_MODEL_USD" \
               --max-total-cost-usd "$MAX_TOTAL_COST_USD"
+          elif [ "$BENCHMARK_MODEL" = "openai/gpt-5-mini" ]; then
+            python scripts/record_candidate_model.py \
+              --model "$BENCHMARK_MODEL" \
+              --max-cost-per-model-usd "$MAX_COST_PER_MODEL_USD" \
+              --max-total-cost-usd "$MAX_TOTAL_COST_USD"
           else
             python scripts/record_model.py \
               --model "$BENCHMARK_MODEL" \
@@ -137,18 +142,19 @@ jobs:
             ./scripts/verify_all_models.sh
             python scripts/vcr_precommit.py --all-models
             python scripts/check_cassette_policy.py
+            python scripts/benchmark_report.py
           else
             PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 \
             LLM_PROVIDER=openrouter \
             LLM_MODEL="$BENCHMARK_MODEL" \
             VCR_MODE=playback \
             python -m pytest tests/llm/test_scenarios.py --run-llm --vcr-mode=playback -q
-            python scripts/vcr_precommit.py --model "$BENCHMARK_MODEL"
-          fi
-          if [ "$BENCHMARK_MODEL" = "all" ]; then
-            python scripts/benchmark_report.py
-          else
-            python scripts/benchmark_report.py --model "$BENCHMARK_MODEL"
+            if [ "$BENCHMARK_MODEL" = "openai/gpt-5-mini" ]; then
+              python scripts/verify_candidate_model.py --model "$BENCHMARK_MODEL"
+            else
+              python scripts/vcr_precommit.py --model "$BENCHMARK_MODEL"
+              python scripts/benchmark_report.py --model "$BENCHMARK_MODEL"
+            fi
           fi
 
       - name: Collect diagnostics
