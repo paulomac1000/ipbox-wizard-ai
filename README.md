@@ -284,11 +284,11 @@ Na końcu analizy agent powinien podać jeden z trzech statusów:
 `COVERED_DIRECTLY` wolno zadeklarować wyłącznie wtedy, gdy łącznie:
 
 - istnieje bezpośredni scenariusz biznesowy;
-- scenariusz sprawdza ten sam istotny invariant;
+- scenariusz sprawdza tę samą istotną regułę działania;
 - macierz VCR wszystkich wymaganych rodzin jest kompletna i aktualna;
 - playback przechodzi bez sekretu i bez połączenia z siecią.
 
-Agent powinien wskazać nazwy testów i scenariuszy, sprawdzany invariant, stan macierzy VCR oraz wynik playbacku. Podobny test bez pełnej bramki oznacza najwyżej `COVERED_PARTIALLY`.
+Agent powinien wskazać nazwy testów i scenariuszy, sprawdzaną regułę, stan macierzy VCR oraz wynik playbacku. Podobny test bez pełnej bramki oznacza najwyżej `COVERED_PARTIALLY`.
 
 Nowy, poprawnie opisany przypadek pomaga utrzymywać jakość projektu w czasie. Należy go odtworzyć na minimalnych danych syntetycznych i dodać jako test regresyjny.
 
