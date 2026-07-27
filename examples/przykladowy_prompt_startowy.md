@@ -12,6 +12,8 @@ Każdy wariant analizy powinien zakończyć się dokładnie jednym statusem:
 
 `COVERED_DIRECTLY` wymaga łącznie: bezpośredniego scenariusza biznesowego, sprawdzenia tego samego istotnego invariantu, kompletnej i aktualnej macierzy VCR wszystkich wymaganych rodzin oraz playbacku przechodzącego bez sekretu i bez sieci. Jeżeli choć jeden warunek nie jest potwierdzony, użyj `COVERED_PARTIALLY` albo `NOT_COVERED` i wyjaśnij brak.
 
+Bieżąca macierz referencyjna obejmuje osiem rodzin, w tym `openai/gpt-5-mini`, oraz 46 scenariuszy na model — łącznie 368 kaset. Agent powinien potwierdzić aktualność macierzy przez raport, politykę kaset i playback, a nie tylko powtórzyć liczbę z dokumentacji.
+
 W benchmarku Python buduje autorytatywną kopertę `expected_decision`. Model ma zwrócić gotowe `status`, `stops` i `reviews` bez ponownego liczenia podatku i bez reinterpretacji klasyfikacji.
 
 ## Wariant 1 — przygotowanie rozliczenia z dokumentów
