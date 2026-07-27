@@ -270,7 +270,7 @@ Każdy z 46 scenariuszy należy przejść na ośmiu niezależnych rodzinach mode
 - Mistral;
 - OpenAI GPT — `openai/gpt-5-mini`.
 
-Pełna macierz zawiera **368 zweryfikowanych kaset VCR**. Testy celowo używają mniejszych lub kosztowo oszczędnych modeli reprezentujących każdą rodzinę. Sprawdzają, czy kontrakt jest na tyle jednoznaczny, że różne architektury potrafią zwrócić ten sam ograniczony wynik bez zmiany matematyki ustalonej przez Python.
+Docelowa bramka pełnej macierzy wymaga **368 zweryfikowanych kaset VCR**. Testy celowo używają mniejszych lub kosztowo oszczędnych modeli reprezentujących każdą rodzinę. Sprawdzają, czy kontrakt jest na tyle jednoznaczny, że różne architektury potrafią zwrócić ten sam ograniczony wynik bez zmiany matematyki ustalonej przez Python.
 
 Kasety OpenAI muszą zostać nagrane i odtworzone przed mergem zmiany rozszerzającej macierz. Sam wpis modelu w konfiguracji nie jest dowodem 46/46.
 
