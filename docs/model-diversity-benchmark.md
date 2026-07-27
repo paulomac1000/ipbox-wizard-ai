@@ -29,17 +29,17 @@ Model trafia do macierzy, gdy:
 | Moonshot Kimi | `moonshotai/kimi-k2.5` | strict `json_schema` |
 | Qwen | `qwen/qwen3.5-flash-02-23` | strict `json_schema` |
 | Mistral | `mistralai/mistral-small-24b-instruct-2501` | strict `json_schema` |
-| OpenAI GPT | `openai/gpt-5-mini` | strict `json_schema`, `reasoning.effort=minimal`, bez temperatury |
+| OpenAI GPT | `openai/gpt-5-mini` | `json_schema`; z kopii transportowej usuwane jest `uniqueItems`, `reasoning.effort=minimal`, bez temperatury |
 
-Pełna bramka wymaga **368 kaset** i ośmiu manifestów. Każdy model musi osiągnąć 46/46. Wynik częściowy jest wyłącznie diagnostyką.
+Aktualna bramka jest kompletna: **368 kaset**, osiem manifestów i 46/46 scenariuszy dla każdego modelu. Pełny playback przechodzi offline, bez klucza API i bez połączenia z providerem. Wynik częściowy pozostaje wyłącznie diagnostyką.
 
 ## Granica adaptera transportowego
 
 Provider nie jest źródłem kontraktu. Źródłem prawdy pozostają `DECISION_JSON_SCHEMA`, parser i evaluator działające lokalnie.
 
 - Claude Haiku przez routing Anthropic/Azure/Bedrock odrzucał `uniqueItems` w przekazanym JSON Schema błędem HTTP 400. Adapter usuwa ten jeden keyword rekursywnie wyłącznie z głębokiej kopii wysyłanej do providera. Lokalna schema nadal wymaga unikalnych kodów.
+- GPT-5 Mini wykazał tę samą niezgodność transportową z `uniqueItems`. Profil OpenAI usuwa keyword wyłącznie z kopii transportowej; lokalna schema, parser i evaluator nadal wymagają unikalnych kodów. Model używa `reasoning.effort=minimal`, a temperatura nie jest wysyłana.
 - MiniMax przez routing DigitalOcean zwracał `content: null` dla `json_schema`. Profil używa więc `json_object`, a pełna schema jest dołączona do instrukcji i bezwarunkowo wykonywana po odpowiedzi.
-- GPT-5 Mini używa wspólnego strict `json_schema`; parametr temperatury nie jest wysyłany, a poziom rozumowania jest jawnie ustawiony na `minimal`.
 - Parser nie usuwa Markdown fences, nie przenosi kodów między kanałami i nie deduplikuje odpowiedzi.
 - Każda odpowiedź nadal musi mieć właściwy model, `finish_reason=stop`, zgodny fingerprint i pełny semantic PASS.
 
@@ -56,7 +56,8 @@ Dzięki temu dodanie nowej rodziny nie unieważnia automatycznie odpowiedzi inny
 1. Pierwsza macierz pełnego raportu wykazała wymyślone kursy, klasyfikacje i TEST-y. Krytyczne obliczenia przeniesiono do Pythona.
 2. Macierz 3 × 36 pozornie miała 108/108, ale wszystkie odpowiedzi Claude zawierały Markdown fences naprawiane przez parser. Naprawę usunięto i kasety unieważniono.
 3. Protokół listy aktywnych reguł usunął nieaktywne fakty, lecz nadal wymagał klasyfikacji kodów do kanałów. MiniMax w scenariuszu 51 umieścił `REVIEW_09` w `stops`; podobny błąd wcześniej wykonał GPT-5 Nano. Zastąpiono go pełną kopertą `expected_decision` i oddzielnymi enumami STOP/REVIEW.
-4. Odrzucenia Claude i MiniMax nie dotyczyły rozumowania ani podatku. Były ograniczeniami transportu opisanymi powyżej.
+4. Odrzucenia Claude, MiniMax i początkowego requestu GPT-5 Mini nie dotyczyły rozumowania podatkowego. Były ograniczeniami transportu opisanymi powyżej.
+5. GPT-5 Mini po zastosowaniu minimalnego adaptera przeszedł 46/46, w tym scenariusz 51 z dokładnym rozdzieleniem `STOP_12` i `REVIEW_09`.
 
 Sama liczba „46/46” nie wystarcza bez audytu surowych odpowiedzi, request hashy, manifestów, fingerprintów, provider adapterów i zasad parsera.
 
