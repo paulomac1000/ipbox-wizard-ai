@@ -9,7 +9,8 @@ import pytest
 import yaml
 
 from python_helper.report_metadata import calculation_meta, engine_source_hash
-from tests.llm.models import BENCHMARK_MODELS, CANDIDATE_MODELS
+from tests.llm.candidate_models import CANDIDATE_MODELS
+from tests.llm.models import BENCHMARK_MODELS
 from tests.llm.vcr.cassette import (
     CassetteMeta,
     parsed_response_equal_ignoring_meta_timestamp,
