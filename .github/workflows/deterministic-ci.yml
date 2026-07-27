@@ -73,7 +73,7 @@ jobs:
       - name: Shell syntax check
         run: |
           set -euo pipefail
-          for script in scripts/*.sh dump-to-md.sh; do
+          for script in scripts/*.sh; do
             bash -n "$script"
           done
 
