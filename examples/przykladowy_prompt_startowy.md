@@ -22,7 +22,8 @@ Dopiero po potwierdzeniu danych wykonaj rozliczenie. Na końcu pokaż przychody
 i koszty IP/NIE, W, MIX, NEXUS, ulgi, podatek, nadpłatę lub dopłatę,
 STOP-y, REVIEW-y oraz listę rzeczy do potwierdzenia z księgową.
 
-Nie zmieniaj kodu repozytorium.
+Wskaż także, czy mój przypadek jest COVERED_DIRECTLY, COVERED_PARTIALLY czy
+NOT_COVERED przez testy i scenariusze repozytorium. Nie zmieniaj kodu.
 ```
 
 ## Wariant 2 — sprawdzenie rozliczenia przygotowanego przez księgową
@@ -43,9 +44,11 @@ Na końcu wskaż:
 - wszystkie różnice i ich dokładne źródło;
 - czy problem leży w dokumentach, księgowaniu, PIT czy algorytmie;
 - jakie korekty są potrzebne;
-- jakie kwestie wymagają potwierdzenia przez księgową albo doradcę.
+- jakie kwestie wymagają potwierdzenia przez księgową albo doradcę;
+- które testy i scenariusze bezpośrednio pokrywają mój przypadek.
 
-Nie zmieniaj kodu repozytorium.
+Jeżeli przypadek nie jest bezpośrednio pokryty, przygotuj minimalny syntetyczny
+opis do GitHub Issue, ale nie zmieniaj kodu repozytorium.
 ```
 
 ## Wariant 3 — niekompletne dokumenty albo pierwsze rozliczenie
@@ -65,7 +68,7 @@ Najpierw oceń:
 
 Następnie wykonaj tylko te obliczenia, które są możliwe na potwierdzonych danych.
 Wynik niepełny oznacz jako wstępny i pokaż listę kroków potrzebnych do finalnego
-rozliczenia.
+rozliczenia. Wskaż także poziom pokrycia mojego przypadku przez istniejące testy.
 ```
 
 ## Wariant 4 — lokalna praca w Codex lub Claude Code
@@ -81,11 +84,31 @@ Najpierw zinwentaryzuj i samodzielnie odczytaj dokumenty. Przygotuj dane robocze
 i uruchom deterministyczne obliczenia w Pythonie. Pokaż źródło każdej ważnej
 kwoty i zapytaj o braki. Porównaj wynik z KPiR, ewidencją i PIT.
 
-Nie zmieniaj kodu i nie twórz commitów. Gdy znajdziesz możliwy błąd algorytmu,
-opisz go osobno jako minimalny syntetyczny przypadek odtwarzający.
+Nie zmieniaj kodu i nie twórz commitów. Wskaż bezpośrednie testy i scenariusze,
+które pokrywają mój przypadek. Gdy znajdziesz możliwy błąd albo brak pokrycia,
+opisz minimalny syntetyczny przypadek i przygotuj treść GitHub Issue.
 ```
 
-## Wariant 5 — rozwój algorytmu po znalezieniu błędu
+## Wariant 5 — przygotowanie zgłoszenia bez zmiany kodu
+
+```text
+Mój przypadek nie jest bezpośrednio pokryty przez testy albo ujawnia możliwy błąd.
+Nie zmieniaj jeszcze kodu.
+
+Przygotuj zanonimizowany, minimalny przypadek odtwarzający:
+- stan faktyczny;
+- dane wejściowe;
+- rzeczywisty wynik algorytmu;
+- wynik oczekiwany;
+- uzasadnienie i źródła;
+- istniejące testy podobne do tego przypadku.
+
+Usuń dane osobowe, nazwy kontrahentów, numery faktur i prywatne sygnatury.
+Jeżeli masz dostęp do GitHuba, zapytaj mnie o zgodę i utwórz Issue przez formularz
+new-tax-case.yml. Jeżeli nie masz dostępu, podaj mi gotową treść i bezpośredni link.
+```
+
+## Wariant 6 — rozwój algorytmu po znalezieniu błędu
 
 Używaj dopiero po zakończeniu analizy dokumentów i wyraźnym potwierdzeniu, że problem leży w kodzie.
 
@@ -96,6 +119,12 @@ Najpierw zredukuj znaleziony problem do minimalnego syntetycznego przypadku,
 bez danych podatnika. Dodaj test regresyjny, który obecnie nie przechodzi.
 Następnie popraw właściwy moduł, uruchom testy celowane i pełną bramkę jakości.
 
-Nie dopasowuj testu do istniejącego błędnego wyniku. W raporcie końcowym podaj
-branch, SHA, zmienione pliki, wykonane testy i wszystkie ograniczenia weryfikacji.
+Jeżeli zmiana dotyczy kontraktu LLM, sprawdź wpływ na scenariusze i macierz VCR.
+Nie dopasowuj testu do istniejącego błędnego wyniku. W raporcie końcowym podaj:
+- branch i SHA;
+- zmienione pliki;
+- wykonane testy i coverage;
+- scenariusze pokrywające przypadek;
+- stan VCR dla wymaganych rodzin modeli;
+- wszystkie ograniczenia weryfikacji.
 ```
