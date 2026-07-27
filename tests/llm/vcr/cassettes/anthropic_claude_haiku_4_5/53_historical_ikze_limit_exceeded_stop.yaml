@@ -4,7 +4,7 @@ meta:
   provider: openrouter
   requested_model: anthropic/claude-haiku-4.5
   returned_model: anthropic/claude-haiku-4.5
-  fingerprint: canonical-source_0c04cc2e2f91ea4cee4b0307e0d3b2bfadc02fbb53063ab7368694a45c4d2d9c
+  fingerprint: canonical-source_f35d0c6d7bb327b11afeafe881f907f69fb8900abb2311a929f79c534b76c301
   request_hash: b9678a11919995a539485fe2a0e7582b05c237be3fef143fc7f69c9386501578
   recorded_at: '2026-07-25T23:26:07.154932+00:00'
   request_id: gen-1785021965-NMDzUh0pkAVP2A7UW0UH
@@ -28,9 +28,9 @@ parsed_response:
     - MF_SCALE_HISTORY
     - MF_HEALTH_HISTORY
     input_hash: aea3cee73a63b94e4b1532c732d429fba0997ea7be30b4238d091b731e31ca53
-    engine_source_hash: 15f46d2c48027b2043e147826d6d249570212e15194590bf8c2590ef758fae17
+    engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
     calculated_at: '2026-07-25T23:26:07Z'
-    code_revision: engine:15f46d2c48027b2043e147826d6d249570212e15194590bf8c2590ef758fae17
+    code_revision: engine:ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
   result:
     rok: 2019
     przychody_roczne:

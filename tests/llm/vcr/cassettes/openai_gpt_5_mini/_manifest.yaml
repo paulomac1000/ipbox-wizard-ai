@@ -1,0 +1,371 @@
+model: openai/gpt-5-mini
+generated_at: '2026-07-27T22:32:30.301167+00:00'
+entries:
+  01_basic_linear:
+    file: 01_basic_linear.yaml
+    fingerprint: canonical-source_37e833d0e83a2547b369199a470269d6534dad44d28a816f5ba03ffe94d1f578
+    request_hash: 0a782e202a56644bb74f4bee51b58a542d1f16530972778780e2a8e02f95b9a1
+    engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
+    recorded_at: '2026-07-27T22:29:24.795159+00:00'
+    returned_model: openai/gpt-5-mini
+    cost: 0.00019025
+  02_basic_scale_single_client:
+    file: 02_basic_scale_single_client.yaml
+    fingerprint: canonical-source_ccda486ecfc1ecd7a722aff764f70f44437c1f021adf13864d1ffe46aba6511d
+    request_hash: 9636c9a4e07343e193d1255beabc672962cbf1f9f955fe5e52025e28842a2160
+    engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
+    recorded_at: '2026-07-27T22:29:26.755151+00:00'
+    returned_model: openai/gpt-5-mini
+    cost: 0.0002015
+  03_fx_usd_single_client:
+    file: 03_fx_usd_single_client.yaml
+    fingerprint: canonical-source_1e5e5d6d3568410207f1fc4191e508aa94b851629ff45f2b402f10fe5d290cd1
+    request_hash: 9636c9a4e07343e193d1255beabc672962cbf1f9f955fe5e52025e28842a2160
+    engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
+    recorded_at: '2026-07-27T22:29:28.596127+00:00'
+    returned_model: openai/gpt-5-mini
+    cost: 0.0002015
+  11_multi_client_mixed_currencies:
+    file: 11_multi_client_mixed_currencies.yaml
+    fingerprint: canonical-source_f4eff7a487af981ed828aa4d92d6395a65b545dbebc365985f84656ce5f838f9
+    request_hash: 8cfdcecc57e916762e2a0ee104404096b2ac698a65cbccfb0f733ab46e57e639
+    engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
+    recorded_at: '2026-07-27T22:29:30.751484+00:00'
+    returned_model: openai/gpt-5-mini
+    cost: 0.00019025
+  12_zus_in_pit_path:
+    file: 12_zus_in_pit_path.yaml
+    fingerprint: canonical-source_954be56e173714e19f8805f4cef44953ed6f8462ffc75818fa67ddb422a05543
+    request_hash: 8cfdcecc57e916762e2a0ee104404096b2ac698a65cbccfb0f733ab46e57e639
+    engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
+    recorded_at: '2026-07-27T22:29:32.780823+00:00'
+    returned_model: openai/gpt-5-mini
+    cost: 0.00019025
+  13_income_from_employment_impact:
+    file: 13_income_from_employment_impact.yaml
+    fingerprint: canonical-source_c524f6c9b63b486c51692a96ed99d95dc8ec4e92db4f556e00add1b50cc724e2
+    request_hash: 8cfdcecc57e916762e2a0ee104404096b2ac698a65cbccfb0f733ab46e57e639
+    engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
+    recorded_at: '2026-07-27T22:29:34.986966+00:00'
+    returned_model: openai/gpt-5-mini
+    cost: 0.00019025
+  14_lump_sum_ineligible_check:
+    file: 14_lump_sum_ineligible_check.yaml
+    fingerprint: canonical-source_d1ae9b2eb33c424394d8f0f09c497c400adef2d0d8a81c9f91ac416166d73e6e
+    request_hash: 3d4d0a927356db0cf2d38f12edffc76e4f67a0a8030a0bcbc4ccc187d89d3e2c
+    engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
+    recorded_at: '2026-07-27T22:29:37.317418+00:00'
+    returned_model: openai/gpt-5-mini
+    cost: 0.00019025
+  15_vacation_sick_mix:
+    file: 15_vacation_sick_mix.yaml
+    fingerprint: canonical-source_78a2a90b9873c0141fb43ef1e6f34a65d369dcb1b08799843f8fc6816b049b47
+    request_hash: 0a782e202a56644bb74f4bee51b58a542d1f16530972778780e2a8e02f95b9a1
+    engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
+    recorded_at: '2026-07-27T22:29:40.069853+00:00'
+    returned_model: openai/gpt-5-mini
+    cost: 0.00019025
+  16_high_w_review:
+    file: 16_high_w_review.yaml
+    fingerprint: canonical-source_9c32254f20e94dabdf3e2f987ea27680af1a1221534ea8ed34ae27242f5e57b5
+    request_hash: 9636c9a4e07343e193d1255beabc672962cbf1f9f955fe5e52025e28842a2160
+    engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
+    recorded_at: '2026-07-27T22:29:42.365635+00:00'
+    returned_model: openai/gpt-5-mini
+    cost: 0.0002015
+  17_low_w_review:
+    file: 17_low_w_review.yaml
+    fingerprint: canonical-source_f11c9b9fb46d356b1aecb4cf49f621b4e49fa7b6cbf3f2cb80659f561788d8e8
+    request_hash: e1532eb99f2c5e03f63d61a4ecabf66966e127e3eb98a68d23f7026d926ebed3
+    engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
+    recorded_at: '2026-07-27T22:29:44.846727+00:00'
+    returned_model: openai/gpt-5-mini
+    cost: 0.0002015
+  18_logic_zero_work_hours:
+    file: 18_logic_zero_work_hours.yaml
+    fingerprint: canonical-source_5b77bf0e0e26b6e58aecca09e12ebf6e70376dbb1bddffc6032c8531713ec8fe
+    request_hash: fe461c8b26d9d86c5f1702049e263df0a3a8d3099f8899533290de384122d164
+    engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
+    recorded_at: '2026-07-27T22:29:47.265428+00:00'
+    returned_model: openai/gpt-5-mini
+    cost: 0.0002015
+  21_monthly_loss_impact:
+    file: 21_monthly_loss_impact.yaml
+    fingerprint: canonical-source_9e85ffad8c45828944d101398ebab1dc8dbc7e234b42c34e0e876ec3f958457b
+    request_hash: 9636c9a4e07343e193d1255beabc672962cbf1f9f955fe5e52025e28842a2160
+    engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
+    recorded_at: '2026-07-27T22:29:49.604351+00:00'
+    returned_model: openai/gpt-5-mini
+    cost: 0.0002015
+  22_related_parties_nexus_reduction:
+    file: 22_related_parties_nexus_reduction.yaml
+    fingerprint: canonical-source_8d18361f845c890124413a74a42c6724790c192bc649905eea2253b805d744df
+    request_hash: 9636c9a4e07343e193d1255beabc672962cbf1f9f955fe5e52025e28842a2160
+    engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
+    recorded_at: '2026-07-27T22:29:52.688960+00:00'
+    returned_model: openai/gpt-5-mini
+    cost: 0.0002015
+  23_loss_carry_forward:
+    file: 23_loss_carry_forward.yaml
+    fingerprint: canonical-source_ac199620a876d98c1225d422e2bb95d851c1815116f2c088c70bd889739680f1
+    request_hash: 66c9d4ec9852f033dcd2597110a911dfa4b2ddd09b35e8e5231e88520a1faad5
+    engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
+    recorded_at: '2026-07-27T22:29:54.898484+00:00'
+    returned_model: openai/gpt-5-mini
+    cost: 0.000179
+  24_donations_relief:
+    file: 24_donations_relief.yaml
+    fingerprint: canonical-source_4bea7bd75fe81699118125eba8752e8729731c2ce8ec53ea2713f42cfbf9ba75
+    request_hash: 66c9d4ec9852f033dcd2597110a911dfa4b2ddd09b35e8e5231e88520a1faad5
+    engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
+    recorded_at: '2026-07-27T22:29:57.372005+00:00'
+    returned_model: openai/gpt-5-mini
+    cost: 0.000179
+  25_rehab_relief:
+    file: 25_rehab_relief.yaml
+    fingerprint: canonical-source_5f7af7b320accbc63b1bdea7c4501fb5c713cfcd7ae28f6c881f92a6e37e3357
+    request_hash: 66c9d4ec9852f033dcd2597110a911dfa4b2ddd09b35e8e5231e88520a1faad5
+    engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
+    recorded_at: '2026-07-27T22:30:00.481885+00:00'
+    returned_model: openai/gpt-5-mini
+    cost: 0.000179
+  26_rd_relief_nexus:
+    file: 26_rd_relief_nexus.yaml
+    fingerprint: canonical-source_aa21f7dce763f86115d1930f1b414bf23c0522ed8eceaee918753ab88393955f
+    request_hash: 0a782e202a56644bb74f4bee51b58a542d1f16530972778780e2a8e02f95b9a1
+    engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
+    recorded_at: '2026-07-27T22:30:03.220963+00:00'
+    returned_model: openai/gpt-5-mini
+    cost: 0.00019025
+  27_termomodernizacja_full:
+    file: 27_termomodernizacja_full.yaml
+    fingerprint: canonical-source_5dc246f5a213b1ae1ea21d12263278b1b6d3677666c04a265ed7e986912eda18
+    request_hash: 0a782e202a56644bb74f4bee51b58a542d1f16530972778780e2a8e02f95b9a1
+    engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
+    recorded_at: '2026-07-27T22:30:05.684073+00:00'
+    returned_model: openai/gpt-5-mini
+    cost: 0.00019025
+  28_edge_multiple_carry-overs:
+    file: 28_edge_multiple_carry-overs.yaml
+    fingerprint: canonical-source_3d59128828c9ac7cd076e6739346b5a754a04b06de9d369c808b5de15cc96938
+    request_hash: 9636c9a4e07343e193d1255beabc672962cbf1f9f955fe5e52025e28842a2160
+    engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
+    recorded_at: '2026-07-27T22:30:08.299829+00:00'
+    returned_model: openai/gpt-5-mini
+    cost: 0.0002015
+  29_edge_related_parties_nexus_0:
+    file: 29_edge_related_parties_nexus_0.yaml
+    fingerprint: canonical-source_6973fed7be041e4cb0b1b2c2b0e339d66d373b675b485ea714e71a8577a89f6e
+    request_hash: 9636c9a4e07343e193d1255beabc672962cbf1f9f955fe5e52025e28842a2160
+    engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
+    recorded_at: '2026-07-27T22:30:10.883910+00:00'
+    returned_model: openai/gpt-5-mini
+    cost: 0.0002015
+  30_edge_related_parties_nexus_mixed:
+    file: 30_edge_related_parties_nexus_mixed.yaml
+    fingerprint: canonical-source_ac13e899917d3f33e4f23e97f2e854fae388402402cb670dc2b02ee6688f1af3
+    request_hash: 9636c9a4e07343e193d1255beabc672962cbf1f9f955fe5e52025e28842a2160
+    engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
+    recorded_at: '2026-07-27T22:30:13.548864+00:00'
+    returned_model: openai/gpt-5-mini
+    cost: 0.0002015
+  31_zus_double_dip_fail:
+    file: 31_zus_double_dip_fail.yaml
+    fingerprint: canonical-source_e509e8904bd8a324f1b1825f51d63717eaa69031984e224a8f3f5df3a64be12f
+    request_hash: 7eacfec56d07488cabc5c29f09b4678703a6e9f348e42893f0c19201bfb88faa
+    engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
+    recorded_at: '2026-07-27T22:30:16.501610+00:00'
+    returned_model: openai/gpt-5-mini
+    cost: 0.000215
+  32_private_costs_ip_fail:
+    file: 32_private_costs_ip_fail.yaml
+    fingerprint: canonical-source_72a652eb608b7a20e6011ee1da27fa2c9f7dee17ad696eda348f77a39275edd4
+    request_hash: 49a4a1ebeab4e807dc380eb5d44e8736e99083fab46335e9e415536b890adf70
+    engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
+    recorded_at: '2026-07-27T22:30:20.620278+00:00'
+    returned_model: openai/gpt-5-mini
+    cost: 0.0002375
+  33_kpir_balance_fail:
+    file: 33_kpir_balance_fail.yaml
+    fingerprint: canonical-source_c634eb1bb0f3b854a9177bfd308c3c232e66a99befdf78370641b04767c53225
+    request_hash: 9636c9a4e07343e193d1255beabc672962cbf1f9f955fe5e52025e28842a2160
+    engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
+    recorded_at: '2026-07-27T22:30:23.464004+00:00'
+    returned_model: openai/gpt-5-mini
+    cost: 0.0002015
+  34_verify_fixed_asset_threshold_fail:
+    file: 34_verify_fixed_asset_threshold_fail.yaml
+    fingerprint: canonical-source_eb192dbb38c56e9cfd6f36a489a90a7c8792ea194db36744a118005ddc3c5803
+    request_hash: 9636c9a4e07343e193d1255beabc672962cbf1f9f955fe5e52025e28842a2160
+    engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
+    recorded_at: '2026-07-27T22:30:26.979006+00:00'
+    returned_model: openai/gpt-5-mini
+    cost: 0.0002015
+  35_verify_monthly_w_jump_inconsistency:
+    file: 35_verify_monthly_w_jump_inconsistency.yaml
+    fingerprint: canonical-source_928fb1a1b459973a2cfa60ab3655fa2136ee25f15f7387ddf0d7360f8fd51cf8
+    request_hash: 732c083776d6b44d7754455b11160bde2b2406e4e3a99c7c2e4dd558b206fbb3
+    engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
+    recorded_at: '2026-07-27T22:30:30.021683+00:00'
+    returned_model: openai/gpt-5-mini
+    cost: 0.00021275
+  36_verify_negative_income_error:
+    file: 36_verify_negative_income_error.yaml
+    fingerprint: canonical-source_27c42b12198ef6ab1dcbc054ef8a4656201389d2f764660ec189b1582a5b20fd
+    request_hash: 9636c9a4e07343e193d1255beabc672962cbf1f9f955fe5e52025e28842a2160
+    engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
+    recorded_at: '2026-07-27T22:30:32.921677+00:00'
+    returned_model: openai/gpt-5-mini
+    cost: 0.0002015
+  37_verify_invalid_tax_form_stop:
+    file: 37_verify_invalid_tax_form_stop.yaml
+    fingerprint: canonical-source_221c507cf4f80a99814e9c07ce29b1bad48cc0cc3c0c2a23ef642f7efb19f3e2
+    request_hash: 5678db6306d37eb05d03a65090fdf14e300802b5f5222b775898b580d826748e
+    engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
+    recorded_at: '2026-07-27T22:30:35.910651+00:00'
+    returned_model: openai/gpt-5-mini
+    cost: 0.00021275
+  38_verify_missing_kpir_data:
+    file: 38_verify_missing_kpir_data.yaml
+    fingerprint: canonical-source_1c426a7f36c669b721374b7983e0e3b7f30817fa1b19a9dee74873dea6619368
+    request_hash: 2c8a48d145817f72edc79355248fcb047bb6d486fc77012ed72c1fc2896d2fcf
+    engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
+    recorded_at: '2026-07-27T22:30:39.038677+00:00'
+    returned_model: openai/gpt-5-mini
+    cost: 0.0002015
+  39_multi_project_weighted_W:
+    file: 39_multi_project_weighted_W.yaml
+    fingerprint: canonical-source_16418add9f33879df7793e86b8f4097f6eb3db192e48d5774acfe5d7e2743b7d
+    request_hash: 979b0c22f089d9ba68dc16d3871057ef4daca52f846b06ef9050505909cdedc1
+    engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
+    recorded_at: '2026-07-27T22:30:42.282166+00:00'
+    returned_model: openai/gpt-5-mini
+    cost: 0.00019025
+  40_mixed_ip_clause:
+    file: 40_mixed_ip_clause.yaml
+    fingerprint: canonical-source_c634f2086c4562305d8b7eddc2934451267395f71bba2673047b6897c1db9226
+    request_hash: 8cfdcecc57e916762e2a0ee104404096b2ac698a65cbccfb0f733ab46e57e639
+    engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
+    recorded_at: '2026-07-27T22:30:45.897775+00:00'
+    returned_model: openai/gpt-5-mini
+    cost: 0.00019025
+  41_ikze_cascade:
+    file: 41_ikze_cascade.yaml
+    fingerprint: canonical-source_45f2d5f099b4de34a5188943447ff52f9d9267c61f0031ef534bd15596d03f6f
+    request_hash: 0a782e202a56644bb74f4bee51b58a542d1f16530972778780e2a8e02f95b9a1
+    engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
+    recorded_at: '2026-07-27T22:30:49.372025+00:00'
+    returned_model: openai/gpt-5-mini
+    cost: 0.00019025
+  42_stop_08_no_documentation:
+    file: 42_stop_08_no_documentation.yaml
+    fingerprint: canonical-source_4447ac446374aa5f1b430c2ca0952191cccbfd335e6d1737b5e444a9c39a7b32
+    request_hash: 2c8a48d145817f72edc79355248fcb047bb6d486fc77012ed72c1fc2896d2fcf
+    engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
+    recorded_at: '2026-07-27T22:30:52.456805+00:00'
+    returned_model: openai/gpt-5-mini
+    cost: 0.0002015
+  43_review_09_single_client_100pct:
+    file: 43_review_09_single_client_100pct.yaml
+    fingerprint: canonical-source_9ee7c7f69b81015692c92a2dc25e08345a6901373a7fa3318c2d3f92d433c16c
+    request_hash: 9636c9a4e07343e193d1255beabc672962cbf1f9f955fe5e52025e28842a2160
+    engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
+    recorded_at: '2026-07-27T22:30:56.153252+00:00'
+    returned_model: openai/gpt-5-mini
+    cost: 0.0002015
+  44_mix_revenue_key_kis:
+    file: 44_mix_revenue_key_kis.yaml
+    fingerprint: canonical-source_d5e9902e22d7971092eb6f0e0e38577ffb947c7d53ac91b04b9ab4b4c14d2d6b
+    request_hash: 0d815c08b928138d04668715059fc1df1baf0ec8cc78633441fa398ed54f98ad
+    engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
+    recorded_at: '2026-07-27T22:30:59.523773+00:00'
+    returned_model: openai/gpt-5-mini
+    cost: 0.00021275
+  45_multi_ip_two_stage:
+    file: 45_multi_ip_two_stage.yaml
+    fingerprint: canonical-source_5d435e252c1f983f235cdcd354d1c7dce2bc1603932c3ec3c2bb2ee217a4c636
+    request_hash: 75133cdd12cf0b241ed0a4c074762f899ff9ebd2d6e888ff9de488cc98a79204
+    engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
+    recorded_at: '2026-07-27T22:31:02.777927+00:00'
+    returned_model: openai/gpt-5-mini
+    cost: 0.00021275
+  46_historical_2019_health_credit:
+    file: 46_historical_2019_health_credit.yaml
+    fingerprint: canonical-source_a1394bfb7dc80a6a077e029c06649dbf4e87ff327936902d68db71453a31bdd6
+    request_hash: 0a782e202a56644bb74f4bee51b58a542d1f16530972778780e2a8e02f95b9a1
+    engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
+    recorded_at: '2026-07-27T22:31:06.045727+00:00'
+    returned_model: openai/gpt-5-mini
+    cost: 0.00019025
+  47_historical_2021_br_ipbox_stop:
+    file: 47_historical_2021_br_ipbox_stop.yaml
+    fingerprint: canonical-source_aa2e3d6e219c07214c9b9fc8f5a2ed392aead38653e1da373ab8a95e6d7bccec
+    request_hash: 30d7d1edfecac945a2d1659f5b6ec1bb5279537f99f6c618c02be34089e690b0
+    engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
+    recorded_at: '2026-07-27T22:31:09.209625+00:00'
+    returned_model: openai/gpt-5-mini
+    cost: 0.0002015
+  48_historical_2024_pit_like_cascade:
+    file: 48_historical_2024_pit_like_cascade.yaml
+    fingerprint: canonical-source_0713c9d989281699b7dfe257478fd616400fd4c5eabd37c4c69e1838ab263aba
+    request_hash: 0a782e202a56644bb74f4bee51b58a542d1f16530972778780e2a8e02f95b9a1
+    engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
+    recorded_at: '2026-07-27T22:31:12.334565+00:00'
+    returned_model: openai/gpt-5-mini
+    cost: 0.00019025
+  49_double_invoice_percentage_stop:
+    file: 49_double_invoice_percentage_stop.yaml
+    fingerprint: canonical-source_72ed08f53a65c94158b093829b1dd30a09f5594ba24a5b1f3846223eb07ca88b
+    request_hash: da6e3ff9d163096738e8b7de05869b6b60e75879c90dc21b788ce2ab87df4aa4
+    engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
+    recorded_at: '2026-07-27T22:31:16.035866+00:00'
+    returned_model: openai/gpt-5-mini
+    cost: 0.0002105
+  50_silent_allocation_method_switch_stop:
+    file: 50_silent_allocation_method_switch_stop.yaml
+    fingerprint: canonical-source_af00eeaaab1421a9fd674b9f9555de6e0ed5b2e08fdfd526c1c5cf33a1c74915
+    request_hash: 34ae45553e2d6d391afb26b2729a6845d99ebda41a184c0933c5d6748906dbe7
+    engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
+    recorded_at: '2026-07-27T22:31:19.852247+00:00'
+    returned_model: openai/gpt-5-mini
+    cost: 0.0002195
+  51_return_ledger_classification_shift_stop:
+    file: 51_return_ledger_classification_shift_stop.yaml
+    fingerprint: canonical-source_a0c2f19bedf6b6f8cb2d5801ea465c1e71cf790348bf1e4253a792ec4c74155e
+    request_hash: 3202fc5de936784e3c84aafa0674a07bceafa6c54133560ac867229c663a8ff1
+    engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
+    recorded_at: '2026-07-27T22:31:23.552851+00:00'
+    returned_model: openai/gpt-5-mini
+    cost: 0.0002015
+  52_cost_date_revenue_mix_policy:
+    file: 52_cost_date_revenue_mix_policy.yaml
+    fingerprint: canonical-source_c45921c2f5e38c0896a15dea56150f5d5ba56b1c63feb1e559b9ad7342841484
+    request_hash: 0d815c08b928138d04668715059fc1df1baf0ec8cc78633441fa398ed54f98ad
+    engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
+    recorded_at: '2026-07-27T22:31:27.413737+00:00'
+    returned_model: openai/gpt-5-mini
+    cost: 0.00021275
+  53_historical_ikze_limit_exceeded_stop:
+    file: 53_historical_ikze_limit_exceeded_stop.yaml
+    fingerprint: canonical-source_5b572a733b6af3c622ab836eb5f628f0b22b021a8dd3bfbccf1ea13e4d156620
+    request_hash: 1139c2c13dd7b0c65861ea86b5975280e519337e036d3a22d42af9c00c2ddfa7
+    engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
+    recorded_at: '2026-07-27T22:31:31.190820+00:00'
+    returned_model: openai/gpt-5-mini
+    cost: 0.0002015
+  54_pre_ipbox_year_stop:
+    file: 54_pre_ipbox_year_stop.yaml
+    fingerprint: canonical-source_a42f8584d51d00abd2a44e299602d7354a5db39b30e492ca726de42cafd1a9c9
+    request_hash: af932a00dcfd3edb9e864929162c48f9a693ddd2de2ba8b1456da1be81e093a7
+    engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
+    recorded_at: '2026-07-27T22:31:35.015861+00:00'
+    returned_model: openai/gpt-5-mini
+    cost: 0.0002015
+  55_disjoint_w_semantics_clean:
+    file: 55_disjoint_w_semantics_clean.yaml
+    fingerprint: canonical-source_d6c8c7ad4c17cc815b12a5aab6fef4c3adbba7f3efd2fdc2fcd14d816de0086d
+    request_hash: 66c9d4ec9852f033dcd2597110a911dfa4b2ddd09b35e8e5231e88520a1faad5
+    engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
+    recorded_at: '2026-07-27T22:31:40.340050+00:00'
+    returned_model: openai/gpt-5-mini
+    cost: 0.000179
