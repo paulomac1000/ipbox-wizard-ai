@@ -11,7 +11,11 @@ import pytest
 
 from python_helper.allocation_precision import audit_revenue_allocation
 from scripts.local_env import load_local_env
-from scripts.record_model import PAID_RUN_CONFIRMATION, _cassette_root, _require_paid_confirmation
+from scripts.record_model import (
+    PAID_RUN_CONFIRMATION,
+    _cassette_root,
+    _require_paid_confirmation,
+)
 from tests.llm.client import LLMClient
 from tests.llm.request_spec import LLMRequestSpec
 from tests.llm.vcr.config import VCRConfig
