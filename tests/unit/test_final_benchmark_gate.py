@@ -1,4 +1,4 @@
-"""Regression tests for the final seven-family cassette gate."""
+"""Regression tests for the final eight-family cassette gate."""
 
 from __future__ import annotations
 
@@ -14,9 +14,10 @@ from tests.llm.runner import LLMTestRunner
 ROOT = Path(__file__).resolve().parents[2]
 
 
-def test_release_gate_contains_exactly_seven_distinct_model_families() -> None:
-    assert len(BENCHMARK_MODELS) == 7
-    assert len({MODEL_PROFILES[model].family for model in BENCHMARK_MODELS}) == 7
+def test_release_gate_contains_exactly_eight_distinct_model_families() -> None:
+    assert len(BENCHMARK_MODELS) == 8
+    assert len({MODEL_PROFILES[model].family for model in BENCHMARK_MODELS}) == 8
+    assert "openai/gpt-5-mini" in BENCHMARK_MODELS
     assert "openai/gpt-5-nano" not in MODEL_PROFILES
     assert "z-ai/glm-4.7-flash" not in MODEL_PROFILES
 
@@ -24,11 +25,15 @@ def test_release_gate_contains_exactly_seven_distinct_model_families() -> None:
 def test_provider_transport_profiles_are_explicit_and_validated() -> None:
     claude = MODEL_PROFILES["anthropic/claude-haiku-4.5"]
     minimax = MODEL_PROFILES["minimax/minimax-m2.5"]
+    openai = MODEL_PROFILES["openai/gpt-5-mini"]
 
     assert claude.response_format_type == "json_schema"
     assert claude.strip_unique_items_for_transport is True
     assert minimax.response_format_type == "json_object"
     assert minimax.strip_unique_items_for_transport is False
+    assert openai.response_format_type == "json_schema"
+    assert openai.reasoning == {"effort": "minimal"}
+    assert openai.temperature is None
 
     with pytest.raises(ValueError, match="response_format_type"):
         ModelProfile(model_id="x", label="x", family="x", response_format_type="invalid")
