@@ -90,7 +90,7 @@ def record_valid_cassette(monkeypatch, tmp_path: Path) -> tuple[dict, Path, VCRR
     return scenario, path, recorder
 
 
-def test_model_profiles_cover_seven_distinct_families() -> None:
+def test_model_profiles_cover_eight_distinct_families() -> None:
     assert BENCHMARK_MODELS == (
         "google/gemini-3-flash-preview",
         "anthropic/claude-haiku-4.5",
@@ -99,8 +99,9 @@ def test_model_profiles_cover_seven_distinct_families() -> None:
         "moonshotai/kimi-k2.5",
         "qwen/qwen3.5-flash-02-23",
         "mistralai/mistral-small-24b-instruct-2501",
+        "openai/gpt-5-mini",
     )
-    assert len({get_model_profile(model).family for model in BENCHMARK_MODELS}) == 7
+    assert len({get_model_profile(model).family for model in BENCHMARK_MODELS}) == 8
     json_object_models = {
         model
         for model in BENCHMARK_MODELS
