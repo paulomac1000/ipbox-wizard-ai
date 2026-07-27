@@ -13,7 +13,7 @@ Ten dokument opisuje kontrolowane dołączenie `openai/gpt-5-mini` jako ósmej r
 - slug kaset: `openai_gpt_5_mini`;
 - oczekiwany komplet: 46 kaset plus `_manifest.yaml`.
 
-`MODEL_PROFILES` zawiera profil modelu, natomiast `BENCHMARK_MODELS` nadal obejmuje siedem rodzin z kompletnymi kasetami. Kandydat pozostaje w `CANDIDATE_MODELS`, dopóki nie przejdzie całej procedury poniżej.
+Profil kandydata znajduje się w `tests/llm/candidate_models.py`, poza hashem istniejącego silnika i siedmiorodzinnej macierzy. To celowe: samo przygotowanie nowego modelu nie może unieważnić 322 poprawnych kaset. Kandydat pozostaje poza bramką wydania, dopóki nie przejdzie całej procedury poniżej.
 
 ## Nagranie przez GitHub Actions
 
@@ -57,19 +57,20 @@ LLM_MODEL=openai/gpt-5-mini \
 VCR_MODE=playback \
 python -m pytest tests/llm/test_scenarios.py --run-llm --vcr-mode=playback -q
 
-python scripts/vcr_precommit.py --model openai/gpt-5-mini
-python scripts/benchmark_report.py --model openai/gpt-5-mini
+python scripts/verify_candidate_model.py --model openai/gpt-5-mini
 ```
 
 ## Promocja do bramki wydania
 
 Dopiero po poprawnym imporcie i playbacku:
 
-1. przenieś `openai/gpt-5-mini` z `CANDIDATE_MODELS` do `BENCHMARK_MODELS`;
+1. utwórz bramkę wydania obejmującą siedem dotychczasowych modeli oraz `CANDIDATE_MODELS`, bez przenoszenia profilu do hashowanego `tests/llm/models.py`;
 2. zmień testy bramki z siedmiu na osiem niezależnych rodzin;
-3. uruchom `./scripts/verify_all_models.sh` bez sekretu;
-4. uruchom `python scripts/check_cassette_policy.py` i `python scripts/benchmark_report.py`;
+3. uruchom pełny playback 368 kaset bez sekretu;
+4. uruchom politykę kompletności dla całej ośmiomodelowej macierzy i raport benchmarku;
 5. zaktualizuj README i dokumentację z 322 do 368 kaset oraz z siedmiu do ośmiu rodzin;
 6. dopiero wtedy uznaj `COVERED_DIRECTLY` za potwierdzone także przez rodzinę OpenAI.
+
+Oddzielenie rejestru kandydata jest częścią kontraktu kompatybilności. Dodanie nowego modelu nie może zmieniać `engine_source_hash` ani fingerprintów istniejących kaset, ponieważ parametry konkretnego modelu są już chronione przez jego `request_hash`.
 
 Brak choć jednej poprawnej kasety, niezgodny model zwrócony przez dostawcę albo nieudany playback jest twardą granicą i blokuje promocję modelu do macierzy wydania.
