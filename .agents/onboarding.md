@@ -14,12 +14,19 @@ Gdy użytkownik chce przygotować albo sprawdzić rozliczenie IP Box:
 - przygotuj dane robocze wewnętrznie;
 - wykonaj obliczenia kodem z `python_helper/`;
 - porównaj wynik z KPiR, ewidencją i PIT;
-- wskaż testy i scenariusze bezpośrednio pokrywające przypadek;
-- rozróżnij `COVERED_DIRECTLY`, `COVERED_PARTIALLY` i `NOT_COVERED`;
+- wskaż testy i scenariusze odpowiadające przypadkowi;
+- podaj dokładnie jeden status: `COVERED_DIRECTLY`, `COVERED_PARTIALLY` albo `NOT_COVERED`;
 - nie zmieniaj kodu i nie twórz commitów;
 - nie zapisuj danych podatnika w repozytorium.
 
-Nie deklaruj pokrycia przez wiele rodzin AI na podstawie podobnego testu. Wymagany jest bezpośredni scenariusz oraz kompletna, aktualna macierz VCR.
+`COVERED_DIRECTLY` wolno zadeklarować wyłącznie wtedy, gdy łącznie:
+
+1. istnieje bezpośredni scenariusz biznesowy;
+2. scenariusz sprawdza ten sam istotny invariant;
+3. macierz VCR wszystkich wymaganych rodzin jest kompletna i aktualna;
+4. playback przechodzi bez sekretu i bez połączenia z siecią.
+
+Jeżeli spełniona jest tylko część tych warunków, użyj `COVERED_PARTIALLY`. Nie deklaruj potwierdzenia przez wiele rodzin AI na podstawie podobnego testu.
 
 Jeżeli przypadek nie jest pokryty albo ujawnia możliwy błąd, przygotuj minimalny przykład syntetyczny. Po zgodzie użytkownika utwórz GitHub Issue, gdy masz dostęp do zapisu. W przeciwnym razie przygotuj treść i podaj formularz:
 
@@ -38,6 +45,8 @@ Gdy użytkownik wyraźnie prosi o zmianę kodu lub dokumentacji:
 5. uruchom test celowany i pełną bramkę jakości;
 6. nie dostosowuj testu, schemy ani evaluatora do błędnej odpowiedzi modelu;
 7. nie wykonuj płatnego nagrywania VCR, jeżeli istniejące kasety dają się poprawnie odświeżyć i odtworzyć offline.
+
+W benchmarku Python buduje autorytatywną kopertę `expected_decision`. Model otrzymuje wyłącznie gotowe `status`, `stops` i `reviews`, a następnie ma je zwrócić bez reinterpretacji. Model nie liczy podatku ani nie ustala klasyfikacji.
 
 Szczegółowe komendy, invarianty, zasady VCR i Definition of Done znajdują się w `AGENTS.md` oraz `docs/testing.md`.
 
