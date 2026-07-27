@@ -17,6 +17,7 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 SCENARIO_DIR = ROOT / "tests/llm/scenarios"
 DEFAULT_CASSETTE_ROOT = ROOT / "tests/llm/vcr/cassettes"
+CASSETTE_ROOT = DEFAULT_CASSETTE_ROOT
 PAID_RUN_CONFIRMATION = "RUN_PAID_BENCHMARK"
 sys.path.insert(0, str(ROOT))
 
@@ -31,10 +32,11 @@ def slug(model: str) -> str:
 
 def _cassette_root() -> Path:
     """Resolve the cassette root after local environment settings are loaded."""
-    raw = os.environ.get("VCR_CASSETTES_ROOT", str(DEFAULT_CASSETTE_ROOT))
-    if not raw.strip():
+    raw = os.environ.get("VCR_CASSETTES_ROOT")
+    selected = Path(raw) if raw is not None else Path(CASSETTE_ROOT)
+    if not str(selected).strip():
         raise ValueError("VCR_CASSETTES_ROOT must not be empty")
-    return Path(raw)
+    return selected
 
 
 def run(command: list[str], env: dict[str, str]) -> int:
