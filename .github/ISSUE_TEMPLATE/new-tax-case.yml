@@ -79,8 +79,16 @@ body:
   - type: textarea
     id: coverage
     attributes:
-      label: Czy znalazłeś podobny test lub scenariusz?
-      description: Podaj nazwę pliku/scenariusza albo napisz, że nie znalazłeś bezpośredniego pokrycia.
+      label: Pokrycie testami i scenariuszami
+      description: Podaj dokładnie COVERED_DIRECTLY, COVERED_PARTIALLY albo NOT_COVERED. Wskaż bezpośredni test lub scenariusz, sprawdzany invariant, stan macierzy VCR wymaganych rodzin oraz wynik playbacku bez sekretu. Gdy czegoś nie potwierdzono, napisz czego brakuje.
+      placeholder: |
+        Status: COVERED_PARTIALLY
+        Test lub scenariusz: tests/llm/scenarios/...
+        Invariant: ...
+        Macierz VCR: kompletna / niepotwierdzona
+        Playback bez sekretu: PASS / nieuruchomiony
+    validations:
+      required: true
 
   - type: checkboxes
     id: privacy
