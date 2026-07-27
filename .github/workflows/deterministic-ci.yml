@@ -78,7 +78,10 @@ jobs:
           done
 
       - name: Cassette policy
-        run: python scripts/check_cassette_policy.py
+        run: |
+          set -o pipefail
+          mkdir -p reports
+          python scripts/check_cassette_policy.py 2>&1 | tee reports/cassette-policy.txt
 
       - name: Complete cassette gate and offline playback
         if: matrix.python-version == '3.13'
