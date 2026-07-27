@@ -26,6 +26,8 @@ Gdy użytkownik chce przygotować albo sprawdzić rozliczenie IP Box:
 3. macierz VCR wszystkich wymaganych rodzin jest kompletna i aktualna;
 4. playback przechodzi bez sekretu i bez połączenia z siecią.
 
+Bieżąca kanoniczna macierz obejmuje osiem rodzin i 46 scenariuszy na model, w tym `openai/gpt-5-mini`: łącznie 368 kaset i osiem manifestów. Zawsze potwierdź jej aktualny stan przez politykę kaset i playback, zamiast opierać się wyłącznie na tej liczbie w dokumentacji.
+
 Jeżeli spełniona jest tylko część tych warunków, użyj `COVERED_PARTIALLY`. Nie deklaruj potwierdzenia przez wiele rodzin AI na podstawie podobnego testu.
 
 Jeżeli przypadek nie jest pokryty albo ujawnia możliwy błąd, przygotuj minimalny przykład syntetyczny. Po zgodzie użytkownika utwórz GitHub Issue, gdy masz dostęp do zapisu. W przeciwnym razie przygotuj treść i podaj formularz:
@@ -47,6 +49,8 @@ Gdy użytkownik wyraźnie prosi o zmianę kodu lub dokumentacji:
 7. nie wykonuj płatnego nagrywania VCR, jeżeli istniejące kasety dają się poprawnie odświeżyć i odtworzyć offline.
 
 W benchmarku Python buduje autorytatywną kopertę `expected_decision`. Model otrzymuje wyłącznie gotowe `status`, `stops` i `reviews`, a następnie ma je zwrócić bez reinterpretacji. Model nie liczy podatku ani nie ustala klasyfikacji.
+
+GPT-5 Mini korzysta z tej samej ścieżki co pozostałe modele. Provider-specific usunięcie `uniqueItems` dotyczy wyłącznie kopii transportowej JSON Schema; lokalna schema, parser i evaluator pozostają wspólne i surowsze.
 
 Szczegółowe komendy, invarianty, zasady VCR i Definition of Done znajdują się w `AGENTS.md` oraz `docs/testing.md`.
 
