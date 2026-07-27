@@ -16,12 +16,7 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 SCENARIO_DIR = ROOT / "tests/llm/scenarios"
-CASSETTE_ROOT = Path(
-    os.environ.get(
-        "VCR_CASSETTES_ROOT",
-        str(ROOT / "tests/llm/vcr/cassettes"),
-    )
-)
+DEFAULT_CASSETTE_ROOT = ROOT / "tests/llm/vcr/cassettes"
 PAID_RUN_CONFIRMATION = "RUN_PAID_BENCHMARK"
 sys.path.insert(0, str(ROOT))
 
@@ -32,6 +27,14 @@ from tests.llm.vcr.cassette import CassetteManifest  # noqa: E402
 
 def slug(model: str) -> str:
     return model_slug(model)
+
+
+def _cassette_root() -> Path:
+    """Resolve the cassette root after local environment settings are loaded."""
+    raw = os.environ.get("VCR_CASSETTES_ROOT", str(DEFAULT_CASSETTE_ROOT))
+    if not raw.strip():
+        raise ValueError("VCR_CASSETTES_ROOT must not be empty")
+    return Path(raw)
 
 
 def run(command: list[str], env: dict[str, str]) -> int:
@@ -213,6 +216,11 @@ def main() -> int:
     load_local_env()
     get_model_profile(args.model)
 
+    try:
+        cassette_root = _cassette_root()
+    except ValueError as exc:
+        parser.error(str(exc))
+
     per_model_limit = _resolve_limit(
         parser,
         explicit=args.max_cost_per_model_usd,
@@ -232,11 +240,11 @@ def main() -> int:
             "LLM_PROVIDER": "openrouter",
             "LLM_MODEL": args.model,
             "VCR_MODE": "record",
-            "VCR_CASSETTES_ROOT": str(CASSETTE_ROOT),
+            "VCR_CASSETTES_ROOT": str(cassette_root),
         }
     )
     model_slug = slug(args.model)
-    model_dir = CASSETTE_ROOT / model_slug
+    model_dir = cassette_root / model_slug
     rejected_root = Path(env.get("VCR_REJECTED_ROOT", "/tmp/ipbox_llm_rejected"))
     started_at = time.time()
     try:
@@ -293,13 +301,13 @@ def main() -> int:
         # cassette can lead to a paid provider request.
         _require_paid_confirmation(parser)
         model_paid = paid_cost_since(
-            CASSETTE_ROOT,
+            cassette_root,
             rejected_root,
             since=session_started_at,
             model=model_slug,
         )
         total_paid = paid_cost_since(
-            CASSETTE_ROOT,
+            cassette_root,
             rejected_root,
             since=session_started_at,
         )
@@ -324,13 +332,13 @@ def main() -> int:
         )
 
         model_paid = paid_cost_since(
-            CASSETTE_ROOT,
+            cassette_root,
             rejected_root,
             since=session_started_at,
             model=model_slug,
         )
         total_paid = paid_cost_since(
-            CASSETTE_ROOT,
+            cassette_root,
             rejected_root,
             since=session_started_at,
         )
@@ -344,13 +352,13 @@ def main() -> int:
 
     accepted_total = recorded_cost(model_dir, args.model)
     model_session_paid = paid_cost_since(
-        CASSETTE_ROOT,
+        cassette_root,
         rejected_root,
         since=session_started_at,
         model=model_slug,
     )
     global_session_paid = paid_cost_since(
-        CASSETTE_ROOT,
+        cassette_root,
         rejected_root,
         since=session_started_at,
     )
