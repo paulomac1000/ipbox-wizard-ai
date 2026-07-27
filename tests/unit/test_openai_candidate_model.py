@@ -4,25 +4,29 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from tests.llm.models import (
-    BENCHMARK_MODELS,
+import pytest
+
+from tests.llm.candidate_models import (
     CANDIDATE_MODELS,
-    SUPPORTED_MODELS,
-    get_model_profile,
-    model_slug,
+    OPENAI_MODEL,
+    register_candidate_models,
 )
+from tests.llm.models import BENCHMARK_MODELS, MODEL_PROFILES, get_model_profile, model_slug
 from tests.llm.runner import LLMTestRunner
 from tests.llm.vcr.config import VCRConfig
 
 ROOT = Path(__file__).resolve().parents[2]
-OPENAI_MODEL = "openai/gpt-5-mini"
 
 
-def test_openai_model_is_supported_but_not_claimed_before_cassettes_exist() -> None:
+def test_openai_model_is_explicitly_registered_but_not_claimed_before_cassettes_exist() -> None:
     assert CANDIDATE_MODELS == (OPENAI_MODEL,)
-    assert OPENAI_MODEL in SUPPORTED_MODELS
     assert OPENAI_MODEL not in BENCHMARK_MODELS
+    assert OPENAI_MODEL not in MODEL_PROFILES
 
+    with pytest.raises(ValueError):
+        get_model_profile(OPENAI_MODEL)
+
+    register_candidate_models()
     profile = get_model_profile(OPENAI_MODEL)
     assert profile.label == "OpenAI GPT-5 Mini"
     assert profile.family == "OpenAI GPT"
@@ -32,9 +36,8 @@ def test_openai_model_is_supported_but_not_claimed_before_cassettes_exist() -> N
     assert model_slug(OPENAI_MODEL) == "openai_gpt_5_mini"
 
 
-def test_openai_transport_uses_strict_schema_and_minimal_reasoning(
-    monkeypatch,
-) -> None:
+def test_openai_transport_uses_strict_schema_and_minimal_reasoning(monkeypatch) -> None:
+    register_candidate_models()
     monkeypatch.setenv("LLM_PROVIDER", "openrouter")
     monkeypatch.setenv("LLM_MODEL", OPENAI_MODEL)
     monkeypatch.setenv("VCR_MODE", "playback")
@@ -53,3 +56,5 @@ def test_paid_workflow_exposes_the_candidate_without_expanding_all_mode() -> Non
     workflow = (ROOT / ".github/workflows/llm-benchmark.yml").read_text(encoding="utf-8")
     assert f'- "{OPENAI_MODEL}"' in workflow
     assert "current release matrix; candidates run individually" in workflow
+    assert "record_candidate_model.py" in workflow
+    assert "verify_candidate_model.py" in workflow
