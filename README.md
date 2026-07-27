@@ -281,20 +281,21 @@ Każdy z 46 scenariuszy został zweryfikowany na siedmiu niezależnych rodzinach
 - Qwen,
 - Mistral.
 
-Łącznie repozytorium utrzymuje **322 zweryfikowane kasety VCR**. Testy celowo używają ekonomicznych, mniej uprzywilejowanych modeli każdej rodziny. Sprawdzają, czy kontrakt jest na tyle jednoznaczny, że różne architektury potrafią zwrócić ten sam ograniczony wynik bez zmiany matematyki ustalonej przez Python.
+Łącznie repozytorium utrzymuje **322 zweryfikowane kasety VCR**. Testy celowo używają mniejszych lub kosztowo oszczędnych modeli reprezentujących każdą rodzinę. Sprawdzają, czy kontrakt jest na tyle jednoznaczny, że różne architektury potrafią zwrócić ten sam ograniczony wynik bez zmiany matematyki ustalonej przez Python.
 
-To jest dowód przenośności protokołu i przewidywalności integracji, a nie obietnica, że każdy model zawsze poprawnie odczyta każdy dokument. Mocniejszy model ma zwykle większy margines na analizę plików i kontekstu, ale nadal musi korzystać z deterministycznego silnika i tych samych kontroli.
+To jest dowód przenośności protokołu i przewidywalności integracji, a nie obietnica, że każdy model zawsze poprawnie odczyta każdy dokument. Mocniejszy model może mieć większy margines na analizę plików i kontekstu, ale nadal musi korzystać z deterministycznego silnika i tych samych kontroli.
 
 VCR pozwala odtwarzać zaakceptowane odpowiedzi offline i wykrywać zmianę zachowania modelu, promptu, schemy albo algorytmu. Szczegóły znajdują się w [`docs/testing.md`](docs/testing.md) i [`docs/model-diversity-benchmark.md`](docs/model-diversity-benchmark.md).
 
 ## Czy mój przypadek jest przetestowany
 
-Na końcu analizy agent powinien podać jeden z dwóch komunikatów:
+Na końcu analizy agent powinien podać jeden z trzech statusów:
 
-1. **Pokryty bezpośrednio** — wskazać nazwy testów lub scenariuszy odpowiadających Twojej sytuacji.
-2. **Niepokryty bezpośrednio** — wyjaśnić, które elementy są nowe i czy wynik wymaga dodatkowej weryfikacji.
+1. **`COVERED_DIRECTLY`** — istnieje bezpośredni test lub scenariusz odtwarzający tę samą ścieżkę i invariant.
+2. **`COVERED_PARTIALLY`** — część reguł jest chroniona, ale przypadek zawiera nowy element lub inną kombinację.
+3. **`NOT_COVERED`** — repozytorium nie ma jeszcze bezpośredniego testu dla istotnej części przypadku.
 
-Nowy, poprawnie opisany przypadek pomaga utrzymywać jakość projektu w czasie. Należy go odtworzyć na minimalnych danych syntetycznych i dodać jako test regresyjny.
+Agent powinien wskazać nazwy pasujących testów i scenariuszy oraz wyjaśnić, czego nie sprawdzono. Nowy, poprawnie opisany przypadek pomaga utrzymywać jakość projektu w czasie. Należy go odtworzyć na minimalnych danych syntetycznych i dodać jako test regresyjny.
 
 [**Zgłoś nowy lub nieobsłużony przypadek przez gotowy formularz GitHub Issue**](https://github.com/paulomac1000/ipbox-wizard-ai/issues/new?template=new-tax-case.yml)
 
