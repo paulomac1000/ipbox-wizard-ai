@@ -10,7 +10,8 @@ from typing import ClassVar
 import pytest
 
 from python_helper.allocation_precision import audit_revenue_allocation
-from scripts.record_model import PAID_RUN_CONFIRMATION, _require_paid_confirmation
+from scripts.local_env import load_local_env
+from scripts.record_model import PAID_RUN_CONFIRMATION, _cassette_root, _require_paid_confirmation
 from tests.llm.client import LLMClient
 from tests.llm.request_spec import LLMRequestSpec
 from tests.llm.vcr.config import VCRConfig
@@ -69,6 +70,25 @@ def test_record_model_requires_exact_process_confirmation(
 
     monkeypatch.setenv("LLM_PAID_RUN_CONFIRMATION", PAID_RUN_CONFIRMATION)
     _require_paid_confirmation(argparse.ArgumentParser())
+
+
+def test_record_model_resolves_cassette_root_after_loading_dotenv(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    expected = tmp_path / "custom-cassettes"
+    env_path = tmp_path / ".env"
+    env_path.write_text(f"VCR_CASSETTES_ROOT={expected}\n", encoding="utf-8")
+
+    monkeypatch.delenv("VCR_CASSETTES_ROOT", raising=False)
+    load_local_env(env_path)
+
+    assert _cassette_root() == expected
+
+
+def test_record_model_rejects_empty_cassette_root(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("VCR_CASSETTES_ROOT", "")
+    with pytest.raises(ValueError, match="must not be empty"):
+        _cassette_root()
 
 
 class _Response:
