@@ -28,7 +28,7 @@ Wydanie 0.2 przebudowuje projekt z instrukcji wspomaganej kodem w deterministycz
 - `STOP` zeruje finalne liczby i klasyfikacje; `REVIEW` sygnalizuje niepewność bez udawania wyniku finalnego.
 - Zmiana kodu, scenariusza, schemy lub requestu może unieważnić kasety. Najpierw należy wykonać bezpłatne odświeżenie metadanych i playback; płatnie nagrywa się wyłącznie faktycznie nieaktualne kasety.
 
-## 0.1 — lipiec 2026
+## 0.1 — 19 kwietnia 2026
 
 Pierwsze wydanie było operacyjnym wizardem Markdown przeznaczonym do pracy z agentem AI podczas przygotowania rozliczenia IP Box programisty B2B.
 
