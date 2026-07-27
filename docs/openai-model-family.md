@@ -16,6 +16,19 @@ Profil znajduje się w `tests/llm/models.py` razem z pozostałymi modelami. List
 
 Rejestr modeli nie należy do `engine_source_hash` silnika podatkowego. Każdy request nadal jest chroniony pełnym `request_hash`, który obejmuje model i wszystkie parametry transportowe. Dodanie nowego providera nie powinno samo w sobie unieważniać poprawnych kaset innych modeli.
 
+## Kolejność dla tego brancha
+
+Zmiana zakresu `engine_source_hash` jednorazowo zmienia tożsamość bieżącego silnika, dlatego istniejące 322 kasety wymagają bezpłatnego odświeżenia metadanych. Jednocześnie `--all-models` obejmuje już GPT-5 Mini, więc przed nagraniem brakujących kaset OpenAI pełne odświeżenie zatrzymałoby się na brakującym katalogu.
+
+Prawidłowa kolejność jest następująca:
+
+1. nagraj 46 brakujących kaset GPT-5 Mini standardowym recorderem;
+2. usuń klucz API z procesu;
+3. uruchom `refresh_vcr_metadata.py --all-models --write`, który zwaliduje surowe odpowiedzi i odświeży metadane wszystkich ośmiu rodzin;
+4. wykonaj pełny pre-commit, raport i playback 368/368.
+
+Nie edytuj ręcznie fingerprintów, hashy, manifestów ani `parsed_response`.
+
 ## Lokalne nagranie kaset
 
 Przełącz się na branch i przygotuj środowisko zgodnie z `docs/testing.md`. Następnie uruchom standardowy recorder pojedynczego modelu:
@@ -39,13 +52,18 @@ Recorder:
 5. respektuje oba limity kosztów;
 6. buduje manifest dla `openai/gpt-5-mini`.
 
-## Weryfikacja przed commitem
+## Odświeżenie i weryfikacja przed commitem
 
-Po nagraniu usuń klucz API z procesu i wykonaj standardową ścieżkę pojedynczego modelu:
+Po nagraniu usuń klucz API i odśwież metadane całej, już kompletnej macierzy:
 
 ```bash
 unset OPENROUTER_API_KEY
+python scripts/refresh_vcr_metadata.py --all-models --write
+```
 
+Następnie wykonaj standardową ścieżkę pojedynczego modelu:
+
+```bash
 PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 \
 LLM_PROVIDER=openrouter \
 LLM_MODEL=openai/gpt-5-mini \
@@ -60,7 +78,7 @@ python scripts/vcr_precommit.py --model openai/gpt-5-mini
 python scripts/benchmark_report.py --model openai/gpt-5-mini
 ```
 
-Następnie sprawdź całą macierz:
+Na końcu sprawdź całą macierz:
 
 ```bash
 python scripts/check_cassette_policy.py
