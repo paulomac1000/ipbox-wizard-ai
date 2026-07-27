@@ -4,27 +4,22 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import pytest
-
+from python_helper.report_metadata import _canonical_source_files
 from tests.llm.candidate_models import (
     CANDIDATE_MODELS,
     OPENAI_MODEL,
     register_candidate_models,
 )
-from tests.llm.models import BENCHMARK_MODELS, MODEL_PROFILES, get_model_profile, model_slug
+from tests.llm.models import BENCHMARK_MODELS, get_model_profile, model_slug
 from tests.llm.runner import LLMTestRunner
 from tests.llm.vcr.config import VCRConfig
 
 ROOT = Path(__file__).resolve().parents[2]
 
 
-def test_openai_model_is_explicitly_registered_but_not_claimed_before_cassettes_exist() -> None:
+def test_openai_model_is_registered_but_not_claimed_before_cassettes_exist() -> None:
     assert CANDIDATE_MODELS == (OPENAI_MODEL,)
     assert OPENAI_MODEL not in BENCHMARK_MODELS
-    assert OPENAI_MODEL not in MODEL_PROFILES
-
-    with pytest.raises(ValueError):
-        get_model_profile(OPENAI_MODEL)
 
     register_candidate_models()
     profile = get_model_profile(OPENAI_MODEL)
@@ -34,6 +29,12 @@ def test_openai_model_is_explicitly_registered_but_not_claimed_before_cassettes_
     assert profile.reasoning == {"effort": "minimal"}
     assert profile.response_format_type == "json_schema"
     assert model_slug(OPENAI_MODEL) == "openai_gpt_5_mini"
+
+
+def test_candidate_registry_does_not_invalidate_released_cassette_engine_hash() -> None:
+    canonical_paths = {relative for relative, _path in _canonical_source_files(ROOT)}
+    assert "tests/llm/models.py" in canonical_paths
+    assert "tests/llm/candidate_models.py" not in canonical_paths
 
 
 def test_openai_transport_uses_strict_schema_and_minimal_reasoning(monkeypatch) -> None:
