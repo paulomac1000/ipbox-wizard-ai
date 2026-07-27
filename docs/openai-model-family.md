@@ -1,76 +1,85 @@
-# Dodanie rodziny OpenAI do benchmarku
+# GPT-5 Mini w benchmarku wielomodelowym
 
-Ten dokument opisuje kontrolowane dołączenie `openai/gpt-5-mini` jako ósmej rodziny modeli. Profil może być nagrywany już teraz, ale nie jest jeszcze częścią bramki wydania. Dzięki temu standardowe CI pozostaje zielone i README nie deklaruje pokrycia, którego repozytorium jeszcze nie posiada.
+`openai/gpt-5-mini` jest ósmym modelem w kanonicznej macierzy benchmarkowej. Nie ma osobnego trybu „candidate”: korzysta z tych samych scenariuszy, recorderów, manifestów, kontroli kosztu, walidacji i playbacku co pozostałe rodziny.
 
-## Stan przygotowawczy
+## Profil transportowy
 
-- model: `openai/gpt-5-mini`;
+- model OpenRouter: `openai/gpt-5-mini`;
 - rodzina: `OpenAI GPT`;
-- transport: OpenRouter Chat Completions;
 - odpowiedź: strict `json_schema`;
 - reasoning: `minimal`;
 - temperatura nie jest wysyłana;
 - slug kaset: `openai_gpt_5_mini`;
-- oczekiwany komplet: 46 kaset plus `_manifest.yaml`.
+- wymagany komplet: 46 kaset oraz `_manifest.yaml`.
 
-Profil kandydata znajduje się w `tests/llm/candidate_models.py`, poza hashem istniejącego silnika i siedmiorodzinnej macierzy. To celowe: samo przygotowanie nowego modelu nie może unieważnić 322 poprawnych kaset. Kandydat pozostaje poza bramką wydania, dopóki nie przejdzie całej procedury poniżej.
+Profil znajduje się w `tests/llm/models.py` razem z pozostałymi modelami. Lista `BENCHMARK_MODELS` jest jedynym źródłem macierzy używanym przez recorder, politykę kaset, raport, playback i workflow.
 
-## Nagranie przez GitHub Actions
+Rejestr modeli nie należy do `engine_source_hash` silnika podatkowego. Każdy request nadal jest chroniony pełnym `request_hash`, który obejmuje model i wszystkie parametry transportowe. Dodanie nowego providera nie powinno samo w sobie unieważniać poprawnych kaset innych modeli.
 
-Uruchom ręcznie workflow **Paid multi-model LLM benchmark** na branchu `feat/openai-model-family` z parametrami:
+## Lokalne nagranie kaset
 
-```text
-confirmation: RUN_PAID_BENCHMARK
-model: openai/gpt-5-mini
-max-cost-per-model-usd: 5
-max-total-cost-usd: 5
+Przełącz się na branch i przygotuj środowisko zgodnie z `docs/testing.md`. Następnie uruchom standardowy recorder pojedynczego modelu:
+
+```bash
+LLM_PAID_RUN_CONFIRMATION=RUN_PAID_BENCHMARK \
+python scripts/record_model.py \
+  --model openai/gpt-5-mini \
+  --max-cost-per-model-usd 5 \
+  --max-total-cost-usd 5
 ```
 
-Workflow przed pierwszym płatnym wywołaniem uruchamia deterministyczne bramki jakości. Po nagraniu usuwa klucz API z procesu, odtwarza cały model offline i publikuje artefakt zawierający kasety, manifest, odpowiedzi diagnostyczne oraz odrzucone próby.
+Nie używaj osobnego wrappera. `scripts/record_model.py` musi obsługiwać GPT-5 Mini dokładnie tak samo jak każdy inny wpis z `BENCHMARK_MODELS`.
 
-Nie uruchamiaj trybu `all` na tym etapie. `all` oznacza aktualną macierz wydania i celowo nie obejmuje kandydata.
+Recorder:
 
-## Weryfikacja artefaktu
+1. nie nadpisuje istniejącej kasety;
+2. zapisuje kasetę dopiero po strict schema PASS i semantic PASS;
+3. odrzuca substytucję modelu;
+4. zapisuje każdą naliczoną, odrzuconą próbę w `VCR_REJECTED_ROOT`;
+5. respektuje oba limity kosztów;
+6. buduje manifest dla `openai/gpt-5-mini`.
 
-Do repozytorium należy skopiować wyłącznie zaakceptowany katalog:
+## Weryfikacja przed commitem
 
-```text
-tests/llm/vcr/cassettes/openai_gpt_5_mini/
-```
-
-Przed commitowaniem sprawdź:
-
-1. istnieje dokładnie 46 kaset scenariuszy oraz `_manifest.yaml`;
-2. manifest ma 46 wpisów i wskazuje `openai/gpt-5-mini` jako requested i returned model;
-3. każda odpowiedź ma `finish_reason=stop` i przechodzi strict schema;
-4. nie ma kluczy API, nagłówków autoryzacji, danych użytkownika ani plików z katalogu rejected;
-5. koszt manifestu zgadza się z raportem workflow;
-6. playback przechodzi bez `OPENROUTER_API_KEY` i bez dostępu do sieci.
-
-## Komendy po zaimportowaniu kaset
+Po nagraniu usuń klucz API z procesu i wykonaj standardową ścieżkę pojedynczego modelu:
 
 ```bash
 unset OPENROUTER_API_KEY
+
 PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 \
 LLM_PROVIDER=openrouter \
 LLM_MODEL=openai/gpt-5-mini \
 VCR_MODE=playback \
-python -m pytest tests/llm/test_scenarios.py --run-llm --vcr-mode=playback -q
+python -m pytest tests/llm/test_scenarios.py \
+  --run-llm \
+  --vcr-mode=playback \
+  --llm-model openai/gpt-5-mini \
+  -q
 
-python scripts/verify_candidate_model.py --model openai/gpt-5-mini
+python scripts/vcr_precommit.py --model openai/gpt-5-mini
+python scripts/benchmark_report.py --model openai/gpt-5-mini
 ```
 
-## Promocja do bramki wydania
+Następnie sprawdź całą macierz:
 
-Dopiero po poprawnym imporcie i playbacku:
+```bash
+python scripts/check_cassette_policy.py
+python scripts/vcr_precommit.py --all-models
+python scripts/benchmark_report.py
+unset OPENROUTER_API_KEY
+./scripts/verify_all_models.sh
+```
 
-1. utwórz bramkę wydania obejmującą siedem dotychczasowych modeli oraz `CANDIDATE_MODELS`, bez przenoszenia profilu do hashowanego `tests/llm/models.py`;
-2. zmień testy bramki z siedmiu na osiem niezależnych rodzin;
-3. uruchom pełny playback 368 kaset bez sekretu;
-4. uruchom politykę kompletności dla całej ośmiomodelowej macierzy i raport benchmarku;
-5. zaktualizuj README i dokumentację z 322 do 368 kaset oraz z siedmiu do ośmiu rodzin;
-6. dopiero wtedy uznaj `COVERED_DIRECTLY` za potwierdzone także przez rodzinę OpenAI.
+## Twarda bramka
 
-Oddzielenie rejestru kandydata jest częścią kontraktu kompatybilności. Dodanie nowego modelu nie może zmieniać `engine_source_hash` ani fingerprintów istniejących kaset, ponieważ parametry konkretnego modelu są już chronione przez jego `request_hash`.
+Model i PR zaliczają dopiero, gdy jednocześnie:
 
-Brak choć jednej poprawnej kasety, niezgodny model zwrócony przez dostawcę albo nieudany playback jest twardą granicą i blokuje promocję modelu do macierzy wydania.
+1. istnieje dokładnie 46 kaset OpenAI i kompletny manifest;
+2. każda kaseta ma `requested_model` oraz `returned_model` równe `openai/gpt-5-mini`;
+3. każda odpowiedź ma `finish_reason=stop`;
+4. wszystkie odpowiedzi przechodzą wspólną strict schema, parser, oracle i evaluator;
+5. katalog nie zawiera sekretów, danych prywatnych ani odrzuconych prób;
+6. playback przechodzi bez klucza API i bez sieci;
+7. kompletna macierz osiąga 8 × 46, czyli 368/368 kaset.
+
+45/46 jest wynikiem diagnostycznym, nie akceptacją. Nie ponawiaj błędu semantycznego do skutku i nie osłabiaj promptu, schemy ani evaluatora pod odpowiedź modelu.
