@@ -1,0 +1,71 @@
+meta:
+  id: 50_silent_allocation_method_switch_stop
+  name: Niejawna zmiana metody alokacji w trakcie roku
+  description: Łączy podwójny zaokrąglony procent w części roku z przypisaniem 100 procent przychodu mimo części NIE-IP.
+  tags: [regression, allocation, rounding, fail-closed, synthetic]
+  priority: P0
+input:
+  coverage:
+    expected_months: 2
+    imported_months: 2
+    invoices_complete: true
+    kpir_complete: true
+    work_records_complete: true
+    period_closed: true
+    confirmed_by: synthetic-scenario
+  rok: 2025
+  forma_opodatkowania: liniowy_19%
+  kwalifikowane_IP: true
+  polityka_alokacji:
+    policy_id: silent-switch-guard
+    W:
+      metoda: disjoint_components
+    przychody:
+      metoda: czasowa_W
+    koszty_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      uzasadnienie: Jedna metoda ma obowiązywać przez cały rok.
+  zus:
+    sposob: brak
+  kontrahenci:
+    - nazwa: ClientA
+      klauzula_IP: true
+  miesiace:
+    - miesiac: 2025-01
+      faktury:
+        - kwota_PLN: 23100
+          kontrahent: ClientA
+          kwalifikuje_IP: true
+      ewidencja:
+        godziny_pracy: 168
+        godziny_nie_IP: 22
+        procent_faktury_IP: 81.82
+        invoice_percentage_precision_pp: 0.01
+      kontrola_alokacji:
+        przychod_IP: 15463.64
+        przychod_NIE: 7636.36
+      koszty:
+        - opis: Dedykowany koszt projektu A
+          kwota: 100
+          kategoria: IP
+          allocation_source: syntetyczna-ewidencja-projektowa
+          nexus_source: own_br
+          nexus_evidence: synthetic-nexus-50_silent_allocation_method_switch_stop-1
+      opis_projektu: Rozwój kwalifikowanego programu komputerowego.
+    - miesiac: 2025-02
+      faktury:
+        - kwota_PLN: 23100
+          kontrahent: ClientA
+          kwalifikuje_IP: true
+      ewidencja:
+        godziny_pracy: 168
+        godziny_nie_IP: 22
+        procent_faktury_IP: 100
+      kontrola_alokacji:
+        przychod_IP: 23100
+        przychod_NIE: 0
+      koszty: []
+      opis_projektu: Rozwój kwalifikowanego programu komputerowego.
+assertions:
+  stops: [STOP_09, STOP_10, STOP_11]

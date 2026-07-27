@@ -1,45 +1,44 @@
 meta:
-  id: "38_verify_missing_kpir_data"
-  name: "Weryfikacja: Brak danych KPiR — REVIEW o niekompletne dane"
-  description: >
-    Podane tylko przychody, brak pozycji kosztowych i ewidencji czasu.
-    Algorytm powinien zidentyfikować brak KPiR i oznaczyć jako REVIEW
-    lub zapytać o brakujące dane przed obliczeniami.
-  tags: ["verification", "review", "missing-data"]
+  id: 38_verify_missing_kpir_data
+  name: Brak ewidencji przy deklarowanym IP
+  description: Brak ewidencji przy deklarowanym IP
+  tags:
+  - regression
   priority: P1
-  expected_stops: []
-  expected_reviews: []
-
 input:
+  coverage:
+    expected_months: 1
+    imported_months: 1
+    invoices_complete: true
+    kpir_complete: true
+    work_records_complete: true
+    period_closed: true
+    confirmed_by: synthetic-scenario
   rok: 2025
-  forma_opodatkowania: "liniowy_19%"
+  forma_opodatkowania: liniowy_19%
+  kwalifikowane_IP: true
+  polityka_alokacji:
+    policy_id: scenario-policy
+    przychody:
+      metoda: czasowa_W
+    koszty_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      uzasadnienie: Jawna polityka testowa; przychody, MIX i NEXUS są rozdzielone.
   zus:
-    sposob: "w_KPiR"
+    sposob: brak
   kontrahenci:
-    - nazwa: "AnonymCorp Sp. z o.o."
-      waluta: "PLN"
-      klauzula_IP: true
-      model_komercjalizacji: "przeniesienie_praw"
-
+  - nazwa: ClientA
+    klauzula_IP: true
   miesiace:
-    - miesiac: "2025-01"
-      faktury:
-        - kwota_netto: 18000
-          kontrahent: "AnonymCorp Sp. z o.o."
-      # Brak ewidencji czasu (godziny)
-      # Brak pozycji kosztowyche (koszty: [])
-      koszty: []
-      opis_projektu: "Wdrożyłem integrację z API zewnętrznego dostawcy danych."
-    - miesiac: "2025-02"
-      faktury:
-        - kwota_netto: 18000
-          kontrahent: "AnonymCorp Sp. z o.o."
-      koszty: []
-      opis_projektu: "Zoptymalizowałem zapytania SQL redukując czas odpowiedzi o 40%."
-
-  ulgi: {}
-
+  - miesiac: 2025-01
+    faktury:
+    - kwota_PLN: 18000
+      kontrahent: ClientA
+      kwalifikuje_IP: true
+    koszty: []
+    opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.
+    brak_ewidencji: true
 assertions:
-  # Bez ewidencji godzin W jest nieznany — algorytm powinien użyć max(0) lub zapytać
-  # Brak kosztów → IP income = przychód, podatek_IP = 18000*2*5% = 1800
-  podatek_IP_range: [1700, 1900]
+  stops:
+  - STOP_08

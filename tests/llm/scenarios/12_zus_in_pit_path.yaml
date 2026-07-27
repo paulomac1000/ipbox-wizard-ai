@@ -1,29 +1,69 @@
 meta:
-  id: "12_zus_in_pit_path"
-  name: "Logika: ZUS odliczany w PIT"
-  description: "Weryfikacja ścieżki B (ZUS nie w KPiR)"
-  tags: ["core", "ZUS"]
-  priority: "P1"
-
+  id: 12_zus_in_pit_path
+  name: ZUS odliczany wyłącznie w PIT
+  description: ZUS odliczany wyłącznie w PIT
+  tags:
+  - regression
+  priority: P1
 input:
+  coverage:
+    expected_months: 1
+    imported_months: 1
+    invoices_complete: true
+    kpir_complete: true
+    work_records_complete: true
+    period_closed: true
+    confirmed_by: synthetic-scenario
   rok: 2025
-  forma_opodatkowania: "liniowy_19%"
+  forma_opodatkowania: liniowy_19%
+  kwalifikowane_IP: true
+  polityka_alokacji:
+    policy_id: scenario-policy
+    przychody:
+      metoda: czasowa_W
+    koszty_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      uzasadnienie: Jawna polityka testowa; przychody, MIX i NEXUS są rozdzielone.
   zus:
-    sposob: "PIT" # Ścieżka B
+    sposob: PIT
+    odliczenie_spoleczne_PIT: 1800
   kontrahenci:
-    - nazwa: "ClientA"
-      waluta: "PLN"
-      klauzula_IP: true
+  - nazwa: ClientA
+    klauzula_IP: true
+  - nazwa: ClientB
+    klauzula_IP: false
   miesiace:
-    - miesiac: "2025-01"
-      przychody: 15000
+  - miesiac: 2025-01
+    faktury:
+    - kwota_PLN: 15000
+      kontrahent: ClientA
+      kwalifikuje_IP: true
+    - kwota_PLN: 5000
+      kontrahent: ClientB
+      kwalifikuje_IP: false
+    ewidencja:
       godziny_pracy: 160
       godziny_nie_IP: 0
-      koszty: []
-  ulgi:
-    zus_spoleczne_roczne: 18000 # Odliczenie w kaskadzie
-
+      procent_faktury_IP: 100
+    koszty:
+    - opis: Licencja IDE
+      kwota: 100
+      nexus_source: own_br
+      nexus_evidence: synthetic-nexus-12_zus_in_pit_path-1
+      kategoria: IP
+      allocation_source: ewidencja_kosztu_IP
+    opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.
 assertions:
   zus_dubel: false
-  testy_pass: ["TEST_3"]
-  podatek_IP_range: [700, 800]
+  podatek_IP_range:
+  - 740
+  - 750
+  testy_pass:
+  - TEST_3
+  - TEST_5
+  - TEST_8
+  - TEST_9
+  podatek_NIE_range:
+  - 608
+  - 608

@@ -1,128 +1,42 @@
-# Onboarding dla agenta — ipbox-wizard-ai
+# Onboarding agenta
 
-## Co to jest ten projekt?
+Repozytorium jest narzędziem **decision-support**, a nie automatycznym doradcą podatkowym. Kontrakt roczny i procedurę wydania ostatnio zweryfikowano 26 lipca 2026 r. dla wszystkich lat obowiązywania IP Box 2019–2026; każdy kolejny rok musi mieć urzędowe źródło i test.
 
-Narzędzie dla **programistów B2B w Polsce** rozliczających ulgę **IP Box** (art. 30ca PIT). Ulga pozwala opodatkować dochód z kwalifikowanych praw własności intelektualnej (np. autorskie oprogramowanie) stawką 5% zamiast standardowych 19%/12-32%.
+## Kolejność pracy
 
-Projekt składa się z:
-- **Algorytmu w Markdown** (`ipbox_algorytm.md`) — system prompt dla AI, prowadzi użytkownika przez 10 faz rozliczenia
-- **Kalkulatora Python** (`python_helper/ipbox_calculator.py`) — czyste funkcje matematyczne bez zależności AI
-- **Testów** — weryfikujących zarówno kalkulator (unit) jak i zachowanie AI (LLM scenariusze)
+1. Przeczytaj `AGENTS.md`, `README.md`, `ipbox_algorytm.md` i `docs/testing.md`.
+2. Uruchom wszystkie bezpłatne bramki.
+3. Błąd semantyczny najpierw odtwórz testem deterministycznym.
+4. Popraw kalkulator/oracle, potem scenariusz, schema i dokumentację.
+5. Nie dopasowuj prawdy testowej do odpowiedzi modelu.
+6. Najpierw spróbuj bezpłatnego odświeżenia metadanych istniejących kaset. Nagrywanie LLM rozpocznij dopiero wtedy, gdy surowa odpowiedź nie przechodzi aktualnego kontraktu, po zielonych bramkach deterministycznych i przy czystym drzewie.
+7. Używaj dokładnych modeli z `tests/llm/models.py`.
+8. Odrzucenia analizuj w `${VCR_REJECTED_ROOT:-/tmp/ipbox_llm_rejected}/<model>/`; każda próba ma osobny plik. Wznawiaj tylko brakujące nagrania po sklasyfikowaniu przyczyny.
+9. Zakończenie wymaga 322/322 dla siedmiu rodzin, czystego JSON bez Markdown fences, playbacku bez sekretu i raportu `scripts/benchmark_report.py` oraz procedury z `docs/testing.md`.
 
-## Pierwsze kroki
+## Model odpowiedzialności
 
-```bash
-# 1. Zainstaluj zależności
-pip install -r requirements.txt
-pip install -r requirements-test.txt
+- Python wykonuje wszystkie obliczenia, wyznacza `decision_facts` i buduje pełną autorytatywną kopertę `expected_decision`.
+- Model otrzymuje gotowe `status`, `stops` i `reviews` i kopiuje je bez zmian; nie widzi faktów podatkowych ani nazw predykatów.
+- Evaluator i lokalna strict schema odrzucają pominięcie, dodatkowy kod, duplikat, skrzyżowanie kanałów lub niewłaściwy status.
+- Adapter transportowy może usunąć keyword nieobsługiwany przez providera albo użyć `json_object`, ale nie może osłabić lokalnej schema ani walidacji semantycznej.
+- VCR zapisuje tylko odpowiedź z `finish_reason=stop`, nie nadpisuje istniejącej kasety i nigdy nie wykonuje sieci podczas playbacku.
 
-# 2. Skonfiguruj klucz Gemini
-cp .env.example .env
-# Edytuj .env i wpisz GEMINI_API_KEY
+Nie przywracaj pełnej mapy `true/false` ani listy wymagającej ponownej klasyfikacji kodów. Kolejne realne macierze wykazały, że słabsze modele potrafiły reinterpretować nieaktywne fakty albo przenosić REVIEW do STOP. `expected_decision` usuwa obie zbędne decyzje modelu.
 
-# 3. Uruchom testy jednostkowe
-pytest tests/unit/ -v
+## Pułapki
 
-# 4. Uruchom testy LLM w trybie playback (offline, zero kosztów)
-make test-llm-playback
+- `W` nie jest domyślnym kluczem `MIX`.
+- NEXUS podwyższa łącznie A+B.
+- IDE, chmura, laptop i repozytorium bez dowodu są `MIX` albo `WYKLUCZONE`, nie automatycznie `IP`.
+- B+R wymaga jawnego rozdziału `IP/NIE`; nie używaj niejednoznacznego `ulga_BR`.
+- `strata_NIE_z_lat_poprzednich` nie obejmuje strat kwalifikowanego IP.
+- Dodatkowe dochody skali łączy się tylko z działalnością na skali; przy liniowym potrzebna jest osobna kaskada.
+- Limity zdrowotnej i IKZE są roczne; nie zgaduj limitu dla nieobsługiwanego roku.
+- Miesiąc musi należeć do `input.rok`, a pula termomodernizacji nie może przekraczać 53 000 zł.
+- Kasety historyczne są diagnostyką poprzednich kontraktów, nie dowodem poprawności obecnego kodu.
+- Lokalnie dopuszczalny jest pusty katalog VCR, ale merge gate wymaga kompletnej i aktualnej macierzy 322/322.
 
-# 5. Sprawdź świeżość kaset
-make vcr-check
-```
+## Stan bazowy
 
-## Struktura katalogów
-
-```
-ipbox-wizard-ai/
-├── ipbox_algorytm.md          # Algorytm — GŁÓWNY PLIK
-├── python_helper/
-│   └── ipbox_calculator.py    # Kalkulator Python
-├── tests/
-│   ├── conftest.py            # Globalne fixtures + opcja --run-llm
-│   ├── unit/                  # Testy deterministyczne kalkulatora
-│   └── llm/
-│       ├── client.py          # Klient Gemini API
-│       ├── runner.py          # Wykonuje scenariusze
-│       ├── evaluator.py       # Waliduje wyniki LLM
-│       ├── test_scenarios.py  # pytest wrapper
-│       └── scenarios/         # Pliki YAML z danymi testowymi
-├── docs/
-│   └── testing.md             # Dokumentacja testów (VCR, Unit)
-├── scripts/
-│   ├── vcr_precommit.py       # Check świeżości kaset
-│   └── vcr_smoke.sh           # Szybki test offline
-├── .github/workflows/         # CI/CD GitHub Actions
-├── AGENTS.md                  # Wytyczne dla agentów AI
-└── .env.example               # Wymagane zmienne środowiskowe
-```
-
-## Kluczowe koncepty algorytmu IP Box
-
-### Współczynnik W
-Procent czasu pracy na kwalifikowanym IP w danym miesiącu. Dzielnik = **faktyczny czas pracy** (bez urlopów), nie 160h.
-
-```
-W = ((godziny_pracy - godziny_nie_IP) × procent_faktury_IP) / godziny_pracy × 100
-```
-
-### Koszyki kosztów
-- **IP** — bezpośrednie (nie mnożone przez W)
-- **MIX** — pośrednie (mnożone przez W dla IP, przez 1-W dla NIE)
-- **NIE** — nie związane z IP Box
-- **WYKLUCZONE** — kary, grzywny
-
-### NEXUS
-Wskaźnik proporcji własnej działalności B+R. Cap = 1.0.
-```
-NEXUS = min(1.0, (A×1.3 + B) / (A + B + C + D))
-```
-gdzie A=własne koszty B+R, B=niezależni podwykonawcy, C=powiązane podmioty, D=nabyte IP.
-
-### Kaskada ulg (kolejność ma znaczenie!)
-1. Strata z lat ubiegłych
-2. ZUS społeczne (jeśli nie w KPiR)
-3. IKZE (use-it-or-lose-it!)
-4. Darowizny / rehabilitacja
-5. Termomodernizacja (carry-over do następnych lat)
-
-### Różnice kursowe
-**ZAWSZE trafiają do koszyka NIE**, nigdy do IP Box.
-
-### Testy weryfikacyjne (Faza 8)
-Algorytm uruchamia 6 testów przed wygenerowaniem YAML:
-- TEST_1: Bilans KPiR
-- TEST_2: Brak kosztów prywatnych w IP
-- TEST_3: Anty-dubel ZUS
-- TEST_4: Baza ≥ 0 i carry-over ≥ 0
-- TEST_5: Zgodność podatku IP
-- TEST_6: Zgodność nadpłaty/dopłaty
-
-## Co można modyfikować
-
-### Dodawanie funkcji do kalkulatora
-1. Dodaj funkcję do `python_helper/ipbox_calculator.py`
-2. Dodaj testy do `tests/unit/test_<nazwa>.py`
-3. Każdy test: `@pytest.mark.unit` + `@pytest.mark.P0/P1/P2`
-
-### Dodawanie scenariuszy LLM
-1. Stwórz plik `tests/llm/scenarios/NN_angielska_nazwa.yaml`
-2. Dane wejściowe po **polsku** (LLM jest dostrojony do polskiego prawa podatkowego)
-3. Zawsze dodaj `input.rok` i `input.forma_opodatkowania`
-
-### Modyfikacja algorytmu
-Edytuj `ipbox_algorytm.md`. Po zmianach **obowiązkowo** uruchom testy dymne lub pełne nagrywanie:
-
-```bash
-make vcr-smoke          # Szybki check offline (P0)
-make test-llm-record    # Nagraj nowe kasety (wymaga API KEY)
-make vcr-check          # Walidacja fingerprintów
-```
-
-## Częste problemy
-
-| Problem | Przyczyna | Rozwiązanie |
-|---|---|---|
-| `GEMINI_API_KEY not set` | Brak pliku `.env` | Skopiuj `.env.example` → `.env` i wpisz klucz |
-| Testy LLM pominięte | Brak flagi | Dodaj `--run-llm` do wywołania pytest |
-| Coverage < 90% | Nowe funkcje bez testów | Dodaj testy do `tests/unit/` |
-| `PytestUnknownMarkWarning` | Nowy marker bez rejestracji | Dodaj do `[tool.pytest.ini_options].markers` w `pyproject.toml` |
+Bramka deterministyczna obejmuje Python 3.11–3.13, pełny zestaw testów jednostkowych, coverage powyżej 90%, pełny bezpłatny suite, politykę kaset i składnię shell. Dokładną liczbę testów raportuje CI. Na Pythonie 3.13 CI dodatkowo wymaga kompletnego raportu macierzy i wykonuje pełny playback offline bez `OPENROUTER_API_KEY`.

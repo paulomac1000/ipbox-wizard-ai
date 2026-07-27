@@ -1,13 +1,80 @@
 meta:
-  id: "32_private_costs_ip_fail"
-  name: "Weryfikacja: Prywatne w IP (FAIL)"
-  tags: ["verification", "fail"]
+  id: 32_private_costs_ip_fail
+  name: Prywatny wydatek ujęty w źródłowej KPiR i zeznaniu
+  description: Syntetyczna regresja sprawdzająca wyłączenie NON-KUP, korektę KPiR i warunkową korektę ulgi bez danych podatnika.
+  tags: [regression, correction, kpir, synthetic, fail-closed]
+  priority: P0
 input:
+  coverage:
+    expected_months: 1
+    imported_months: 1
+    invoices_complete: true
+    kpir_complete: true
+    work_records_complete: true
+    period_closed: true
+    confirmed_by: synthetic-scenario
+  rok: 2025
+  forma_opodatkowania: liniowy_19%
+  kwalifikowane_IP: true
+  polityka_alokacji:
+    policy_id: synthetic-source-ledger-correction
+    przychody:
+      metoda: dokumentowa
+    koszty_MIX:
+      metoda: przychodowa_roczna
+      źródło: użytkownik
+      uzasadnienie: Syntetyczna polityka do testu korekty źródłowej ewidencji.
+  zus:
+    sposob: brak
+    odliczenie_spoleczne_PIT: 2000
+  ulgi:
+    ikze: 3000
+    termomodernizacja_pula: 5000
+  zaliczki:
+    suma: 5000
+  kontrahenci:
+  - nazwa: ClientA
+    klauzula_IP: true
+  podsumowanie_kpir:
+    przychody: 30000
+    koszty: 3400
+  uzgodnienie_zeznania:
+    przychod_IP: 20000
+    przychod_NIE: 10000
+    koszt_IP: 2000
+    koszt_NIE: 1400
+    termomodernizacja_odliczona: 3600
+    podatek_łączny: 900
+    nadpłata: 4100
   miesiace:
-    - miesiac: "2025-01"
-      koszty:
-        - opis: "Kawa do domu"
-          kwota: 100
-          koszyk: "IP" # BŁĄD! Powinno być NIE.
+  - miesiac: 2025-12
+    faktury:
+    - kwota_PLN: 30000
+      kwota_IP: 20000
+      kontrahent: ClientA
+      kwalifikuje_IP: true
+    ewidencja:
+      godziny_pracy: 160
+      godziny_nie_IP: 40
+      procent_faktury_IP: 100
+    koszty:
+    - opis: Bezpośredni koszt projektu
+      kwota: 2000
+      kategoria: IP
+      allocation_source: SYNTHETIC-IP-EVIDENCE
+      nexus_source: own_br
+      nexus_evidence: synthetic-nexus-32_private_costs_ip_fail-1
+    - opis: Koszt wyłącznie działalności NIE
+      kwota: 1000
+      kategoria: NON
+      nexus_source: outside_nexus
+    - opis: Wydatek prywatny omyłkowo ujęty jako koszt działalności
+      kwota: 400
+      kategoria: NON
+      KUP: false
+      source_ledger_included: true
+      nexus_source: outside_nexus
+    opis_projektu: Rozwój syntetycznego kwalifikowanego programu komputerowego.
 assertions:
-  testy_fail: ["TEST_2"]
+  stops: [SOURCE_KPIR_REQUIRES_CORRECTION, STOP_12]
+  testy_fail: [TEST_2]

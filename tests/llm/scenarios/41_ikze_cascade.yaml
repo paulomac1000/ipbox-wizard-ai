@@ -1,66 +1,84 @@
 meta:
-  id: "41_ikze_cascade"
-  name: "IKZE w kaskadzie odliczeń — odliczenie od dochodu NIE"
-  description: >
-    W = 70% (część czasu na prace inne niż B+R), więc istnieje dochód NIE.
-    IKZE (7000 zł) odliczane od Dochodu_NIE przed obliczeniem podatku NIE.
-    Test weryfikuje że IKZE faktycznie redukuje podstawę podatku NIE.
-    Bez IKZE: podatek_NIE ≈ 1548 zł. Z IKZE (7000): podatek_NIE ≈ 218 zł.
-  tags: ["core", "cascade", "IKZE"]
-  priority: "P0"
-
+  id: 41_ikze_cascade
+  name: IKZE w kaskadzie dochodu NIE
+  description: IKZE w kaskadzie dochodu NIE
+  tags:
+  - regression
+  priority: P0
 input:
+  coverage:
+    expected_months: 2
+    imported_months: 2
+    invoices_complete: true
+    kpir_complete: true
+    work_records_complete: true
+    period_closed: true
+    confirmed_by: synthetic-scenario
   rok: 2025
-  forma_opodatkowania: "liniowy_19%"
+  forma_opodatkowania: liniowy_19%
+  kwalifikowane_IP: true
+  polityka_alokacji:
+    policy_id: scenario-policy
+    przychody:
+      metoda: czasowa_W
+    koszty_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      uzasadnienie: Jawna polityka testowa; przychody, MIX i NEXUS są rozdzielone.
   zus:
-    sposob: "w_KPiR"
-    spoleczne_miesiecznie: 1418.48
-
+    sposob: brak
   kontrahenci:
-    - nazwa: "TechCorp Sp. z o.o."
-      waluta: "PLN"
-      klauzula_IP: true
-      model_komercjalizacji: "przeniesienie_praw"
-
-  miesiace:
-    - miesiac: "2025-01"
-      faktury:
-        - kwota_netto: 15000
-          kontrahent: "TechCorp Sp. z o.o."
-      ewidencja:
-        godziny_pracy: 160
-        godziny_nie_IP: 48   # W = (160-48)/160 = 70%
-        procent_faktury_IP: 100
-      koszty:
-        - opis: "Składki ZUS społeczne"
-          kwota: 1418.48
-      opis_projektu: >
-        Zaprojektowałem i wdrożyłem moduł autoryzacji OAuth2 z obsługą PKCE.
-
-    - miesiac: "2025-02"
-      faktury:
-        - kwota_netto: 15000
-          kontrahent: "TechCorp Sp. z o.o."
-      ewidencja:
-        godziny_pracy: 160
-        godziny_nie_IP: 48   # W = 70%
-        procent_faktury_IP: 100
-      koszty:
-        - opis: "Składki ZUS społeczne"
-          kwota: 1418.48
-      opis_projektu: >
-        Zoptymalizowałem pipeline przetwarzania danych redukując latencję o 35%.
-
+  - nazwa: ClientA
+    klauzula_IP: true
   ulgi:
-    IKZE: 7000
-
+    ikze: 7000
+  miesiace:
+  - miesiac: 2025-01
+    faktury:
+    - kwota_PLN: 15000
+      kontrahent: ClientA
+      kwalifikuje_IP: true
+    ewidencja:
+      godziny_pracy: 160
+      godziny_nie_IP: 48
+      procent_faktury_IP: 100
+    koszty:
+    - opis: IDE
+      kwota: 100
+      nexus_source: own_br
+      nexus_evidence: synthetic-nexus-41_ikze_cascade-1
+      kategoria: IP
+      allocation_source: ewidencja_kosztu_IP
+    - opis: Księgowość
+      kwota: 500
+      nexus_source: outside_nexus
+      kategoria: MIX
+    opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.
+  - miesiac: 2025-02
+    faktury:
+    - kwota_PLN: 15000
+      kontrahent: ClientA
+      kwalifikuje_IP: true
+    ewidencja:
+      godziny_pracy: 160
+      godziny_nie_IP: 48
+      procent_faktury_IP: 100
+    koszty:
+    - opis: Hosting
+      kwota: 500
+      nexus_source: outside_nexus
+      kategoria: MIX
+    opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.
 assertions:
-  # W = 70%, Revenue IP = 30000×0.7 = 21000, Revenue NIE = 9000
-  # ZUS (MIX): 2836.96 → IP = 1985.87, NIE = 851.09
-  # Dochód IP = 21000 - 1985.87 = 19014.13 → podatek IP ≈ 19014×5% = 951
-  # Dochód NIE = 9000 - 851.09 = 8148.91
-  # Kaskada: IKZE = 7000 → Podstawa NIE = 8148.91 - 7000 = 1148.91
-  # Podatek NIE = round(1148.91)×19% ≈ 218 PLN
-  # Bez IKZE byłoby: round(8148.91)×19% ≈ 1548 PLN — zakres [150,350] wyklucza brak IKZE
-  podatek_NIE_range: [150, 350]
-  podatek_IP_range: [800, 1100]
+  W_miesieczne:
+    2025-01: 70.0
+    2025-02: 70.0
+  podatek_NIE_range:
+  - 300
+  - 350
+  testy_pass:
+  - TEST_4
+  - TEST_5
+  - TEST_6
+  - TEST_8
+  - TEST_9

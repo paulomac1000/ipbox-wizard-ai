@@ -1,38 +1,47 @@
 meta:
-  id: "37_verify_invalid_tax_form_stop"
-  name: "Weryfikacja: Ryczałt niekompatybilny z IP Box (STOP)"
-  description: >
-    Forma opodatkowania = ryczałt ewidencjonowany.
-    IP Box (art. 30ca PIT) jest NIEKOMPATYBILNY z ryczałtem — algorytm
-    powinien wygenerować STOP i poinformować użytkownika o braku możliwości
-    stosowania ulgi.
-  tags: ["verification", "fail", "stop", "tax-form"]
+  id: 37_verify_invalid_tax_form_stop
+  name: Nieprawidłowa forma opodatkowania
+  description: Nieprawidłowa forma opodatkowania
+  tags:
+  - regression
   priority: P1
-  expected_stops: ["ryczałt"]
-
 input:
+  coverage:
+    expected_months: 1
+    imported_months: 1
+    invoices_complete: true
+    kpir_complete: true
+    work_records_complete: true
+    period_closed: true
+    confirmed_by: synthetic-scenario
   rok: 2025
-  forma_opodatkowania: "ryczalt"
+  forma_opodatkowania: ryczalt
+  kwalifikowane_IP: true
+  polityka_alokacji:
+    policy_id: scenario-policy
+    przychody:
+      metoda: czasowa_W
+    koszty_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      uzasadnienie: Jawna polityka testowa; przychody, MIX i NEXUS są rozdzielone.
+  zus:
+    sposob: brak
   kontrahenci:
-    - nazwa: "TechClient Sp. z o.o."
-      waluta: "PLN"
-      klauzula_IP: true
-      model_komercjalizacji: "przeniesienie_praw"
-
+  - nazwa: ClientA
+    klauzula_IP: true
   miesiace:
-    - miesiac: "2025-01"
-      faktury:
-        - kwota_netto: 20000
-          kontrahent: "TechClient Sp. z o.o."
-      ewidencja:
-        godziny_pracy: 160
-        godziny_nie_IP: 0
-        procent_faktury_IP: 100
-      koszty: []
-      opis_projektu: "Zaimplementowałem moduł autoryzacji OAuth2."
-
-  ulgi: {}
-
+  - miesiac: 2025-01
+    faktury:
+    - kwota_PLN: 20000
+      kontrahent: ClientA
+      kwalifikuje_IP: true
+    ewidencja:
+      godziny_pracy: 160
+      godziny_nie_IP: 0
+      procent_faktury_IP: 100
+    koszty: []
+    opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.
 assertions:
-  # Ryczałt jest niekompatybilny z IP Box — algorytm powinien wygenerować STOP
-  # Asercja checked przez meta.expected_stops powyżej
+  stops:
+  - STOP_01

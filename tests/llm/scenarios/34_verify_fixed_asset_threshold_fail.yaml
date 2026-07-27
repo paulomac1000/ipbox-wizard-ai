@@ -1,47 +1,52 @@
 meta:
-  id: "34_verify_fixed_asset_threshold_fail"
-  name: "Weryfikacja: Środek trwały >10k jako jednorazowy koszt (FAIL)"
-  description: >
-    Laptop wart 12 500 zł wpisany jednorazowo do KPiR w miesiącu zakupu.
-    Algorytm (Faza 3.5) powinien wykryć środek trwały >10k i zaklasyfikować
-    jako WYKLUCZONE (właściwe ujęcie: amortyzacja).
-  tags: ["verification", "fail", "fixed-asset"]
+  id: 34_verify_fixed_asset_threshold_fail
+  name: Środek trwały powyżej progu
+  description: Środek trwały powyżej progu
+  tags:
+  - regression
   priority: P1
-  expected_stops: []
-  expected_reviews: []
-
 input:
+  coverage:
+    expected_months: 1
+    imported_months: 1
+    invoices_complete: true
+    kpir_complete: true
+    work_records_complete: true
+    period_closed: true
+    confirmed_by: synthetic-scenario
   rok: 2025
-  forma_opodatkowania: "liniowy_19%"
+  forma_opodatkowania: liniowy_19%
+  kwalifikowane_IP: true
+  polityka_alokacji:
+    policy_id: scenario-policy
+    przychody:
+      metoda: czasowa_W
+    koszty_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      uzasadnienie: Jawna polityka testowa; przychody, MIX i NEXUS są rozdzielone.
   zus:
-    sposob: "w_KPiR"
-    spoleczne_miesiecznie: 1418.48
+    sposob: brak
   kontrahenci:
-    - nazwa: "SoftClient Sp. z o.o."
-      waluta: "PLN"
-      klauzula_IP: true
-      model_komercjalizacji: "przeniesienie_praw"
-
+  - nazwa: ClientA
+    klauzula_IP: true
   miesiace:
-    - miesiac: "2025-01"
-      faktury:
-        - kwota_netto: 25000
-          kontrahent: "SoftClient Sp. z o.o."
-      ewidencja:
-        godziny_pracy: 160
-        godziny_nie_IP: 0
-        procent_faktury_IP: 100
-      koszty:
-        - opis: "Składki ZUS społeczne"
-          kwota: 1418.48
-        - opis: "Laptop ThinkPad X1 Carbon"
-          kwota: 12500
-      opis_projektu: >
-        Zaimplementowałem system obsługi płatności z integracją bramki PayU.
-
-  ulgi: {}
-
+  - miesiac: 2025-01
+    faktury:
+    - kwota_PLN: 25000
+      kontrahent: ClientA
+      kwalifikuje_IP: true
+    ewidencja:
+      godziny_pracy: 160
+      godziny_nie_IP: 0
+      procent_faktury_IP: 100
+    koszty:
+    - opis: Laptop ThinkPad X1 Carbon
+      kwota: 12500
+      kategoria: WYKLUCZONE
+      asset_treatment: amortyzacja_poza_tym_przebiegiem
+      nexus_source: outside_nexus
+    opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.
 assertions:
-  # Laptop >10k powinien być WYKLUCZONE (środek trwały, nie jednorazowy koszt)
   koszty_koszyk:
-    "Laptop ThinkPad X1 Carbon": "WYKLUCZONE"
+    Laptop ThinkPad X1 Carbon: WYKLUCZONE

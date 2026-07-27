@@ -1,32 +1,68 @@
 meta:
   id: 27_termomodernizacja_full
-  name: 'Brzegowy: Termomodernizacja — pełna pula'
-  description: Weryfikacja odliczenia termomodernizacji po IKZE, z carry-over do następnych
-    lat
+  name: Termomodernizacja po pozostałych ulgach
+  description: Termomodernizacja po pozostałych ulgach
   tags:
-  - edge
   - relief
-  - termo
   priority: P1
 input:
+  coverage:
+    expected_months: 1
+    imported_months: 1
+    invoices_complete: true
+    kpir_complete: true
+    work_records_complete: true
+    period_closed: true
+    confirmed_by: synthetic-scenario
   rok: 2025
   forma_opodatkowania: liniowy_19%
+  kwalifikowane_IP: true
+  polityka_alokacji:
+    policy_id: scenario-policy
+    przychody:
+      metoda: czasowa_W
+    koszty_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      uzasadnienie: Jawna polityka testowa; przychody, MIX i NEXUS są rozdzielone.
   zus:
-    sposob: w_KPiR
+    sposob: brak
+  kontrahenci:
+  - nazwa: ClientA
+    klauzula_IP: true
+  ulgi:
+    termomodernizacja_loty:
+    - origin_year: 2025
+      remaining_amount: 53000
+      evidence_ref: synthetic-thermo-27-2025
+    ikze: 2000
   miesiace:
   - miesiac: 2025-01
     faktury:
-    - kwota_netto: 20000
-      kontrahent: TestCorp
+    - kwota_PLN: 20000
+      kontrahent: ClientA
+      kwalifikuje_IP: true
     ewidencja:
       godziny_pracy: 160
       godziny_nie_IP: 16
       procent_faktury_IP: 100
     koszty:
-    - opis: Abonament internet
+    - opis: Licencja IDE
       kwota: 89
-  ulgi:
-    termomodernizacja_pula: 53000
-    ikze: 9388.8
+      nexus_source: own_br
+      nexus_evidence: synthetic-nexus-27_termomodernizacja_full-1
+      kategoria: IP
+      allocation_source: ewidencja_kosztu_IP
+    opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.
 assertions:
   nexus: 1.0
+  przychod_IP_roczny_range:
+  - 18000
+  - 18000
+  W_miesieczne:
+    2025-01: 90.0
+  testy_pass:
+  - TEST_5
+  - TEST_8
+  - TEST_9
+  termomodernization_carry_over: 53000

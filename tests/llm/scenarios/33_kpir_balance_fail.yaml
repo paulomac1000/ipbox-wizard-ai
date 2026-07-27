@@ -1,13 +1,50 @@
 meta:
-  id: "33_kpir_balance_fail"
-  name: "Weryfikacja: Bilans KPiR (FAIL)"
-  tags: ["verification", "fail"]
+  id: 33_kpir_balance_fail
+  name: Niespójny bilans KPiR
+  description: Niespójny bilans KPiR
+  tags:
+  - regression
+  priority: P1
 input:
+  coverage:
+    expected_months: 1
+    imported_months: 1
+    invoices_complete: true
+    kpir_complete: true
+    work_records_complete: true
+    period_closed: true
+    confirmed_by: synthetic-scenario
+  rok: 2025
+  forma_opodatkowania: liniowy_19%
+  kwalifikowane_IP: true
+  polityka_alokacji:
+    policy_id: scenario-policy
+    przychody:
+      metoda: czasowa_W
+    koszty_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      uzasadnienie: Jawna polityka testowa; przychody, MIX i NEXUS są rozdzielone.
+  zus:
+    sposob: brak
+  kontrahenci:
+  - nazwa: ClientA
+    klauzula_IP: true
   podsumowanie_kpir:
     przychody: 100000
     koszty: 50000
   miesiace:
-    - miesiac: "2025-01"
-      przychody: 90000 # SUMA != 100000
+  - miesiac: 2025-01
+    faktury:
+    - kwota_PLN: 90000
+      kontrahent: ClientA
+      kwalifikuje_IP: true
+    ewidencja:
+      godziny_pracy: 160
+      godziny_nie_IP: 0
+      procent_faktury_IP: 100
+    koszty: []
+    opis_projektu: Projekt z celowo niespójnym bilansem KPiR.
 assertions:
-  testy_fail: ["TEST_1"]
+  testy_fail:
+  - TEST_1

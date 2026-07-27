@@ -1,38 +1,81 @@
 meta:
-  id: "11_multi_client_mixed_currencies"
-  name: "Logika: 2 klientów (PLN + EUR)"
-  description: "Weryfikacja agregacji przychodów z różnych walut"
-  tags: ["core", "multi-client", "FX"]
-  priority: "P1"
-
+  id: 11_multi_client_mixed_currencies
+  name: Wiele klientów i walut
+  description: Wiele klientów i walut
+  tags:
+  - fx
+  - multi-client
+  priority: P1
 input:
+  coverage:
+    expected_months: 1
+    imported_months: 1
+    invoices_complete: true
+    kpir_complete: true
+    work_records_complete: true
+    period_closed: true
+    confirmed_by: synthetic-scenario
   rok: 2025
-  forma_opodatkowania: "liniowy_19%"
+  forma_opodatkowania: liniowy_19%
+  kwalifikowane_IP: true
+  polityka_alokacji:
+    policy_id: scenario-policy
+    przychody:
+      metoda: czasowa_W
+    koszty_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      uzasadnienie: Jawna polityka testowa; przychody, MIX i NEXUS są rozdzielone.
   zus:
-    sposob: "w_KPiR"
+    sposob: brak
   kontrahenci:
-    - nazwa: "TechPL"
-      waluta: "PLN"
-      klauzula_IP: true
-    - nazwa: "EuroSoft"
-      waluta: "EUR"
-      klauzula_IP: true
+  - nazwa: TechPL
+    klauzula_IP: true
+  - nazwa: EuroSoft
+    klauzula_IP: true
   miesiace:
-    - miesiac: "2025-01"
-      przychody_kontrahent:
-        TechPL: 10000
-        EuroSoft: 3000 # 3000 EUR
-      faktury:
-        - numer: "FV/EUR/01"
-          kontrahent: "EuroSoft"
-          kwota_waluta: 3000
-          waluta: "EUR"
-          data_wystawienia: "2024-12-31" # Kurs z 30.12
-          data_wplywu: "2025-01-05"
+  - miesiac: 2025-01
+    faktury:
+    - kwota_waluta: 2500
+      waluta: USD
+      data_wystawienia: '2025-01-02'
+      data_zaplaty: '2025-01-10'
+      data_kursu_przychodu: '2024-12-31'
+      kurs_przychodu: 4.0
+      data_kursu_zaplaty: '2025-01-09'
+      kurs_zaplaty: 4.02
+      źródło_kursu: NBP_table_A_fixture
+      kontrahent: TechPL
+      kwalifikuje_IP: true
+    - kwota_waluta: 3000
+      waluta: EUR
+      data_wystawienia: '2025-01-03'
+      data_zaplaty: '2025-01-15'
+      data_kursu_przychodu: '2025-01-02'
+      kurs_przychodu: 4.3
+      data_kursu_zaplaty: '2025-01-14'
+      kurs_zaplaty: 4.2666666667
+      źródło_kursu: NBP_table_A_fixture
+      kontrahent: EuroSoft
+      kwalifikuje_IP: true
+    ewidencja:
       godziny_pracy: 160
       godziny_nie_IP: 0
-  ulgi: {}
-
+      procent_faktury_IP: 100
+    koszty:
+    - opis: Repozytorium kodu
+      kwota: 300
+      nexus_source: own_br
+      nexus_evidence: synthetic-nexus-11_multi_client_mixed_currencies-1
+      kategoria: IP
+      allocation_source: ewidencja_kosztu_IP
+    opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.
 assertions:
-  nexus: 1.0
-  testy_pass: ["TEST_1", "TEST_2", "TEST_3", "TEST_4", "TEST_5", "TEST_6"]
+  roznice_kursowe_w_IP: false
+  podatek_IP_range:
+  - 1120
+  - 1140
+  testy_pass:
+  - TEST_5
+  - TEST_8
+  - TEST_9

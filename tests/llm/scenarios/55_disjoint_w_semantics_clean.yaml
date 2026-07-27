@@ -1,0 +1,68 @@
+meta:
+  id: 55_disjoint_w_semantics_clean
+  name: Zaokrąglone W dla rozłącznych składników i osobna faktura NIE-IP
+  description: W zaokrąglone do 0,01 pp nie wywołuje fałszywego STOP, a osobna faktura NIE-IP nie trafia do wspólnego mianownika.
+  tags: [regression, allocation, rounding, w-semantics, synthetic]
+  priority: P0
+input:
+  coverage:
+    expected_months: 1
+    imported_months: 1
+    invoices_complete: true
+    kpir_complete: true
+    work_records_complete: true
+    period_closed: true
+    confirmed_by: synthetic-scenario
+  rok: 2025
+  forma_opodatkowania: liniowy_19%
+  kwalifikowane_IP: true
+  polityka_alokacji:
+    policy_id: disjoint-w-clean
+    W:
+      metoda: disjoint_components
+    przychody:
+      metoda: czasowa_W
+    koszty_MIX:
+      metoda: przychodowa_roczna
+      źródło: użytkownik
+      uzasadnienie: Umowa i raport rozdzielają część faktury oraz godziny NIE-IP.
+  zus:
+    sposob: brak
+  kontrahenci:
+    - nazwa: ClientA
+      klauzula_IP: true
+    - nazwa: ClientB
+      klauzula_IP: false
+  miesiace:
+    - miesiac: 2025-01
+      faktury:
+        - kwota_PLN: 23100
+          kontrahent: ClientA
+          kwalifikuje_IP: true
+        - kwota_PLN: 2500
+          kontrahent: ClientB
+          kwalifikuje_IP: false
+      ewidencja:
+        godziny_pracy: 168
+        godziny_nie_IP: 22
+        procent_faktury_IP: 81.8182
+        W: 68.72
+        W_precision_pp: 0.01
+      kontrola_alokacji:
+        przychod_IP: 15874.32
+        przychod_NIE: 9725.68
+      koszty:
+        - opis: Bezpośredni koszt projektu
+          kwota: 100
+          kategoria: IP
+          allocation_source: syntetyczna-ewidencja-projektowa
+          nexus_source: own_br
+          nexus_evidence: synthetic-nexus-55_disjoint_w_semantics_clean-1
+      opis_projektu: Rozwój kwalifikowanego programu komputerowego.
+assertions:
+  W_miesieczne:
+    2025-01: 68.72
+  przychod_IP_roczny_range: [15874.32, 15874.32]
+  przychod_NIE_roczny_range: [9725.68, 9725.68]
+  stops: []
+  testy_pass: [TEST_4, TEST_5, TEST_6, TEST_8, TEST_9]

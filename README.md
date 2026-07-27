@@ -1,278 +1,282 @@
-# 🧮 Algorytm IP Box — Wizard AI dla programistów B2B
+# IP Box Wizard AI
 
-> Operacyjna instrukcja w Markdown, którą wklejasz do agenta AI (Claude, ChatGPT, Gemini itp.), aby poprowadził Cię przez rozliczenie PIT z ulgą IP Box — od kwalifikacji, przez obliczenia, aż po gotowe dane do wpisania w formularz.
+**Deterministyczny silnik wspierający przygotowanie rozliczenia IP Box programisty B2B.**
 
-[![Licencja MIT](https://img.shields.io/badge/licencja-MIT-green)]()
-[![Status](https://img.shields.io/badge/status-v1.0-brightgreen)]()
-[![Prawo PL](https://img.shields.io/badge/prawo-PIT%2030ca–30cb-orange)]()
+Projekt przyjmuje znormalizowane dane o przychodach, czasie pracy, kosztach, dowodach i ulgach, a następnie tworzy audytowalny raport z alokacją IP/NIE, współczynnikiem `W`, kosztami `MIX`, NEXUS, podatkiem, testami kontrolnymi oraz śladem decyzji.
 
----
+Najważniejsza zasada projektu jest prosta:
 
-## ⚠️ Najpierw — zastrzeżenia
+> **Python liczy i ustala wynik. Model językowy nie wykonuje krytycznej arytmetyki ani klasyfikacji podatkowej.**
 
-- Algorytm **nie stanowi porady prawnej ani podatkowej**. To narzędzie pomocnicze, które systematyzuje przepisy.
-- Stan prawny: **kwiecień 2026**. Prawo się zmienia — zweryfikuj aktualność przed wysłaniem PIT.
-- Limity kwotowe (IKZE, składki zdrowotnej, ulg) zmieniają się corocznie. Algorytm odsyła Cię do aktualnych źródeł (gov.pl, biznes.gov.pl), nie zapisuje ich na sztywno.
-- **Zawsze weryfikuj wyniki z doradcą podatkowym lub księgową.** Algorytm dobrze odwali robotę przygotowawczą, ale decyzja końcowa należy do Ciebie.
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/python-3.11–3.13-blue.svg)](pyproject.toml)
 
----
+> [!IMPORTANT]
+> To narzędzie pomocnicze, nie porada podatkowa ani generator gotowego zeznania. Dane wejściowe i wynik powinny zostać sprawdzone przez księgową lub doradcę podatkowego przed użyciem w rozliczeniu.
 
-## Co to jest
+## Co dostajesz
 
-[**`ipbox_algorytm.md`**](ipbox_algorytm.md) to ~1000-linijkowa instrukcja dla agenta AI, która prowadzi użytkownika przez 10 faz:
+Dla kompletnego, znormalizowanego wejścia silnik potrafi przygotować:
 
-| Faza | Co się dzieje |
+- podział przychodów na IP i NIE;
+- miesięczny współczynnik czasu `W` z jawną metodą;
+- klasyfikację kosztów jako IP, NIE, MIX albo WYKLUCZONE;
+- alokację kosztów pośrednich z zachowaniem każdego grosza;
+- koszyki NEXUS A/B/C/D i współczynnik NEXUS;
+- dochód kwalifikowany oraz część IP opodatkowaną zwykłą stawką;
+- kaskadę podatku i ulg właściwą dla roku 2019–2026;
+- TEST 1–9, statusy STOP i REVIEW oraz ostrzeżenia;
+- audyt źródłowej KPiR, ewidencji i zeznania;
+- `correction_preview` pokazujący skutki korekty bez udawania finalnego wyniku;
+- `calculation_meta` z hashem wejścia, źródłami reguł i tożsamością silnika.
+
+Projekt jest szczególnie przydatny, gdy trzeba jasno odpowiedzieć na pytania:
+
+- czy przychód rzeczywiście kwalifikuje się do IP Box;
+- czy współczynnik `W` został policzony właściwą metodą;
+- czy koszt `MIX` nie został błędnie rozdzielony według `W`;
+- czy koszt ma dowód pozwalający przypisać go bezpośrednio do IP;
+- czy NEXUS uwzględnia poprawne koszyki i wzór;
+- czy rozliczenie źródłowe wymaga korekty;
+- która część dochodu podlega 5%, a która zwykłej stawce.
+
+## Zakres i granice
+
+Silnik przyjmuje **znormalizowany YAML/dict**. Repozytorium nie zawiera kompletnego importera surowych PDF, XLSX, KPiR ani formularzy PIT.
+
+Warstwa ekstrakcji dokumentów musi zachować jawne fakty źródłowe, takie jak:
+
+- kwalifikacja prawa i faktury;
+- `KUP` i informacja, czy koszt pozostał w KPiR;
+- metoda podziału przychodu i kosztów;
+- czas pracy i część NIE-IP;
+- dowody alokacji oraz dowody NEXUS;
+- limity i dokumenty dotyczące ulg.
+
+Brak danych nie jest interpretowany jako zero ani korzystne `true`. Niepewność prowadzi do błędu, STOP albo REVIEW.
+
+## Szybki start
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt -r requirements-test.txt
+
+ruff format --check .
+ruff check .
+python -m compileall -q python_helper tests scripts
+pytest tests/unit --cov=python_helper --cov-report=term-missing --cov-fail-under=90
+pytest -q
+```
+
+Pierwsze wywołanie pytest egzekwuje wymagane coverage `python_helper`, a drugie uruchamia pełny bezpłatny suite. Standardowa bramka nie wykonuje płatnych requestów do modeli.
+
+## Uruchom pełny przykład
+
+Repozytorium zawiera syntetyczny scenariusz podstawowego rozliczenia liniowego. Poniższe polecenie uruchamia kanoniczny pipeline referencyjny i zapisuje raport YAML:
+
+```bash
+python - <<'PY'
+from pathlib import Path
+
+import yaml
+
+from tests.llm.oracle import compute_reference
+
+scenario_path = Path("tests/llm/scenarios/01_basic_linear.yaml")
+scenario = yaml.safe_load(scenario_path.read_text(encoding="utf-8"))
+report = compute_reference(scenario)
+
+Path("report.yaml").write_text(
+    yaml.safe_dump(report, allow_unicode=True, sort_keys=False),
+    encoding="utf-8",
+)
+print("Zapisano report.yaml")
+PY
+```
+
+`yaml.safe_dump` jest funkcją biblioteki PyYAML używanej przez projekt. Pełny przykładowy wynik znajduje się w [`examples/przykladowy_output_yaml.yaml`](examples/przykladowy_output_yaml.yaml).
+
+### Minimalny fragment wejścia
+
+```yaml
+input:
+  coverage:
+    expected_months: 1
+    imported_months: 1
+    invoices_complete: true
+    kpir_complete: true
+    work_records_complete: true
+    period_closed: true
+    confirmed_by: example
+  rok: 2025
+  forma_opodatkowania: liniowy_19%
+  kwalifikowane_IP: true
+  polityka_alokacji:
+    przychody:
+      metoda: czasowa_W
+    koszty_MIX:
+      metoda: przychodowa_roczna
+      źródło: jawna_polityka
+      uzasadnienie: Przychód, W, MIX i NEXUS są rozdzielone.
+  miesiace:
+    - miesiac: 2025-01
+      faktury:
+        - kwota_PLN: 25000
+          kontrahent: ClientA
+          kwalifikuje_IP: true
+      ewidencja:
+        godziny_pracy: 168
+        godziny_nie_IP: 16
+        procent_faktury_IP: 100
+```
+
+To celowo minimalny fragment pokazujący kształt kontraktu. Pełny przykład z kontrahentem, kosztami, dowodami alokacji i NEXUS oraz asercjami znajduje się w [`tests/llm/scenarios/01_basic_linear.yaml`](tests/llm/scenarios/01_basic_linear.yaml). Bardziej złożone przypadki — ulgi, waluty, korekty i wiele IP — znajdują się w [`tests/llm/scenarios/`](tests/llm/scenarios/).
+
+## Używanie deterministycznych helperów
+
+Poszczególne elementy silnika można wykorzystywać bez pipeline'u LLM:
+
+```python
+from python_helper import calculate_w_percent
+
+w = calculate_w_percent(
+    work_hours=168,
+    non_ip_hours=16,
+    invoice_percentage=100,
+    method="time_only",
+)
+
+assert w == 90.48
+```
+
+Publiczne helpery obejmują między innymi obliczanie `W`, audyt alokacji, reguły podatkowe per rok, podatek skali, termomodernizację i uzgodnienie ewidencji.
+
+## Jak działa architektura
+
+```text
+YAML/dict
+   ↓
+ścisła walidacja typów, kompletności i dowodów
+   ↓
+python_helper
+W → przychód IP/NIE → koszty i MIX → NEXUS → ulgi → podatek
+   ↓
+kanoniczny oracle tworzy raport i decision_facts
+   ↓
+expected_decision: status / stops / reviews
+   ↓
+LLM kopiuje wyłącznie ograniczoną decyzję protokołu
+   ↓
+strict JSON Schema + evaluator
+   ↓
+VCR playback / zweryfikowana kaseta
+```
+
+Model nie widzi nazw predykatów podatkowych i nie ustala kodów na podstawie własnej interpretacji. Benchmark mierzy jednoznaczność protokołu i zgodność integracji, a nie zdolność modelu do liczenia podatku.
+
+## Kluczowe invarianty
+
+- przychód IP/NIE, `W`, alokacja `MIX` i NEXUS są niezależnymi decyzjami;
+- `W` nie jest domyślnym ani uniwersalnym kluczem `MIX`;
+- NEXUS wynosi `min(1, ((A+B)×1,3)/(A+B+C+D))`;
+- brak A/B/C/D daje NEXUS `0`, nie `1`;
+- część dochodu IP poza preferencją trafia do zwykłej podstawy;
+- koszt bez dowodu wyłączności nie staje się kosztem IP;
+- opis lub kwota kosztu nie mogą samodzielnie ustalić KUP ani koszyka;
+- alokacje zachowują każdy grosz;
+- STOP zeruje finalne liczby i klasyfikacje;
+- dodatnie odliczenie wymaga zweryfikowanego limitu i dowodu;
+- rok, liczby i flagi kwalifikacji mają ścisłe typy;
+- odpowiedź modelu musi być czystym JSON-em i zakończyć się `finish_reason=stop`.
+
+Szczegółowy kontrakt znajduje się w [`ipbox_algorytm.md`](ipbox_algorytm.md).
+
+## Mapa repozytorium
+
+| Ścieżka | Rola |
 |---|---|
-| 0 | Kwalifikacja — pytanie o interpretację KIS, analiza umowy i KPiR |
-| 1 | Zbieranie danych rocznych i ulg (w tym podinstrukcja dodawania nowych ulg) |
-| 2 | Obliczenie współczynnika W dla każdego miesiąca |
-| 3 | Klasyfikacja kosztów do koszyków IP / MIX / NIE / WYKLUCZONE |
-| 4 | Obliczenia miesięczne (przychody, koszty, różnice kursowe) |
-| 5 | Walidacja opisów projektów |
-| 6 | Warunki STOP / REVIEW (fail-fast przed obliczeniami) |
-| 7 | Rozliczenie roczne — kaskada odliczeń w prawidłowej kolejności |
-| 8 | Weryfikacja (6 testów matematycznych) |
-| 9 | Mapowanie pól formularzy PIT |
-| 10 | Generowanie YAML i propozycja ewidencji XLSX |
+| [`ipbox_algorytm.md`](ipbox_algorytm.md) | kontrakt domenowy i kolejność decyzji |
+| [`python_helper/`](python_helper/) | deterministyczna matematyka, walidacja i reguły roczne |
+| [`tests/unit/`](tests/unit/) | wykonywalna specyfikacja i regresje |
+| [`tests/llm/oracle.py`](tests/llm/oracle.py) | pełny wynik referencyjny |
+| [`tests/llm/scenarios/`](tests/llm/scenarios/) | syntetyczne przypadki biznesowe |
+| [`tests/llm/vcr/`](tests/llm/vcr/) | fingerprinty, kasety, manifesty i playback |
+| [`scripts/`](scripts/) | bramki jakości, raport benchmarku i nagrywanie |
+| [`docs/testing.md`](docs/testing.md) | procedura testów, VCR i wydania |
+| [`AGENTS.md`](AGENTS.md) | onboarding oraz reguły pracy agenta |
+| [`CHANGELOG.md`](CHANGELOG.md) | najważniejsze różnice między wydaniami 0.1 i 0.2 |
 
----
+## Testy i reprodukowalność
 
-## Dla kogo
+Projekt utrzymuje trzy warstwy kontroli:
 
-| Profil | Pasuje? |
-|---|---|
-| Programista B2B (JDG) na podatku liniowym 19% | ✅ idealnie |
-| Programista B2B na skali 12/32% | ✅ obsługiwany |
-| Programista z 1–3 kontrahentami | ✅ |
-| Programista z podwykonawcami (freelancerzy UI/UX, testerzy) | ✅ (NEXUS uwzględnia) |
-| Programista z klientami zagranicznymi (USD/EUR) | ✅ (obsługa kursów NBP + różnic kursowych) |
-| Programista zatrudniający pracowników + IP Box + ulga B+R | ✅ (blokada double-dipping) |
-| Programista na ryczałcie ewidencjonowanym | ❌ IP Box nie łączy się z ryczałtem |
-| Spółka z o.o. | ❌ algorytm jest pod JDG/PIT, nie CIT |
-| Programista na etacie | ❌ IP Box dotyczy działalności gospodarczej |
+1. **Testy jednostkowe** — matematyka, walidacja, reguły roczne i przypadki brzegowe.
+2. **Scenariusze referencyjne** — kompletne syntetyczne przypadki biznesowe.
+3. **VCR** — zweryfikowane odpowiedzi siedmiu rodzin modeli, odtwarzane offline.
 
----
+Aktualna macierz wydania 0.2 obejmuje 46 scenariuszy × 7 rodzin modeli, czyli 322 kasety i 7 manifestów. Fingerprint wiąże każdą kasetę z kodem silnika, scenariuszem, requestem i harness VCR.
 
-## 🚀 Jak zacząć — 3 ścieżki
+Pełna bezpłatna bramka:
 
-### Ścieżka A: Najszybsza — Claude.ai Project / ChatGPT Project
-
-1. Załóż projekt w Claude.ai (lub Custom GPT w OpenAI, lub Gem w Google Gemini).
-2. Wklej zawartość [**`ipbox_algorytm.md`**](ipbox_algorytm.md) jako **system prompt** (instrukcje / knowledge base).
-3. Dodaj pliki: KPiR, ewidencję czasu, umowę, interpretację KIS (jeśli masz).
-4. Napisz: *"Chcę rozliczyć IP Box za rok 2025. Poprowadź mnie przez algorytm."*
-5. Agent przeprowadzi Cię przez wszystkie 10 faz.
-
-> [!TIP]
-> Rozliczenie zajmuje zwykle 15–30 wiadomości. Darmowe wersje modeli (np. Claude Free) mogą mieć zbyt małe limity, by ukończyć sesję za jednym razem. Rekomendujemy wersje płatne (Pro/Advanced).
-
-**Rekomendowane modele** (testowane, stan 04/2026):
-
-| Model | Uruchamianie kodu | Rekomendacja |
-|---|---|---|
-| Claude Opus 4.7 (Claude.ai Pro) | ✅ | ⭐⭐⭐ najlepszy do długich sesji wizard, Projects z plikami |
-| GPT-5.4 (ChatGPT Plus) | ✅ | ⭐⭐⭐ Custom GPT + Advanced Data Analysis, świetna arytmetyka |
-| Gemini 3.1 Pro (Google AI Studio / Google AI Pro) | ✅ | ⭐⭐ Gems, dobra obsługa plików |
-| Claude Sonnet 4.6 / GPT-5.3 (darmowe) | ⚠️ ograniczone | ⭐ zadziała, ale pilnuj arytmetyki |
-| Claude Haiku / GPT-5.4 mini (fallback) / Gemini 3.1 Flash | ❌ | ⭐ może zadziałać, ale nie polecam |
-| Lokalne LLM (Llama 4, Qwen 3.6, Mistral Large) | ❌ zwykle | ⭐ tylko jeśli wymuszasz Python zewnętrznie |
-
-### Ścieżka B: Z uruchamianiem kodu (rekomendowana dla precyzji)
-
-Zamiast polegać na "matematyce w głowie" LLM, wymuszasz wykonywanie obliczeń w Pythonie:
-
-1. Użyj Claude Opus 4.7 z Code Execution (dostępne w Claude.ai) albo Custom GPT z Advanced Data Analysis / Code Interpreter.
-2. Załaduj dodatkowo plik [**`python_helper/ipbox_calculator.py`**](python_helper/ipbox_calculator.py) — zawiera gotowe funkcje do obliczeń W, NEXUS, kaskady podatkowej i weryfikacji.
-3. W system prompcie dodaj linijkę: *"Przed każdym obliczeniem uruchom odpowiednią funkcję z `ipbox_calculator.py` — nie licz w głowie."*
-4. Dalej jak w ścieżce A.
-
-Zaletą: zero halucynacji arytmetycznych, powtarzalne wyniki, zobaczysz dokładne podstawienie wartości.
-
-### Ścieżka C: Claude Skill (dla mocno zaawansowanych)
-
-Jeśli korzystasz z Claude (Anthropic) i chcesz żeby Claude miał ten algorytm zawsze pod ręką:
-
-1. Utwórz folder `ipbox-skill/` z plikiem `SKILL.md` (treść: zawartość `ipbox_algorytm.md` + krótkie `description` na górze wyjaśniające kiedy skill uruchamiać).
-2. Dołącz `ipbox_calculator.py` jako resource skilla.
-3. Upload jako custom skill w Claude (Settings → Skills — zależnie od wersji produktu).
-
-Wtedy Claude automatycznie uruchomi skill kiedy wspomnisz o rozliczaniu IP Box.
-
----
-
-## Czy fallback "LLM-only" (bez Pythona) jest ok?
-
-**Tak, zadziała — ale z ostrożnością.** Algorytm został zaprojektowany tak, żeby działał w obu trybach:
-
-- **Z uruchamianiem kodu (Code Execution / Advanced Data Analysis):** pełna dokładność matematyczna, tabele Pandas, testy jako assertions.
-- **Bez uruchamiania kodu (tylko tekst):** agent wymuszony jest pokazywać formułę + podstawienie + wynik krok po kroku. Sumy 12 miesięcy robimy iteracyjnie z sumą częściową po każdym miesiącu.
-
-Kiedy rekomenduję uruchamianie kodu, a kiedy tekst wystarczy:
-
-| Sytuacja | Rekomendacja |
-|---|---|
-| 1 kontrahent, faktury PLN, proste koszty, ZUS w KPiR | tekst wystarczy |
-| Faktury walutowe (kursy NBP) | uruchamianie kodu (API NBP) |
-| Wieloprojektowość, wiele klientów | uruchamianie kodu (mniej błędów) |
-| Ulga B+R + IP Box jednocześnie | uruchamianie kodu (zawiła kaskada) |
-| Mieszane zaliczki (część miesięczne, część uproszczone) | uruchamianie kodu |
-| Wysoki dochód, wysokie stawki | uruchamianie kodu (każdy błąd bolesny) |
-
----
-
-## 📁 Struktura repozytorium
-
-```
-ipbox-wizard-ai/
-├── README.md                          ← jesteś tu
-├── ipbox_algorytm.md                  ← GŁÓWNY PLIK — wklej do agenta AI
-├── python_helper/
-│   └── ipbox_calculator.py            ← Kalkulator Pythonowy (Code Execution / Advanced Data Analysis)
-├── scripts/                           ← Skrypty (vcr, pre-commit)
-├── docs/                              ← Dokumentacja techniczna i testowa
-│   └── testing.md                     ← Szczegółowy opis systemu testów
-├── tests/                             
-│   ├── unit/                          ← testy matematyki (Python)
-│   └── llm/                           ← scenariusze end-to-end (VCR)
-└── input/                             ← (GITIGNORE) tu wrzucaj swoje dane
+```bash
+ruff format --check .
+ruff check .
+python -m compileall -q python_helper tests scripts
+pytest tests/unit --cov=python_helper --cov-report=term-missing --cov-fail-under=90
+pytest -q
+python scripts/check_cassette_policy.py
+python scripts/vcr_precommit.py --all-models
+python scripts/benchmark_report.py
+unset OPENROUTER_API_KEY
+./scripts/verify_all_models.sh
+for script in scripts/*.sh dump-to-md.sh; do bash -n "$script"; done
 ```
 
----
+CI uruchamia bezpłatne kontrole na Pythonie 3.11, 3.12 i 3.13. Playback nie ma live fallbacku i nie potrzebuje sekretu.
 
-## 💡 Przykładowy prompt startowy
+## Płatne nagrywanie modeli
 
+Nagrywanie jest opcjonalne, jawne i płatne. Nie wykonuj go po każdej zmianie.
+
+Najpierw odśwież metadane i sprawdź istniejące odpowiedzi bez API:
+
+```bash
+python scripts/refresh_vcr_metadata.py --all-models --write
+python scripts/vcr_precommit.py --all-models
+unset OPENROUTER_API_KEY
+./scripts/verify_all_models.sh
+python scripts/benchmark_report.py
 ```
-Mam algorytm IP Box w pliku [**`ipbox_algorytm.md`**](ipbox_algorytm.md).
-W katalogu `input/` umieściłem swoje dokumenty:
-- ewidencję czasu za 2025 (`input/ewidencja.xlsx`)
-- KPiR za 2025 (`input/kpir.csv`)
-- umowę B2B i interpretację KIS (`input/dokumenty.pdf`)
 
-Chcę rozliczyć PIT-36L z ulgą IP Box za rok 2025.
-Dodatkowe ulgi: IKZE (limit), termomodernizacja, ulga internet, 2 dzieci.
+Jeżeli raport zwraca `all_complete_and_valid=true`, płatne nagrywanie nie jest potrzebne. Płatnie nagrywaj wyłącznie kasetę rzeczywiście unieważnioną przez zmianę requestu lub semantyki. Każdy przebieg wymaga jawnego potwierdzenia oraz dwóch dodatnich limitów kosztu. Szczegóły: [`docs/testing.md`](docs/testing.md).
 
-Poprowadź mnie przez algorytm — zacznij od Fazy 0. Analizuj pliki z katalogu `input/`.
-```
+## Rozwój projektu
 
----
+Przed zmianą kodu przeczytaj [`AGENTS.md`](AGENTS.md). Dokument zawiera:
 
-## 🔬 Na czym się opiera
+- topologię modułów;
+- przepływ danych;
+- hierarchię źródeł prawdy;
+- procedury dodawania reguły, scenariusza i poprawki;
+- typowe ścieżki debugowania;
+- zasady bezpiecznego nagrywania;
+- Definition of Done.
 
-### Lekcje z testów i symulacji
+Dobry wkład do projektu zaczyna się od minimalnego testu odtwarzającego problem i kończy pełną bramką jakości. Nie osłabiaj testów ani schemy pod zachowanie konkretnego modelu.
 
-Algorytm ewoluował poprzez dziesiątki iteracji testowych, uwzględniając najczęstsze błędy i ryzyka:
+## Status wersji 0.2
 
-- **Kwalifikacja kosztów**: Izolacja kosztów bezpośrednich IP od kosztów ogólnych (MIX).
-- **ZUS i Zdrowotna**: Wykluczenie ryzyka podwójnego odliczania (w KPiR vs w PIT).
-- **Kaskada ulg**: Prawidłowa kolejność odliczeń (IKZE przed termomodernizacją itp.).
-- **Waluty**: Precyzyjna obsługa kursów NBP i przesunięcie różnic kursowych do przychodów nie-IP.
-- **Współczynnik W**: Wykorzystanie faktycznego czasu pracy jako dzielnika (brak kary za urlop).
-- **Weryfikacja matematyczna**: Wprowadzenie 6 testów kontrolnych (szanty/balance check).
+Wersja 0.2 skupia się na deterministycznym obliczaniu, audytowalności, bezpiecznych domyślnych zachowaniach i odtwarzalnym benchmarku. Nie próbuje jeszcze rozwiązać pełnego importu dokumentów ani automatycznego przygotowania gotowego zeznania.
 
-Każda zmiana w algorytmie jest weryfikowana przez system testów LLM. Wykorzystujemy mechanizm **VCR (Virtual Cassette Recorder)**, który nagrywa odpowiedzi modeli Gemini i porównuje je z oczekiwanymi wynikami (NEXUS, podatek, klasyfikacje). Obecnie posiadamy bazę **34 scenariuszy testowych**, co gwarantuje stabilność algorytmu nawet przy zmianach w modelach AI.
+Planowane kierunki dalszego rozwoju mogą obejmować:
 
-### Orzecznictwo
+- deterministyczny importer KPiR/PIT/XLSX z pełnym lineage danych;
+- stabilne identyfikatory dokumentów i decyzji;
+- osobny publiczny CLI/API dla pełnego raportu;
+- model zdarzeń korekt i certyfikat decyzji;
+- dalsze upraszczanie aktywnych warstw zgodności `_legacy`.
 
-- NSA II FSK 61/25 — podwykonawcy nie wykluczają IP Box (pod warunkiem posiadania praw i roli koncepcyjnej).
-- NSA II FSK 1350/22 — potwierdzenie wymogów dokumentacyjnych.
-- WSA Poznań I SA/Po 500/21 — kwestionowanie IP Box przy pracy zespołowej bez wydzielenia utworu.
+## Licencja
 
----
-
-## 🤝 Zaproszenie do współpracy — pomóż ulepszyć algorytm
-
-**Twój przypadek jest dla nas złotem.** Algorytm jest tak dobry, jak różnorodność przypadków, na których został przetestowany.
-
-### Jak możesz pomóc
-
-**1. Wrzuć swoje rozliczenie do algorytmu, nawet (zwłaszcza!) jeśli masz je już gotowe od biura rachunkowego.**
-
-Jeśli masz zrobione rozliczenie przez księgową / doradcę podatkowego:
-
-- Uruchom algorytm na tych samych danych.
-- Porównaj wyniki — czy nadpłata się zgadza? Czy NEXUS wyszedł taki sam? Czy koszty są podobnie podzielone?
-- Jeśli są **różnice** — zgłoś je w [GitHub Issues](../../issues).
-- Wklej do issue anonimizowany opis: forma opodatkowania, typ kontrahenta, zakres działalności, co wyszło księgowej vs co wyszło algorytmowi, gdzie konkretnie jest różnica.
-
-**2. Opisz swój nietypowy przypadek**
-
-Specyficzne sytuacje, które pomogą wszystkim:
-
-- Wieloma klientami z różnych krajów (PLN + USD + EUR + GBP)
-- Leasing auta z wykupem prywatnym w połowie roku
-- Współwłasność małżeńska, małżonek pracuje jako podwykonawca
-- Spółka cywilna / spółka jawna z IP Box
-- Przerwa w działalności w środku roku (zawieszenie)
-- Pierwszy rok IP Box (brak interpretacji, pierwsze rozliczenie)
-- Body leasing przez agencję IT z klientem zagranicznym
-- Zmiana formy opodatkowania w trakcie roku
-- Zmiana stawki / rozszerzenie zakresu prac w umowie
-
-Otwórz issue z tagiem `edge-case` i opisem.
-
-**3. Wrzuć output / log z sesji**
-
-Jeśli algorytm gdzieś się pomylił, zawahał, zadał dziwne pytanie, albo wygenerował niepoprawny YAML:
-
-- Anonimizuj dane (zmień nazwy firm, zaokrąglij kwoty).
-- Wklej fragment konwersacji do issue.
-- Opisz co poszło nie tak.
-
-**4. Zgłaszaj błędy prawne**
-
-Jeśli znasz orzecznictwo / interpretację KIS, która pokazuje, że algorytm robi coś niezgodnie z prawem — otwórz issue z tagiem `bug-legal` i linkiem do źródła.
-
-**5. Dodawaj ulgi i scenariusze**
-
-Jeśli skorzystałeś z ulgi spoza listy (np. darowizny, ulga na dzieci o nietypowej strukturze) i algorytm wymagał poprawek — opisz to w zgłoszeniu `enhancement`. Dzięki temu baza wiedzy algorytmu będzie rosła.
-
-### Jak otwierać issues
-
-Użyj jednego z tagów:
-
-- 🐛 `bug-calc` — błąd w obliczeniach matematycznych
-- ⚖️ `bug-legal` — niezgodność z prawem / orzecznictwem
-- 🌍 `edge-case` — nietypowy przypadek biznesowy
-- 💡 `enhancement` — propozycja rozszerzenia lub nowej ulgi
-- 📋 `compare-with-advisor` — różnica w rozliczeniu vs biuro rachunkowe
-- ❓ `question` — pytanie o stosowanie algorytmu
-- 🧪 `tests` — błędy w infrastrukturze testowej / VCR
-
-Każdy issue = szansa na ulepszenie algorytmu dla całej społeczności. Dzięki!
-
----
-
-## 📋 Znane ograniczenia v1.0
-
-1. Nie obsługuje CIT (spółek z o.o.) — tylko JDG na PIT.
-2. Nie łączy się z ryczałtem ewidencjonowanym.
-3. Podinstrukcja dla rzadkich ulg wymaga wyszukania w sieci — nie wszystko jest w katalogu domyślnym.
-4. Dla bardzo skomplikowanych przypadków (podwykonawcy powiązani, spółki cywilne, zmiana formy w trakcie roku) wymaga weryfikacji z doradcą podatkowym.
-5. Status UD116 (projekt zmian wymagający zatrudnienia 3 osób dla IP Box) — projekt **nie wszedł w życie 1 stycznia 2026 r.**, rozliczenie za 2025 r. jest bezpieczne na starych zasadach. Prace legislacyjne trwają (brak ogłoszonej daty wejścia w życie) — zmiany mogą objąć kolejny rok. Monitoruj stan legislacyjny, algorytm nie śledzi zmian automatycznie.
-6. Numery pól formularzy PIT podawane są opisowo (nie `"poz. 40"` na sztywno), bo numery zmieniają się między latami.
-
----
-
-## 🙏 Podziękowania
-
-Algorytm powstał dzięki wsparciu społeczności programistów B2B oraz dziesiątkom godzin symulacji i audytów prowadzonych przez agentów AI. **Z góry dziękuję za każdy "issue", "pull request" czy opis przypadku, który pomoże ulepszyć narzędzie dla wszystkich.**
-
----
-
-## 📄 Licencja
-
-MIT — używaj, modyfikuj i dystrybuuj bez ograniczeń. Forki, adaptacje do innych krajów, integracje z narzędziami księgowymi — wszystko mile widziane.
-
----
-
-## 🔗 Przydatne zasoby
-
-- [Objaśnienia MF do IP Box](https://www.gov.pl/web/finanse/objasnienia-podatkowe-dot-preferencyjnego-opodatkowania-dochodow-wytwarzanych-przez-prawa-wlasnosci-intelektualnej-ip-box)
-- [Eureka — wyszukiwarka interpretacji KIS](https://eureka.mf.gov.pl/)
-- [SIP MF — system informacji podatkowej](https://sip.mf.gov.pl/)
-- [API NBP — kursy walut](http://api.nbp.pl/)
-- [Biznes.gov.pl — ulgi podatkowe](https://www.biznes.gov.pl/)
-
----
-
-*Narzędzie edukacyjne. Nie zastępuje doradcy podatkowego. Autor i współpracownicy nie ponoszą odpowiedzialności za decyzje podatkowe podjęte na podstawie tego algorytmu.*
+Projekt jest udostępniany na licencji [MIT](LICENSE).

@@ -1,64 +1,84 @@
 meta:
-  id: "28_edge_multiple_carry-overs"
-  name: "Edge: Wielokrotne przeniesienia ulg termomodernizacyjnych"
-  description: >
-    Pula termomodernizacyjna skomponowana z dwóch lat (8000 z 2023 + 7000 z 2024).
-    Test czy carry-over z wielu lat jest poprawnie sumowany i stosowany.
-  tags: ["edge", "relief", "termo", "carry-over"]
+  id: 28_edge_multiple_carry-overs
+  name: Wielokrotne carry-over ulg
+  description: Niewykorzystana termomodernizacja pozostaje carry-over; IKZE nie tworzy carry-over w tym modelu.
+  tags:
+  - regression
   priority: P1
-  expected_stops: []
-  expected_reviews: []
-
 input:
+  coverage:
+    expected_months: 2
+    imported_months: 2
+    invoices_complete: true
+    kpir_complete: true
+    work_records_complete: true
+    period_closed: true
+    confirmed_by: synthetic-scenario
   rok: 2025
-  forma_opodatkowania: "liniowy_19%"
+  forma_opodatkowania: liniowy_19%
+  kwalifikowane_IP: true
+  polityka_alokacji:
+    policy_id: scenario-policy
+    przychody:
+      metoda: czasowa_W
+    koszty_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      uzasadnienie: Jawna polityka testowa; przychody, MIX i NEXUS są rozdzielone.
   zus:
-    sposob: "w_KPiR"
-    spoleczne_miesiecznie: 1418.48
+    sposob: brak
   kontrahenci:
-    - nazwa: "TechCorp Sp. z o.o."
-      waluta: "PLN"
-      klauzula_IP: true
-      model_komercjalizacji: "przeniesienie_praw"
-
-  miesiace:
-    - miesiac: "2025-01"
-      faktury:
-        - kwota_netto: 15000
-          kontrahent: "TechCorp Sp. z o.o."
-      ewidencja:
-        godziny_pracy: 160
-        godziny_nie_IP: 0
-        procent_faktury_IP: 100
-      koszty:
-        - opis: "Składki ZUS społeczne"
-          kwota: 1418.48
-      opis_projektu: "Zaimplementowałem moduł API integracji z systemem płatności Stripe."
-    - miesiac: "2025-02"
-      faktury:
-        - kwota_netto: 15000
-          kontrahent: "TechCorp Sp. z o.o."
-      ewidencja:
-        godziny_pracy: 160
-        godziny_nie_IP: 0
-        procent_faktury_IP: 100
-      koszty:
-        - opis: "Składki ZUS społeczne"
-          kwota: 1418.48
-      opis_projektu: "Zaprojektowałem algorytm buforowania zapytań dla usługi uwierzytelniania."
-
+  - nazwa: ClientA
+    klauzula_IP: true
   ulgi:
-    # Carry-over z 2 poprzednich lat: 8000 (2023) + 7000 (2024) = 15000
-    termomodernizacja_pula: 15000
-    ikze: 9388.80
-
-  zaliczki:
-    typ: "miesięczne"
-    suma: 2000
-    rozbicie: [1000, 1000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-
+    termomodernizacja_loty:
+    - origin_year: 2022
+      remaining_amount: 7000
+      evidence_ref: synthetic-thermo-28-2022
+    - origin_year: 2024
+      remaining_amount: 8000
+      evidence_ref: synthetic-thermo-28-2024
+    ikze: 2000
+  miesiace:
+  - miesiac: 2025-01
+    faktury:
+    - kwota_PLN: 15000
+      kontrahent: ClientA
+      kwalifikuje_IP: true
+    ewidencja:
+      godziny_pracy: 160
+      godziny_nie_IP: 0
+      procent_faktury_IP: 100
+    koszty:
+    - opis: IDE
+      kwota: 100
+      nexus_source: own_br
+      nexus_evidence: synthetic-nexus-28_edge_multiple_carry-overs-1
+      kategoria: IP
+      allocation_source: ewidencja_kosztu_IP
+    opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.
+  - miesiac: 2025-02
+    faktury:
+    - kwota_PLN: 15000
+      kontrahent: ClientA
+      kwalifikuje_IP: true
+    ewidencja:
+      godziny_pracy: 160
+      godziny_nie_IP: 0
+      procent_faktury_IP: 100
+    koszty:
+    - opis: IDE support
+      kwota: 100
+      nexus_source: own_br
+      nexus_evidence: synthetic-nexus-28_edge_multiple_carry-overs-2
+      kategoria: IP
+      allocation_source: ewidencja_kosztu_IP
+    opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.
 assertions:
   nexus: 1.0
-  # Dochód_IP = (15000 - 1418.48) * 2 = 27163.04
-  # IP tax = 27163.04 * 5% = 1358.15
-  podatek_IP_range: [1300, 1450]
+  testy_pass:
+  - TEST_4
+  - TEST_5
+  - TEST_8
+  - TEST_9
+  termomodernization_carry_over: 15000

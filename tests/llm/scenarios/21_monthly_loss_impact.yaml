@@ -1,29 +1,71 @@
 meta:
-  id: "21_monthly_loss_impact"
-  name: "Brzegowy: Strata w miesiącu"
-  description: "Weryfikacja czy strata miesięczna nie psuje agregacji rocznej"
-  tags: ["edge", "loss"]
-  priority: "P1"
-
+  id: 21_monthly_loss_impact
+  name: Strata miesięczna nie psuje agregacji rocznej
+  description: Strata miesięczna nie psuje agregacji rocznej
+  tags:
+  - regression
+  priority: P1
 input:
+  coverage:
+    expected_months: 2
+    imported_months: 2
+    invoices_complete: true
+    kpir_complete: true
+    work_records_complete: true
+    period_closed: true
+    confirmed_by: synthetic-scenario
   rok: 2025
-  forma_opodatkowania: "liniowy_19%"
+  forma_opodatkowania: liniowy_19%
+  kwalifikowane_IP: true
+  polityka_alokacji:
+    policy_id: scenario-policy
+    przychody:
+      metoda: czasowa_W
+    koszty_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      uzasadnienie: Jawna polityka testowa; przychody, MIX i NEXUS są rozdzielone.
   zus:
-    sposob: "w_KPiR"
+    sposob: brak
+  kontrahenci:
+  - nazwa: ClientA
+    klauzula_IP: true
   miesiace:
-    - miesiac: "2025-01"
-      przychody: 0 # Brak przychodu
+  - miesiac: 2025-01
+    faktury:
+    - kwota_PLN: 0
+      kontrahent: ClientA
+      kwalifikuje_IP: true
+    ewidencja:
       godziny_pracy: 160
       godziny_nie_IP: 0
-      koszty:
-        - opis: "Leasing"
-          kwota: 5000
-    - miesiac: "2025-02"
-      przychody: 20000
+      procent_faktury_IP: 100
+    koszty:
+    - opis: Leasing
+      kwota: 5000
+      nexus_source: outside_nexus
+      kategoria: MIX
+  - miesiac: 2025-02
+    faktury:
+    - kwota_PLN: 20000
+      kontrahent: ClientA
+      kwalifikuje_IP: true
+    ewidencja:
       godziny_pracy: 160
       godziny_nie_IP: 0
-      koszty: []
-
+      procent_faktury_IP: 100
+    koszty:
+    - opis: IDE
+      kwota: 100
+      nexus_source: own_br
+      nexus_evidence: synthetic-nexus-21_monthly_loss_impact-1
+      kategoria: IP
+      allocation_source: ewidencja_kosztu_IP
+    opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.
 assertions:
-  testy_pass: ["TEST_4"]
-  podatek_IP_range: [700, 800] # (20000 - 5000) * 0.05 = 750
+  nexus: 1.0
+  testy_pass:
+  - TEST_4
+  - TEST_5
+  - TEST_8
+  - TEST_9

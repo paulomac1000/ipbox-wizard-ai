@@ -1,0 +1,51 @@
+meta:
+  id: 54_pre_ipbox_year_stop
+  name: Rok sprzed wprowadzenia IP Box
+  description: Rok 2018 jest odrzucany zamiast obliczania według najbliższych znanych reguł.
+  tags: [historical, limits, fail-closed]
+  priority: P0
+input:
+  coverage:
+    expected_months: 1
+    imported_months: 1
+    invoices_complete: true
+    kpir_complete: true
+    work_records_complete: true
+    period_closed: true
+    confirmed_by: synthetic-scenario
+  rok: 2018
+  forma_opodatkowania: liniowy_19%
+  kwalifikowane_IP: true
+  polityka_alokacji:
+    policy_id: pre-ipbox-year
+    przychody:
+      metoda: czasowa_W
+    koszty_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      uzasadnienie: Syntetyczna polityka regresyjna.
+  zus:
+    sposob: brak
+  kontrahenci:
+    - nazwa: ClientA
+      klauzula_IP: true
+  miesiace:
+    - miesiac: 2018-01
+      faktury:
+        - kwota_PLN: 10000
+          kontrahent: ClientA
+          kwalifikuje_IP: true
+      ewidencja:
+        godziny_pracy: 160
+        godziny_nie_IP: 16
+        procent_faktury_IP: 100
+      koszty:
+        - opis: Bezpośredni koszt projektu
+          kwota: 100
+          kategoria: IP
+          allocation_source: syntetyczna-ewidencja-projektowa
+          nexus_source: own_br
+          nexus_evidence: synthetic-nexus-54_pre_ipbox_year_stop-1
+      opis_projektu: Rozwój kwalifikowanego programu komputerowego.
+assertions:
+  stops: [STOP_16]

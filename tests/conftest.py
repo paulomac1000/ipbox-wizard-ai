@@ -1,41 +1,34 @@
+from __future__ import annotations
+
 import os
+
 import pytest
-from dotenv import load_dotenv
 
 
-def pytest_addoption(parser):
-    parser.addoption(
-        "--run-llm",
-        action="store_true",
-        default=False,
-        help="Run LLM scenario tests (requires GEMINI_API_KEY)",
-    )
+def pytest_addoption(parser: pytest.Parser) -> None:
+    parser.addoption("--run-llm", action="store_true", default=False)
     parser.addoption(
         "--vcr-mode",
-        action="store",
+        choices=("playback", "record", "none"),
         default=None,
-        choices=["playback", "auto", "record", "none"],
-        help="VCR mode: playback (use cassettes), auto (use or record), record (always record), none (bypass VCR)",
     )
+    parser.addoption("--llm-model", default=None)
+    parser.addoption("--scenario", default=None)
 
 
-def pytest_collection_modifyitems(config, items):
-    """Propagate VCR mode to environment variable."""
-    vcr_mode = config.getoption("--vcr-mode", default=None)
-    if vcr_mode:
-        os.environ["VCR_MODE"] = vcr_mode
+def pytest_configure(config: pytest.Config) -> None:
+    if mode := config.getoption("--vcr-mode"):
+        os.environ["VCR_MODE"] = mode
+    if model := config.getoption("--llm-model"):
+        os.environ["LLM_MODEL"] = model
+    if scenario := config.getoption("--scenario"):
+        os.environ["IPBOX_SCENARIO"] = scenario
 
 
-@pytest.fixture(scope="session", autouse=True)
-def load_env():
-    load_dotenv()
-
-
-@pytest.fixture(scope="session")
-def gemini_api_key():
-    return os.getenv("GEMINI_API_KEY")
-
-
-@pytest.fixture(scope="session")
-def gemini_model():
-    return os.getenv("GEMINI_MODEL", "gemini-2.0-flash")
+def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item]) -> None:
+    if config.getoption("--run-llm"):
+        return
+    marker = pytest.mark.skip(reason="LLM tests require --run-llm")
+    for item in items:
+        if "llm" in item.keywords:
+            item.add_marker(marker)

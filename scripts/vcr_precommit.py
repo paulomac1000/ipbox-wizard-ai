@@ -1,93 +1,160 @@
 #!/usr/bin/env python3
-"""
-VCR Pre-commit Check.
+"""Validate cassette completeness and exact request identity."""
 
-Validates that cassettes are up-to-date with algorithm changes.
-Blocks commit if algorithm changed but cassettes are stale.
-"""
+# ruff: noqa: E402
 
+from __future__ import annotations
+
+import argparse
+import os
 import sys
 from pathlib import Path
+from typing import Any
 
-# Add project root to path
-sys.path.insert(0, str(Path(__file__).parent.parent))
+import yaml
 
-from tests.llm.vcr import VCRConfig, CassetteManifest, compute_fingerprint
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+
+from python_helper.report_metadata import engine_source_hash
+from tests.llm.models import BENCHMARK_MODELS
+from tests.llm.oracle import validate_scenario
+from tests.llm.runner import LLMTestRunner
+from tests.llm.vcr.cassette import (
+    Cassette,
+    CassetteManifest,
+    manifest_entry_errors,
+    parsed_response_equal_ignoring_meta_timestamp,
+)
+from tests.llm.vcr.config import VCRConfig
+from tests.llm.vcr.fingerprint import compute_fingerprint
 
 
-def check_vcr_freshness() -> int:
-    """Check if cassettes are fresh. Returns 0 if OK, 1 if stale."""
-    config = VCRConfig()
-    manifest = CassetteManifest.load(config.manifest_path)
-    
-    scenarios_dir = Path("tests/llm/scenarios")
-    algorithm_path = Path("ipbox_algorytm.md")
-    
-    if not scenarios_dir.exists():
-        print("⚠️  No scenarios directory found")
-        return 0
-    
-    stale = []
-    
-    for scenario_file in sorted(scenarios_dir.glob("*.yaml")):
-        scenario_id = scenario_file.stem
-        
-        current_fp = compute_fingerprint(
-            scenario_path=scenario_file,
-            provider=config.provider,
-            model=config.model,
+def orphan_cassette_ids(model_directory: Path, expected_ids: set[str]) -> set[str]:
+    return {
+        path.stem for path in model_directory.glob("*.yaml") if path.name != "_manifest.yaml"
+    } - expected_ids
+
+
+def cassette_payload_errors(
+    cassette: Cassette,
+    reparsed: dict[str, Any],
+    expected_model: str | None = None,
+) -> list[str]:
+    """Return payload-integrity errors shared by pre-commit and unit tests."""
+    errors: list[str] = []
+    if cassette.meta.finish_reason != "stop":
+        errors.append(f"finish_reason must be 'stop', got {cassette.meta.finish_reason!r}")
+    if expected_model is not None and cassette.meta.returned_model != expected_model:
+        errors.append(
+            f"returned_model must equal requested model {expected_model!r}, "
+            f"got {cassette.meta.returned_model!r}"
         )
-        
-        stored_fp = manifest.get_fingerprint(scenario_id)
-        
-        if stored_fp is None:
-            stale.append((scenario_id, "no cassette recorded"))
+    if not parsed_response_equal_ignoring_meta_timestamp(reparsed, cassette.parsed_response):
+        errors.append("stored parsed_response differs from reparsed response")
+    return errors
+
+
+def validate_model(model: str) -> list[str]:
+    os.environ.update(
+        {
+            "LLM_PROVIDER": "openrouter",
+            "LLM_MODEL": model,
+            "VCR_MODE": "playback",
+            "VCR_CASSETTES_ROOT": str(ROOT / "tests/llm/vcr/cassettes"),
+        }
+    )
+    config = VCRConfig()
+    runner = LLMTestRunner(None)
+    errors: list[str] = []
+    paths = sorted((ROOT / "tests/llm/scenarios").glob("*.yaml"))
+    try:
+        manifest = CassetteManifest.load(config.manifest_path, model)
+    except Exception as exc:
+        return [f"{model}: invalid/missing manifest: {exc}"]
+
+    expected_ids: set[str] = set()
+    expected_engine_hash = engine_source_hash(ROOT)
+    algorithm = (ROOT / "ipbox_algorytm.md").read_text(encoding="utf-8")
+    for path in paths:
+        scenario = yaml.safe_load(path.read_text(encoding="utf-8"))
+        validate_scenario(scenario)
+        scenario_id = str(scenario["meta"]["id"])
+        expected_ids.add(scenario_id)
+        cassette_path = config.cassette_path(scenario_id)
+        if not cassette_path.exists():
+            errors.append(f"{model}: missing {scenario_id}")
             continue
-        
-        if stored_fp != current_fp:
-            stale.append((scenario_id, f"fingerprint changed"))
-    
-    if stale:
-        print("❌ VCR cassettes are STALE:")
-        for sid, reason in stale:
-            print(f"   - {sid}: {reason}")
-        print("\n💡 To update cassettes, run:")
-        print("   VCR_MODE=record pytest tests/llm/ -v --run-llm --tb=short")
-        return 1
-    
-    print("✅ All VCR cassettes are fresh")
-    return 0
+        try:
+            cassette = Cassette.load(cassette_path)
+            prompt = runner.build_prompt(algorithm, scenario)
+            request = runner.request_spec(prompt, config)
+            request_hash = request.request_hash()
+            fingerprint = compute_fingerprint(path, request_hash)
+            if cassette.meta.requested_model != model:
+                errors.append(f"{model}/{scenario_id}: requested model mismatch")
+            if cassette.meta.request_hash != request_hash:
+                errors.append(f"{model}/{scenario_id}: request hash mismatch")
+            if cassette.meta.fingerprint != fingerprint:
+                errors.append(f"{model}/{scenario_id}: fingerprint mismatch")
+            stored_calculation_meta = cassette.parsed_response.get("calculation_meta")
+            stored_engine_hash = (
+                stored_calculation_meta.get("engine_source_hash")
+                if isinstance(stored_calculation_meta, dict)
+                else None
+            )
+            if stored_engine_hash != expected_engine_hash:
+                errors.append(f"{model}/{scenario_id}: engine_source_hash mismatch")
+            reparsed = runner.validate_semantics(cassette.response, scenario)
+            errors.extend(
+                f"{model}/{scenario_id}: {error}"
+                for error in cassette_payload_errors(cassette, reparsed, model)
+            )
+            entry = manifest.entries.get(scenario_id)
+            if entry is None:
+                errors.append(f"{model}/{scenario_id}: manifest entry missing")
+            else:
+                errors.extend(
+                    f"{model}/{scenario_id}: {error}"
+                    for error in manifest_entry_errors(
+                        entry,
+                        cassette,
+                        expected_file=cassette_path.name,
+                        expected_request_hash=request_hash,
+                        expected_fingerprint=fingerprint,
+                        expected_engine_hash=expected_engine_hash,
+                    )
+                )
+        except Exception as exc:
+            errors.append(f"{model}/{scenario_id}: {exc}")
+
+    cassette_ids = {
+        path.stem for path in config.model_directory.glob("*.yaml") if path.name != "_manifest.yaml"
+    }
+    for orphan in sorted(cassette_ids - expected_ids):
+        errors.append(f"{model}: orphan cassette file {orphan}")
+    for orphan in sorted(set(manifest.entries) - expected_ids):
+        errors.append(f"{model}: orphan manifest entry {orphan}")
+    return errors
 
 
 def main() -> int:
-    """Main entry point."""
-    # Check if algorithm was modified
-    algorithm_path = Path("ipbox_algorytm.md")
-    
-    if not algorithm_path.exists():
-        print("Algorithm file not found in current directory")
-        return 0
-    
-    # Only check if we're in a git repo with changes
-    import subprocess
-    try:
-        result = subprocess.run(
-            ["git", "diff", "--name-only", "HEAD"],
-            capture_output=True,
-            text=True,
-            timeout=10,
-        )
-        changed_files = result.stdout.strip().split("\n")
-        
-        if "ipbox_algorytm.md" in changed_files:
-            print("📝 Algorithm file modified — checking cassette freshness...")
-            return check_vcr_freshness()
-    except Exception:
-        # Not a git repo or git not available
-        pass
-    
+    parser = argparse.ArgumentParser()
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument("--model")
+    group.add_argument("--all-models", action="store_true")
+    args = parser.parse_args()
+    models = BENCHMARK_MODELS if args.all_models else (args.model,)
+    errors = [error for model in models for error in validate_model(model)]
+    if errors:
+        print("VCR validation failed:", file=sys.stderr)
+        for error in errors:
+            print(f"- {error}", file=sys.stderr)
+        return 1
+    scenario_count = len(list((ROOT / "tests/llm/scenarios").glob("*.yaml")))
+    print(f"VCR validation passed for {len(models)} model(s), {scenario_count} scenarios each")
     return 0
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    raise SystemExit(main())

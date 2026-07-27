@@ -1,12 +1,66 @@
 meta:
-  id: "13_income_from_employment_impact"
-  name: "Logika: Dochody z UoP"
-  description: "Weryfikacja progu 120k przy dochodach mieszanych"
-  tags: ["core", "scale"]
+  id: 13_income_from_employment_impact
+  name: Dodatkowy dochód na skali
+  description: Dodatkowy dochód na skali
+  tags:
+  - regression
+  priority: P1
 input:
+  coverage:
+    expected_months: 1
+    imported_months: 1
+    invoices_complete: true
+    kpir_complete: true
+    work_records_complete: true
+    period_closed: true
+    confirmed_by: synthetic-scenario
   rok: 2025
-  forma_opodatkowania: "skala"
+  forma_opodatkowania: skala
+  kwalifikowane_IP: true
+  polityka_alokacji:
+    policy_id: scenario-policy
+    przychody:
+      metoda: czasowa_W
+    koszty_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      uzasadnienie: Jawna polityka testowa; przychody, MIX i NEXUS są rozdzielone.
+  zus:
+    sposob: brak
+  kontrahenci:
+  - nazwa: ClientA
+    klauzula_IP: true
+  - nazwa: ClientB
+    klauzula_IP: false
   dochody_dodatkowe_skala: 100000
   miesiace:
-    - miesiac: "2025-01"
-      przychody: 50000
+  - miesiac: 2025-01
+    faktury:
+    - kwota_PLN: 50000
+      kontrahent: ClientA
+      kwalifikuje_IP: true
+    - kwota_PLN: 20000
+      kontrahent: ClientB
+      kwalifikuje_IP: false
+    ewidencja:
+      godziny_pracy: 160
+      godziny_nie_IP: 0
+      procent_faktury_IP: 100
+    koszty:
+    - opis: Licencja IDE
+      kwota: 500
+      nexus_source: own_br
+      nexus_evidence: synthetic-nexus-13_income_from_employment_impact-1
+      kategoria: IP
+      allocation_source: ewidencja_kosztu_IP
+    opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.
+assertions:
+  nexus: 1.0
+  testy_pass:
+  - TEST_5
+  - TEST_8
+  - TEST_9
+  # Pełny podatek od łącznej podstawy skali: 100 000 + 20 000 = 120 000.
+  podatek_NIE_range:
+  - 10800
+  - 10800

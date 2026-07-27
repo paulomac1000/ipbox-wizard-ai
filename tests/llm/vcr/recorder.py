@@ -1,290 +1,304 @@
-"""
-VCR Recorder — record and playback logic.
-
-Main responsibilities:
-1. Determine if cassette should be used or recorded
-2. Execute playback or make API call
-3. Parse and cache response data
-4. Update manifest
-"""
+"""Fail-closed record/playback implementation."""
 
 from __future__ import annotations
 
-import hashlib
+import json
 import time
-from datetime import datetime, timezone, timedelta
+import uuid
+from collections.abc import Callable
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Callable
+from typing import Any
 
-from .cassette import Cassette, CassetteMeta, CassetteTurn, CassetteManifest
-from .config import VCRConfig, VCRMode
-from .fingerprint import (
-    compute_fingerprint,
-    fingerprint_changed,
-    explain_fingerprint_change,
-    get_algorithm_hash,
+from ..client import LLMResponse
+from ..request_spec import LLMRequestSpec
+from .cassette import (
+    Cassette,
+    CassetteManifest,
+    CassetteMeta,
+    manifest_entry_errors,
+    parsed_response_equal_ignoring_meta_timestamp,
 )
+from .config import VCRConfig
+from .fingerprint import compute_fingerprint
+
+
+class CassetteError(RuntimeError):
+    pass
+
+
+class CassetteMissingError(CassetteError):
+    pass
+
+
+class CassetteStaleError(CassetteError):
+    pass
+
+
+class RecordingRejectedError(CassetteError):
+    pass
 
 
 class VCRRecorder:
-    """Main VCR interface for record/playback operations."""
-    
     def __init__(self, config: VCRConfig):
         self.config = config
-        self.manifest = CassetteManifest.load(config.manifest_path)
-        self._stats = {
-            "playback_hits": 0,
-            "recordings": 0,
-            "invalidations": 0,
-            "errors": 0,
-        }
-    
+        try:
+            self.manifest = CassetteManifest.load(config.manifest_path, config.model)
+        except (TypeError, ValueError) as exc:
+            raise CassetteStaleError(f"Invalid cassette manifest: {exc}") from exc
+
     def get_or_record(
         self,
-        scenario_id: str,
+        *,
+        scenario: dict[str, Any],
         scenario_path: Path,
-        prompt: str,
-        api_call_fn: Callable[[str], str],
-        scenario_name: str = "",
-    ) -> str:
-        """
-        Get response from cassette or record new one.
-        
-        Args:
-            scenario_id: Scenario identifier (e.g., "01_basic_linear")
-            scenario_path: Path to scenario YAML file
-            prompt: Full prompt to send to LLM
-            api_call_fn: Function that calls the LLM API
-            scenario_name: Human-readable scenario name for metadata
-            
-        Returns:
-            LLM response string (from cassette or fresh)
-        """
-        # NONE mode: bypass VCR entirely
-        if self.config.is_none:
-            return api_call_fn(prompt)
-        
-        # Calculate current fingerprint
-        current_fp = compute_fingerprint(
-            scenario_path=scenario_path,
-            provider=self.config.provider,
-            model=self.config.model,
-        )
-        
-        cassette_path = self.config.cassette_path(scenario_id)
-        
-        # Decide: record or playback?
-        should_record = self._should_record(
-            scenario_id=scenario_id,
-            cassette_path=cassette_path,
-            current_fingerprint=current_fp,
-        )
-        
-        if not should_record:
-            # PLAYBACK mode
-            return self._playback(cassette_path, scenario_id)
-        
+        request: LLMRequestSpec,
+        api_call: Callable[[LLMRequestSpec], LLMResponse] | None,
+        validate_response: Callable[[str], dict[str, Any]],
+    ) -> tuple[LLMResponse, dict[str, Any]]:
+        scenario_id = str(scenario["meta"]["id"])
+        request_hash = request.request_hash()
+        fingerprint = compute_fingerprint(scenario_path, request_hash)
+        path = self.config.cassette_path(scenario_id)
+
         if self.config.is_playback:
-            # PLAYBACK but cassette missing/stale: FAIL
-            raise CassetteNotFoundError(
-                f"Cassette for '{scenario_id}' is missing or stale, "
-                f"but VCR_MODE=playback prevents recording.\n"
-                f"Run with VCR_MODE=auto or VCR_MODE=record to update cassettes.\n"
-                f"Fingerprint: {current_fp}"
-            )
-        
-        # RECORD mode (or AUTO with missing/stale cassette)
+            return self._playback(path, scenario_id, request_hash, fingerprint, validate_response)
+        if api_call is None:
+            raise ValueError("record/none mode requires an API callback")
+        if self.config.is_none:
+            response = api_call(request)
+            self._require_complete(response)
+            self._require_content(response)
+            self._require_requested_model(response, request.model)
+            parsed = validate_response(response.content)
+            return response, parsed
         return self._record(
-            scenario_id=scenario_id,
-            scenario_name=scenario_name,
-            cassette_path=cassette_path,
-            prompt=prompt,
-            fingerprint=current_fp,
-            api_call_fn=api_call_fn,
+            path=path,
+            scenario=scenario,
+            request=request,
+            request_hash=request_hash,
+            fingerprint=fingerprint,
+            api_call=api_call,
+            validate_response=validate_response,
         )
-    
-    def _should_record(
+
+    def _playback(
         self,
+        path: Path,
         scenario_id: str,
-        cassette_path: Path,
-        current_fingerprint: str,
-    ) -> bool:
-        """Determine if we need to record a new cassette."""
-        # Forced record mode
-        if self.config.is_record:
-            return True
-        
-        # Cassette file doesn't exist
-        if not cassette_path.exists():
-            print(f"  📼 No cassette for {scenario_id} → will record")
-            return True
-        
-        # Check manifest for fingerprint (fast path)
-        stored_fp = self.manifest.get_fingerprint(scenario_id)
-        if stored_fp is None:
-            print(f"  📼 No fingerprint in manifest for {scenario_id} → will record")
-            return True
-        
-        # Fingerprint changed → algorithm or scenario updated
-        if fingerprint_changed(stored_fp, current_fingerprint):
-            changes = explain_fingerprint_change(stored_fp, current_fingerprint)
-            print(f"  📼 Fingerprint changed for {scenario_id}:")
-            for change in changes:
-                print(f"      → {change}")
-            self._stats["invalidations"] += 1
-            return True
-        
-        # Check staleness (only in AUTO mode)
-        if self.config.is_auto and self._is_stale(cassette_path):
-            print(f"  📼 Cassette {scenario_id} older than {self.config.max_age_days}d → will refresh")
-            return True
-        
-        return False
-    
-    def _is_stale(self, cassette_path: Path) -> bool:
-        """Check if cassette is older than max_age_days."""
-        if self.config.max_age_days <= 0:
-            return False
-        
-        try:
-            cassette = Cassette.load(cassette_path)
-            recorded = datetime.fromisoformat(cassette.meta.recorded_at)
-            age = datetime.now(timezone.utc) - recorded
-            return age > timedelta(days=self.config.max_age_days)
-        except Exception:
-            return True  # Corrupted cassette → re-record
-    
-    def _playback(self, cassette_path: Path, scenario_id: str) -> str:
-        """Play back response from cassette."""
-        cassette = Cassette.load(cassette_path)
-        
-        if not cassette.is_valid:
-            raise CassetteCorruptedError(
-                f"Cassette {scenario_id} is empty or corrupted"
+        request_hash: str,
+        fingerprint: str,
+        validate_response: Callable[[str], dict[str, Any]],
+    ) -> tuple[LLMResponse, dict[str, Any]]:
+        if not path.exists():
+            raise CassetteMissingError(
+                f"Missing cassette for {scenario_id} and model {self.config.model}"
             )
-        
-        self._stats["playback_hits"] += 1
-        recorded_date = cassette.meta.recorded_at[:10]
-        print(f"  ▶️  Playback: {scenario_id} (recorded: {recorded_date})")
-        
-        return cassette.response
-    
+        cassette = Cassette.load(path)
+        if cassette.meta.requested_model != self.config.model:
+            raise CassetteStaleError("Cassette requested_model does not match LLM_MODEL")
+        if cassette.meta.returned_model != self.config.model:
+            raise CassetteStaleError("Cassette returned_model does not match LLM_MODEL")
+        if cassette.meta.request_hash != request_hash:
+            raise CassetteStaleError("Cassette request hash does not match the exact request")
+        if cassette.meta.fingerprint != fingerprint:
+            raise CassetteStaleError("Cassette fingerprint is stale")
+        entry = self.manifest.entries.get(scenario_id)
+        if entry is None:
+            raise CassetteStaleError("Cassette is missing from the model manifest")
+        parsed = validate_response(cassette.response)
+        calculation_meta = parsed.get("calculation_meta")
+        engine_hash = (
+            calculation_meta.get("engine_source_hash")
+            if isinstance(calculation_meta, dict)
+            else None
+        )
+        if not isinstance(engine_hash, str):
+            raise CassetteStaleError("Parsed response has no engine_source_hash")
+        entry_errors = manifest_entry_errors(
+            entry,
+            cassette,
+            expected_file=path.name,
+            expected_request_hash=request_hash,
+            expected_fingerprint=fingerprint,
+            expected_engine_hash=engine_hash,
+        )
+        if entry_errors:
+            raise CassetteStaleError("; ".join(entry_errors))
+        if not parsed_response_equal_ignoring_meta_timestamp(parsed, cassette.parsed_response):
+            raise CassetteStaleError("Stored parsed_response differs from reparsed response")
+        response = LLMResponse(
+            content=cassette.response,
+            request_id=cassette.meta.request_id,
+            requested_model=cassette.meta.requested_model,
+            returned_model=cassette.meta.returned_model,
+            finish_reason=cassette.meta.finish_reason,
+            native_finish_reason=cassette.meta.native_finish_reason,
+            system_fingerprint=cassette.meta.system_fingerprint,
+            prompt_tokens=cassette.meta.prompt_tokens,
+            completion_tokens=cassette.meta.completion_tokens,
+            total_tokens=cassette.meta.total_tokens,
+            cost=cassette.meta.cost,
+        )
+        try:
+            self._require_complete(response)
+            self._require_content(response)
+        except RecordingRejectedError as exc:
+            raise CassetteStaleError(str(exc)) from exc
+        return response, parsed
+
     def _record(
         self,
-        scenario_id: str,
-        scenario_name: str,
-        cassette_path: Path,
-        prompt: str,
+        *,
+        path: Path,
+        scenario: dict[str, Any],
+        request: LLMRequestSpec,
+        request_hash: str,
         fingerprint: str,
-        api_call_fn: Callable[[str], str],
-    ) -> str:
-        """Record new cassette from API call."""
-        print(f"  🔴 Recording: {scenario_id} "
-              f"(provider={self.config.provider}, model={self.config.model})")
-        
-        start_time = time.time()
-        
+        api_call: Callable[[LLMRequestSpec], LLMResponse],
+        validate_response: Callable[[str], dict[str, Any]],
+    ) -> tuple[LLMResponse, dict[str, Any]]:
+        scenario_id = str(scenario["meta"]["id"])
+        if path.exists():
+            try:
+                return self._playback(
+                    path,
+                    scenario_id,
+                    request_hash,
+                    fingerprint,
+                    validate_response,
+                )
+            except CassetteError as exc:
+                raise CassetteStaleError(
+                    "Refusing to overwrite an existing cassette. Validate the change, "
+                    "delete the stale cassette explicitly, and record again."
+                ) from exc
+        if scenario_id in self.manifest.entries:
+            raise CassetteStaleError(
+                "Manifest entry exists without its cassette. Repair or delete the stale "
+                "entry explicitly before recording."
+            )
+
+        started = time.monotonic()
+        response = api_call(request)
+        duration = time.monotonic() - started
         try:
-            response = api_call_fn(prompt)
-        except Exception as e:
-            self._stats["errors"] += 1
-            raise RecordingError(
-                f"Failed to record cassette for {scenario_id}: {e}"
-            ) from e
-        
-        duration = time.time() - start_time
-        
-        # Create turn with response
-        prompt_hash = hashlib.sha256(
-            prompt.encode("utf-8")
-        ).hexdigest()[:16]
-        
-        turn = CassetteTurn(
-            role="user",
-            prompt=prompt if self.config.save_full_prompt else "",
-            response=response,
-            prompt_hash=prompt_hash,
-        )
-        
-        # Create metadata
-        meta = CassetteMeta(
-            scenario_id=scenario_id,
-            scenario_name=scenario_name,
-            provider=self.config.provider,
-            model=self.config.model,
-            fingerprint=fingerprint,
-            recording_duration_seconds=round(duration, 2),
-            prompt_tokens_estimate=len(prompt) // 4,
-            response_tokens_estimate=len(response) // 4,
-            algorithm_hash=get_algorithm_hash(),
-        )
-        
-        # Try to parse response for cached sections
-        from ..runner import LLMTestRunner
-        runner = LLMTestRunner.__new__(LLMTestRunner)
-        runner.algorithm_path = "ipbox_algorytm.md"
-        parsed = runner._extract_tags(response) if hasattr(runner, '_extract_tags') else {}
-        
-        # Build cassette
-        cassette = Cassette(
-            meta=meta,
-            turns=[turn],
-            parsed_result_yaml=parsed.get("result"),
-            parsed_classifications=parsed.get("classifications"),
-            parsed_monthly_W=parsed.get("monthly_W"),
-            parsed_tests=parsed.get("tests"),
-            parsed_stops_reviews=parsed.get("stops_reviews"),
-        )
-        
-        # Save cassette
-        cassette.save(cassette_path)
-        
-        # Update manifest
-        self.manifest.update(
-            scenario_id=scenario_id,
-            fingerprint=fingerprint,
-            filename=cassette_path.name,
-        )
+            self._require_complete(response)
+            self._require_content(response)
+        except RecordingRejectedError as exc:
+            self._save_rejected(scenario, request_hash, response, str(exc))
+            raise
+        if response.returned_model != request.model:
+            reason = (
+                f"returned_model={response.returned_model!r} does not match "
+                f"requested model {request.model!r}"
+            )
+            self._save_rejected(scenario, request_hash, response, reason)
+            raise RecordingRejectedError(reason)
+        try:
+            parsed = validate_response(response.content)
+        except Exception as exc:
+            self._save_rejected(scenario, request_hash, response, str(exc))
+            raise RecordingRejectedError(
+                f"Response failed schema/semantic validation; cassette not saved: {exc}"
+            ) from exc
+
+        try:
+            meta = CassetteMeta(
+                scenario_id=scenario_id,
+                scenario_name=str(scenario["meta"]["name"]),
+                provider=self.config.provider,
+                requested_model=request.model,
+                returned_model=response.returned_model,
+                fingerprint=fingerprint,
+                request_hash=request_hash,
+                recorded_at=datetime.now(UTC).isoformat(),
+                request_id=response.request_id,
+                finish_reason=response.finish_reason,
+                native_finish_reason=response.native_finish_reason,
+                system_fingerprint=response.system_fingerprint,
+                prompt_tokens=response.prompt_tokens,
+                completion_tokens=response.completion_tokens,
+                total_tokens=response.total_tokens,
+                cost=response.cost,
+                recording_duration_seconds=round(duration, 3),
+            )
+            cassette = Cassette(meta=meta, response=response.content, parsed_response=parsed)
+        except (TypeError, ValueError) as exc:
+            self._save_rejected(scenario, request_hash, response, str(exc))
+            raise RecordingRejectedError(
+                f"Response metadata failed fail-closed validation; cassette not saved: {exc}"
+            ) from exc
+        cassette.save(path)
+        self.manifest.update(cassette, path.name)
         self.manifest.save(self.config.manifest_path)
-        
-        self._stats["recordings"] += 1
-        print(f"  💾 Saved: {cassette_path.name} ({duration:.1f}s)")
-        
-        return response
-    
-    @property
-    def stats(self) -> dict:
-        """Get recording/playback statistics."""
-        return dict(self._stats)
-    
-    def print_stats(self) -> None:
-        """Print session statistics."""
-        s = self._stats
-        total = s["playback_hits"] + s["recordings"]
-        print(f"\n📼 VCR Stats:")
-        print(f"   Playback hits:  {s['playback_hits']}")
-        print(f"   Recordings:   {s['recordings']}")
-        print(f"   Invalidations: {s['invalidations']}")
-        print(f"   Errors:       {s['errors']}")
-        if total > 0:
-            pct = (s["playback_hits"] / total) * 100
-            print(f"   API calls saved: {pct:.0f}%")
+        return response, parsed
 
+    @staticmethod
+    def _require_complete(response: LLMResponse) -> None:
+        if response.finish_reason != "stop":
+            raise RecordingRejectedError(
+                f"Response finish_reason={response.finish_reason!r}; response rejected"
+            )
 
-# ============================================================================
-# Exceptions
-# ============================================================================
+    @staticmethod
+    def _require_content(response: LLMResponse) -> None:
+        if not response.content.strip():
+            detail = (
+                f"; provider_error={response.provider_error}" if response.provider_error else ""
+            )
+            raise RecordingRejectedError(f"Response content is empty{detail}; response rejected")
 
-class CassetteNotFoundError(Exception):
-    """Cassette required but not found (in playback mode)."""
-    pass
+    @staticmethod
+    def _require_requested_model(response: LLMResponse, requested_model: str) -> None:
+        if response.returned_model != requested_model:
+            raise RecordingRejectedError(
+                f"returned_model={response.returned_model!r} does not match "
+                f"requested model {requested_model!r}"
+            )
 
-
-class CassetteCorruptedError(Exception):
-    """Cassette file is corrupted or invalid."""
-    pass
-
-
-class RecordingError(Exception):
-    """Failed to record cassette."""
-    pass
+    def _save_rejected(
+        self,
+        scenario: dict[str, Any],
+        request_hash: str,
+        response: LLMResponse,
+        reason: str,
+    ) -> None:
+        model_dir = self.config.rejected_root / self.config.model_slug
+        model_dir.mkdir(parents=True, exist_ok=True)
+        scenario_id = str(scenario["meta"]["id"])
+        safe_scenario_id = "".join(
+            character if character.isalnum() or character in {"-", "_"} else "_"
+            for character in scenario_id
+        ).strip("_")
+        if not safe_scenario_id:
+            raise RecordingRejectedError("scenario id cannot produce a safe rejected-record name")
+        recorded_at = datetime.now(UTC)
+        attempt_id = uuid.uuid4().hex
+        filename = (
+            f"{safe_scenario_id}__{recorded_at.strftime('%Y%m%dT%H%M%S.%fZ')}__{attempt_id}.json"
+        )
+        path = model_dir / filename
+        payload = {
+            "attempt_id": attempt_id,
+            "recorded_at": recorded_at.isoformat(),
+            "scenario_id": scenario_id,
+            "model": self.config.model,
+            "request_hash": request_hash,
+            "reason": reason,
+            "response": response.content,
+            "metadata": {
+                "request_id": response.request_id,
+                "returned_model": response.returned_model,
+                "finish_reason": response.finish_reason,
+                "native_finish_reason": response.native_finish_reason,
+                "prompt_tokens": response.prompt_tokens,
+                "completion_tokens": response.completion_tokens,
+                "total_tokens": response.total_tokens,
+                "cost": response.cost,
+                "provider_error": response.provider_error,
+            },
+        }
+        with path.open("x", encoding="utf-8") as handle:
+            json.dump(payload, handle, ensure_ascii=False, indent=2)
+            handle.write("\n")

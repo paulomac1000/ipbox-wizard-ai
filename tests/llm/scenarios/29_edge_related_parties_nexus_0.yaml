@@ -1,46 +1,55 @@
 meta:
-  id: "29_edge_related_parties_nexus_0"
-  name: "Edge: NEXUS = 0 — tylko powiązany podwykonawca (typ C)"
-  description: >
-    Programista zleca 100% prac programistycznych spółce powiązanej (brat).
-    Brak własnych kosztów kwalifikowanych (A=0, B=0, C>0).
-    NEXUS = 0, podatek IP Box = 0 mimo dodatniego dochodu.
-  tags: ["edge", "nexus", "related-parties"]
+  id: 29_edge_related_parties_nexus_0
+  name: NEXUS zero przy wyłącznie kosztach C
+  description: NEXUS zero przy wyłącznie kosztach C
+  tags:
+  - regression
   priority: P1
-  expected_stops: []
-  expected_reviews: []
-
 input:
+  coverage:
+    expected_months: 1
+    imported_months: 1
+    invoices_complete: true
+    kpir_complete: true
+    work_records_complete: true
+    period_closed: true
+    confirmed_by: synthetic-scenario
   rok: 2025
-  forma_opodatkowania: "liniowy_19%"
+  forma_opodatkowania: liniowy_19%
+  kwalifikowane_IP: true
+  polityka_alokacji:
+    policy_id: scenario-policy
+    przychody:
+      metoda: czasowa_W
+    koszty_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      uzasadnienie: Jawna polityka testowa; przychody, MIX i NEXUS są rozdzielone.
   zus:
-    sposob: "brak"  # Programista na etacie gdzie pracodawca opłaca ZUS
+    sposob: brak
   kontrahenci:
-    - nazwa: "GlobalSoft S.A."
-      waluta: "PLN"
-      klauzula_IP: true
-      model_komercjalizacji: "przeniesienie_praw"
-
+  - nazwa: ClientA
+    klauzula_IP: true
   miesiace:
-    - miesiac: "2025-01"
-      faktury:
-        - kwota_netto: 20000
-          kontrahent: "GlobalSoft S.A."
-      ewidencja:
-        godziny_pracy: 160
-        godziny_nie_IP: 0
-        procent_faktury_IP: 100
-      koszty:
-        - opis: "Usługi programistyczne — DevBro Sp. z o.o. (spółka brata)"
-          kwota: 15000
-          typ_nexus: "C"
-      opis_projektu: >
-        Zarządzałem projektem implementacji systemu CRM; prace programistyczne
-        zlecone spółce powiązanej DevBro Sp. z o.o.
-
-  ulgi: {}
-
+  - miesiac: 2025-01
+    faktury:
+    - kwota_PLN: 20000
+      kontrahent: ClientA
+      kwalifikuje_IP: true
+    ewidencja:
+      godziny_pracy: 160
+      godziny_nie_IP: 0
+      procent_faktury_IP: 100
+    koszty:
+    - opis: Usługi spółki powiązanej
+      kwota: 15000
+      nexus_source: related_br_contractor
+      nexus_evidence: synthetic-nexus-29_edge_related_parties_nexus_0-1
+      kategoria: IP
+      allocation_source: ewidencja_kosztu_IP
+    opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.
 assertions:
   nexus: 0.0
-  # NEXUS = 0 → Dochód_IP * NEXUS = 0 → podatek_IP = 0
-  podatek_IP_range: [0, 10]
+  podatek_IP_range:
+  - 0
+  - 0

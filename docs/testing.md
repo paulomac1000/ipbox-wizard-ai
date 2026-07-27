@@ -1,208 +1,208 @@
-# System testów IP Box Wizard AI
+# Testowanie i nagrywanie kaset
 
-## Architektura
+## 1. Co testuje benchmark
 
-Dwie niezależne warstwy testów:
+Python oblicza liczby, klasyfikacje, W, TEST 1–9 i atomowe `decision_facts`, a następnie składa kompletną autorytatywną kopertę `expected_decision`. Model otrzymuje gotowe, rozdzielone `status`, `stops` i `reviews` i ma je skopiować bez zmian:
 
-| Warstwa | Katalog | Cel | Uruchamia się |
-|---|---|---|---|
-| **Unit (Python)** | `tests/unit/` | Deterministyczna weryfikacja matematyki (`ipbox_calculator.py`) | Zawsze — bez klucza API |
-| **LLM (scenariuszowe)** | `tests/llm/` | Weryfikacja end-to-end `ipbox_algorytm.md` przez Gemini | Tylko z `--run-llm` + `GEMINI_API_KEY` |
+```json
+{"status":"FINAL","stops":[],"reviews":["REVIEW_09"]}
+```
 
-## Szybki start
+Runner składa decyzję z raportem deterministycznym i waliduje całość. Benchmark mierzy zgodność instrukcji oraz integracji providera, nie umiejętność modelu do ponownego liczenia podatku.
 
-### 1. Instalacja
+Kolejne historyczne protokoły ujawniły trzy klasy problemów:
+
+1. pełny raport LLM powodował wymyślone kursy, klasyfikacje, NEXUS i TEST-y;
+2. widoczność nieaktywnych faktów powodowała dopisywanie nieaktywnych kodów;
+3. lista kodów z etykietami wymagała ponownej klasyfikacji do STOP/REVIEW i pozwoliła MiniMax przenieść `REVIEW_09` do `stops`.
+
+`expected_decision` usuwa wszystkie trzy zbędne odpowiedzialności modelu.
+
+## 2. Bezpłatna bramka
 
 ```bash
-pip install -r requirements.txt
-pip install -r requirements-test.txt
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt -r requirements-test.txt
+
+ruff format --check .
+ruff check .
+python -m compileall -q python_helper tests scripts
+pytest tests/unit \
+  --cov=python_helper \
+  --cov-report=term-missing \
+  --cov-fail-under=90
+pytest -q
+python scripts/check_cassette_policy.py
+for script in scripts/*.sh dump-to-md.sh; do bash -n "$script"; done
 ```
 
-### 2. Konfiguracja `.env`
+Stan referencyjny przed końcowym nagraniem:
 
-```env
-GEMINI_API_KEY=twoj_klucz_api
-GEMINI_MODEL=gemini-2.0-flash
-```
+- wszystkie testy jednostkowe PASS; dokładną liczbę raportuje CI;
+- coverage `python_helper` powyżej wymaganego progu 90%;
+- pełny suite: wszystkie bezpłatne testy PASS i 46 kontrolowanych skipów LLM;
+- pusty katalog kaset jest dozwolony lokalnie, ale nie spełnia merge gate.
 
-### 3. Uruchamianie
+Standardowy workflow na Pythonie 3.13 dodatkowo uruchamia:
 
 ```bash
-# Testy jednostkowe (szybkie, bez API)
-make test-unit
-# lub: pytest tests/unit/ -v
-
-# Testy LLM z VCR (domyślnie auto - użyj kaset jeśli aktualne)
-make test-llm
-# lub: pytest tests/llm/ --run-llm -v
-
-# Testy LLM w trybie playback (użyj wyłącznie kaset, brak API calls)
-make test-llm-playback
-
-# Testy LLM w trybie record (nagraj na nowo wszystkie kasety)
-make test-llm-record
-
-# Tylko smoke testy LLM (priorytet P0)
-make test-llm-smoke
-
-# VCR smoke check (bez API calls)
-make vcr-smoke
-
-# Sprawdź świeżość kaset VCR
-make vcr-check
-
-# Coverage report
-make coverage
+python scripts/benchmark_report.py
+unset OPENROUTER_API_KEY
+./scripts/verify_all_models.sh
 ```
 
-## VCR (Virtual Cassette Recorder)
+Dlatego PR z pustą, częściową albo nieaktualną macierzą nie może mieć zielonej bramki wydania.
 
-System VCR nagrywa i odtwarza odpowiedzi LLM, redukując koszty API o >95%.
+## 3. Testy semantyczne, które muszą pozostać
 
-### Struktura
+Szczególnie chronione regresje:
 
-```
-tests/llm/vcr/
-├── __init__.py
-├── config.py        # Konfiguracja trybów
-├── fingerprint.py  # Obliczanie hash kaset
-├── cassette.py     # Model kasety + manifest
-├── recorder.py     # Logika nagrywania/odtwarzania
-└── cassettes/     # Nagrane kasety (commitowane do repo)
-    ├── 01_basic_linear_google_gemini-2.0-flash.yaml
-    └── _manifest.yaml
-```
+- NEXUS podwyższa A+B, w tym przypadek B+C = 0,65;
+- B+R IP pomniejsza dochód przed NEXUS;
+- podatek działalności na skali obejmuje inne dochody skali;
+- liniowy nie przyjmuje ulg dostępnych wyłącznie na skali;
+- `straty_poprzednie` i `ulga_BR` są odrzucane jako niejednoznaczne;
+- ujemne faktury, odliczenia i zaliczki są odrzucane;
+- limity zdrowotnej/IKZE dla nieobsługiwanego roku są fail-closed;
+- STOP zeruje każde finalne pole i klasyfikacje;
+- multi-IP zachowuje grosze;
+- prompt zawiera wyłącznie `expected_decision`, bez faktów podatkowych i nazw predykatów;
+- schema odrzuca kod REVIEW w `stops`, kod STOP w `reviews` i duplikaty;
+- dokumentacja kontraktu nie może opisywać starszego protokołu;
+- provider adapter nie mutuje ani nie osłabia lokalnej strict schema;
+- playback nie wywołuje sieci i odrzuca `finish_reason` inny niż `stop`;
+- live run, playback i pre-commit odrzucają substytucję modelu;
+- pre-commit porównuje zapisane `parsed_response` z ponownym parsowaniem;
+- tryb record nie nadpisuje istniejącej kasety;
+- miesiące muszą odpowiadać `input.rok`, a termomodernizacja nie przekracza 53 000 zł;
+- jawna semantyka W odróżnia iloczyn warunkowy, rozłączne składniki i sam czas;
+- podwójny procent faktury oraz nieudokumentowana zmiana metody w roku aktywują STOP;
+- ewidencja i zeznanie uzgadniają się osobno w IP/NIE nawet przy równych sumach globalnych;
+- reguły roczne 2019–2026 obejmują IKZE, zdrowotną, skalę i granicę jednoczesnego B+R/IP Box;
+- `rounding_steps` przyjmuje wyłącznie rzeczywisty dodatni `int`, bez booleanów, stringów i obcinania floatów;
+- naliczona odpowiedź HTTP 200 z pustą albo odrzuconą treścią trafia do niezmiennego rejestru odrzuceń wraz z kosztem.
 
-### Tryby pracy
+## 4. Fingerprint i unieważnienie
 
-| Tryb | Env | Opis |
-|------|-----|------|
-| `playback` | `VCR_MODE=playback` | Użyj wyłącznie kaset. Fail jeśli brak. Zero API calls. |
-| `auto` | `VCR_MODE=auto` (domyślny) | Użyj kasety jeśli aktualna, inaczej nagraj |
-| `record` | `VCR_MODE=record` | Zawsze nagraj (nadpisz istniejące) |
-| `none` | `VCR_MODE=none` | Wyłącz VCR — zawsze wywołuj API |
+Fingerprint obejmuje treściowy hash silnika, treściowy hash harnessu VCR, scenariusz oraz pełny request hash. Zmiana któregokolwiek elementu unieważnia nagranie. Nie kopiuj ręcznie odpowiedzi, hashy, fingerprintów, manifestu ani `parsed_response`. Jeżeli zmienia się wyłącznie deterministyczny kod lub metadane, `scripts/refresh_vcr_metadata.py --all-models --write` może ponownie zwalidować istniejące surowe odpowiedzi bez requestów API; każda niezgodna odpowiedź zatrzymuje proces.
 
-### Fingerprint
+## 5. Modele i adaptery transportowe
 
-Kaseta jest unieważniona gdy zmieni się:
+Wykonywalna lista znajduje się wyłącznie w `tests/llm/models.py`.
 
-- Zawartość `ipbox_algorytm.md`
-- Plik scenariusza YAML
-- Provider LLM
-- Model LLM
-
-Fingerprint = `hash(algorithm + scenario + provider + model)`
-
-### Użycie lokalne
-
-```bash
-# Nagraj pierwsze kasety (wymaga GEMINI_API_KEY)
-VCR_MODE=record pytest tests/llm/ --run-llm -v
-
-# Kolejne uruchomienia (użyj kaset, brak kosztów)
-pytest tests/llm/ --run-llm -v
-
-# Sprawdź czy kasety są świeże
-make vcr-check
-# lub: python scripts/vcr_precommit.py
-
-# Smoke test (zero API calls)
-make vcr-smoke
-# lub: ./scripts/vcr_smoke.sh
-```
-
-### CI/CD
-
-W GitHub Actions domyślnie używany jest tryb `playback` (zero kosztów API). Gdy kasety są nieaktualne, workflow tworzy PR z nowymi kasetami.
-
-### Rozwiązywanie problemów
-
-| Problem | Rozwiązanie |
-|---------|------------|
-| `CassetteNotFoundError` w trybie playback | Uruchom z `VCR_MODE=record` aby nagrać nowe kasety |
-| Kasety nieaktualne | `make vcr-check` sprawdzi świeżość, `VCR_MODE=record` odświeży |
-| Chcesz live API | Uruchom z `VCR_MODE=none` |
-
-## VSCode
-
-Po otwarciu projektu w VSCode panel **Testing** (ikona probówki) pokaże zarówno testy `unit/` jak i `llm/`. Testy LLM mają status "skip" dopóki nie ustawisz `GEMINI_API_KEY` w `.env` i nie uruchomisz ich ręcznie przez terminal z flagą `--run-llm`.
-
-## Markery pytest
-
-| Marker | Opis |
-|---|---|
-| `unit` | Testy Python (deterministyczne) |
-| `llm` | Testy LLM (wymagają API) |
-| `smoke` | Minimalne testy do szybkiej walidacji |
-| `P0` | Krytyczne — muszą przejść |
-| `P1` | Ważne |
-| `P2` | Dodatkowe edge cases |
-
-## GitHub CI/CD
-
-### Wymagana konfiguracja repozytorium
-
-| Typ | Nazwa | Wartość |
+| Model | Transport | Powód wyjątku |
 |---|---|---|
-| **Secret** | `GEMINI_API_KEY` | Klucz API Gemini |
-| **Variable** | `GEMINI_MODEL` | np. `gemini-2.0-flash` |
+| `google/gemini-3-flash-preview` | `json_schema` | — |
+| `anthropic/claude-haiku-4.5` | `json_schema` bez `uniqueItems` w kopii transportowej | endpoint odrzuca keyword HTTP 400; lokalna schema nadal wymaga unikalności |
+| `deepseek/deepseek-chat-v3.1` | `json_schema` | — |
+| `minimax/minimax-m2.5` | `json_object` | routing DigitalOcean zwracał `content: null` dla `json_schema`; lokalna schema nadal jest pełna |
+| `moonshotai/kimi-k2.5` | `json_schema` | — |
+| `qwen/qwen3.5-flash-02-23` | `json_schema` | — |
+| `mistralai/mistral-small-24b-instruct-2501` | `json_schema` | — |
 
-### Przepływ
+Adapter zmienia wyłącznie transport. Parser, `DECISION_JSON_SCHEMA`, output schema i evaluator są wspólne dla wszystkich modeli.
 
-- `unit-tests.yml` — uruchamiany przy zmianach w `python_helper/` lub `tests/unit/`
-- `llm-scenario-tests.yml` — uruchamiany przy zmianach w `ipbox_algorytm.md` lub `tests/llm/`
-- `full-suite.yml` — orchestrator (unit → llm → summary), uruchamiany na `main` i co poniedziałek
+## 6. Odświeżenie lub nagranie
 
-Domyślny limit LLM: `LLM_MAX_CALLS_PER_RUN=0` (wszystkie scenariusze).
+Po zmianie deterministycznego kodu albo metadanych zacznij bez requestów API:
 
-## Dodawanie scenariuszy LLM
-
-Nowy plik `NN_nazwa.yaml` w `tests/llm/scenarios/`:
-
-```yaml
-meta:
-  id: "NN_krotka_nazwa"
-  name: "Opis po polsku"
-  description: "Szczegółowy opis co testuje scenariusz"
-  tags: ["core", "edge", ...]
-  priority: "P0"  # P0 / P1 / P2
-  expected_stops: []   # opcjonalne
-  expected_reviews: [] # opcjonalne
-  # skip: true         # opcjonalne — pomija test (WIP)
-
-input:
-  rok: 2025
-  forma_opodatkowania: "liniowy_19%"
-  zus:
-    sposob: "w_KPiR"
-  miesiace: [...]
-  ulgi: {}
-
-assertions:
-  nexus: 1.0
-  W_miesieczne:
-    "2025-01": 90.0
-  podatek_IP_range: [1000, 5000]
-  testy_pass: ["TEST_1", "TEST_3"]
-  zus_dubel: false
-  roznice_kursowe_w_IP: false
-  koszty_koszyk:
-    kawa: "NON"
-    jetbrains: "IP"
+```bash
+python scripts/refresh_vcr_metadata.py --all-models --write
+python scripts/vcr_precommit.py --all-models
+unset OPENROUTER_API_KEY
+./scripts/verify_all_models.sh
 ```
 
-### Typy asercji
+Skrypt zachowuje surowe odpowiedzi, przelicza tożsamość i ponownie wykonuje pełną walidację. Jeżeli choć jedna odpowiedź nie odpowiada aktualnej semantyce, proces zatrzymuje się — wtedy usuń tylko wskazane, unieważnione kasety i nagraj je ponownie. Nie kasuj całej macierzy rutynowo.
 
-| Klucz | Typ | Opis |
-|---|---|---|
-| `nexus` | HARD | Dokładność ±0.001 |
-| `testy_pass` | HARD | Lista TEST_1..TEST_6 które muszą być PASS |
-| `zus_dubel` | HARD | `false` = brak podwójnego odliczenia ZUS |
-| `roznice_kursowe_w_IP` | HARD | `false` = różnice kursowe nie w IP |
-| `expected_stops` | HARD | Lista kodów STOP które muszą wystąpić |
-| `expected_reviews` | HARD | Lista kodów REVIEW które muszą wystąpić |
-| `koszty_koszyk` | HARD | Mapa koszt→koszyk |
-| `podatek_IP_range` | RANGE | `[min, max]` — tolerancja |
-| `podatek_NIE_range` | RANGE | `[min, max]` — tolerancja |
-| `W_miesieczne` | RANGE | Miesięczne W, tolerancja ±2pp |
-| `warnings` | SOFT | Kody ostrzeżeń do sprawdzenia |
+Płatne nagranie pełnej lub brakującej części macierzy:
+
+```bash
+git switch fix/decouple-mix-allocation-from-w
+git pull --ff-only
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt -r requirements-test.txt
+
+cp .env.example .env
+chmod 600 .env
+# wpisz OPENROUTER_API_KEY oraz dwa dodatnie limity w .env albo przekaż je przez CLI
+# potwierdzenia nie zapisuj w .env — ustaw je tylko dla świadomie uruchamianego polecenia
+LLM_PAID_RUN_CONFIRMATION=RUN_PAID_BENCHMARK \
+./scripts/record_all_models.sh \
+  --max-cost-per-model-usd 5 \
+  --max-total-cost-usd 5
+```
+
+Pojedynczy model lub scenariusz:
+
+```bash
+LLM_PAID_RUN_CONFIRMATION=RUN_PAID_BENCHMARK \
+python scripts/record_model.py --model google/gemini-3-flash-preview \
+  --max-cost-per-model-usd 5 --max-total-cost-usd 5
+LLM_PAID_RUN_CONFIRMATION=RUN_PAID_BENCHMARK \
+python scripts/record_model.py \
+  --model google/gemini-3-flash-preview \
+  --scenario 45_multi_ip_two_stage \
+  --max-cost-per-model-usd 5 --max-total-cost-usd 5
+```
+
+Skrypty lokalne automatycznie czytają tylko dozwolone ustawienia z `.env`. Plik nie jest wykonywany przez powłokę, nieznane klucze są ignorowane, a jawnie ustawione zmienne procesu mają pierwszeństwo. `.env` pozostaje w `.gitignore`; ustaw prawa `chmod 600`. Potwierdzenie płatnego przebiegu celowo nie jest czytane z `.env`: ma być nową, świadomą decyzją dla bieżącego polecenia lub sesji powłoki. Skrypt nie nadpisuje istniejącej kasety. Przy błędzie transportowym uruchom ponownie dopiero po sprawdzeniu, że plik nie powstał i przyczyna została sklasyfikowana. Odrzucenia trafiają do skonfigurowanego `VCR_REJECTED_ROOT` (domyślnie `/tmp/ipbox_llm_rejected/`) jako osobne, niezmienne pliki dla każdej płatnej próby, a wyniki do `/tmp/ipbox_llm_responses/`. Odpowiedź z naliczonym `usage.cost`, lecz pustą albo odrzuconą treścią, również musi pozostać w tym rejestrze.
+
+Nie ma `--force`. Nie ponawiaj błędu semantycznego aż do uzyskania „szczęśliwej” odpowiedzi.
+
+## 7. Playback offline
+
+```bash
+python scripts/check_cassette_policy.py
+python scripts/vcr_precommit.py --all-models
+python scripts/benchmark_report.py
+unset OPENROUTER_API_KEY
+./scripts/verify_all_models.sh
+```
+
+Playback musi przejść przy nieustawionym sekrecie. Live request w tym trybie jest błędem krytycznym.
+
+## 8. Kryterium zaliczenia
+
+Model zalicza tylko przy 46/46, a cała macierz przy 322/322. Każda kaseta musi:
+
+- mieć `finish_reason=stop`;
+- mieć `returned_model` identyczny z modelem żądanym;
+- zawierać czysty JSON bez pól dodatkowych, Markdown fences ani naprawiania parserem;
+- przejść lokalną strict schema decyzji;
+- zwrócić dokładny zestaw STOP/REVIEW bez duplikatów;
+- po złożeniu przejść pełny schema i evaluator;
+- mieć zgodny request hash, fingerprint i ponowne parsowanie;
+- przejść playback bez klucza API.
+
+45/46 jest diagnostyką, nie bramką wydania.
+
+## 9. Analiza porażki
+
+Przypisz przyczynę:
+
+1. scenariusz lub asercja;
+2. kalkulator/oracle;
+3. budowa `expected_decision` lub schema;
+4. adapter/routing providera;
+5. format odpowiedzi modelu;
+6. model mimo jednoznacznej instrukcji.
+
+Najpierw dodaj test deterministyczny. Nie poszerzaj zakresu i nie usuwaj kodu tylko dlatego, że model go pomija.
+
+Minimalny ręczny przegląd obejmuje scenariusze 13, 17, 22, 23, 26, 31, 34, 38, 42, 44, 45 i 46–55. W scenariuszu 51 każdy model ma zwrócić dokładnie `status=STOPPED`, `stops=[STOP_12]`, `reviews=[REVIEW_09]`.
+
+## 10. Commit i merge gate
+
+```bash
+./scripts/verify_all_models.sh
+python scripts/benchmark_report.py
+python scripts/vcr_precommit.py --all-models
+python scripts/check_cassette_policy.py
+git status --short
+git diff --stat
+```
+
+Nie commituj `/tmp`, raportów lokalnych ani częściowej macierzy. Po wypchnięciu kaset poczekaj na CI Python 3.11–3.13. Job 3.13 musi wykonać raport i pełny playback offline. Dopiero potem można oznaczyć PR jako ready.

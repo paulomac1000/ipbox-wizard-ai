@@ -1,14 +1,55 @@
 meta:
-  id: "16_high_w_review"
-  name: "Logika: W > 95%"
-  description: "Weryfikacja flagi REVIEW_01"
-  tags: ["core", "review"]
-  priority: "P1"
+  id: 16_high_w_review
+  name: W powyżej 95 procent
+  description: W powyżej 95 procent
+  tags:
+  - regression
+  priority: P1
 input:
+  coverage:
+    expected_months: 1
+    imported_months: 1
+    invoices_complete: true
+    kpir_complete: true
+    work_records_complete: true
+    period_closed: true
+    confirmed_by: synthetic-scenario
   rok: 2025
+  forma_opodatkowania: liniowy_19%
+  kwalifikowane_IP: true
+  polityka_alokacji:
+    policy_id: scenario-policy
+    przychody:
+      metoda: czasowa_W
+    koszty_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      uzasadnienie: Jawna polityka testowa; przychody, MIX i NEXUS są rozdzielone.
+  zus:
+    sposob: brak
+  kontrahenci:
+  - nazwa: ClientA
+    klauzula_IP: true
   miesiace:
-    - miesiac: "2025-01"
+  - miesiac: 2025-01
+    faktury:
+    - kwota_PLN: 10000
+      kontrahent: ClientA
+      kwalifikuje_IP: true
+    ewidencja:
       godziny_pracy: 160
       godziny_nie_IP: 2
+      procent_faktury_IP: 100
+    koszty:
+    - opis: IDE
+      kwota: 200
+      nexus_source: own_br
+      nexus_evidence: synthetic-nexus-16_high_w_review-1
+      kategoria: IP
+      allocation_source: ewidencja_kosztu_IP
+    opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.
 assertions:
-  warnings: ["REVIEW_01"]
+  W_miesieczne:
+    2025-01: 98.75
+  review_obecne:
+  - REVIEW_01

@@ -1,0 +1,69 @@
+meta:
+  id: 44_mix_revenue_key_kis
+  name: Klucz przychodowy MIX z interpretacji KIS
+  description: Klucz przychodowy MIX z interpretacji KIS
+  tags:
+  - regression
+  priority: P1
+input:
+  coverage:
+    expected_months: 1
+    imported_months: 1
+    invoices_complete: true
+    kpir_complete: true
+    work_records_complete: true
+    period_closed: true
+    confirmed_by: synthetic-scenario
+  rok: 2025
+  forma_opodatkowania: liniowy_19%
+  kwalifikowane_IP: true
+  polityka_alokacji:
+    policy_id: scenario-policy
+    przychody:
+      metoda: dokumentowa
+    koszty_MIX:
+      metoda: przychodowa_roczna
+      źródło: interpretacja_KIS
+      źródło_ref: SYNTHETIC-KIS-REFERENCE
+      uzasadnienie: Jawna polityka testowa; przychody, MIX i NEXUS są rozdzielone.
+  zus:
+    sposob: brak
+  kontrahenci:
+  - nazwa: ClientA
+    klauzula_IP: true
+  miesiace:
+  - miesiac: 2025-01
+    faktury:
+    - kwota_PLN: 10000
+      kontrahent: ClientA
+      kwalifikuje_IP: true
+      kwota_IP: 9000
+    ewidencja:
+      godziny_pracy: 160
+      godziny_nie_IP: 20
+      procent_faktury_IP: 100
+    koszty:
+    - opis: Serwer AWS
+      kwota: 500
+      nexus_source: outside_nexus
+      kategoria: MIX
+    - opis: Licencja JetBrains
+      kwota: 100
+      nexus_source: own_br
+      nexus_evidence: synthetic-nexus-44_mix_revenue_key_kis-1
+      kategoria: IP
+      allocation_source: ewidencja_kosztu_IP
+    opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.
+assertions:
+  klucz_MIX_metoda: przychodowa_roczna
+  klucz_MIX_źródło: interpretacja_KIS
+  nie_używaj_W_do_MIX: true
+  mix_w_nexus_A: false
+  testy_pass:
+  - TEST_7
+  - TEST_8
+  - TEST_9
+  review_obecne:
+  - REVIEW_16
+  - REVIEW_17
+  klucz_MIX_wartość: 0.9

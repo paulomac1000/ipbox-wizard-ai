@@ -1,0 +1,56 @@
+meta:
+  id: 47_historical_2021_br_ipbox_stop
+  name: Rok 2021 — niedozwolone równoczesne B+R i IP Box
+  description: Syntetyczna granica prawa obowiązująca przed 2022 rokiem.
+  tags: [historical, regression, br]
+  priority: P0
+input:
+  coverage:
+    expected_months: 1
+    imported_months: 1
+    invoices_complete: true
+    kpir_complete: true
+    work_records_complete: true
+    period_closed: true
+    confirmed_by: synthetic-scenario
+  rok: 2021
+  forma_opodatkowania: liniowy_19%
+  kwalifikowane_IP: true
+  polityka_alokacji:
+    policy_id: historical-2021
+    przychody:
+      metoda: czasowa_W
+    koszty_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      uzasadnienie: Syntetyczna polityka regresyjna.
+  zus:
+    sposob: brak
+  kontrahenci:
+    - nazwa: ClientA
+      klauzula_IP: true
+  ulgi:
+    ulga_BR_IP: 100
+    ulga_BR_limit_odliczenia: 100
+  miesiace:
+    - miesiac: 2021-01
+      faktury:
+        - kwota_PLN: 12000
+          kontrahent: ClientA
+          kwalifikuje_IP: true
+      ewidencja:
+        godziny_pracy: 160
+        godziny_nie_IP: 16
+        procent_faktury_IP: 100
+      koszty:
+        - opis: Syntetyczny koszt kwalifikowany B+R
+          kwota: 500
+          kategoria: IP
+          allocation_source: syntetyczna-ewidencja-projektowa
+          nexus_source: own_br
+          br_relief_bucket: IP
+          br_relief_amount: 100
+          br_evidence: syntetyczny-dowod-br
+      opis_projektu: Rozwój kwalifikowanego programu komputerowego.
+assertions:
+  stops: [STOP_13]

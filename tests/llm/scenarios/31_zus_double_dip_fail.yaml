@@ -1,26 +1,54 @@
 meta:
-  id: "31_zus_double_dip_fail"
-  name: "Weryfikacja: Dublowanie ZUS (FAIL)"
-  description: "Wymuszenie błędu weryfikacji TEST_3"
-  tags: ["verification", "fail", "ZUS"]
-  priority: "P1"
-
+  id: 31_zus_double_dip_fail
+  name: Dublowanie ZUS
+  description: Dublowanie ZUS
+  tags:
+  - regression
+  priority: P1
 input:
+  coverage:
+    expected_months: 1
+    imported_months: 1
+    invoices_complete: true
+    kpir_complete: true
+    work_records_complete: true
+    period_closed: true
+    confirmed_by: synthetic-scenario
   rok: 2025
-  forma_opodatkowania: "liniowy_19%"
+  forma_opodatkowania: liniowy_19%
+  kwalifikowane_IP: true
+  polityka_alokacji:
+    policy_id: scenario-policy
+    przychody:
+      metoda: czasowa_W
+    koszty_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      uzasadnienie: Jawna polityka testowa; przychody, MIX i NEXUS są rozdzielone.
   zus:
-    sposob: "w_KPiR"
+    sposob: w_KPiR
+    odliczenie_spoleczne_PIT: 18000
+  kontrahenci:
+  - nazwa: ClientA
+    klauzula_IP: true
   miesiace:
-    - miesiac: "2025-01"
-      przychody: 15000
+  - miesiac: 2025-01
+    faktury:
+    - kwota_PLN: 15000
+      kontrahent: ClientA
+      kwalifikuje_IP: true
+    ewidencja:
       godziny_pracy: 160
       godziny_nie_IP: 0
-      koszty:
-        - opis: "ZUS Społeczne"
-          kwota: 1500 # Wpisane w KPiR
-  ulgi:
-    zus_spoleczne_roczne: 18000 # I dodatkowo odliczone w PIT -> DUBEL!
-
+      procent_faktury_IP: 100
+    koszty:
+    - opis: ZUS społeczne
+      kwota: 1500
+      nexus_source: outside_nexus
+      kategoria: MIX
+    opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.
 assertions:
-  testy_fail: ["TEST_3"]
-  stops: ["ZUS_DOUBLE_DIP"] # Oczekiwany STOP w fazie 8
+  testy_fail:
+  - TEST_3
+  stops:
+  - ZUS_DOUBLE_DIP

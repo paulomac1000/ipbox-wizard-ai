@@ -1,0 +1,177 @@
+name: Paid multi-model LLM benchmark
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirmation:
+        description: "Type RUN_PAID_BENCHMARK to confirm paid requests"
+        required: true
+        type: string
+      model:
+        description: "Benchmark model (or 'all' for the full seven-family matrix)"
+        required: true
+        type: choice
+        default: "all"
+        options:
+          - "all"
+          - "google/gemini-3-flash-preview"
+          - "anthropic/claude-haiku-4.5"
+          - "deepseek/deepseek-chat-v3.1"
+          - "minimax/minimax-m2.5"
+          - "moonshotai/kimi-k2.5"
+          - "qwen/qwen3.5-flash-02-23"
+          - "mistralai/mistral-small-24b-instruct-2501"
+      max-cost-per-model-usd:
+        description: "Required positive per-model paid-cost guard in USD"
+        required: true
+        type: string
+        default: "5"
+      max-total-cost-usd:
+        description: "Required positive whole-run paid-cost guard in USD"
+        required: true
+        type: string
+        default: "5"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: llm-benchmark-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  benchmark:
+    if: inputs.confirmation == 'RUN_PAID_BENCHMARK'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+      LLM_PROVIDER: openrouter
+      LLM_PAID_RUN_CONFIRMATION: ${{ inputs.confirmation }}
+      BENCHMARK_MODEL: ${{ inputs.model }}
+      MAX_COST_PER_MODEL_USD: ${{ inputs.max-cost-per-model-usd }}
+      MAX_TOTAL_COST_USD: ${{ inputs.max-total-cost-usd }}
+      VCR_REJECTED_ROOT: /tmp/ipbox_llm_rejected
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements-test.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt -r requirements-test.txt
+
+      - name: Validate API key and cost guards
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import math
+          import os
+          import sys
+
+          for name in ("MAX_COST_PER_MODEL_USD", "MAX_TOTAL_COST_USD"):
+              raw = os.environ.get(name, "").strip()
+              try:
+                  value = float(raw)
+              except ValueError as exc:
+                  print(f"::error::{name} must be a number, got {raw!r}", file=sys.stderr)
+                  raise SystemExit(1) from exc
+              if not math.isfinite(value) or value <= 0:
+                  print(
+                      f"::error::{name} must be finite and > 0, got {value}",
+                      file=sys.stderr,
+                  )
+                  raise SystemExit(1)
+              print(f"{name}: ${value:.6f}")
+          PY
+          test -n "$OPENROUTER_API_KEY" || {
+            echo "::error::OPENROUTER_API_KEY secret is not configured"
+            exit 1
+          }
+
+      - name: Deterministic gates before paid calls
+        run: |
+          set -euo pipefail
+          ruff format --check .
+          ruff check .
+          python -m compileall -q python_helper tests scripts
+          pytest tests/unit \
+            --cov=python_helper \
+            --cov-report=term-missing \
+            --cov-fail-under=90
+          pytest -q
+          for script in scripts/*.sh dump-to-md.sh; do bash -n "$script"; done
+
+      - name: Record cassettes
+        run: |
+          set -euo pipefail
+          mkdir -p reports
+          rm -rf "$VCR_REJECTED_ROOT"
+          mkdir -p "$VCR_REJECTED_ROOT"
+          if [ "$BENCHMARK_MODEL" = "all" ]; then
+            ./scripts/record_all_models.sh \
+              --max-cost-per-model-usd "$MAX_COST_PER_MODEL_USD" \
+              --max-total-cost-usd "$MAX_TOTAL_COST_USD"
+          else
+            python scripts/record_model.py \
+              --model "$BENCHMARK_MODEL" \
+              --max-cost-per-model-usd "$MAX_COST_PER_MODEL_USD" \
+              --max-total-cost-usd "$MAX_TOTAL_COST_USD"
+          fi
+
+      - name: Offline verification (no API key)
+        run: |
+          set -euo pipefail
+          unset OPENROUTER_API_KEY || true
+          if [ "$BENCHMARK_MODEL" = "all" ]; then
+            ./scripts/verify_all_models.sh
+            python scripts/vcr_precommit.py --all-models
+            python scripts/check_cassette_policy.py
+          else
+            PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 \
+            LLM_PROVIDER=openrouter \
+            LLM_MODEL="$BENCHMARK_MODEL" \
+            VCR_MODE=playback \
+            python -m pytest tests/llm/test_scenarios.py --run-llm --vcr-mode=playback -q
+            python scripts/vcr_precommit.py --model "$BENCHMARK_MODEL"
+          fi
+          if [ "$BENCHMARK_MODEL" = "all" ]; then
+            python scripts/benchmark_report.py
+          else
+            python scripts/benchmark_report.py --model "$BENCHMARK_MODEL"
+          fi
+
+      - name: Collect diagnostics
+        if: always()
+        run: |
+          set -euo pipefail
+          mkdir -p reports/rejected reports/responses
+          cp -a "$VCR_REJECTED_ROOT"/. reports/rejected/ 2>/dev/null || true
+          cp -a /tmp/ipbox_llm_responses/. reports/responses/ 2>/dev/null || true
+
+      - name: Upload cassette candidates and reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: llm-benchmark-${{ github.run_id }}
+          path: |
+            tests/llm/vcr/cassettes/
+            reports/
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Require a complete matrix for all-model runs
+        if: inputs.model == 'all'
+        run: |
+          set -euo pipefail
+          python scripts/check_cassette_policy.py
+          python scripts/benchmark_report.py

@@ -1,0 +1,135 @@
+meta:
+  scenario_id: 46_historical_2019_health_credit
+  scenario_name: Rok 2019 — liniowy, IKZE i historyczne odliczenie zdrowotne od podatku
+  provider: openrouter
+  requested_model: minimax/minimax-m2.5
+  returned_model: minimax/minimax-m2.5
+  fingerprint: canonical-source_4828e135771b57f0df9ee106507f6417f69fb6d3a070a2f57849c27a9203170d
+  request_hash: d23c40a77dde5a4e27cb35d33fefc5f674840347cd9e300fa1385ac0bf6b2abd
+  recorded_at: '2026-07-25T23:36:29.643317+00:00'
+  request_id: gen-1785022584-PI4rpDv0VajmW0EbfMRQ
+  finish_reason: stop
+  native_finish_reason: stop
+  system_fingerprint: null
+  prompt_tokens: 690
+  completion_tokens: 145
+  total_tokens: 835
+  cost: 0.000225825
+  recording_duration_seconds: 4.8
+response: '{"status":"FINAL","stops":[],"reviews":["REVIEW_09"]}'
+parsed_response:
+  status: FINAL
+  calculation_meta:
+    engine_version: ipbox-wizard-ai
+    rule_pack: PL-PIT-IPBOX-2019
+    rules_source_ids:
+    - MF_IPBOX_2019
+    - KNF_IKZE
+    - MF_SCALE_HISTORY
+    - MF_HEALTH_HISTORY
+    input_hash: 4983651992a4943a9af94f60c9178301e6b498c5c941f135aabdac81838cbbaf
+    engine_source_hash: 15f46d2c48027b2043e147826d6d249570212e15194590bf8c2590ef758fae17
+    calculated_at: '2026-07-25T23:36:29Z'
+    code_revision: engine:15f46d2c48027b2043e147826d6d249570212e15194590bf8c2590ef758fae17
+  result:
+    rok: 2019
+    przychody_roczne:
+      IP: 8000.0
+      NIE: 2000.0
+    koszty_roczne:
+      IP: 100.0
+      NIE: 0.0
+      MIX: 0.0
+      WYKLUCZONE: 0.0
+    nexus_koszty:
+      A: 100.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 0.0
+    nexus: 1.0
+    dochód_IP: 7900.0
+    dochód_NIE: 2000.0
+    klucz_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      wartość: null
+      status: NOT_APPLICABLE
+      źródło_ref: null
+      rounding_granularity: per_cost_item
+    alokacja_multi_ip: null
+    podatek:
+      podstawa_IP: 7900
+      podstawa_NIE: 1000
+      podstawa_zwykła: 1000
+      dochód_IP_po_uldze_BR: 7900.0
+      dochód_IP_kwalifikowany: 7900.0
+      dochód_IP_poza_preferencją: 0.0
+      podatek_IP: 395
+      podatek_NIE_finalny: 190
+      podatek_całościowy: 285
+      nadpłata_lub_dopłata: -285.0
+      thermomodernization_used: 0.0
+      termomodernization_carry_over: 0.0
+      termomodernization_expired: 0.0
+      thermomodernization_mode: none
+      thermomodernization_evidence_status: NOT_APPLICABLE
+      thermomodernization_rules_source_id: MF_THERMOMODERNIZATION
+      thermomodernization_limit: 53000.0
+      health_tax_credit_used: 300.0
+      ulga_BR_IP_wykorzystana: 0.0
+      ulga_BR_NIE_wykorzystana: 0.0
+      ulga_BR_carry_over: 0.0
+      dochód_dodatkowy_skala: 0.0
+  classifications:
+  - opis: Dedykowane środowisko projektu
+    amount: 100.0
+    basket: IP
+    allocation_method: direct
+    allocation_source: syntetyczna-ewidencja-projektowa
+    allocation_key: 1.0
+    ip_amount: 100.0
+    non_ip_amount: 0.0
+    nexus_source: own_br
+    nexus_basket: A
+    nexus_amount: 100.0
+    allocation_period: 2019-01
+    rounding_granularity: per_cost_item
+    rounding_adjustment: 0.0
+    nexus_evidence: synthetic-nexus-46_historical_2019_health_credit-1
+    nexus_basis: explicit_amount
+  monthly_W:
+  - miesiąc: 2019-01
+    wartość: 80.0
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+    TEST_3: PASS
+    TEST_4: PASS
+    TEST_5: PASS
+    TEST_6: PASS
+    TEST_7: PASS
+    TEST_8: PASS
+    TEST_9: PASS
+  source_ledger_audit:
+    status: NOT_PROVIDED
+    reported_costs: null
+    raw_input_costs: 100.0
+    deductible_costs: 100.0
+    excluded_recorded_costs: 0.0
+    correction_delta: 0.0
+  correction_preview:
+    status: NOT_NEEDED
+    source_kpir_correction_required: false
+    return_correction_required: false
+    relief_adjustment_required: false
+    tax_unchanged_only_if_reliefs_updated: false
+    corrected_total_tax: 285.0
+    corrected_overpayment: -285.0
+    thermomodernization_used: 0.0
+    thermomodernization_carry_over: 0.0
+  stops_reviews:
+    stops: []
+    reviews:
+    - REVIEW_09
+    warnings: []

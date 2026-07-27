@@ -1,0 +1,65 @@
+meta:
+  id: 48_historical_2024_pit_like_cascade
+  name: Rok 2024 — kaskada ZUS, IKZE, termomodernizacja i IP Box
+  description: Syntetyczny wariant podobny strukturalnie do realnej korekty, bez danych osobowych i rzeczywistych kwot.
+  tags: [historical, regression, cascade]
+  priority: P0
+input:
+  coverage:
+    expected_months: 1
+    imported_months: 1
+    invoices_complete: true
+    kpir_complete: true
+    work_records_complete: true
+    period_closed: true
+    confirmed_by: synthetic-scenario
+  rok: 2024
+  forma_opodatkowania: liniowy_19%
+  kwalifikowane_IP: true
+  polityka_alokacji:
+    policy_id: synthetic-2024-cascade
+    przychody:
+      metoda: dokumentowa
+    koszty_MIX:
+      metoda: przychodowa_roczna
+      źródło: użytkownik
+      uzasadnienie: Dokumentowy podział wynagrodzenia i roczny true-up kosztów wspólnych.
+  zus:
+    sposob: brak
+    odliczenie_spoleczne_PIT: 15000
+  kontrahenci:
+    - nazwa: ClientA
+      klauzula_IP: true
+  ulgi:
+    ikze: 14000
+    termomodernizacja_loty:
+      - origin_year: 2024
+        remaining_amount: 10000
+        evidence_ref: synthetic-thermo-48-2024
+  zaliczki:
+    suma: 38000
+  miesiace:
+    - miesiac: 2024-12
+      faktury:
+        - kwota_PLN: 211000
+          kwota_IP: 181000
+          kontrahent: ClientA
+          kwalifikuje_IP: true
+      ewidencja:
+        godziny_pracy: 160
+        godziny_nie_IP: 16
+        procent_faktury_IP: 100
+      koszty:
+        - opis: Dedykowany koszt wytworzenia oprogramowania
+          kwota: 1000
+          kategoria: IP
+          allocation_source: syntetyczna-ewidencja-projektowa
+          nexus_source: own_br
+          nexus_evidence: synthetic-nexus-48_historical_2024_pit_like_cascade-1
+      opis_projektu: Rozwój kwalifikowanego programu komputerowego.
+assertions:
+  nexus: 1
+  podatek_IP_range: [9000, 9000]
+  podatek_NIE_range: [0, 0]
+  termomodernization_carry_over: 9000
+  testy_pass: [TEST_3, TEST_4, TEST_5, TEST_6, TEST_8, TEST_9]

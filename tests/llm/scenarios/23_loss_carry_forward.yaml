@@ -1,29 +1,71 @@
 meta:
   id: 23_loss_carry_forward
-  name: 'Brzegowy: Strata z lat ubiegłych'
-  description: Weryfikacja odliczania straty z poprzednich lat przed bazą IP Box
+  name: Strata z lat ubiegłych
+  description: Strata z lat ubiegłych
   tags:
-  - edge
-  - loss
+  - relief
   priority: P1
 input:
+  coverage:
+    expected_months: 1
+    imported_months: 1
+    invoices_complete: true
+    kpir_complete: true
+    work_records_complete: true
+    period_closed: true
+    confirmed_by: synthetic-scenario
   rok: 2025
   forma_opodatkowania: liniowy_19%
+  kwalifikowane_IP: true
+  polityka_alokacji:
+    policy_id: scenario-policy
+    przychody:
+      metoda: czasowa_W
+    koszty_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      uzasadnienie: Jawna polityka testowa; przychody, MIX i NEXUS są rozdzielone.
   zus:
-    sposob: w_KPiR
+    sposob: brak
+  kontrahenci:
+  - nazwa: ClientA
+    klauzula_IP: true
+  - nazwa: ClientB
+    klauzula_IP: false
+  ulgi:
+    strata_NIE_z_lat_poprzednich: 5000
   miesiace:
   - miesiac: 2025-01
     faktury:
-    - kwota_netto: 20000
-      kontrahent: TestCorp
+    - kwota_PLN: 20000
+      kontrahent: ClientA
+      kwalifikuje_IP: true
+    - kwota_PLN: 10000
+      kontrahent: ClientB
+      kwalifikuje_IP: false
     ewidencja:
       godziny_pracy: 160
       godziny_nie_IP: 16
       procent_faktury_IP: 100
     koszty:
-    - opis: Abonament internet
+    - opis: Licencja IDE
       kwota: 89
-  ulgi:
-    straty_poprzednie: 50000
+      nexus_source: own_br
+      nexus_evidence: synthetic-nexus-23_loss_carry_forward-1
+      kategoria: IP
+      allocation_source: ewidencja_kosztu_IP
+    opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.
 assertions:
   nexus: 1.0
+  przychod_IP_roczny_range:
+  - 18000
+  - 18000
+  W_miesieczne:
+    2025-01: 90.0
+  testy_pass:
+  - TEST_5
+  - TEST_8
+  - TEST_9
+  podatek_NIE_range:
+  - 1330
+  - 1330

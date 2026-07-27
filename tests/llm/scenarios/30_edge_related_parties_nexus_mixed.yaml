@@ -1,75 +1,87 @@
 meta:
-  id: "30_edge_related_parties_nexus_mixed"
-  name: "Edge: NEXUS mieszany — własne koszty A (sprzęt/licencje) + powiązany podwykonawca C"
-  description: >
-    Programista ma zarówno własne koszty B+R (laptop, licencje IDE) → NEXUS A,
-    jak i powiązanego podwykonawcę (siostra prowadzi CodeSis Sp. z o.o.) → NEXUS C.
-    NEXUS < 1.0 — test prawidłowego obliczenia przy mieszanym NEXUS.
-    A = 3500 (laptop 3000 + JetBrains 500), C = 10000.
-    NEXUS = min(1.0, 3500×1.3 / (3500+10000)) = min(1.0, 4550/13500) ≈ 0.337
-  tags: ["edge", "nexus", "related-parties"]
+  id: 30_edge_related_parties_nexus_mixed
+  name: Mieszane koszty A i C
+  description: Mieszane koszty A i C
+  tags:
+  - regression
   priority: P1
-  expected_stops: []
-  expected_reviews: []
-
 input:
+  coverage:
+    expected_months: 2
+    imported_months: 2
+    invoices_complete: true
+    kpir_complete: true
+    work_records_complete: true
+    period_closed: true
+    confirmed_by: synthetic-scenario
   rok: 2025
-  forma_opodatkowania: "liniowy_19%"
+  forma_opodatkowania: liniowy_19%
+  kwalifikowane_IP: true
+  polityka_alokacji:
+    policy_id: scenario-policy
+    przychody:
+      metoda: czasowa_W
+    koszty_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      uzasadnienie: Jawna polityka testowa; przychody, MIX i NEXUS są rozdzielone.
   zus:
-    sposob: "w_KPiR"
-    spoleczne_miesiecznie: 1418.48
+    sposob: brak
   kontrahenci:
-    - nazwa: "MegaCorp Sp. z o.o."
-      waluta: "PLN"
-      klauzula_IP: true
-      model_komercjalizacji: "przeniesienie_praw"
-
+  - nazwa: ClientA
+    klauzula_IP: true
   miesiace:
-    - miesiac: "2025-01"
-      faktury:
-        - kwota_netto: 20000
-          kontrahent: "MegaCorp Sp. z o.o."
-      ewidencja:
-        godziny_pracy: 160
-        godziny_nie_IP: 0
-        procent_faktury_IP: 100
-      koszty:
-        - opis: "Składki ZUS społeczne"
-          kwota: 1418.48
-        - opis: "Laptop Dell Precision (narzędzie B+R)"
-          kwota: 3000.00
-        - opis: "Usługi programistyczne — CodeSis Sp. z o.o. (siostra)"
-          kwota: 5000
-          typ_nexus: "C"
-      opis_projektu: >
-        Zaprojektowałem architekturę mikroserwisów; część modułów back-end
-        zrealizowała spółka powiązana CodeSis.
-    - miesiac: "2025-02"
-      faktury:
-        - kwota_netto: 20000
-          kontrahent: "MegaCorp Sp. z o.o."
-      ewidencja:
-        godziny_pracy: 160
-        godziny_nie_IP: 0
-        procent_faktury_IP: 100
-      koszty:
-        - opis: "Składki ZUS społeczne"
-          kwota: 1418.48
-        - opis: "Licencja JetBrains All Products Pack"
-          kwota: 500.00
-        - opis: "Usługi programistyczne — CodeSis Sp. z o.o. (siostra)"
-          kwota: 5000
-          typ_nexus: "C"
-      opis_projektu: >
-        Wdrożyłem system CI/CD i przeprowadziłem integrację z API zewnętrznego dostawcy.
-
-  ulgi: {}
-
+  - miesiac: 2025-01
+    faktury:
+    - kwota_PLN: 20000
+      kontrahent: ClientA
+      kwalifikuje_IP: true
+    ewidencja:
+      godziny_pracy: 160
+      godziny_nie_IP: 0
+      procent_faktury_IP: 100
+    koszty:
+    - opis: Laptop do B+R
+      kwota: 3000
+      nexus_source: own_br
+      nexus_evidence: synthetic-nexus-30_edge_related_parties_nexus_mixed-1
+      kategoria: IP
+      allocation_source: ewidencja_kosztu_IP
+    - opis: Usługi CodeSis
+      kwota: 5000
+      nexus_source: related_br_contractor
+      nexus_evidence: synthetic-nexus-30_edge_related_parties_nexus_mixed-2
+      kategoria: IP
+      allocation_source: ewidencja_kosztu_IP
+    opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.
+  - miesiac: 2025-02
+    faktury:
+    - kwota_PLN: 20000
+      kontrahent: ClientA
+      kwalifikuje_IP: true
+    ewidencja:
+      godziny_pracy: 160
+      godziny_nie_IP: 0
+      procent_faktury_IP: 100
+    koszty:
+    - opis: Licencja JetBrains
+      kwota: 500
+      nexus_source: own_br
+      nexus_evidence: synthetic-nexus-30_edge_related_parties_nexus_mixed-3
+      kategoria: IP
+      allocation_source: ewidencja_kosztu_IP
+    - opis: Usługi CodeSis 2
+      kwota: 5000
+      nexus_source: related_br_contractor
+      nexus_evidence: synthetic-nexus-30_edge_related_parties_nexus_mixed-4
+      kategoria: IP
+      allocation_source: ewidencja_kosztu_IP
+    opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.
 assertions:
-  # A = laptop (3000) + JetBrains (500) = 3500 (własne koszty B+R)
-  # C = CodeSis × 2 miesięcy = 10000 (powiązany podwykonawca)
-  # NEXUS = min(1.0, 3500×1.3 / (3500+10000)) = 4550/13500 ≈ 0.337
-  # Dochód_IP ≈ (40000 - koszty_IP) × NEXUS
-  # Szeroki zakres: poprawna kalkulacja ≈567 PLN, ale LLM może uzyskać do ~1000 PLN
-  # w zależności od alokacji ZUS i sposobu traktowania CodeSis w NEXUS
-  podatek_IP_range: [200, 1100]
+  nexus_range:
+  - 0.337
+  - 0.3371
+  testy_pass:
+  - TEST_5
+  - TEST_8
+  - TEST_9

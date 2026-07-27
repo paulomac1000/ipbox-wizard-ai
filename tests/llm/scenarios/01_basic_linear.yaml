@@ -1,64 +1,63 @@
 meta:
-  id: "01_basic_linear"
-  name: "Podstawowy programista B2B — liniowy 19%, 1 klient PLN"
-  description: >
-    1 kontrahent, faktury PLN, ZUS w KPiR, brak ulg poza IKZE,
-    NEXUS = 1.0
-  difficulty: "basic"
-  tags: ["liniowy", "1-klient", "PLN", "ZUS-w-KPiR"]
-  expected_stops: []
-  expected_reviews: []
-
+  id: 01_basic_linear
+  name: Podstawowy liniowy z W i rocznym MIX
+  description: Podstawowy liniowy z W i rocznym MIX
+  tags:
+  - regression
+  priority: P0
 input:
+  coverage:
+    expected_months: 1
+    imported_months: 1
+    invoices_complete: true
+    kpir_complete: true
+    work_records_complete: true
+    period_closed: true
+    confirmed_by: synthetic-scenario
   rok: 2025
-  forma_opodatkowania: "liniowy_19%"
+  forma_opodatkowania: liniowy_19%
+  kwalifikowane_IP: true
+  polityka_alokacji:
+    policy_id: scenario-policy
+    przychody:
+      metoda: czasowa_W
+    koszty_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      uzasadnienie: Jawna polityka testowa; przychody, MIX i NEXUS są rozdzielone.
   zus:
-    sposob: "w_KPiR"
-    spoleczne_miesiecznie: 1418.48
-    zdrowotna_miesiecznie: 900.00
-  interpretacja_KIS:
-    posiada: true
-    sygnatura: "0111-KDIB1-1.4010.XXX.2024.X.XX"
+    sposob: brak
   kontrahenci:
-    - nazwa: "TechCorp Sp. z o.o."
-      NIP: "1234567890"
-      waluta: "PLN"
-      klauzula_IP: true
-      model_komercjalizacji: "przeniesienie_praw"
-
+  - nazwa: ClientA
+    klauzula_IP: true
   miesiace:
-    - miesiac: "2025-01"
-      faktury:
-        - kwota_netto: 25000
-          kontrahent: "TechCorp Sp. z o.o."
-      ewidencja:
-        godziny_pracy: 168
-        godziny_nie_IP: 16
-        procent_faktury_IP: 100
-      koszty:
-        - opis: "Składki ZUS społeczne"
-          kwota: 1418.48
-        - opis: "Składka zdrowotna"
-          kwota: 900.00
-        - opis: "Internet firmowy"
-          kwota: 89.00
-        - opis: "Licencja JetBrains"
-          kwota: 119.00
-        - opis: "Księgowość"
-          kwota: 400.00
-      opis_projektu: >
-        Zaprojektowałem i zaimplementowałem moduł autoryzacji OAuth2.
-
-  ulgi:
-    ikze: 9388.80
-    termomodernizacja_pula: 0
-
-  zaliczki:
-    typ: "miesięczne"
-    suma: 36000
-    rozbicie: [3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000]
-
+  - miesiac: 2025-01
+    faktury:
+    - kwota_PLN: 25000
+      kontrahent: ClientA
+      kwalifikuje_IP: true
+    ewidencja:
+      godziny_pracy: 168
+      godziny_nie_IP: 16
+      procent_faktury_IP: 100
+    koszty:
+    - opis: Licencja JetBrains
+      kwota: 119
+      nexus_source: own_br
+      nexus_evidence: synthetic-nexus-01_basic_linear-1
+      kategoria: IP
+      allocation_source: ewidencja_kosztu_IP
+    - opis: Internet firmowy
+      kwota: 89
+      nexus_source: outside_nexus
+      kategoria: MIX
+    opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.
 assertions:
   nexus: 1.0
-  podatek_IP_range: [900, 30000]
-  testy_pass: ["TEST 1", "TEST 3", "TEST 4", "TEST 5", "TEST 6"]
+  W_miesieczne:
+    2025-01: 90.48
+  testy_pass:
+  - TEST_5
+  - TEST_7
+  - TEST_8
+  - TEST_9

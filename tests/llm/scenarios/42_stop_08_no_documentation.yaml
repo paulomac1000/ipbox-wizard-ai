@@ -1,47 +1,44 @@
 meta:
-  id: "42_stop_08_no_documentation"
-  name: "STOP_08: 100% IP deklarowane, brak ewidencji godzin"
-  description: >
-    STOP_08: Przychód IP = 100% deklarowany, ale brak udokumentowanych godzin
-    B+R. To fail-fast check — algorytm powinien zatrzymać się lub emitować
-    REVIEW.
-  tags: [ "stop", "documentation", "fail-fast" ]
-  priority: "P0"
-  expected_stops: []
-
+  id: 42_stop_08_no_documentation
+  name: STOP_08 przy braku ewidencji
+  description: STOP_08 przy braku ewidencji
+  tags:
+  - regression
+  priority: P0
 input:
+  coverage:
+    expected_months: 1
+    imported_months: 1
+    invoices_complete: true
+    kpir_complete: true
+    work_records_complete: true
+    period_closed: true
+    confirmed_by: synthetic-scenario
   rok: 2025
-  forma_opodatkowania: "liniowy_19%"
+  forma_opodatkowania: liniowy_19%
+  kwalifikowane_IP: true
+  polityka_alokacji:
+    policy_id: scenario-policy
+    przychody:
+      metoda: czasowa_W
+    koszty_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      uzasadnienie: Jawna polityka testowa; przychody, MIX i NEXUS są rozdzielone.
   zus:
-    sposob: "w_KPiR"
-    spoleczne_miesiecznie: 1418.48
-
+    sposob: brak
   kontrahenci:
-    - nazwa: "TechCorp Sp. z o.o."
-      NIP: "1234567890"
-      waluta: "PLN"
-      klauzula_IP: true
-      model_komercjalizacji: "przeniesienie_praw"
-
+  - nazwa: ClientA
+    klauzula_IP: true
   miesiace:
-    - miesiac: "2025-01"
-      faktury:
-        - kwota_netto: 20000
-          kontrahent: "TechCorp Sp. z o.o."
-      # BRAK ewidencji — algorytm powinien to wykryć
-      ewidencja:
-        godziny_pracy: 0
-        godziny_nie_IP: 0
-        procent_faktury_IP: 100
-      koszty:
-        - opis: "Składki ZUS społeczne"
-          kwota: 1418.48
-      opis_projektu: >
-        Rozwój modułu autoryzacji OAuth2.
-
-  ulgi: {}
-
+  - miesiac: 2025-01
+    faktury:
+    - kwota_PLN: 20000
+      kontrahent: ClientA
+      kwalifikuje_IP: true
+    koszty: []
+    opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.
+    brak_ewidencji: true
 assertions:
-  # Algorytm powinien wyemitować STOP_08 lub przynajmniej REVIEW_08
-  # bo 100% IP bez dokumentacji = red flag
-  warnings: [ "STOP_08", "REVIEW" ]
+  stops:
+  - STOP_08

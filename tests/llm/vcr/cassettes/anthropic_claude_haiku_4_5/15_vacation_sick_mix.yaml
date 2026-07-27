@@ -1,0 +1,136 @@
+meta:
+  scenario_id: 15_vacation_sick_mix
+  scenario_name: Urlop i L4 nie zwiększają mianownika W
+  provider: openrouter
+  requested_model: anthropic/claude-haiku-4.5
+  returned_model: anthropic/claude-haiku-4.5
+  fingerprint: canonical-source_cb40707c22115f513784368af7032f20132b0728cecc68b3a44a618f1eab07b1
+  request_hash: b03223a96bf977f3d05d1a1b20b40481314e1aabec1534bc4bd0f0f43e20e63d
+  recorded_at: '2026-07-25T23:23:43.294367+00:00'
+  request_id: gen-1785021821-VNDb6Aq2RmNyHVb8TSLD
+  finish_reason: stop
+  native_finish_reason: end_turn
+  system_fingerprint: null
+  prompt_tokens: 761
+  completion_tokens: 22
+  total_tokens: 783
+  cost: 0.000871
+  recording_duration_seconds: 1.41
+response: '{"status":"FINAL","stops":[],"reviews":["REVIEW_09"]}'
+parsed_response:
+  status: FINAL
+  calculation_meta:
+    engine_version: ipbox-wizard-ai
+    rule_pack: PL-PIT-IPBOX-2025
+    rules_source_ids:
+    - MF_IPBOX_2019
+    - KNF_IKZE
+    - MF_SCALE_CURRENT
+    - MF_HEALTH
+    - MF_IPBOX_BR
+    input_hash: 3b931d4053aeb4d9dbf76c58e5c86e60039f5dbf9d3edfd8555d53ccea4cc546
+    engine_source_hash: 15f46d2c48027b2043e147826d6d249570212e15194590bf8c2590ef758fae17
+    calculated_at: '2026-07-25T23:23:43Z'
+    code_revision: engine:15f46d2c48027b2043e147826d6d249570212e15194590bf8c2590ef758fae17
+  result:
+    rok: 2025
+    przychody_roczne:
+      IP: 9000.0
+      NIE: 1000.0
+    koszty_roczne:
+      IP: 270.0
+      NIE: 30.0
+      MIX: 300.0
+      WYKLUCZONE: 0.0
+    nexus_koszty:
+      A: 0.0
+      B: 0.0
+      C: 0.0
+      D: 0.0
+      poza_nexus: 300.0
+    nexus: 0.0
+    dochód_IP: 8730.0
+    dochód_NIE: 970.0
+    klucz_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      wartość: 0.9
+      status: FINAL
+      źródło_ref: null
+      rounding_granularity: per_cost_item
+    alokacja_multi_ip: null
+    podatek:
+      podstawa_IP: 0
+      podstawa_NIE: 9700
+      podstawa_zwykła: 9700
+      dochód_IP_po_uldze_BR: 8730.0
+      dochód_IP_kwalifikowany: 0.0
+      dochód_IP_poza_preferencją: 8730.0
+      podatek_IP: 0
+      podatek_NIE_finalny: 1843
+      podatek_całościowy: 1843
+      nadpłata_lub_dopłata: -1843.0
+      thermomodernization_used: 0.0
+      termomodernization_carry_over: 0.0
+      termomodernization_expired: 0.0
+      thermomodernization_mode: none
+      thermomodernization_evidence_status: NOT_APPLICABLE
+      thermomodernization_rules_source_id: MF_THERMOMODERNIZATION
+      thermomodernization_limit: 53000.0
+      health_tax_credit_used: 0.0
+      ulga_BR_IP_wykorzystana: 0.0
+      ulga_BR_NIE_wykorzystana: 0.0
+      ulga_BR_carry_over: 0.0
+      dochód_dodatkowy_skala: 0.0
+  classifications:
+  - opis: Hosting
+    amount: 300.0
+    basket: MIX
+    allocation_method: przychodowa_roczna
+    allocation_source: domyślna_wizard
+    allocation_key: 0.9
+    ip_amount: 270.0
+    non_ip_amount: 30.0
+    nexus_source: outside_nexus
+    nexus_basket: poza_nexus
+    nexus_amount: 0.0
+    allocation_period: 2025-01
+    rounding_granularity: per_cost_item
+    rounding_adjustment: 0.0
+    nexus_evidence: ''
+    nexus_basis: explicit_amount
+  monthly_W:
+  - miesiąc: 2025-01
+    wartość: 90.0
+  tests:
+    TEST_1: PASS
+    TEST_2: PASS
+    TEST_3: PASS
+    TEST_4: PASS
+    TEST_5: PASS
+    TEST_6: PASS
+    TEST_7: PASS
+    TEST_8: PASS
+    TEST_9: PASS
+  source_ledger_audit:
+    status: NOT_PROVIDED
+    reported_costs: null
+    raw_input_costs: 300.0
+    deductible_costs: 300.0
+    excluded_recorded_costs: 0.0
+    correction_delta: 0.0
+  correction_preview:
+    status: NOT_NEEDED
+    source_kpir_correction_required: false
+    return_correction_required: false
+    relief_adjustment_required: false
+    tax_unchanged_only_if_reliefs_updated: false
+    corrected_total_tax: 1843.0
+    corrected_overpayment: -1843.0
+    thermomodernization_used: 0.0
+    thermomodernization_carry_over: 0.0
+  stops_reviews:
+    stops: []
+    reviews:
+    - REVIEW_09
+    warnings: []

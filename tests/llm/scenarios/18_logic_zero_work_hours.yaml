@@ -1,28 +1,50 @@
 meta:
-  id: "18_logic_zero_work_hours"
-  name: "Logika: Miesiąc z zerową liczbą godzin pracy"
-  description: "Weryfikacja czy algorytm pomija miesiąc z urlopem całkowitym (W=0 → POMIŃ MIESIĄC)"
-  tags: ["core", "edge", "W"]
-  priority: "P1"
-
+  id: 18_logic_zero_work_hours
+  name: Brak prac B+R w miesiącu
+  description: Brak prac B+R w miesiącu
+  tags:
+  - regression
+  priority: P1
 input:
+  coverage:
+    expected_months: 1
+    imported_months: 1
+    invoices_complete: true
+    kpir_complete: true
+    work_records_complete: true
+    period_closed: true
+    confirmed_by: synthetic-scenario
   rok: 2025
-  forma_opodatkowania: "liniowy_19%"
+  forma_opodatkowania: liniowy_19%
+  kwalifikowane_IP: true
+  polityka_alokacji:
+    policy_id: scenario-policy
+    przychody:
+      metoda: czasowa_W
+    koszty_MIX:
+      metoda: przychodowa_roczna
+      źródło: domyślna_wizard
+      uzasadnienie: Jawna polityka testowa; przychody, MIX i NEXUS są rozdzielone.
   zus:
-    sposob: "w_KPiR"
+    sposob: brak
+  kontrahenci:
+  - nazwa: ClientA
+    klauzula_IP: true
   miesiace:
-    - miesiac: "2025-01"
-      faktury:
-        - kwota_netto: 20000
-          kontrahent: "TestCorp"
-      ewidencja:
-        godziny_pracy: 0
-        godziny_nie_IP: 0
-        procent_faktury_IP: 100
-      koszty:
-        - opis: "Abonament internet"
-          kwota: 89
-
+  - miesiac: 2025-01
+    faktury:
+    - kwota_PLN: 20000
+      kontrahent: ClientA
+      kwalifikuje_IP: true
+    ewidencja:
+      godziny_pracy: 0
+      godziny_nie_IP: 0
+      procent_faktury_IP: 100
+    koszty: []
+    opis_projektu: Rozwój i ulepszanie kwalifikowanego oprogramowania.
+    brak_prac_br: true
 assertions:
+  stops:
+  - STOP_04
   W_miesieczne:
-    "2025-01": 0.0
+    2025-01: 0.0
