@@ -3,7 +3,13 @@
 
 from __future__ import annotations
 
-from tests.llm.candidate_models import register_candidate_models
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+
+from tests.llm.candidate_models import register_candidate_models  # noqa: E402
 
 register_candidate_models()
 
