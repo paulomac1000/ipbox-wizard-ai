@@ -134,7 +134,7 @@ Sprzeczność między źródłami jest błędem. Nie wybieraj wygodniejszej wers
 - `README.md` opisuje produkt i pierwszy kontakt.
 - `AGENTS.md` opisuje sposób pracy z kodem.
 - `ipbox_algorytm.md` jest kontraktem domenowym, nie marketingowym opisem.
-- `CHANGELOG.md` zawiera tylko najważniejsze różnice między wydaniami.
+- `CHANGELOG.md` zawiera tylko najważniejsze różnice między datowanymi wydaniami.
 - Nie wpisuj do dokumentacji ulotnych liczb testów, chyba że opisujesz konkretną, zamkniętą wersję.
 
 ## Invarianty domenowe
@@ -195,6 +195,7 @@ Sprzeczność między źródłami jest błędem. Nie wybieraj wygodniejszej wers
 | cassette policy nie przechodzi | brakujące lub nadmiarowe pliki, manifest, nazwy scenariuszy i katalogów modeli |
 | benchmark ma brakujące rekordy | `meta.id`, nazwa pliku, kompletność manifestu i dokładny wybór scenariusza |
 | koszt nagrywania jest niepełny | katalog odrzuceń, timestamp sesji i metadane `usage.cost` |
+| CI pada tylko na Pythonie 3.13 | odtwórz lokalnie środowisko 3.13, uruchom pełny playback offline i porównaj pierwszy różniący się krok z jobem CI |
 | wynik jest podejrzanie korzystny | domyślne wartości, brak dowodów, koszty prywatne i błędne mieszanie W z MIX |
 
 Nie „naprawiaj” problemu przez rozszerzenie tolerancji, osłabienie asercji, ręczną edycję kasety albo dodanie `skip`.
@@ -228,6 +229,8 @@ unset OPENROUTER_API_KEY
 ./scripts/verify_all_models.sh
 python scripts/benchmark_report.py
 ```
+
+`benchmark_report.py` musi zostać uruchomiony przed decyzją o płatnym nagrywaniu. Jeżeli zwraca `all_complete_and_valid=true`, nie wykonuj żadnego płatnego requestu.
 
 Nie nagrywaj kaset profilaktycznie. Gdy zmiana requestu albo semantyki rzeczywiście unieważniła konkretną kasetę, usuń wyłącznie tę kasetę i nagraj ją przez `scripts/record_model.py`.
 
