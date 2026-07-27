@@ -15,63 +15,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  repair-legacy-model-count-test:
-    if: github.event_name == 'pull_request' && github.head_ref == 'feat/openai-model-family'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: feat/openai-model-family
-          persist-credentials: true
-      - name: Update the legacy seven-family assertion once
-        run: |
-          set -euo pipefail
-          python - <<'PY'
-          from pathlib import Path
-
-          path = Path("tests/unit/test_vcr_and_client.py")
-          text = path.read_text(encoding="utf-8")
-          old = '''def test_model_profiles_cover_seven_distinct_families() -> None:
-              assert BENCHMARK_MODELS == (
-                  "google/gemini-3-flash-preview",
-                  "anthropic/claude-haiku-4.5",
-                  "deepseek/deepseek-chat-v3.1",
-                  "minimax/minimax-m2.5",
-                  "moonshotai/kimi-k2.5",
-                  "qwen/qwen3.5-flash-02-23",
-                  "mistralai/mistral-small-24b-instruct-2501",
-              )
-              assert len({get_model_profile(model).family for model in BENCHMARK_MODELS}) == 7
-          '''
-          new = '''def test_model_profiles_cover_eight_distinct_families() -> None:
-              assert BENCHMARK_MODELS == (
-                  "google/gemini-3-flash-preview",
-                  "anthropic/claude-haiku-4.5",
-                  "deepseek/deepseek-chat-v3.1",
-                  "minimax/minimax-m2.5",
-                  "moonshotai/kimi-k2.5",
-                  "qwen/qwen3.5-flash-02-23",
-                  "mistralai/mistral-small-24b-instruct-2501",
-                  "openai/gpt-5-mini",
-              )
-              assert len({get_model_profile(model).family for model in BENCHMARK_MODELS}) == 8
-          '''
-          if old not in text:
-              print("Legacy assertion already absent; no change needed")
-              raise SystemExit(0)
-          path.write_text(text.replace(old, new), encoding="utf-8")
-          PY
-          if git diff --quiet -- tests/unit/test_vcr_and_client.py; then
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add tests/unit/test_vcr_and_client.py
-          git commit -m "test: update benchmark family expectations"
-          git push origin HEAD:feat/openai-model-family
-
   deterministic:
     runs-on: ubuntu-latest
     timeout-minutes: 30
