@@ -4,8 +4,6 @@ import os
 
 import pytest
 
-from tests.llm.candidate_models import register_candidate_models
-
 
 def pytest_addoption(parser: pytest.Parser) -> None:
     parser.addoption("--run-llm", action="store_true", default=False)
@@ -19,7 +17,6 @@ def pytest_addoption(parser: pytest.Parser) -> None:
 
 
 def pytest_configure(config: pytest.Config) -> None:
-    register_candidate_models()
     if mode := config.getoption("--vcr-mode"):
         os.environ["VCR_MODE"] = mode
     if model := config.getoption("--llm-model"):
