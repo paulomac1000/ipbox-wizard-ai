@@ -30,7 +30,7 @@ Rozliczenie IP Box nie sprowadza się do pomnożenia dochodu przez 5%. Trzeba za
 - jak zastosować składki, ulgi, straty i zaokrąglenia;
 - czy ewidencja, KPiR i formularze PIT mówią to samo.
 
-Projekt porządkuje ten proces i oddziela rozmowę z AI od krytycznej matematyki. **Model pomaga czytać dokumenty i prowadzić użytkownika, ale wynik oblicza i kontroluje Python.**
+Projekt oddziela rozmowę z AI od krytycznej matematyki. **Model pomaga czytać dokumenty i prowadzić użytkownika, ale wynik oblicza i kontroluje Python.**
 
 ## Dla kogo
 
@@ -102,7 +102,7 @@ Na końcu pokaż:
 - porównanie z KPiR, ewidencją i PIT;
 - błędy, STOP-y, REVIEW i potrzebne korekty;
 - listę rzeczy do potwierdzenia z księgową;
-- informację, czy mój przypadek ma bezpośredni test regresyjny w repozytorium.
+- status COVERED_DIRECTLY, COVERED_PARTIALLY albo NOT_COVERED wraz z dowodami.
 
 Nie zmieniaj kodu, chyba że wyraźnie o to poproszę.
 ```
@@ -110,8 +110,6 @@ Nie zmieniaj kodu, chyba że wyraźnie o to poproszę.
 Więcej wariantów znajduje się w [`examples/przykladowy_prompt_startowy.md`](examples/przykladowy_prompt_startowy.md).
 
 ## Jak wygląda dobra sesja
-
-Agent powinien pracować w tej kolejności:
 
 ```text
 inwentaryzacja dokumentów
@@ -172,7 +170,7 @@ Najpierw zinwentaryzuj i odczytaj dokumenty. Potem pokaż wyekstrahowane dane,
 zapytaj o braki i uruchom deterministyczne obliczenia w Pythonie. Porównaj wynik
 z KPiR, ewidencją i PIT. Nie zmieniaj kodu ani nie twórz commitów.
 
-Na końcu wskaż, które istniejące testy bezpośrednio pokrywają mój przypadek.
+Na końcu podaj COVERED_DIRECTLY, COVERED_PARTIALLY albo NOT_COVERED oraz dowody.
 Jeżeli przypadek nie jest pokryty albo ujawnia możliwy błąd algorytmu, przygotuj
 zanonimizowany minimalny przykład oraz propozycję zgłoszenia GitHub Issue.
 ```
@@ -212,8 +210,6 @@ python -m pytest tests/unit -q
 Repozytorium nie ma jeszcze samodzielnej aplikacji okienkowej ani uniwersalnego importera każdego PDF/XLSX. W lokalnym użyciu rolę operatora pełni Codex, Claude Code lub inny agent z dostępem do plików i Pythona.
 
 ## Jak działa silnik
-
-Projekt rozdziela odpowiedzialności:
 
 ```text
 Dokumenty użytkownika
@@ -255,17 +251,7 @@ Projekt nie opiera zaufania na pojedynczej odpowiedzi modelu ani na jednym przyk
 
 ### Scenariusze biznesowe
 
-Repozytorium zawiera **46 scenariuszy**, między innymi:
-
-- podatek liniowy i skala;
-- jedna lub wiele umów;
-- waluty i różnice kursowe;
-- składki i ryzyko podwójnego odliczenia;
-- koszty prywatne w KPiR;
-- różne metody alokacji kosztów;
-- NEXUS z podmiotami powiązanymi i niepowiązanymi;
-- ulgi, straty, korekty i historyczne lata podatkowe;
-- niespójność między ewidencją a zeznaniem.
+Repozytorium zawiera **46 scenariuszy**, między innymi podatek liniowy i skalę, waluty, różnice kursowe, składki, koszty prywatne w KPiR, różne metody alokacji, NEXUS, ulgi, straty, korekty i historyczne lata podatkowe.
 
 Scenariusz jest twardą granicą jakości: po dodaniu poprawnego testu algorytm nie może zostać uznany za gotowy, jeżeli ten przypadek przestaje działać.
 
@@ -273,12 +259,12 @@ Scenariusz jest twardą granicą jakości: po dodaniu poprawnego testu algorytm 
 
 Każdy z 46 scenariuszy został zweryfikowany na siedmiu niezależnych rodzinach modeli:
 
-- Google Gemini,
-- Anthropic Claude,
-- DeepSeek,
-- MiniMax,
-- Moonshot Kimi,
-- Qwen,
+- Google Gemini;
+- Anthropic Claude;
+- DeepSeek;
+- MiniMax;
+- Moonshot Kimi;
+- Qwen;
 - Mistral.
 
 Łącznie repozytorium utrzymuje **322 zweryfikowane kasety VCR**. Testy celowo używają mniejszych lub kosztowo oszczędnych modeli reprezentujących każdą rodzinę. Sprawdzają, czy kontrakt jest na tyle jednoznaczny, że różne architektury potrafią zwrócić ten sam ograniczony wynik bez zmiany matematyki ustalonej przez Python.
@@ -291,11 +277,20 @@ VCR pozwala odtwarzać zaakceptowane odpowiedzi offline i wykrywać zmianę zach
 
 Na końcu analizy agent powinien podać jeden z trzech statusów:
 
-1. **`COVERED_DIRECTLY`** — istnieje bezpośredni test lub scenariusz odtwarzający tę samą ścieżkę i invariant.
-2. **`COVERED_PARTIALLY`** — część reguł jest chroniona, ale przypadek zawiera nowy element lub inną kombinację.
-3. **`NOT_COVERED`** — repozytorium nie ma jeszcze bezpośredniego testu dla istotnej części przypadku.
+1. **`COVERED_DIRECTLY`** — pełne potwierdzenie opisane poniżej;
+2. **`COVERED_PARTIALLY`** — część reguł jest chroniona, ale brakuje co najmniej jednego elementu pełnego potwierdzenia;
+3. **`NOT_COVERED`** — repozytorium nie ma bezpośredniego testu dla istotnej części przypadku.
 
-Agent powinien wskazać nazwy pasujących testów i scenariuszy oraz wyjaśnić, czego nie sprawdzono. Nowy, poprawnie opisany przypadek pomaga utrzymywać jakość projektu w czasie. Należy go odtworzyć na minimalnych danych syntetycznych i dodać jako test regresyjny.
+`COVERED_DIRECTLY` wolno zadeklarować wyłącznie wtedy, gdy łącznie:
+
+- istnieje bezpośredni scenariusz biznesowy;
+- scenariusz sprawdza ten sam istotny invariant;
+- macierz VCR wszystkich wymaganych rodzin jest kompletna i aktualna;
+- playback przechodzi bez sekretu i bez połączenia z siecią.
+
+Agent powinien wskazać nazwy testów i scenariuszy, sprawdzany invariant, stan macierzy VCR oraz wynik playbacku. Podobny test bez pełnej bramki oznacza najwyżej `COVERED_PARTIALLY`.
+
+Nowy, poprawnie opisany przypadek pomaga utrzymywać jakość projektu w czasie. Należy go odtworzyć na minimalnych danych syntetycznych i dodać jako test regresyjny.
 
 [**Zgłoś nowy lub nieobsłużony przypadek przez gotowy formularz GitHub Issue**](https://github.com/paulomac1000/ipbox-wizard-ai/issues/new?template=new-tax-case.yml)
 
