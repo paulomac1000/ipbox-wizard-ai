@@ -14,8 +14,16 @@ Gdy użytkownik chce przygotować albo sprawdzić rozliczenie IP Box:
 - przygotuj dane robocze wewnętrznie;
 - wykonaj obliczenia kodem z `python_helper/`;
 - porównaj wynik z KPiR, ewidencją i PIT;
+- wskaż testy i scenariusze bezpośrednio pokrywające przypadek;
+- rozróżnij `COVERED_DIRECTLY`, `COVERED_PARTIALLY` i `NOT_COVERED`;
 - nie zmieniaj kodu i nie twórz commitów;
 - nie zapisuj danych podatnika w repozytorium.
+
+Nie deklaruj pokrycia przez wiele rodzin AI na podstawie podobnego testu. Wymagany jest bezpośredni scenariusz oraz kompletna, aktualna macierz VCR.
+
+Jeżeli przypadek nie jest pokryty albo ujawnia możliwy błąd, przygotuj minimalny przykład syntetyczny. Po zgodzie użytkownika utwórz GitHub Issue, gdy masz dostęp do zapisu. W przeciwnym razie przygotuj treść i podaj formularz:
+
+`https://github.com/paulomac1000/ipbox-wizard-ai/issues/new?template=new-tax-case.yml`
 
 Szczegółowa procedura znajduje się w sekcji „Tryb 1” pliku `AGENTS.md`.
 
