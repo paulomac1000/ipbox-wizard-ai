@@ -109,7 +109,7 @@ jobs:
             --cov-report=term-missing \
             --cov-fail-under=90
           pytest -q
-          for script in scripts/*.sh dump-to-md.sh; do bash -n "$script"; done
+          for script in scripts/*.sh; do bash -n "$script"; done
 
       - name: Record cassettes
         run: |

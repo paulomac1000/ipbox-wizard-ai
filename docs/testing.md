@@ -34,7 +34,7 @@ pytest tests/unit \
   --cov-fail-under=90
 pytest -q
 python scripts/check_cassette_policy.py
-for script in scripts/*.sh dump-to-md.sh; do bash -n "$script"; done
+for script in scripts/*.sh; do bash -n "$script"; done
 ```
 
 Stan referencyjny przed końcowym nagraniem:
@@ -119,7 +119,7 @@ Skrypt zachowuje surowe odpowiedzi, przelicza tożsamość i ponownie wykonuje p
 Płatne nagranie pełnej lub brakującej części macierzy:
 
 ```bash
-git switch fix/decouple-mix-allocation-from-w
+git switch <working-branch>
 git pull --ff-only
 python -m venv .venv
 source .venv/bin/activate
