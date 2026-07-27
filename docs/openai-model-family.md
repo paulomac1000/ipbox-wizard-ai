@@ -2,37 +2,53 @@
 
 `openai/gpt-5-mini` jest ósmym modelem w kanonicznej macierzy benchmarkowej. Nie ma osobnego trybu „candidate”: korzysta z tych samych scenariuszy, recorderów, manifestów, kontroli kosztu, walidacji i playbacku co pozostałe rodziny.
 
+## Stan potwierdzony
+
+Aktualny zestaw został nagrany i zweryfikowany:
+
+- 46/46 zaakceptowanych kaset GPT-5 Mini;
+- koszt nagrania: `$0.009166`;
+- zero odrzuconych prób;
+- `requested_model == returned_model == openai/gpt-5-mini` we wszystkich kasetach;
+- `finish_reason=stop` we wszystkich kasetach;
+- pełny playback OpenAI przechodzi offline;
+- kompletna macierz osiąga 8 × 46, czyli 368/368 kaset i osiem manifestów;
+- polityka kaset, pre-commit, raport benchmarku i CI Python 3.11–3.13 przechodzą.
+
+Kasety potwierdzają wykonanie ograniczonego kontraktu `status/stops/reviews` w 46 scenariuszach. Nie dowodzą samodzielnie poprawności ekstrakcji dowolnego dokumentu ani interpretacji prawnej — krytyczne obliczenia i klasyfikacje nadal ustala Python.
+
 ## Profil transportowy
 
 - model OpenRouter: `openai/gpt-5-mini`;
 - rodzina: `OpenAI GPT`;
 - odpowiedź: strict `json_schema`;
 - reasoning: `minimal`;
-- `uniqueItems` jest usuwane przed transportem (identycznie jak Claude);
+- `uniqueItems` jest usuwane przed transportem;
 - temperatura nie jest wysyłana;
 - slug kaset: `openai_gpt_5_mini`;
 - wymagany komplet: 46 kaset oraz `_manifest.yaml`.
+
+OpenAI, podobnie jak bieżący routing Claude, odrzuca `uniqueItems` w transportowym JSON Schema. Adapter usuwa ten keyword rekursywnie wyłącznie z głębokiej kopii wysyłanej do providera. Kanoniczna lokalna `DECISION_JSON_SCHEMA`, parser i evaluator nadal wymagają unikalnych kodów. Test profilu sprawdza obie strony tej granicy.
 
 Profil znajduje się w `tests/llm/models.py` razem z pozostałymi modelami. Lista `BENCHMARK_MODELS` jest jedynym źródłem macierzy używanym przez recorder, politykę kaset, raport, playback i workflow.
 
 Rejestr modeli nie należy do `engine_source_hash` silnika podatkowego. Każdy request nadal jest chroniony pełnym `request_hash`, który obejmuje model i wszystkie parametry transportowe. Dodanie nowego providera nie powinno samo w sobie unieważniać poprawnych kaset innych modeli.
 
-## Kolejność dla tego brancha
+## Jednorazowa migracja wykonana przy dodaniu modelu
 
-Zmiana zakresu `engine_source_hash` jednorazowo zmienia tożsamość bieżącego silnika, dlatego istniejące 322 kasety wymagają bezpłatnego odświeżenia metadanych. Jednocześnie `--all-models` obejmuje już GPT-5 Mini, więc przed nagraniem brakujących kaset OpenAI pełne odświeżenie zatrzymałoby się na brakującym katalogu.
+Przy dodawaniu GPT-5 Mini zmiana zakresu `engine_source_hash` jednorazowo zmieniła tożsamość bieżącego silnika. Wykonano następującą kolejność:
 
-Prawidłowa kolejność jest następująca:
+1. nagrano 46 brakujących kaset GPT-5 Mini standardowym recorderem;
+2. usunięto klucz API z procesu;
+3. uruchomiono `refresh_vcr_metadata.py --all-models --write`;
+4. ponownie zwalidowano surowe odpowiedzi i odświeżono metadane 322 istniejących kaset;
+5. wykonano pełny pre-commit, raport i playback 368/368.
 
-1. nagraj 46 brakujących kaset GPT-5 Mini standardowym recorderem;
-2. usuń klucz API z procesu;
-3. uruchom `refresh_vcr_metadata.py --all-models --write`, który zwaliduje surowe odpowiedzi i odświeży metadane wszystkich ośmiu rodzin;
-4. wykonaj pełny pre-commit, raport i playback 368/368.
+W starych kasetach zmieniły się wyłącznie kontrolowane metadane, fingerprinty i ponownie złożony wynik. Surowe odpowiedzi modeli nie zostały przepisane ani ponownie nagrane.
 
-Nie edytuj ręcznie fingerprintów, hashy, manifestów ani `parsed_response`.
+## Lokalne nagranie lub odtworzenie
 
-## Lokalne nagranie kaset
-
-Przełącz się na branch i przygotuj środowisko zgodnie z `docs/testing.md`. Następnie uruchom standardowy recorder pojedynczego modelu:
+Standardowy recorder pojedynczego modelu:
 
 ```bash
 LLM_PAID_RUN_CONFIRMATION=RUN_PAID_BENCHMARK \
@@ -42,7 +58,7 @@ python scripts/record_model.py \
   --max-total-cost-usd 5
 ```
 
-Nie używaj osobnego wrappera. `scripts/record_model.py` musi obsługiwać GPT-5 Mini dokładnie tak samo jak każdy inny wpis z `BENCHMARK_MODELS`.
+Nie używaj osobnego wrappera. `scripts/record_model.py` obsługuje GPT-5 Mini dokładnie tak samo jak każdy inny wpis z `BENCHMARK_MODELS`.
 
 Recorder:
 
@@ -51,20 +67,14 @@ Recorder:
 3. odrzuca substytucję modelu;
 4. zapisuje każdą naliczoną, odrzuconą próbę w `VCR_REJECTED_ROOT`;
 5. respektuje oba limity kosztów;
-6. buduje manifest dla `openai/gpt-5-mini`.
+6. buduje manifest dla `openai/gpt-5-mini`;
+7. respektuje `VCR_CASSETTES_ROOT` z procesu albo bezpiecznie wczytanego `.env`.
 
-## Odświeżenie i weryfikacja przed commitem
-
-Po nagraniu usuń klucz API i odśwież metadane całej, już kompletnej macierzy:
+## Weryfikacja przed commitem
 
 ```bash
 unset OPENROUTER_API_KEY
-python scripts/refresh_vcr_metadata.py --all-models --write
-```
 
-Następnie wykonaj standardową ścieżkę pojedynczego modelu:
-
-```bash
 PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 \
 LLM_PROVIDER=openrouter \
 LLM_MODEL=openai/gpt-5-mini \
@@ -96,7 +106,7 @@ Model i PR zaliczają dopiero, gdy jednocześnie:
 1. istnieje dokładnie 46 kaset OpenAI i kompletny manifest;
 2. każda kaseta ma `requested_model` oraz `returned_model` równe `openai/gpt-5-mini`;
 3. każda odpowiedź ma `finish_reason=stop`;
-4. wszystkie odpowiedzi przechodzą wspólną strict schema, parser, oracle i evaluator;
+4. wszystkie odpowiedzi przechodzą wspólną lokalną strict schema, parser, oracle i evaluator;
 5. katalog nie zawiera sekretów, danych prywatnych ani odrzuconych prób;
 6. playback przechodzi bez klucza API i bez sieci;
 7. kompletna macierz osiąga 8 × 46, czyli 368/368 kaset.
