@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import os
 import subprocess
 import sys
@@ -9,6 +10,7 @@ from pathlib import Path
 
 from python_helper.report_metadata import _canonical_source_files
 from tests.llm.models import BENCHMARK_MODELS, MODEL_PROFILES, get_model_profile, model_slug
+from tests.llm.output_schema import DECISION_JSON_SCHEMA
 from tests.llm.runner import LLMTestRunner
 from tests.llm.vcr.config import VCRConfig
 
@@ -36,7 +38,7 @@ def test_model_registry_is_not_part_of_the_tax_engine_hash() -> None:
     assert "tests/llm/request_spec.py" in canonical_paths
 
 
-def test_openai_transport_uses_the_common_strict_schema(monkeypatch) -> None:
+def test_openai_transport_uses_provider_compatible_copy_of_strict_schema(monkeypatch) -> None:
     monkeypatch.setenv("LLM_PROVIDER", "openrouter")
     monkeypatch.setenv("LLM_MODEL", OPENAI_MODEL)
     monkeypatch.setenv("VCR_MODE", "playback")
@@ -49,6 +51,13 @@ def test_openai_transport_uses_the_common_strict_schema(monkeypatch) -> None:
     assert payload["response_format"]["type"] == "json_schema"
     assert payload["reasoning"] == {"effort": "minimal"}
     assert "temperature" not in payload
+
+    transport_schema = json.dumps(payload["response_format"], sort_keys=True)
+    assert "uniqueItems" not in transport_schema
+
+    local_properties = DECISION_JSON_SCHEMA["schema"]["properties"]
+    assert local_properties["stops"]["uniqueItems"] is True
+    assert local_properties["reviews"]["uniqueItems"] is True
 
 
 def test_standard_recorder_refuses_openai_without_paid_confirmation(tmp_path) -> None:
