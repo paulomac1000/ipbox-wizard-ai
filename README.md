@@ -65,10 +65,11 @@ pip install -r requirements.txt -r requirements-test.txt
 ruff format --check .
 ruff check .
 python -m compileall -q python_helper tests scripts
+pytest tests/unit --cov=python_helper --cov-report=term-missing --cov-fail-under=90
 pytest -q
 ```
 
-Standardowa bramka nie wykonuje płatnych requestów do modeli.
+Pierwsze wywołanie pytest egzekwuje wymagane coverage `python_helper`, a drugie uruchamia pełny bezpłatny suite. Standardowa bramka nie wykonuje płatnych requestów do modeli.
 
 ## Uruchom pełny przykład
 
@@ -94,7 +95,7 @@ print("Zapisano report.yaml")
 PY
 ```
 
-Pełny przykładowy wynik znajduje się w [`examples/przykladowy_output_yaml.yaml`](examples/przykladowy_output_yaml.yaml).
+`yaml.safe_dump` jest funkcją biblioteki PyYAML używanej przez projekt. Pełny przykładowy wynik znajduje się w [`examples/przykladowy_output_yaml.yaml`](examples/przykladowy_output_yaml.yaml).
 
 ### Minimalny fragment wejścia
 
@@ -130,7 +131,7 @@ input:
         procent_faktury_IP: 100
 ```
 
-W realnym przypadku należy uzupełnić pełne dane o kontrahentach, kosztach, dowodach, składkach, ulgach i kompletności źródeł. Najlepszym punktem odniesienia są scenariusze w [`tests/llm/scenarios/`](tests/llm/scenarios/).
+To celowo minimalny fragment pokazujący kształt kontraktu. Pełny przykład z kontrahentem, kosztami, dowodami alokacji i NEXUS oraz asercjami znajduje się w [`tests/llm/scenarios/01_basic_linear.yaml`](tests/llm/scenarios/01_basic_linear.yaml). Bardziej złożone przypadki — ulgi, waluty, korekty i wiele IP — znajdują się w [`tests/llm/scenarios/`](tests/llm/scenarios/).
 
 ## Używanie deterministycznych helperów
 
@@ -172,7 +173,7 @@ strict JSON Schema + evaluator
 VCR playback / zweryfikowana kaseta
 ```
 
-Model nie widzi nazw predykatów podatkowych i nie ustala kodów na podstawie własnej interpretacji. Dzięki temu benchmark mierzy jednoznaczność protokołu i zgodność integracji, a nie zdolność modelu do liczenia podatku.
+Model nie widzi nazw predykatów podatkowych i nie ustala kodów na podstawie własnej interpretacji. Benchmark mierzy jednoznaczność protokołu i zgodność integracji, a nie zdolność modelu do liczenia podatku.
 
 ## Kluczowe invarianty
 
@@ -204,7 +205,7 @@ Szczegółowy kontrakt znajduje się w [`ipbox_algorytm.md`](ipbox_algorytm.md).
 | [`scripts/`](scripts/) | bramki jakości, raport benchmarku i nagrywanie |
 | [`docs/testing.md`](docs/testing.md) | procedura testów, VCR i wydania |
 | [`AGENTS.md`](AGENTS.md) | onboarding oraz reguły pracy agenta |
-| [`CHANGELOG.md`](CHANGELOG.md) | najważniejsze różnice między wersjami 0.1 i 0.2 |
+| [`CHANGELOG.md`](CHANGELOG.md) | najważniejsze różnice między wydaniami 0.1 i 0.2 |
 
 ## Testy i reprodukowalność
 
@@ -214,7 +215,7 @@ Projekt utrzymuje trzy warstwy kontroli:
 2. **Scenariusze referencyjne** — kompletne syntetyczne przypadki biznesowe.
 3. **VCR** — zweryfikowane odpowiedzi siedmiu rodzin modeli, odtwarzane offline.
 
-Aktualna macierz wersji 0.2 obejmuje 46 scenariuszy × 7 rodzin modeli, czyli 322 kasety i 7 manifestów. Fingerprint wiąże każdą kasetę z kodem silnika, scenariuszem, requestem i harness VCR.
+Aktualna macierz wydania 0.2 obejmuje 46 scenariuszy × 7 rodzin modeli, czyli 322 kasety i 7 manifestów. Fingerprint wiąże każdą kasetę z kodem silnika, scenariuszem, requestem i harness VCR.
 
 Pełna bezpłatna bramka:
 
@@ -245,9 +246,10 @@ python scripts/refresh_vcr_metadata.py --all-models --write
 python scripts/vcr_precommit.py --all-models
 unset OPENROUTER_API_KEY
 ./scripts/verify_all_models.sh
+python scripts/benchmark_report.py
 ```
 
-Płatnie nagrywaj wyłącznie kasetę rzeczywiście unieważnioną przez zmianę requestu lub semantyki. Każdy przebieg wymaga jawnego potwierdzenia oraz dwóch dodatnich limitów kosztu. Szczegóły: [`docs/testing.md`](docs/testing.md).
+Jeżeli raport zwraca `all_complete_and_valid=true`, płatne nagrywanie nie jest potrzebne. Płatnie nagrywaj wyłącznie kasetę rzeczywiście unieważnioną przez zmianę requestu lub semantyki. Każdy przebieg wymaga jawnego potwierdzenia oraz dwóch dodatnich limitów kosztu. Szczegóły: [`docs/testing.md`](docs/testing.md).
 
 ## Rozwój projektu
 
