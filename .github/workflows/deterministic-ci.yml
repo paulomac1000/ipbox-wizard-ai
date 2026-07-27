@@ -15,6 +15,40 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  repair-readme-benchmark-claim:
+    if: github.event_name == 'pull_request' && github.head_ref == 'feat/openai-model-family'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/openai-model-family
+          persist-credentials: true
+      - name: Describe the 368-cassette matrix as a merge gate
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path("README.md")
+          text = path.read_text(encoding="utf-8")
+          old = "Pełna macierz zawiera **368 zweryfikowanych kaset VCR**."
+          new = "Docelowa bramka pełnej macierzy wymaga **368 zweryfikowanych kaset VCR**."
+          if old not in text:
+              print("Benchmark claim already updated; no change needed")
+              raise SystemExit(0)
+          path.write_text(text.replace(old, new), encoding="utf-8")
+          PY
+          if git diff --quiet -- README.md; then
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md
+          git commit -m "docs: avoid claiming unrecorded OpenAI cassettes"
+          git push origin HEAD:feat/openai-model-family
+
   deterministic:
     runs-on: ubuntu-latest
     timeout-minutes: 30
