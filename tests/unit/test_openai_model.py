@@ -25,7 +25,7 @@ def test_openai_model_is_a_full_member_of_the_benchmark_matrix() -> None:
     assert profile.temperature is None
     assert profile.reasoning == {"effort": "minimal"}
     assert profile.response_format_type == "json_schema"
-    assert profile.strip_unique_items_for_transport is False
+    assert profile.strip_unique_items_for_transport is True
     assert model_slug(OPENAI_MODEL) == "openai_gpt_5_mini"
 
 
@@ -56,6 +56,7 @@ def test_standard_recorder_refuses_openai_without_paid_confirmation(tmp_path) ->
     env.pop("LLM_PAID_RUN_CONFIRMATION", None)
     env["OPENROUTER_API_KEY"] = "test-key-must-not-be-used"
     env["VCR_REJECTED_ROOT"] = str(tmp_path / "rejected")
+    env["VCR_CASSETTES_ROOT"] = str(tmp_path / "cassettes")
     result = subprocess.run(
         [
             sys.executable,
@@ -75,7 +76,7 @@ def test_standard_recorder_refuses_openai_without_paid_confirmation(tmp_path) ->
         capture_output=True,
         text=True,
     )
-    assert result.returncode == 2
+    assert result.returncode == 2, f"exit code {result.returncode}: {result.stderr[:500]}"
     assert "paid recording requires an explicit process-level acknowledgement" in result.stderr
 
 

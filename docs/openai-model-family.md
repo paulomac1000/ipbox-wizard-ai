@@ -8,6 +8,7 @@
 - rodzina: `OpenAI GPT`;
 - odpowiedź: strict `json_schema`;
 - reasoning: `minimal`;
+- `uniqueItems` jest usuwane przed transportem (identycznie jak Claude);
 - temperatura nie jest wysyłana;
 - slug kaset: `openai_gpt_5_mini`;
 - wymagany komplet: 46 kaset oraz `_manifest.yaml`.

@@ -16,7 +16,12 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 SCENARIO_DIR = ROOT / "tests/llm/scenarios"
-CASSETTE_ROOT = ROOT / "tests/llm/vcr/cassettes"
+CASSETTE_ROOT = Path(
+    os.environ.get(
+        "VCR_CASSETTES_ROOT",
+        str(ROOT / "tests/llm/vcr/cassettes"),
+    )
+)
 PAID_RUN_CONFIRMATION = "RUN_PAID_BENCHMARK"
 sys.path.insert(0, str(ROOT))
 

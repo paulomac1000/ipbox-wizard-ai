@@ -81,6 +81,7 @@ MODEL_PROFILES: dict[str, ModelProfile] = {
         label="OpenAI GPT-5 Mini",
         family="OpenAI GPT",
         reasoning={"effort": "minimal"},
+        strip_unique_items_for_transport=True,
     ),
 }
 
