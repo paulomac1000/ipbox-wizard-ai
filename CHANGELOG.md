@@ -2,6 +2,13 @@
 
 Najważniejsze zmiany w kolejnych wydaniach projektu. Changelog opisuje możliwości produktu i istotne zmiany kontraktu, a nie historię wszystkich commitów.
 
+## Unreleased
+
+- Rozszerzono kanoniczną macierz benchmarkową o rodzinę OpenAI przez `openai/gpt-5-mini`.
+- GPT-5 Mini używa tego samego recordera, manifestu, pre-commit, raportu i playbacku co pozostałe modele; pełna bramka wymaga 8 × 46, czyli 368 kaset.
+- Profile modeli oddzielono od `engine_source_hash` silnika podatkowego. Parametry każdego modelu pozostają chronione przez pełny `request_hash` jego kaset.
+- Dodano instrukcję lokalnego nagrywania i code review przed dopuszczeniem nowej rodziny do wydania.
+
 ## 0.2 — 27 lipca 2026
 
 Wydanie 0.2 przebudowuje projekt z instrukcji wspomaganej kodem w deterministyczny, testowalny silnik przygotowania danych do IP Box.
