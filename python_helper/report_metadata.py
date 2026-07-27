@@ -21,7 +21,6 @@ ENGINE_SOURCE_GLOBS = (
     "tests/llm/oracle*.py",
     "tests/llm/allocation_guard*.py",
     "tests/llm/evaluator.py",
-    "tests/llm/models.py",
     "tests/llm/output_schema*.py",
     "tests/llm/request_spec.py",
     "tests/llm/runner.py",
