@@ -269,8 +269,6 @@ Każdy z 46 scenariuszy został zweryfikowany na siedmiu rodzinach modeli objęt
 
 Łącznie repozytorium utrzymuje **322 zweryfikowane kasety VCR**. Testy celowo używają mniejszych lub kosztowo oszczędnych modeli reprezentujących każdą rodzinę. Sprawdzają, czy kontrakt jest na tyle jednoznaczny, że różne architektury potrafią zwrócić ten sam ograniczony wynik bez zmiany matematyki ustalonej przez Python.
 
-Aktualna macierz nie obejmuje jeszcze rodziny OpenAI. Dodanie GPT-5 mini jest planowane jako osobna zmiana wymagająca rozszerzenia konfiguracji, manifestu i kompletu kaset; do tego czasu README nie przypisuje tej rodzinie potwierdzonego pokrycia.
-
 To jest dowód przenośności protokołu i przewidywalności integracji, a nie obietnica, że każdy model zawsze poprawnie odczyta każdy dokument. Mocniejszy model może mieć większy margines na analizę plików i kontekstu, ale nadal musi korzystać z deterministycznego silnika i tych samych kontroli.
 
 VCR pozwala odtwarzać zaakceptowane odpowiedzi offline i wykrywać zmianę zachowania modelu, promptu, schemy albo algorytmu. Szczegóły znajdują się w [`docs/testing.md`](docs/testing.md) i [`docs/model-diversity-benchmark.md`](docs/model-diversity-benchmark.md).
