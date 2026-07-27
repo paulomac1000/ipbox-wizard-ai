@@ -1,0 +1,93 @@
+name: Nowy przypadek rozliczenia IP Box
+description: Zgłoś przypadek, którego algorytm nie obsłużył, obsłużył niejednoznacznie albo policzył inaczej niż oczekiwano.
+title: "[Przypadek] "
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Dziękujemy za pomoc w rozwijaniu algorytmu. Opisz przypadek na danych zanonimizowanych lub syntetycznych. Nie wklejaj danych osobowych, NIP, adresów, nazw klientów, numerów faktur, prywatnych sygnatur ani pełnych dokumentów podatkowych.
+
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Rodzaj zgłoszenia
+      options:
+        - Wynik różni się od rozliczenia księgowej lub doradcy
+        - Algorytm zatrzymał się mimo kompletnych danych
+        - Algorytm zaakceptował przypadek, który powinien zatrzymać
+        - Brakuje obsługi konkretnej sytuacji podatkowej
+        - Dokumentacja lub prompt prowadzą agenta w złą stronę
+        - Inny problem
+    validations:
+      required: true
+
+  - type: input
+    id: year
+    attributes:
+      label: Rok podatkowy
+      placeholder: "np. 2025"
+    validations:
+      required: true
+
+  - type: input
+    id: tax_form
+    attributes:
+      label: Forma opodatkowania
+      placeholder: "np. podatek liniowy 19%"
+    validations:
+      required: true
+
+  - type: textarea
+    id: scenario
+    attributes:
+      label: Opis przypadku
+      description: Opisz sytuację biznesową i podatkową bez danych identyfikujących podatnika lub kontrahenta.
+      placeholder: |
+        - liczba kontrahentów i waluty
+        - sposób przenoszenia praw autorskich
+        - sposób prowadzenia ewidencji czasu
+        - nietypowe koszty, ulgi, straty lub korekty
+    validations:
+      required: true
+
+  - type: textarea
+    id: inputs
+    attributes:
+      label: Zanonimizowane dane wejściowe
+      description: Podaj minimalne liczby i fakty wystarczające do odtworzenia problemu. Możesz zmienić kwoty, zachowując relacje matematyczne.
+      render: yaml
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Rzeczywisty wynik algorytmu
+      description: Wklej status, STOP/REVIEW oraz istotny fragment raportu. Usuń dane prywatne.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Oczekiwany wynik i uzasadnienie
+      description: Podaj wynik oczekiwany oraz źródło, np. interpretację, przepis, objaśnienia, opinię księgowej lub niezależne obliczenie.
+    validations:
+      required: true
+
+  - type: textarea
+    id: coverage
+    attributes:
+      label: Czy znalazłeś podobny test lub scenariusz?
+      description: Podaj nazwę pliku/scenariusza albo napisz, że nie znalazłeś bezpośredniego pokrycia.
+
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Prywatność i kompletność
+      options:
+        - label: Usunąłem dane osobowe, identyfikatory, nazwy klientów i dokumenty prywatne.
+          required: true
+        - label: Podałem minimalny przypadek, który pozwala odtworzyć problem.
+          required: true
