@@ -2,18 +2,18 @@
 
 Instrukcja dla agentów pracujących z repozytorium `ipbox-wizard-ai`.
 
-Najpierw ustal, **w jakim trybie pracujesz**. Ten sam projekt może służyć do analizy dokumentów podatnika albo do rozwijania kodu. Nie mieszaj tych zadań.
+Najpierw ustal, **w jakim trybie pracujesz**. Ten sam projekt może służyć do analizy dokumentów podatnika albo do rozwijania kodu. Nie mieszaj tych zadań bez wyraźnego polecenia użytkownika.
 
 ## Tryb 1: analiza rozliczenia użytkownika
 
 Wybierz ten tryb, gdy użytkownik przekazał dokumenty, archiwum ZIP lub link do repozytorium i chce przygotować albo sprawdzić rozliczenie IP Box.
 
-W tym trybie:
+### Kolejność pracy
 
 1. Przeczytaj `README.md` i `ipbox_algorytm.md`.
 2. Zinwentaryzuj wszystkie dokumenty użytkownika.
 3. Samodzielnie odczytaj PDF, XLSX, CSV i inne załączniki.
-4. Przy każdej ważnej wartości wskaż dokument, stronę, arkusz albo wiersz źródłowy.
+4. Przy każdej istotnej wartości wskaż dokument, stronę, arkusz albo wiersz źródłowy.
 5. Pokaż użytkownikowi wyekstrahowane dane przed finalnym obliczeniem.
 6. Zapytaj o braki. Brak danych nie jest zerem ani korzystnym założeniem.
 7. Przygotuj znormalizowane dane robocze wewnętrznie — użytkownik nie musi pisać YAML-a.
@@ -27,7 +27,48 @@ W tym trybie:
 11. Nie zmieniaj kodu, nie twórz commitów i nie modyfikuj testów, chyba że użytkownik wyraźnie zleci rozwój projektu.
 12. Nie zapisuj prywatnych dokumentów ani danych podatnika w repozytorium.
 
-Jeżeli odkryjesz możliwy błąd algorytmu, opisz minimalny syntetyczny przypadek odtwarzający. Nie kopiuj rzeczywistych danych podatnika do testów.
+### Raport pokrycia konkretnego przypadku
+
+Na końcu każdej analizy podaj jawny status pokrycia:
+
+```text
+COVERED_DIRECTLY | COVERED_PARTIALLY | NOT_COVERED
+```
+
+Następnie wskaż:
+
+- testy jednostkowe, które chronią istotne reguły;
+- scenariusze z `tests/llm/scenarios/`, które odtwarzają tę samą ścieżkę biznesową;
+- elementy przypadku, które nie mają bezpośredniego odpowiednika;
+- czy odpowiednie scenariusze mają kompletną, aktualną macierz VCR.
+
+Nie mów, że „dokładnie ten przypadek został potwierdzony przez siedem rodzin AI”, jeżeli znalazłeś jedynie podobny test albo częściowe pokrycie. Takie stwierdzenie jest dozwolone wyłącznie wtedy, gdy:
+
+1. przypadek ma bezpośredni scenariusz biznesowy;
+2. wynik scenariusza odpowiada analizowanemu invariantowi;
+3. kasety wszystkich wymaganych rodzin są kompletne i aktualne;
+4. playback przechodzi bez sekretu.
+
+W pozostałych sytuacjach napisz precyzyjnie, które fragmenty są potwierdzone, a które wymagają nowego testu.
+
+### Nowy lub nieobsłużony przypadek
+
+Jeżeli przypadek nie jest pokryty albo ujawnia możliwy błąd:
+
+1. nie kopiuj danych podatnika do repozytorium;
+2. zredukuj problem do minimalnego przykładu syntetycznego;
+3. zachowaj relacje matematyczne, ale zmień kwoty i identyfikatory;
+4. opisz wynik rzeczywisty, oczekiwany i źródło oczekiwania;
+5. ustal, czy problem dotyczy ekstrakcji dokumentu, danych wejściowych, reguły podatkowej czy implementacji;
+6. poinformuj użytkownika, że taki przypadek może stać się trwałym testem regresyjnym.
+
+Jeżeli agent ma dostęp do GitHuba, może utworzyć Issue **dopiero po zgodzie użytkownika**. Użyj formularza:
+
+`https://github.com/paulomac1000/ipbox-wizard-ai/issues/new?template=new-tax-case.yml`
+
+Jeżeli agent nie ma dostępu do zapisu, przygotuj gotowy tytuł i treść zgłoszenia oraz podaj ten link. Treść musi być zanonimizowana i zawierać minimalny przypadek, a nie pełne dokumenty.
+
+Nowy poprawny przypadek jest twardą granicą jakości: po dodaniu regresji algorytm nie może zostać zaakceptowany, jeżeli ten przypadek nie przechodzi.
 
 ## Tryb 2: rozwój kodu w Codex, Claude Code lub podobnym narzędziu
 
@@ -47,7 +88,7 @@ Następnie:
 
 1. sprawdź bieżący branch i SHA;
 2. uruchom test celowany;
-3. odtwórz problem testem regresyjnym;
+3. odtwórz problem minimalnym testem regresyjnym;
 4. dopiero potem zmień implementację;
 5. przed zakończeniem uruchom pełną bramkę jakości.
 
@@ -141,7 +182,8 @@ Sprzeczność między źródłami jest błędem. Nie wybieraj wygodniejszej wers
 - playback nigdy nie wykonuje live requestu;
 - recorder nie nadpisuje istniejącej kasety;
 - kaseta powstaje dopiero po schema PASS, semantic PASS i ponownym parsowaniu;
-- `engine_source_hash`, request, scenariusz i harness należą do fingerprintu.
+- `engine_source_hash`, request, scenariusz i harness należą do fingerprintu;
+- kompletna macierz wielu rodzin dowodzi przenośności kontraktu, nie poprawności prawnej każdego odczytu dokumentu.
 
 ## Jak wprowadzać zmiany
 
@@ -167,21 +209,24 @@ Sprzeczność między źródłami jest błędem. Nie wybieraj wygodniejszej wers
 1. Nie kopiuj danych podatnika do repozytorium.
 2. Zredukuj problem do minimalnego syntetycznego scenariusza.
 3. Dodaj test jednostkowy dla nowego invariantu.
-4. Dodaj scenariusz biznesowy tylko wtedy, gdy wnosi nową ścieżkę procesu.
+4. Dodaj scenariusz biznesowy, jeżeli przypadek wnosi nową ścieżkę procesu.
 5. Zachowaj źródła i uzasadnienia, ale użyj fikcyjnych identyfikatorów i kwot.
+6. Zweryfikuj scenariusz w pełnej macierzy rodzin modeli, jeśli zmienia kontrakt LLM.
+7. W raporcie dla użytkownika wskaż dokładne testy i poziom pokrycia.
 
 ### Dokumentacja
 
-- `README.md` ma być zrozumiały dla użytkownika wrzucającego pliki do rozmowy;
+- `README.md` ma być zrozumiały dla użytkownika wrzucającego pliki do rozmowy, w tym dla księgowej bez doświadczenia programistycznego;
 - `AGENTS.md` opisuje tryb analizy i tryb pracy z kodem;
-- `ipbox_algorytm.md` jest kontraktem domenowym, nie instrukcją marketingową;
+- `ipbox_algorytm.md` jest kontraktem domenowym, nie opisem marketingowym;
 - szczegóły VCR i wydania należą głównie do `docs/testing.md`;
+- przykłady poleceń muszą działać na aktualnym drzewie;
 - nie wpisuj ulotnych liczb testów poza opisem konkretnego wydania.
 
 ## Prywatność
 
 - nie commituj dokumentów podatnika, KPiR, PIT-ów, faktur, umów ani interpretacji;
-- nie umieszczaj realnych danych w testach, kasetach, fixture, logach ani komentarzach;
+- nie umieszczaj realnych danych w testach, kasetach, fixture, logach, Issue ani komentarzach;
 - katalog `input/` traktuj jako lokalny i prywatny;
 - raporty robocze z danymi użytkownika nie mogą trafiać do Git;
 - przy opisywaniu błędu używaj danych syntetycznych.
@@ -201,7 +246,7 @@ python scripts/vcr_precommit.py --all-models
 python scripts/benchmark_report.py
 unset OPENROUTER_API_KEY
 ./scripts/verify_all_models.sh
-for script in scripts/*.sh dump-to-md.sh; do bash -n "$script"; done
+for script in scripts/*.sh; do bash -n "$script"; done
 ```
 
 Raport końcowy podaje sprawdzony SHA, wykonane polecenia, wyniki testów, coverage i stan VCR.
@@ -231,6 +276,8 @@ Nie nagrywaj całej macierzy profilaktycznie. Gdy zmiana rzeczywiście unieważn
 - dodawać korzystnych wartości domyślnych;
 - włączać live fallbacku w playbacku;
 - deklarować gotowości przy czerwonym CI albo niepełnej macierzy;
+- deklarować pełnego pokrycia przypadku na podstawie podobnego testu;
+- publikować danych użytkownika w Issue lub scenariuszu;
 - usuwać aktywnych modułów `_legacy` bez osobnego refaktoru i migracji;
 - zmieniać kod podczas zwykłej analizy dokumentów bez wyraźnego polecenia użytkownika.
 
@@ -246,4 +293,5 @@ Zmiana jest gotowa, gdy:
 6. nie wykonano nieuzasadnionych płatnych requestów;
 7. dokumentacja odzwierciedla aktualny sposób użycia;
 8. repozytorium nie zawiera danych podatnika ani sekretów;
-9. raport końcowy jasno rozróżnia to, co sprawdzono, od tego, czego nie zweryfikowano.
+9. raport końcowy jasno rozróżnia to, co sprawdzono, od tego, czego nie zweryfikowano;
+10. dla nowego przypadku użytkownik otrzymał status pokrycia oraz możliwość utworzenia zanonimizowanego Issue.
