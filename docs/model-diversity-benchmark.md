@@ -8,17 +8,17 @@ Przejście wielu tanich i relatywnie małych modeli jest silniejszym dowodem prz
 
 ## Kryteria doboru
 
-Model trafia do macierzy, gdy na dzień 19 lipca 2026 r.:
+Model trafia do macierzy, gdy:
 
 1. reprezentuje odrębną rodzinę lub dostawcę;
-2. jest tani w porównaniu z modelami frontier;
+2. jest rozsądny kosztowo względem modeli frontier;
 3. ma stabilny, jawny slug OpenRouter;
 4. pozwala wymusić co najmniej obiekt JSON i przechodzi pełną lokalną walidację;
 5. nie jest aliasem routera ani endpointem `:free` o zmiennej dostępności;
 6. wykonuje ten sam kontrakt bez wyjątków scenariuszowych;
 7. provider-specific adapter jest jawny, minimalny i objęty testem regresyjnym.
 
-## Aktualna macierz 7 × 46
+## Macierz 8 × 46
 
 | Rodzina | Model OpenRouter | Transport |
 |---|---|---|
@@ -29,8 +29,9 @@ Model trafia do macierzy, gdy na dzień 19 lipca 2026 r.:
 | Moonshot Kimi | `moonshotai/kimi-k2.5` | strict `json_schema` |
 | Qwen | `qwen/qwen3.5-flash-02-23` | strict `json_schema` |
 | Mistral | `mistralai/mistral-small-24b-instruct-2501` | strict `json_schema` |
+| OpenAI GPT | `openai/gpt-5-mini` | strict `json_schema`, `reasoning.effort=minimal`, bez temperatury |
 
-Łącznie wydanie wymaga **322 kaset** i siedmiu manifestów. Każdy model musi osiągnąć 46/46. Wynik częściowy jest wyłącznie diagnostyką.
+Pełna bramka wymaga **368 kaset** i ośmiu manifestów. Każdy model musi osiągnąć 46/46. Wynik częściowy jest wyłącznie diagnostyką.
 
 ## Granica adaptera transportowego
 
@@ -38,45 +39,27 @@ Provider nie jest źródłem kontraktu. Źródłem prawdy pozostają `DECISION_J
 
 - Claude Haiku przez routing Anthropic/Azure/Bedrock odrzucał `uniqueItems` w przekazanym JSON Schema błędem HTTP 400. Adapter usuwa ten jeden keyword rekursywnie wyłącznie z głębokiej kopii wysyłanej do providera. Lokalna schema nadal wymaga unikalnych kodów.
 - MiniMax przez routing DigitalOcean zwracał `content: null` dla `json_schema`. Profil używa więc `json_object`, a pełna schema jest dołączona do instrukcji i bezwarunkowo wykonywana po odpowiedzi.
+- GPT-5 Mini używa wspólnego strict `json_schema`; parametr temperatury nie jest wysyłany, a poziom rozumowania jest jawnie ustawiony na `minimal`.
 - Parser nie usuwa Markdown fences, nie przenosi kodów między kanałami i nie deduplikuje odpowiedzi.
 - Każda odpowiedź nadal musi mieć właściwy model, `finish_reason=stop`, zgodny fingerprint i pełny semantic PASS.
 
 To są ograniczenia adapterów/providerów, a nie zmiany algorytmu podatkowego. Nie wolno rozszerzać ich na inne modele bez odtworzonego błędu transportowego i testu.
 
-## Migawka cen OpenRouter
+## Tożsamość i odtwarzalność
 
-Ceny są informacyjne, za milion tokenów wejścia/wyjścia, według katalogu OpenRouter z 18 lipca 2026 r.; mogą się zmienić bez zmiany kodu:
+Lista modeli i ich profile znajdują się w `tests/llm/models.py`. Rejestr modeli nie jest częścią `engine_source_hash` silnika podatkowego: pełny model, schema transportowa, reasoning, temperatura i pozostałe parametry należą do `request_hash` konkretnej kasety.
 
-| Model | Wejście USD/M | Wyjście USD/M |
-|---|---:|---:|
-| Gemini 3 Flash Preview | 0,50 | 3,00 |
-| GPT-5 Nano | 0,05 | 0,40 |
-| Claude Haiku 4.5 | 1,00 | 5,00 |
-| DeepSeek | 0,21 | 0,79 |
-| MiniMax M2.5 | 0,15 | 0,90 |
-| Kimi K2.5 | 0,375 | 2,025 |
-| GLM 4.7 Flash | 0,06 | 0,40 |
-| Qwen 3.5 Flash | 0,065 | 0,26 |
-| Mistral Small 24B | 0,20 | 0,30 |
-
-GPT-5 Nano i GLM pozostają w tabeli historycznej ceny, ale nie należą do wykonywalnej macierzy. Jedynym źródłem listy modeli jest `tests/llm/models.py`.
-
-Krótki prompt i odpowiedź utrzymują realny koszt macierzy na niskim poziomie, lecz źródłem prawdy jest koszt zapisany w kasetach i raporcie po nagraniu.
+Dzięki temu dodanie nowej rodziny nie unieważnia automatycznie odpowiedzi innych rodzin, ale każda zmiana profilu danego modelu nadal unieważnia jego kasety.
 
 ## Wnioski z kolejnych macierzy
 
 1. Pierwsza macierz pełnego raportu wykazała wymyślone kursy, klasyfikacje i TEST-y. Krytyczne obliczenia przeniesiono do Pythona.
 2. Macierz 3 × 36 pozornie miała 108/108, ale wszystkie odpowiedzi Claude zawierały Markdown fences naprawiane przez parser. Naprawę usunięto i kasety unieważniono.
 3. Protokół listy aktywnych reguł usunął nieaktywne fakty, lecz nadal wymagał klasyfikacji kodów do kanałów. MiniMax w scenariuszu 51 umieścił `REVIEW_09` w `stops`; podobny błąd wcześniej wykonał GPT-5 Nano. Zastąpiono go pełną kopertą `expected_decision` i oddzielnymi enumami STOP/REVIEW.
-4. Ostatnie odrzucenia Claude i MiniMax nie dotyczyły rozumowania ani podatku. Były ograniczeniami transportu opisanymi powyżej.
+4. Odrzucenia Claude i MiniMax nie dotyczyły rozumowania ani podatku. Były ograniczeniami transportu opisanymi powyżej.
 
 Sama liczba „46/46” nie wystarcza bez audytu surowych odpowiedzi, request hashy, manifestów, fingerprintów, provider adapterów i zasad parsera.
 
-## Źródła migawki modeli
+## Przed nagraniem
 
-- katalog OpenRouter i strona Gemini 3 Flash Preview;
-- strony modelowe GPT-5 Nano i Claude Haiku 4.5;
-- strony modelowe DeepSeek, MiniMax M2.5, Kimi K2.5 i GLM 4.7 Flash;
-- strony modelowe Qwen 3.5 Flash i Ministral 3B.
-
-Przed kolejnym nagraniem należy sprawdzić, czy slugi, ceny i obsługiwane parametry nadal są aktualne. Kod celowo nie wybiera modelu automatycznie na podstawie ceny, aby zmiana katalogu nie modyfikowała bramki bez review.
+Przed kolejnym nagraniem sprawdź aktualność slugów i obsługiwanych parametrów. Kod celowo nie wybiera modelu automatycznie na podstawie ceny, aby zmiana katalogu nie modyfikowała bramki bez review. Procedurę lokalnego nagrania opisują `docs/testing.md` i `docs/openai-model-family.md`.
