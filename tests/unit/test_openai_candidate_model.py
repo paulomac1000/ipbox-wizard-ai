@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import os
+import subprocess
+import sys
 from pathlib import Path
 
 from python_helper.report_metadata import _canonical_source_files
@@ -51,6 +54,57 @@ def test_openai_transport_uses_strict_schema_and_minimal_reasoning(monkeypatch) 
     assert payload["response_format"]["type"] == "json_schema"
     assert payload["reasoning"] == {"effort": "minimal"}
     assert "temperature" not in payload
+
+
+def test_candidate_recorder_refuses_paid_call_without_exact_confirmation(tmp_path) -> None:
+    env = os.environ.copy()
+    env.pop("LLM_PAID_RUN_CONFIRMATION", None)
+    env["OPENROUTER_API_KEY"] = "test-key-must-not-be-used"
+    env["VCR_REJECTED_ROOT"] = str(tmp_path / "rejected")
+    result = subprocess.run(
+        [
+            sys.executable,
+            "scripts/record_candidate_model.py",
+            "--model",
+            OPENAI_MODEL,
+            "--scenario",
+            "01_basic_linear",
+            "--max-cost-per-model-usd",
+            "1",
+            "--max-total-cost-usd",
+            "1",
+        ],
+        cwd=ROOT,
+        env=env,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert result.returncode == 2
+    assert "paid recording requires an explicit process-level acknowledgement" in result.stderr
+
+
+def test_candidate_verifier_fails_closed_when_matrix_is_missing(tmp_path) -> None:
+    env = os.environ.copy()
+    env.pop("OPENROUTER_API_KEY", None)
+    result = subprocess.run(
+        [
+            sys.executable,
+            "scripts/verify_candidate_model.py",
+            "--model",
+            OPENAI_MODEL,
+            "--output",
+            str(tmp_path / "candidate-report.json"),
+        ],
+        cwd=ROOT,
+        env=env,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert result.returncode == 1
+    assert "all_complete_and_valid" in result.stdout
+    assert "Candidate VCR validation failed" in result.stderr
 
 
 def test_paid_workflow_exposes_the_candidate_without_expanding_all_mode() -> None:
