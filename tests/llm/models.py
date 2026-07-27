@@ -76,37 +76,11 @@ MODEL_PROFILES: dict[str, ModelProfile] = {
         family="Mistral",
         temperature=0.0,
     ),
-    "openai/gpt-5-mini": ModelProfile(
-        model_id="openai/gpt-5-mini",
-        label="OpenAI GPT-5 Mini",
-        family="OpenAI GPT",
-        reasoning={"effort": "minimal"},
-    ),
 }
 
 DEFAULT_MODEL = "google/gemini-3-flash-preview"
-
-# Models in the release gate must already have a complete, verified cassette matrix.
-BENCHMARK_MODELS = (
-    "google/gemini-3-flash-preview",
-    "anthropic/claude-haiku-4.5",
-    "deepseek/deepseek-chat-v3.1",
-    "minimax/minimax-m2.5",
-    "moonshotai/kimi-k2.5",
-    "qwen/qwen3.5-flash-02-23",
-    "mistralai/mistral-small-24b-instruct-2501",
-)
-
-# Candidate profiles may be recorded and verified individually, but do not join the
-# release gate until their complete cassette matrix is committed and passes offline.
-CANDIDATE_MODELS = ("openai/gpt-5-mini",)
-SUPPORTED_MODELS = tuple(MODEL_PROFILES)
+BENCHMARK_MODELS = tuple(MODEL_PROFILES)
 EXPECTED_MODEL_COUNT = len(BENCHMARK_MODELS)
-
-if set(BENCHMARK_MODELS) & set(CANDIDATE_MODELS):
-    raise RuntimeError("A model cannot be both a release benchmark and a candidate")
-if set(SUPPORTED_MODELS) != set(BENCHMARK_MODELS) | set(CANDIDATE_MODELS):
-    raise RuntimeError("Every supported model must be classified as benchmark or candidate")
 
 
 def model_slug(model_id: str) -> str:
