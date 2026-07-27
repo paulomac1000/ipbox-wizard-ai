@@ -7,7 +7,7 @@
 [![Release](https://img.shields.io/badge/release-0.2-informational.svg)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-IP Box Wizard AI łączy instrukcję dla agenta AI z deterministycznym kodem Python. Użytkownik przekazuje dokumenty w zwykłej rozmowie z Claude, ChatGPT lub Gemini, a agent:
+IP Box Wizard AI łączy instrukcję dla agenta AI z deterministycznym kodem Python. Użytkownik przekazuje dokumenty w zwykłej rozmowie z Claude, ChatGPT, Gemini albo innym agentem obsługującym pliki, a agent:
 
 1. odczytuje dokumenty i pokazuje rozpoznane dane;
 2. pyta o braki i niejasności;
@@ -60,7 +60,7 @@ Najwygodniejsza kolejność:
    - katalog `python_helper/`,
    - `examples/przykladowy_prompt_startowy.md`.
 
-Pełne archiwum zawiera także testy i kasety odpowiedzi modeli. Podczas zwykłego rozliczenia agent powinien skupić się na algorytmie, kodzie Python i dokumentach podatnika.
+Pełne archiwum zawiera także testy, scenariusze i kasety odpowiedzi modeli. Podczas zwykłego rozliczenia agent powinien skupić się na algorytmie, kodzie Python i dokumentach podatnika.
 
 ### 2. Dodaj dokumenty
 
@@ -240,14 +240,16 @@ Szczegółowy kontrakt znajduje się w [`ipbox_algorytm.md`](ipbox_algorytm.md).
 
 ## Skąd wiadomo, że algorytm działa
 
-Projekt nie opiera zaufania na pojedynczej odpowiedzi modelu ani na jednym przykładowym rozliczeniu. Wydanie 0.2 zostało sprawdzone kilkoma niezależnymi warstwami.
+Projekt nie opiera zaufania na pojedynczej odpowiedzi modelu ani na jednym przykładowym rozliczeniu. Jakość jest sprawdzana kilkoma niezależnymi warstwami.
 
 ### Deterministyczne testy Pythona
 
-- **391 testów jednostkowych** obejmujących matematykę, reguły roczne, walidację, zaokrąglenia i przypadki brzegowe;
+- ponad **390 testów jednostkowych** obejmujących matematykę, reguły roczne, walidację, zaokrąglenia i przypadki brzegowe;
 - ponad **90% pokrycia linii** kodu `python_helper`;
 - CI na Pythonie **3.11, 3.12 i 3.13**;
 - testy regresyjne zbudowane z abstrakcyjnych, zanonimizowanych przypadków odpowiadających realnym problemom rozliczeniowym.
+
+Dokładna bieżąca liczba testów jest raportowana przez CI, aby README nie stawał się źródłem ulotnego licznika.
 
 ### Scenariusze biznesowe
 
@@ -257,7 +259,7 @@ Scenariusz jest twardą granicą jakości: po dodaniu poprawnego testu algorytm 
 
 ### VCR i test przenośności między rodzinami AI
 
-Każdy z 46 scenariuszy został zweryfikowany na siedmiu rodzinach modeli objętych aktualnym wydaniem:
+Każdy z 46 scenariuszy należy przejść na ośmiu niezależnych rodzinach modeli objętych macierzą:
 
 - Google Gemini;
 - Anthropic Claude;
@@ -265,13 +267,16 @@ Każdy z 46 scenariuszy został zweryfikowany na siedmiu rodzinach modeli objęt
 - MiniMax;
 - Moonshot Kimi;
 - Qwen;
-- Mistral.
+- Mistral;
+- OpenAI GPT — `openai/gpt-5-mini`.
 
-Łącznie repozytorium utrzymuje **322 zweryfikowane kasety VCR**. Testy celowo używają mniejszych lub kosztowo oszczędnych modeli reprezentujących każdą rodzinę. Sprawdzają, czy kontrakt jest na tyle jednoznaczny, że różne architektury potrafią zwrócić ten sam ograniczony wynik bez zmiany matematyki ustalonej przez Python.
+Pełna macierz zawiera **368 zweryfikowanych kaset VCR**. Testy celowo używają mniejszych lub kosztowo oszczędnych modeli reprezentujących każdą rodzinę. Sprawdzają, czy kontrakt jest na tyle jednoznaczny, że różne architektury potrafią zwrócić ten sam ograniczony wynik bez zmiany matematyki ustalonej przez Python.
+
+Kasety OpenAI muszą zostać nagrane i odtworzone przed mergem zmiany rozszerzającej macierz. Sam wpis modelu w konfiguracji nie jest dowodem 46/46.
 
 To jest dowód przenośności protokołu i przewidywalności integracji, a nie obietnica, że każdy model zawsze poprawnie odczyta każdy dokument. Mocniejszy model może mieć większy margines na analizę plików i kontekstu, ale nadal musi korzystać z deterministycznego silnika i tych samych kontroli.
 
-VCR pozwala odtwarzać zaakceptowane odpowiedzi offline i wykrywać zmianę zachowania modelu, promptu, schemy albo algorytmu. Szczegóły znajdują się w [`docs/testing.md`](docs/testing.md) i [`docs/model-diversity-benchmark.md`](docs/model-diversity-benchmark.md).
+VCR pozwala odtwarzać zaakceptowane odpowiedzi offline i wykrywać zmianę zachowania modelu, promptu, schemy albo algorytmu. Szczegóły znajdują się w [`docs/testing.md`](docs/testing.md), [`docs/model-diversity-benchmark.md`](docs/model-diversity-benchmark.md) i [`docs/openai-model-family.md`](docs/openai-model-family.md).
 
 ## Czy mój przypadek jest przetestowany
 
@@ -316,7 +321,7 @@ Jeżeli agent ma dostęp do GitHuba, może — po Twojej zgodzie — utworzyć z
 | [`tests/unit/`](tests/unit/) | testy matematyki, reguł i regresji |
 | [`tests/llm/scenarios/`](tests/llm/scenarios/) | abstrakcyjne scenariusze biznesowe |
 | [`tests/llm/vcr/`](tests/llm/vcr/) | zweryfikowane odpowiedzi rodzin modeli i playback offline |
-| [`docs/testing.md`](docs/testing.md) | procedura testów i wydania |
+| [`docs/testing.md`](docs/testing.md) | procedura testów, nagrywania i wydania |
 | [`CHANGELOG.md`](CHANGELOG.md) | najważniejsze zmiany między wydaniami |
 
 ## Rozwój projektu
@@ -338,7 +343,7 @@ unset OPENROUTER_API_KEY
 ./scripts/verify_all_models.sh
 ```
 
-Standardowy CI nie wykonuje płatnych zapytań do modeli. Procedurę zmian, VCR i nagrywania opisują [`AGENTS.md`](AGENTS.md) oraz [`docs/testing.md`](docs/testing.md).
+Standardowy CI nie wykonuje płatnych zapytań do modeli. Procedurę zmian, VCR i lokalnego nagrywania opisują [`AGENTS.md`](AGENTS.md) oraz [`docs/testing.md`](docs/testing.md).
 
 ## Prywatność
 
