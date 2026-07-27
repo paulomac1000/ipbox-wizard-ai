@@ -9,7 +9,7 @@ import pytest
 import yaml
 
 from python_helper.report_metadata import calculation_meta, engine_source_hash
-from tests.llm.models import BENCHMARK_MODELS
+from tests.llm.models import BENCHMARK_MODELS, CANDIDATE_MODELS
 from tests.llm.vcr.cassette import (
     CassetteMeta,
     parsed_response_equal_ignoring_meta_timestamp,
@@ -123,10 +123,10 @@ def test_cassette_meta_rejects_invalid_runtime_boundaries(field: str, value: obj
         replace(valid_meta(), **{field: value})
 
 
-def test_manual_workflow_models_match_registry_exactly() -> None:
+def test_manual_workflow_models_match_supported_registry_exactly() -> None:
     workflow = yaml.load(
         (ROOT / ".github/workflows/llm-benchmark.yml").read_text(encoding="utf-8"),
         Loader=yaml.BaseLoader,
     )
     options = workflow["on"]["workflow_dispatch"]["inputs"]["model"]["options"]
-    assert tuple(options) == ("all", *BENCHMARK_MODELS)
+    assert tuple(options) == ("all", *BENCHMARK_MODELS, *CANDIDATE_MODELS)
