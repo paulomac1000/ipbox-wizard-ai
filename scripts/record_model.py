@@ -32,12 +32,16 @@ def slug(model: str) -> str:
 
 def _cassette_root() -> Path:
     """Resolve the cassette root after local environment settings are loaded."""
+    compatibility_override = Path(CASSETTE_ROOT)
+    if compatibility_override != DEFAULT_CASSETTE_ROOT:
+        return compatibility_override
+
     raw = os.environ.get("VCR_CASSETTES_ROOT")
     if raw is not None:
         if not raw.strip():
             raise ValueError("VCR_CASSETTES_ROOT must not be empty")
         return Path(raw)
-    return Path(CASSETTE_ROOT)
+    return DEFAULT_CASSETTE_ROOT
 
 
 def run(command: list[str], env: dict[str, str]) -> int:
