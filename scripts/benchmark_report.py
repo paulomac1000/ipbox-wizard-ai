@@ -13,10 +13,7 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from scripts.vcr_paths import (  # noqa: E402
-    resolve_cassette_root,
-    resolve_cassette_root_or_error,
-)
+from scripts.vcr_paths import resolve_cassette_root  # noqa: E402
 from scripts.vcr_precommit import validate_model  # noqa: E402
 from tests.llm.models import BENCHMARK_MODELS, get_model_profile, model_slug  # noqa: E402
 from tests.llm.vcr.cassette import CassetteManifest  # noqa: E402
@@ -89,7 +86,10 @@ def main() -> int:
     models = tuple(args.models) if args.models else BENCHMARK_MODELS
     for model in models:
         get_model_profile(model)
-    cassette_root = resolve_cassette_root_or_error(parser, args.cassette_root)
+    try:
+        cassette_root = resolve_cassette_root(args.cassette_root)
+    except ValueError as exc:
+        parser.error(str(exc))
 
     scenario_ids = scenario_ids_from_yaml()
     rows = [summarize_model(model, scenario_ids, cassette_root) for model in models]
