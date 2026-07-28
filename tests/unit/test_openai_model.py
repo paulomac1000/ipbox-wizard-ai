@@ -6,6 +6,7 @@ import json
 import os
 import subprocess
 import sys
+from dataclasses import replace
 from pathlib import Path
 
 from python_helper.report_metadata import _canonical_source_files
@@ -36,6 +37,24 @@ def test_model_registry_is_not_part_of_the_tax_engine_hash() -> None:
     assert "tests/llm/models.py" not in canonical_paths
     assert "tests/llm/runner.py" in canonical_paths
     assert "tests/llm/request_spec.py" in canonical_paths
+
+
+def test_openai_profile_change_invalidates_request_hash(monkeypatch) -> None:
+    monkeypatch.setenv("LLM_PROVIDER", "openrouter")
+    monkeypatch.setenv("LLM_MODEL", OPENAI_MODEL)
+    monkeypatch.setenv("VCR_MODE", "playback")
+
+    runner = LLMTestRunner(client=None)
+    baseline_config = VCRConfig()
+    baseline = runner.request_spec("copy the decision", baseline_config)
+
+    changed_profile = replace(baseline_config.profile, reasoning={"effort": "low"})
+    monkeypatch.setitem(MODEL_PROFILES, OPENAI_MODEL, changed_profile)
+    changed = runner.request_spec("copy the decision", VCRConfig())
+
+    assert baseline.canonical_dict()["reasoning"] == {"effort": "minimal"}
+    assert changed.canonical_dict()["reasoning"] == {"effort": "low"}
+    assert baseline.request_hash() != changed.request_hash()
 
 
 def test_openai_transport_uses_provider_compatible_copy_of_strict_schema(monkeypatch) -> None:
