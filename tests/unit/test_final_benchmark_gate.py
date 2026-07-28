@@ -46,6 +46,7 @@ def test_paid_workflow_initializes_exactly_one_rejected_root_at_runtime() -> Non
     init_step = next(
         step for step in steps if step.get("name") == "Initialize isolated rejected-attempt path"
     )
+    init_script = init_step["run"]
 
     assert "VCR_REJECTED_ROOT" not in job["env"]
 
@@ -62,6 +63,11 @@ def test_paid_workflow_initializes_exactly_one_rejected_root_at_runtime() -> Non
         for line in script.splitlines()
         if "VCR_REJECTED_ROOT=" in line
     ]
+    init_exports = [
+        line.strip()
+        for line in init_script.splitlines()
+        if "VCR_REJECTED_ROOT=" in line
+    ]
 
     init_index = steps.index(init_step)
     consumer_indices = [
@@ -74,6 +80,8 @@ def test_paid_workflow_initializes_exactly_one_rejected_root_at_runtime() -> Non
         )
     ]
 
+    assert init_script.count(expected_assignment) == 1
+    assert init_exports == [expected_export]
     assert assignment_count == 1
     assert rejected_root_exports == [expected_export]
     assert consumer_indices
@@ -97,6 +105,13 @@ def test_all_model_workflow_generates_one_report_before_artifact_upload() -> Non
     assert "original_status=$?" in matrix_script
     assert 'exit "$original_status"' in matrix_script
     assert 'exit "$report_status"' in matrix_script
+
+    recorder_commands = ("scripts/record_all_models.sh", "scripts/record_model.py")
+    for step in steps:
+        if step is record_step:
+            continue
+        script = step.get("run", "")
+        assert all(command not in script for command in recorder_commands)
 
     record_run = record_step["run"]
     before_if, if_marker, conditional = record_run.partition(
