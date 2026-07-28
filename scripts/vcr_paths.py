@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import argparse
 import hashlib
 import os
 import tempfile
@@ -55,17 +54,6 @@ def resolve_cassette_root(
         current = _effective_environ(environ)
         selected = current.get("VCR_CASSETTES_ROOT", str(DEFAULT_CASSETTE_ROOT))
     return resolve_storage_path(selected, name="VCR_CASSETTES_ROOT")
-
-
-def resolve_cassette_root_or_error(
-    parser: argparse.ArgumentParser,
-    value: str | Path | None = None,
-) -> Path:
-    """Resolve a cassette root or terminate an argparse CLI with a clear error."""
-    try:
-        return resolve_cassette_root(value)
-    except ValueError as exc:
-        parser.error(str(exc))
 
 
 def resolve_rejected_root(
