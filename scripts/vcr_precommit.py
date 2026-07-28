@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from python_helper.report_metadata import engine_source_hash
-from scripts.vcr_paths import resolve_cassette_root
+from scripts.vcr_paths import resolve_cassette_root, resolve_cassette_root_or_error
 from tests.llm.models import BENCHMARK_MODELS
 from tests.llm.oracle import validate_scenario
 from tests.llm.runner import LLMTestRunner
@@ -154,10 +154,7 @@ def main() -> int:
         help="Override VCR_CASSETTES_ROOT for this validation run.",
     )
     args = parser.parse_args()
-    try:
-        cassette_root = resolve_cassette_root(args.cassette_root)
-    except ValueError as exc:
-        parser.error(str(exc))
+    cassette_root = resolve_cassette_root_or_error(parser, args.cassette_root)
     models = BENCHMARK_MODELS if args.all_models else (args.model,)
     errors = [
         error for model in models for error in validate_model(model, cassette_root=cassette_root)
