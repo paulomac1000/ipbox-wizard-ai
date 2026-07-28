@@ -30,7 +30,7 @@ Bieżąca bramka obejmuje:
 - zero braków, osieroconych kaset i błędów integralności;
 - pełny playback offline bez klucza API i bez połączenia z providerem.
 
-Wynik 45/46 albo brak jednego manifestu jest diagnostyką, nie zaliczeniem.
+Wynik 45/46 albo brak jednego manifestu oznacza diagnostykę, a nie zaliczenie.
 
 ## Kryteria przyjęcia modelu
 
@@ -93,7 +93,7 @@ Formularz `workflow_dispatch` w `.github/workflows/llm-benchmark.yml` wymaga sta
 
 Recorder, odświeżanie metadanych, pre-commit, raport, polityka kaset oraz pełny playback muszą używać dokładnie tego samego drzewa. Żadne narzędzie następcze nie może po nagraniu do katalogu niestandardowego bez ostrzeżenia wrócić do kaset commitowanych w repozytorium. Narzędzia Python przyjmują także jawne `--cassette-root`, a skrypty macierzy eksportują jedną rozwiązaną wartość dla całego przebiegu.
 
-`VCR_REJECTED_ROOT` podlega tej samej walidacji i normalizacji, aby skaner kosztów obejmował wszystkie naliczone, także odrzucone próby.
+`VCR_REJECTED_ROOT` podlega tej samej walidacji i normalizacji, aby skaner kosztów obejmował wszystkie naliczone, także odrzucone próby. Domyślny katalog tymczasowy jest rozdzielony per użytkownik, aby nie używać wspólnej przewidywalnej lokalizacji.
 
 ## Najważniejsze wnioski z regresji
 
@@ -101,7 +101,7 @@ Historia macierzy ujawniła problemy architektoniczne, których nie powinno się
 
 1. Model nie może obliczać kursów, NEXUS, klasyfikacji ani TEST 1–9 — krytyczne decyzje należą do Pythona.
 2. Parser nie może naprawiać odpowiedzi, ponieważ pozorne 46/46 może ukrywać niespełniony kontrakt.
-3. Model nie powinien ponownie klasyfikować kodów do STOP i REVIEW. Scenariusz 51 ujawnił tę zbędną transformację; obecny protokół przekazuje gotową `expected_decision`.
+3. Model nie powinien ponownie przypisywać kodów do STOP i REVIEW. Scenariusz 51 ujawnił tę zbędną transformację; obecny protokół przekazuje gotową `expected_decision`.
 4. Błąd transportowy providera nie jest powodem do osłabienia lokalnej schemy ani evaluatora.
 5. Sama liczba kaset nie wystarcza bez zgodnych manifestów, fingerprintów, request hashy i playbacku bez sieci.
 
@@ -115,7 +115,8 @@ Syntetyczne scenariusze regresyjne są źródłem prawdy dla tych przypadków. R
 4. Użyj standardowego `scripts/record_model.py`; nie twórz osobnego wrappera.
 5. Nagraj 46 kaset i sprawdź odrzucone próby oraz koszt.
 6. Uruchom pre-commit i raport pojedynczego modelu.
-7. Uruchom politykę i playback całej macierzy bez sekretu.
-8. Dopiero po pełnym wyniku zaktualizuj dokumentację i deklarację pokrycia.
+7. Uruchom formatowanie, lint, kompilację oraz testy z pokryciem.
+8. Uruchom politykę kaset i playback całej macierzy bez sekretu.
+9. Dopiero po pełnym wyniku zaktualizuj dokumentację i deklarację pokrycia.
 
 Procedurę operacyjną opisują [`docs/testing.md`](testing.md) oraz [`docs/openai-model-family.md`](openai-model-family.md).
