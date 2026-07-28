@@ -45,9 +45,7 @@ def test_vcr_config_rejects_empty_storage_roots(
 def test_record_all_models_executes_shared_rejected_root_resolver() -> None:
     root = Path(__file__).parents[2]
     shell = (root / "scripts/record_all_models.sh").read_text(encoding="utf-8")
-    executable = "\n".join(
-        line for line in shell.splitlines() if not line.lstrip().startswith("#")
-    )
+    executable = "\n".join(line for line in shell.splitlines() if not line.lstrip().startswith("#"))
 
     assert "from scripts.vcr_paths import resolve_rejected_root" in executable
     assert "print(resolve_rejected_root())" in executable
