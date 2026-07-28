@@ -87,6 +87,14 @@ Zmiana profilu danego modelu zmienia `request_hash` i blokuje ponowne użycie st
 
 Formularz `workflow_dispatch` w `.github/workflows/llm-benchmark.yml` wymaga statycznej listy wyboru. Test `test_paid_workflow_model_allowlist_matches_canonical_registry` pilnuje, aby ta lista była identyczna i w tej samej kolejności co `BENCHMARK_MODELS`.
 
+## Jedno drzewo kaset
+
+`VCR_CASSETTES_ROOT` może wskazywać katalog domyślny w repozytorium albo jawnie wybrane drzewo robocze. Ścieżka jest wczytywana z procesu lub dozwolonego `.env`, sprawdzana jako niepusta i normalizowana do postaci absolutnej przed przekroczeniem granicy `cwd` lub subprocessu.
+
+Recorder, odświeżanie metadanych, pre-commit, raport, polityka kaset oraz pełny playback muszą używać dokładnie tego samego drzewa. Żadne narzędzie następcze nie może po nagraniu do katalogu niestandardowego bez ostrzeżenia wrócić do kaset commitowanych w repozytorium. Narzędzia Python przyjmują także jawne `--cassette-root`, a skrypty macierzy eksportują jedną rozwiązaną wartość dla całego przebiegu.
+
+`VCR_REJECTED_ROOT` podlega tej samej walidacji i normalizacji, aby skaner kosztów obejmował wszystkie naliczone, także odrzucone próby.
+
 ## Najważniejsze wnioski z regresji
 
 Historia macierzy ujawniła problemy architektoniczne, których nie powinno się ponownie wprowadzać:
