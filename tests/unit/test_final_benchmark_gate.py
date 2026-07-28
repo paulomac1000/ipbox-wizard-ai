@@ -55,12 +55,23 @@ def test_paid_workflow_initializes_exactly_one_rejected_root_at_runtime() -> Non
     job = workflow["jobs"]["benchmark"]
     steps = job["steps"]
     run_scripts = [step.get("run", "") for step in steps]
+    step_payloads = [json.dumps(step, sort_keys=True) for step in steps]
+    non_run_step_payloads = [
+        json.dumps(
+            {key: value for key, value in step.items() if key != "run"},
+            sort_keys=True,
+        )
+        for step in steps
+    ]
     init_step = next(
         step for step in steps if step.get("name") == "Initialize isolated rejected-attempt path"
     )
     init_script = init_step["run"]
 
     assert "VCR_REJECTED_ROOT" not in job["env"]
+    assert all(
+        "VCR_REJECTED_ROOT" not in payload for payload in non_run_step_payloads
+    )
 
     expected_assignment = "".join(
         ("rejected_root=", '"$RUNNER_TEMP/', 'ipbox_llm_rejected_${GITHUB_RUN_ID}"')
@@ -82,8 +93,8 @@ def test_paid_workflow_initializes_exactly_one_rejected_root_at_runtime() -> Non
     init_index = steps.index(init_step)
     consumer_indices = [
         index
-        for index, step in enumerate(steps)
-        if index != init_index and "VCR_REJECTED_ROOT" in step.get("run", "")
+        for index, payload in enumerate(step_payloads)
+        if index != init_index and "VCR_REJECTED_ROOT" in payload
     ]
 
     assert init_script.count(expected_assignment) == 1
