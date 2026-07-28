@@ -142,7 +142,6 @@ jobs:
             ./scripts/verify_all_models.sh
             python scripts/vcr_precommit.py --all-models
             python scripts/check_cassette_policy.py
-            python scripts/benchmark_report.py
           else
             PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 \
             LLM_PROVIDER=openrouter \
