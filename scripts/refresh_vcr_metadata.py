@@ -15,7 +15,10 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from python_helper.report_metadata import engine_source_hash  # noqa: E402
-from scripts.vcr_paths import resolve_cassette_root, resolve_cassette_root_or_error  # noqa: E402
+from scripts.vcr_paths import (  # noqa: E402
+    resolve_cassette_root,
+    resolve_cassette_root_or_error,
+)
 from tests.llm.models import BENCHMARK_MODELS  # noqa: E402
 from tests.llm.oracle import validate_scenario  # noqa: E402
 from tests.llm.runner import LLMTestRunner  # noqa: E402
