@@ -14,6 +14,7 @@ from scripts.local_env import load_local_env
 from scripts.record_model import (
     PAID_RUN_CONFIRMATION,
     _cassette_root,
+    _rejected_root,
     _require_paid_confirmation,
 )
 from tests.llm.client import LLMClient
@@ -89,10 +90,27 @@ def test_record_model_resolves_cassette_root_after_loading_dotenv(
     assert _cassette_root() == expected
 
 
+def test_record_model_normalizes_relative_storage_roots_before_subprocess(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("VCR_CASSETTES_ROOT", "relative/cassettes")
+    monkeypatch.setenv("VCR_REJECTED_ROOT", "relative/rejected")
+
+    assert _cassette_root() == (tmp_path / "relative/cassettes").resolve()
+    assert _rejected_root(os.environ) == (tmp_path / "relative/rejected").resolve()
+
+
 def test_record_model_rejects_empty_cassette_root(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("VCR_CASSETTES_ROOT", "")
     with pytest.raises(ValueError, match="must not be empty"):
         _cassette_root()
+
+
+def test_record_model_rejects_empty_rejected_root(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("VCR_REJECTED_ROOT", "")
+    with pytest.raises(ValueError, match="must not be empty"):
+        _rejected_root(os.environ)
 
 
 class _Response:
