@@ -68,12 +68,15 @@ def test_paid_workflow_initializes_exactly_one_rejected_root_at_runtime() -> Non
     initialization_index = steps.index(initialization_step)
     initialization_run = initialization_step.get("run", "")
     record_index = next(
-        index for index, step in enumerate(steps) if step.get("name") == "Record cassettes"
+        index
+        for index, step in enumerate(steps)
+        if step.get("name") == "Record cassettes"
     )
     consumer_indices = [
         index
         for index, step in enumerate(steps)
-        if index != initialization_index and "VCR_REJECTED_ROOT" in step.get("run", "")
+        if index != initialization_index
+        and "VCR_REJECTED_ROOT" in step.get("run", "")
     ]
 
     assert assignment_count == 1
