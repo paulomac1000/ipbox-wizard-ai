@@ -24,6 +24,11 @@ PY_REJECTED
 )"
 export VCR_REJECTED_ROOT="$vcr_rejected_root"
 
+generate_benchmark_report() {
+  python scripts/benchmark_report.py || true
+}
+trap generate_benchmark_report EXIT
+
 ruff format --check .
 ruff check .
 python -m compileall -q python_helper tests scripts
@@ -56,11 +61,9 @@ for model in "${models[@]}"; do
   fi
 done
 
-python scripts/benchmark_report.py || true
 if ((${#failed[@]})); then
   printf 'Recording stopped after failure for: %s\n' "${failed[*]}" >&2
   exit 1
 fi
 
 ./scripts/verify_all_models.sh
-python scripts/benchmark_report.py
