@@ -7,6 +7,9 @@ if [[ "${LLM_PAID_RUN_CONFIRMATION:-}" != "$EXPECTED_CONFIRMATION" ]]; then
   exit 2
 fi
 
+# The former `python scripts/local_env.py --get VCR_REJECTED_ROOT` lookup is now
+# centralized in scripts.vcr_paths so cassette and rejected roots share one
+# validation, .env precedence and absolute-path normalization contract.
 export VCR_CASSETTES_ROOT="$(python - <<'PY_CASSETTES'
 from scripts.vcr_paths import resolve_cassette_root
 print(resolve_cassette_root())
