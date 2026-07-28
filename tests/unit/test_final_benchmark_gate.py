@@ -41,7 +41,8 @@ def test_paid_workflow_model_allowlist_matches_canonical_registry() -> None:
 def test_paid_workflow_initializes_exactly_one_rejected_root_at_runtime() -> None:
     workflow = _paid_workflow()
     job = workflow["jobs"]["benchmark"]
-    run_scripts = [step.get("run", "") for step in job["steps"]]
+    steps = job["steps"]
+    run_scripts = [step.get("run", "") for step in steps]
 
     assert "VCR_REJECTED_ROOT" not in job["env"]
 
@@ -61,6 +62,20 @@ def test_paid_workflow_initializes_exactly_one_rejected_root_at_runtime() -> Non
 
     assert assignment_count == 1
     assert rejected_root_exports == [expected_export]
+
+    initialization_index = next(
+        index
+        for index, step in enumerate(steps)
+        if step.get("name") == "Initialize isolated rejected-attempt path"
+    )
+    consumer_indices = [
+        index
+        for index, step in enumerate(steps)
+        if index != initialization_index and "VCR_REJECTED_ROOT" in step.get("run", "")
+    ]
+
+    assert consumer_indices
+    assert initialization_index < min(consumer_indices)
 
 
 def test_all_model_workflow_generates_one_report_before_artifact_upload() -> None:
