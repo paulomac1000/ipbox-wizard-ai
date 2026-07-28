@@ -45,16 +45,13 @@ def test_paid_workflow_initializes_exactly_one_rejected_root_at_runtime() -> Non
 
     assert "VCR_REJECTED_ROOT" not in job["env"]
 
-    expected_assignment = (
-        'rejected_root="$RUNNER_TEMP/ipbox_llm_rejected_${GITHUB_RUN_ID}"'
+    expected_assignment = "".join(
+        ("rejected_root=", '"$RUNNER_TEMP/', 'ipbox_llm_rejected_${GITHUB_RUN_ID}"')
     )
-    expected_export = (
-        "printf 'VCR_REJECTED_ROOT=%s\\n' "
-        '"$rejected_root" >> "$GITHUB_ENV"'
+    expected_export = " ".join(
+        ("printf", "'VCR_REJECTED_ROOT=%s\\n'", '"$rejected_root"', ">>", '"$GITHUB_ENV"')
     )
-    assignment_count = sum(
-        script.count(expected_assignment) for script in run_scripts
-    )
+    assignment_count = sum(script.count(expected_assignment) for script in run_scripts)
     rejected_root_exports = [
         line.strip()
         for script in run_scripts
@@ -69,23 +66,15 @@ def test_paid_workflow_initializes_exactly_one_rejected_root_at_runtime() -> Non
 def test_all_model_workflow_generates_one_report_before_artifact_upload() -> None:
     workflow = _paid_workflow()
     steps = workflow["jobs"]["benchmark"]["steps"]
-    record_step = next(
-        step for step in steps if step.get("name") == "Record cassettes"
-    )
+    record_step = next(step for step in steps if step.get("name") == "Record cassettes")
     offline_step = next(
-        step
-        for step in steps
-        if step.get("name") == "Offline verification (no API key)"
+        step for step in steps if step.get("name") == "Offline verification (no API key)"
     )
     final_step = next(
-        step
-        for step in steps
-        if step.get("name") == "Require a complete matrix for all-model runs"
+        step for step in steps if step.get("name") == "Require a complete matrix for all-model runs"
     )
 
-    matrix_script = (ROOT / "scripts/record_all_models.sh").read_text(
-        encoding="utf-8"
-    )
+    matrix_script = (ROOT / "scripts/record_all_models.sh").read_text(encoding="utf-8")
     assert matrix_script.count("python scripts/benchmark_report.py") == 1
     assert "trap generate_benchmark_report EXIT" in matrix_script
     assert "original_status=$?" in matrix_script
@@ -97,17 +86,12 @@ def test_all_model_workflow_generates_one_report_before_artifact_upload() -> Non
 
     offline_run = offline_step["run"]
     all_model_branch, single_model_branch = offline_run.split("else", maxsplit=1)
+    single_model_report = 'python scripts/benchmark_report.py --model "$BENCHMARK_MODEL"'
     assert "benchmark_report.py" not in all_model_branch
-    assert (
-        single_model_branch.count(
-            "python scripts/benchmark_report.py --model \"$BENCHMARK_MODEL\""
-        )
-        == 1
-    )
+    assert single_model_branch.count(single_model_report) == 1
 
     direct_workflow_report_count = sum(
-        step.get("run", "").count("python scripts/benchmark_report.py")
-        for step in steps
+        step.get("run", "").count("python scripts/benchmark_report.py") for step in steps
     )
     assert direct_workflow_report_count == 1
 
@@ -119,9 +103,7 @@ def test_all_model_workflow_generates_one_report_before_artifact_upload() -> Non
     assert steps.index(record_step) < upload_index
 
     assert final_step is steps[-1]
-    assert final_step["run"].count(
-        "python scripts/check_cassette_policy.py"
-    ) == 1
+    assert final_step["run"].count("python scripts/check_cassette_policy.py") == 1
     assert "benchmark_report.py" not in final_step["run"]
 
 
@@ -139,12 +121,7 @@ def test_provider_transport_profiles_are_explicit_and_validated() -> None:
     assert openai.temperature is None
 
     with pytest.raises(ValueError, match="response_format_type"):
-        ModelProfile(
-            model_id="x",
-            label="x",
-            family="x",
-            response_format_type="invalid",
-        )
+        ModelProfile(model_id="x", label="x", family="x", response_format_type="invalid")
     with pytest.raises(ValueError, match="valid only with json_schema"):
         ModelProfile(
             model_id="x",
@@ -169,10 +146,7 @@ def test_transport_schema_compatibility_never_weakens_local_validation() -> None
     assert local_schema["properties"]["stops"]["uniqueItems"] is True
     assert local_schema["properties"]["reviews"]["uniqueItems"] is True
 
-    nested = {
-        "uniqueItems": True,
-        "items": [{"properties": {"x": {"uniqueItems": True}}}],
-    }
+    nested = {"uniqueItems": True, "items": [{"properties": {"x": {"uniqueItems": True}}}]}
     LLMTestRunner._remove_schema_keyword(nested, "uniqueItems")
     assert nested == {"items": [{"properties": {"x": {}}}]}
 
