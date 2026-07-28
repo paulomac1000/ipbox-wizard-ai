@@ -175,7 +175,7 @@ LLM_PAID_RUN_CONFIRMATION=RUN_PAID_BENCHMARK \
 
 Skrypty lokalne automatycznie czytają tylko dozwolone ustawienia z `.env`. Plik nie jest wykonywany przez powłokę, nieznane klucze są ignorowane, a jawnie ustawione zmienne procesu mają pierwszeństwo. `.env` pozostaje w `.gitignore`; ustaw prawa `chmod 600`.
 
-Recorder nie nadpisuje istniejącej kasety. Odrzucenia trafiają do skonfigurowanego `VCR_REJECTED_ROOT` — domyślnie `/tmp/ipbox_llm_rejected/` — jako osobne, niezmienne pliki dla każdej płatnej próby, a wyniki diagnostyczne do `/tmp/ipbox_llm_responses/`. Odpowiedź z naliczonym `usage.cost`, lecz pustą albo odrzuconą treścią, również musi pozostać w tym rejestrze.
+Recorder nie nadpisuje istniejącej kasety. Odrzucenia trafiają do skonfigurowanego `VCR_REJECTED_ROOT` — domyślnie do katalogu tymczasowego rozdzielonego per użytkownik (`ipbox_llm_rejected_<scope>`) — jako osobne, niezmienne pliki dla każdej płatnej próby, a wyniki diagnostyczne do `/tmp/ipbox_llm_responses/`. Odpowiedź z naliczonym `usage.cost`, lecz pustą albo odrzuconą treścią, również musi pozostać w tym rejestrze.
 
 Nie ma `--force`. Nie ponawiaj błędu semantycznego aż do uzyskania „szczęśliwej” odpowiedzi.
 
