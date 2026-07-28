@@ -69,9 +69,7 @@ def test_paid_workflow_initializes_exactly_one_rejected_root_at_runtime() -> Non
     init_script = init_step["run"]
 
     assert "VCR_REJECTED_ROOT" not in job["env"]
-    assert all(
-        "VCR_REJECTED_ROOT" not in payload for payload in non_run_step_payloads
-    )
+    assert all("VCR_REJECTED_ROOT" not in payload for payload in non_run_step_payloads)
 
     expected_assignment = "".join(
         ("rejected_root=", '"$RUNNER_TEMP/', 'ipbox_llm_rejected_${GITHUB_RUN_ID}"')
