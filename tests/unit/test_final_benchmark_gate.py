@@ -46,7 +46,6 @@ def test_paid_workflow_initializes_exactly_one_rejected_root_at_runtime() -> Non
     init_step = next(
         step for step in steps if step.get("name") == "Initialize isolated rejected-attempt path"
     )
-    record_step = next(step for step in steps if step.get("name") == "Record cassettes")
 
     assert "VCR_REJECTED_ROOT" not in job["env"]
 
@@ -64,9 +63,21 @@ def test_paid_workflow_initializes_exactly_one_rejected_root_at_runtime() -> Non
         if "VCR_REJECTED_ROOT=" in line
     ]
 
+    init_index = steps.index(init_step)
+    consumer_indices = [
+        index
+        for index, step in enumerate(steps)
+        if index != init_index
+        and any(
+            reference in step.get("run", "")
+            for reference in ("$VCR_REJECTED_ROOT", "${VCR_REJECTED_ROOT}")
+        )
+    ]
+
     assert assignment_count == 1
     assert rejected_root_exports == [expected_export]
-    assert steps.index(init_step) < steps.index(record_step)
+    assert consumer_indices
+    assert init_index < min(consumer_indices)
 
 
 def test_all_model_workflow_generates_one_report_before_artifact_upload() -> None:
