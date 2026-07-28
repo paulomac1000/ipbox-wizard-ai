@@ -15,7 +15,46 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  refresh-vcr-metadata:
+    if: github.event_name == 'pull_request' && github.head_ref == 'feat/openai-model-family'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/openai-model-family
+          persist-credentials: true
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements-test.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt -r requirements-test.txt
+
+      - name: Refresh validated cassette metadata once
+        run: |
+          set -euo pipefail
+          unset OPENROUTER_API_KEY || true
+          python scripts/refresh_vcr_metadata.py --all-models --write
+          python scripts/vcr_precommit.py --all-models
+          if git diff --quiet -- tests/llm/vcr/cassettes; then
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add tests/llm/vcr/cassettes
+          git commit -m "test: refresh VCR metadata after harness changes"
+          git push origin HEAD:feat/openai-model-family
+
   deterministic:
+    needs: refresh-vcr-metadata
+    if: always() && (needs.refresh-vcr-metadata.result == 'success' || needs.refresh-vcr-metadata.result == 'skipped')
     runs-on: ubuntu-latest
     timeout-minutes: 30
     strategy:
