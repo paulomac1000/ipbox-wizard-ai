@@ -18,12 +18,12 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 SCENARIO_DIR = ROOT / "tests/llm/scenarios"
 DEFAULT_CASSETTE_ROOT = ROOT / "tests/llm/vcr/cassettes"
-DEFAULT_REJECTED_ROOT = Path("/tmp/ipbox_llm_rejected")
 CASSETTE_ROOT = DEFAULT_CASSETTE_ROOT
 PAID_RUN_CONFIRMATION = "RUN_PAID_BENCHMARK"
 sys.path.insert(0, str(ROOT))
 
 from scripts.local_env import load_local_env  # noqa: E402
+from scripts.vcr_paths import resolve_rejected_root  # noqa: E402
 from tests.llm.models import get_model_profile, model_slug  # noqa: E402
 from tests.llm.vcr.cassette import CassetteManifest  # noqa: E402
 
@@ -57,8 +57,7 @@ def _cassette_root() -> Path:
 
 def _rejected_root(environ: Mapping[str, str]) -> Path:
     """Resolve rejected-attempt storage to the same absolute path in parent and child."""
-    raw = environ.get("VCR_REJECTED_ROOT", str(DEFAULT_REJECTED_ROOT))
-    return _absolute_storage_path(raw, name="VCR_REJECTED_ROOT")
+    return resolve_rejected_root(environ=environ)
 
 
 def run(command: list[str], env: dict[str, str]) -> int:
