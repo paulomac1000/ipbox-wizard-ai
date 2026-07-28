@@ -52,7 +52,7 @@ jobs:
       BENCHMARK_MODEL: ${{ inputs.model }}
       MAX_COST_PER_MODEL_USD: ${{ inputs.max-cost-per-model-usd }}
       MAX_TOTAL_COST_USD: ${{ inputs.max-total-cost-usd }}
-      VCR_REJECTED_ROOT: /tmp/ipbox_llm_rejected
+      VCR_REJECTED_ROOT: "${{ runner.temp }}/ipbox_llm_rejected_${{ github.run_id }}"
 
     steps:
       - uses: actions/checkout@v4
