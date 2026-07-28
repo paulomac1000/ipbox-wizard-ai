@@ -15,10 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from python_helper.report_metadata import engine_source_hash  # noqa: E402
-from scripts.vcr_paths import (  # noqa: E402
-    resolve_cassette_root,
-    resolve_cassette_root_or_error,
-)
+from scripts.vcr_paths import resolve_cassette_root  # noqa: E402
 from tests.llm.models import BENCHMARK_MODELS  # noqa: E402
 from tests.llm.oracle import validate_scenario  # noqa: E402
 from tests.llm.runner import LLMTestRunner  # noqa: E402
@@ -113,7 +110,10 @@ def main() -> int:
         help="Override VCR_CASSETTES_ROOT for this refresh run.",
     )
     args = parser.parse_args()
-    cassette_root = resolve_cassette_root_or_error(parser, args.cassette_root)
+    try:
+        cassette_root = resolve_cassette_root(args.cassette_root)
+    except ValueError as exc:
+        parser.error(str(exc))
     models = BENCHMARK_MODELS if args.all_models else (args.model,)
     total = sum(
         refresh_model(model, write=args.write, cassette_root=cassette_root) for model in models
