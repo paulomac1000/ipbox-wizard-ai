@@ -160,9 +160,7 @@ def main() -> int:
         parser.error(str(exc))
     models = BENCHMARK_MODELS if args.all_models else (args.model,)
     errors = [
-        error
-        for model in models
-        for error in validate_model(model, cassette_root=cassette_root)
+        error for model in models for error in validate_model(model, cassette_root=cassette_root)
     ]
     if errors:
         print("VCR validation failed:", file=sys.stderr)
