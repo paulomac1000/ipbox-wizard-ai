@@ -41,7 +41,14 @@ def test_paid_workflow_model_allowlist_matches_canonical_registry() -> None:
 def test_paid_workflow_initializes_exactly_one_rejected_root_at_runtime() -> None:
     workflow = _paid_workflow()
     job = workflow["jobs"]["benchmark"]
-    run_scripts = [step.get("run", "") for step in job["steps"]]
+    steps = job["steps"]
+    run_scripts = [step.get("run", "") for step in steps]
+    init_step = next(
+        step
+        for step in steps
+        if step.get("name") == "Initialize isolated rejected-attempt path"
+    )
+    record_step = next(step for step in steps if step.get("name") == "Record cassettes")
 
     assert "VCR_REJECTED_ROOT" not in job["env"]
 
@@ -61,6 +68,7 @@ def test_paid_workflow_initializes_exactly_one_rejected_root_at_runtime() -> Non
 
     assert assignment_count == 1
     assert rejected_root_exports == [expected_export]
+    assert steps.index(init_step) < steps.index(record_step)
 
 
 def test_all_model_workflow_generates_one_report_before_artifact_upload() -> None:
@@ -82,7 +90,10 @@ def test_all_model_workflow_generates_one_report_before_artifact_upload() -> Non
     assert 'exit "$report_status"' in matrix_script
 
     record_run = record_step["run"]
-    assert record_run.count("./scripts/record_all_models.sh") == 1
+    all_record_branch, single_record_branch = record_run.split("else", maxsplit=1)
+    assert all_record_branch.count("./scripts/record_all_models.sh") == 1
+    assert "./scripts/record_all_models.sh" not in single_record_branch
+    assert single_record_branch.count("python scripts/record_model.py") == 1
 
     offline_run = offline_step["run"]
     all_model_branch, single_model_branch = offline_run.split("else", maxsplit=1)
