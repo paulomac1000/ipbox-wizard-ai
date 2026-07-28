@@ -49,10 +49,15 @@ def test_paid_workflow_initializes_rejected_root_at_runtime() -> None:
         if step.get("name") == "Initialize isolated rejected-attempt path"
     )
     script = init_step["run"]
-    assert "$RUNNER_TEMP" in script
-    assert "${GITHUB_RUN_ID}" in script
-    assert "VCR_REJECTED_ROOT" in script
-    assert "$GITHUB_ENV" in script
+
+    assert (
+        'rejected_root="$RUNNER_TEMP/ipbox_llm_rejected_${GITHUB_RUN_ID}"'
+        in script
+    )
+    assert (
+        "printf 'VCR_REJECTED_ROOT=%s\\n' \"$rejected_root\" >> \"$GITHUB_ENV\""
+        in script
+    )
 
 
 def test_paid_workflow_generates_benchmark_report_only_before_artifact_upload() -> None:
@@ -65,8 +70,20 @@ def test_paid_workflow_generates_benchmark_report_only_before_artifact_upload() 
         step for step in steps if step.get("name") == "Require a complete matrix for all-model runs"
     )
 
-    assert "python scripts/benchmark_report.py" in offline_step["run"]
-    assert "python scripts/benchmark_report.py" not in final_step["run"]
+    report_steps = [
+        step.get("name")
+        for step in steps
+        if "python scripts/benchmark_report.py" in step.get("run", "")
+    ]
+    assert report_steps == ["Offline verification (no API key)"]
+
+    offline_index = steps.index(offline_step)
+    upload_index = next(
+        index
+        for index, step in enumerate(steps)
+        if step.get("name") == "Upload cassette candidates and reports"
+    )
+    assert offline_index < upload_index
     assert "python scripts/check_cassette_policy.py" in final_step["run"]
 
 
