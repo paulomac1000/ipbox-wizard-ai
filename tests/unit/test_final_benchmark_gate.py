@@ -64,9 +64,7 @@ def test_paid_workflow_initializes_exactly_one_rejected_root_at_runtime() -> Non
         if "VCR_REJECTED_ROOT=" in line
     ]
     init_exports = [
-        line.strip()
-        for line in init_script.splitlines()
-        if "VCR_REJECTED_ROOT=" in line
+        line.strip() for line in init_script.splitlines() if "VCR_REJECTED_ROOT=" in line
     ]
 
     init_index = steps.index(init_step)
