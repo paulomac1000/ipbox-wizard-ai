@@ -60,11 +60,13 @@ def test_paid_workflow_initializes_exactly_one_rejected_root_at_runtime() -> Non
         if "VCR_REJECTED_ROOT=" in line
     ]
 
-    initialization_index = next(
-        index
-        for index, step in enumerate(steps)
+    initialization_step = next(
+        step
+        for step in steps
         if step.get("name") == "Initialize isolated rejected-attempt path"
     )
+    initialization_index = steps.index(initialization_step)
+    initialization_run = initialization_step.get("run", "")
     record_index = next(
         index for index, step in enumerate(steps) if step.get("name") == "Record cassettes"
     )
@@ -76,6 +78,8 @@ def test_paid_workflow_initializes_exactly_one_rejected_root_at_runtime() -> Non
 
     assert assignment_count == 1
     assert rejected_root_exports == [expected_export]
+    assert initialization_run.count(expected_assignment) == 1
+    assert initialization_run.count(expected_export) == 1
     assert consumer_indices
     assert initialization_index < record_index
     assert initialization_index < min(consumer_indices)
