@@ -60,29 +60,27 @@ def test_paid_workflow_initializes_exactly_one_rejected_root_at_runtime() -> Non
         if "VCR_REJECTED_ROOT=" in line
     ]
 
-    initialization_step = next(
-        step
-        for step in steps
-        if step.get("name") == "Initialize isolated rejected-attempt path"
-    )
-    initialization_index = steps.index(initialization_step)
-    initialization_run = initialization_step.get("run", "")
-    record_index = next(
-        index
-        for index, step in enumerate(steps)
-        if step.get("name") == "Record cassettes"
-    )
-    consumer_indices = [
-        index
-        for index, step in enumerate(steps)
-        if (
-            index != initialization_index
-            and "VCR_REJECTED_ROOT" in step.get("run", "")
-        )
-    ]
+    initialization_index: int | None = None
+    initialization_run: str | None = None
+    record_index: int | None = None
+    consumer_indices: list[int] = []
+
+    for index, step in enumerate(steps):
+        name = step.get("name")
+        run_script = step.get("run", "")
+        if name == "Initialize isolated rejected-attempt path":
+            initialization_index = index
+            initialization_run = run_script
+        elif "VCR_REJECTED_ROOT" in run_script:
+            consumer_indices.append(index)
+        if name == "Record cassettes":
+            record_index = index
 
     assert assignment_count == 1
     assert rejected_root_exports == [expected_export]
+    assert initialization_index is not None
+    assert initialization_run is not None
+    assert record_index is not None
     assert initialization_run.count(expected_assignment) == 1
     assert initialization_run.count(expected_export) == 1
     assert consumer_indices
