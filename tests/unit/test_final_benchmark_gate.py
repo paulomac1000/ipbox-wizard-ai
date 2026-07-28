@@ -13,11 +13,23 @@ from tests.llm.output_schema import DECISION_JSON_SCHEMA
 from tests.llm.runner import LLMTestRunner
 
 ROOT = Path(__file__).resolve().parents[2]
+MODEL_SELECTION_GUARD = 'if [ "$BENCHMARK_MODEL" = "all" ]; then\n'
 
 
 def _paid_workflow() -> dict:
     workflow_path = ROOT / ".github/workflows/llm-benchmark.yml"
     return yaml.safe_load(workflow_path.read_text(encoding="utf-8"))
+
+
+def _bounded_shell_branches(script: str) -> tuple[str, str, str, str]:
+    before_if, if_marker, conditional = script.partition(MODEL_SELECTION_GUARD)
+    first_branch, else_marker, conditional = conditional.partition("\nelse\n")
+    second_branch, fi_marker, after_fi = conditional.partition("\nfi")
+
+    assert if_marker
+    assert else_marker
+    assert fi_marker
+    return before_if, first_branch, second_branch, after_fi
 
 
 def test_release_gate_contains_exactly_eight_distinct_model_families() -> None:
@@ -71,11 +83,7 @@ def test_paid_workflow_initializes_exactly_one_rejected_root_at_runtime() -> Non
     consumer_indices = [
         index
         for index, step in enumerate(steps)
-        if index != init_index
-        and any(
-            reference in step.get("run", "")
-            for reference in ("$VCR_REJECTED_ROOT", "${VCR_REJECTED_ROOT}")
-        )
+        if index != init_index and "VCR_REJECTED_ROOT" in step.get("run", "")
     ]
 
     assert init_script.count(expected_assignment) == 1
@@ -111,17 +119,10 @@ def test_all_model_workflow_generates_one_report_before_artifact_upload() -> Non
         script = step.get("run", "")
         assert all(command not in script for command in recorder_commands)
 
-    record_run = record_step["run"]
-    before_if, if_marker, conditional = record_run.partition(
-        'if [ "$BENCHMARK_MODEL" = "all" ]; then\n'
+    before_record_if, all_record_branch, single_record_branch, after_record_fi = (
+        _bounded_shell_branches(record_step["run"])
     )
-    all_record_branch, else_marker, conditional = conditional.partition("\nelse\n")
-    single_record_branch, fi_marker, after_fi = conditional.partition("\nfi")
-
-    assert if_marker
-    assert else_marker
-    assert fi_marker
-    for outside_branch in (before_if, after_fi):
+    for outside_branch in (before_record_if, after_record_fi):
         assert "record_all_models.sh" not in outside_branch
         assert "record_model.py" not in outside_branch
     assert all_record_branch.count("./scripts/record_all_models.sh") == 1
@@ -129,11 +130,14 @@ def test_all_model_workflow_generates_one_report_before_artifact_upload() -> Non
     assert single_record_branch.count("python scripts/record_model.py") == 1
     assert "record_all_models.sh" not in single_record_branch
 
-    offline_run = offline_step["run"]
-    all_model_branch, single_model_branch = offline_run.split("else", maxsplit=1)
+    before_offline_if, all_offline_branch, single_offline_branch, after_offline_fi = (
+        _bounded_shell_branches(offline_step["run"])
+    )
     single_model_report = 'python scripts/benchmark_report.py --model "$BENCHMARK_MODEL"'
-    assert "benchmark_report.py" not in all_model_branch
-    assert single_model_branch.count(single_model_report) == 1
+    assert "benchmark_report.py" not in before_offline_if
+    assert "benchmark_report.py" not in all_offline_branch
+    assert single_offline_branch.count(single_model_report) == 1
+    assert "benchmark_report.py" not in after_offline_fi
 
     direct_workflow_report_count = sum(
         step.get("run", "").count("python scripts/benchmark_report.py") for step in steps
@@ -146,6 +150,7 @@ def test_all_model_workflow_generates_one_report_before_artifact_upload() -> Non
         if step.get("name") == "Upload cassette candidates and reports"
     )
     assert steps.index(record_step) < upload_index
+    assert steps.index(offline_step) < upload_index
 
     assert final_step is steps[-1]
     assert final_step["run"].count("python scripts/check_cassette_policy.py") == 1
