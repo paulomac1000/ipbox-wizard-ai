@@ -30,9 +30,9 @@ Kasety potwierdzają wykonanie ograniczonego kontraktu `status/stops/reviews` w 
 
 OpenAI, podobnie jak bieżący routing Claude, odrzuca `uniqueItems` w transportowym JSON Schema. Adapter usuwa ten keyword rekursywnie wyłącznie z głębokiej kopii wysyłanej do providera. Kanoniczna lokalna `DECISION_JSON_SCHEMA`, parser i evaluator nadal wymagają unikalnych kodów. Test profilu sprawdza obie strony tej granicy.
 
-Profil znajduje się w `tests/llm/models.py` razem z pozostałymi modelami. Lista `BENCHMARK_MODELS` jest jedynym źródłem macierzy używanym przez recorder, politykę kaset, raport, playback i workflow.
+Profil znajduje się w `tests/llm/models.py` razem z pozostałymi modelami. `BENCHMARK_MODELS` jest kanonicznym źródłem wykonawczym dla recordera, polityki kaset, raportu i playbacku. Formularz `workflow_dispatch` w `.github/workflows/llm-benchmark.yml` ma osobną statyczną allowlistę wymaganą przez GitHub Actions; test `test_paid_workflow_model_allowlist_matches_canonical_registry` wymusza jej identyczność i kolejność względem `BENCHMARK_MODELS`.
 
-Rejestr modeli nie należy do `engine_source_hash` silnika podatkowego. Każdy request nadal jest chroniony pełnym `request_hash`, który obejmuje model i wszystkie parametry transportowe. Dodanie nowego providera nie powinno samo w sobie unieważniać poprawnych kaset innych modeli.
+Rejestr modeli nie należy do `engine_source_hash` silnika podatkowego. Każdy request nadal jest chroniony pełnym `request_hash`, który obejmuje model i wszystkie parametry transportowe. Test regresyjny potwierdza, że zmiana profilu GPT-5 Mini zmienia `request_hash`, nawet gdy hash silnika podatkowego pozostaje bez zmian. Dodanie nowego providera nie powinno samo w sobie unieważniać poprawnych kaset innych modeli.
 
 ## Jednorazowa migracja wykonana przy dodaniu modelu
 
@@ -68,7 +68,8 @@ Recorder:
 4. zapisuje każdą naliczoną, odrzuconą próbę w `VCR_REJECTED_ROOT`;
 5. respektuje oba limity kosztów;
 6. buduje manifest dla `openai/gpt-5-mini`;
-7. respektuje `VCR_CASSETTES_ROOT` z procesu albo bezpiecznie wczytanego `.env`.
+7. respektuje `VCR_CASSETTES_ROOT` i `VCR_REJECTED_ROOT` z procesu albo bezpiecznie wczytanego `.env`;
+8. normalizuje obie ścieżki do wartości absolutnych przed uruchomieniem pytest, dzięki czemu subprocess i skanowanie kosztów zawsze używają tych samych katalogów.
 
 ## Weryfikacja przed commitem
 
