@@ -20,6 +20,13 @@ def _paid_workflow() -> dict:
     return yaml.safe_load(workflow_path.read_text(encoding="utf-8"))
 
 
+def _step_uses_rejected_root(step: dict) -> bool:
+    for field in ("run", "env", "if", "with"):
+        if "VCR_REJECTED_ROOT" in str(step.get(field, "")):
+            return True
+    return False
+
+
 def test_release_gate_contains_exactly_eight_distinct_model_families() -> None:
     assert len(BENCHMARK_MODELS) == 8
     assert len({MODEL_PROFILES[model].family for model in BENCHMARK_MODELS}) == 8
@@ -64,19 +71,14 @@ def test_paid_workflow_initializes_exactly_one_rejected_root_at_runtime() -> Non
     initialization_run: str | None = None
     record_index: int | None = None
     consumer_indices: list[int] = []
-    runtime_fields = ("run", "env", "if", "with")
 
     for index, step in enumerate(steps):
         name = step.get("name")
         run_script = step.get("run", "")
-        uses_rejected_root = any(
-            "VCR_REJECTED_ROOT" in str(step.get(field, ""))
-            for field in runtime_fields
-        )
         if name == "Initialize isolated rejected-attempt path":
             initialization_index = index
             initialization_run = run_script
-        elif uses_rejected_root:
+        elif _step_uses_rejected_root(step):
             consumer_indices.append(index)
         if name == "Record cassettes":
             record_index = index
