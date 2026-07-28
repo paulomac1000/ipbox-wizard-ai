@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from enum import Enum
 from os import environ
+from pathlib import Path
 
 from scripts.vcr_paths import resolve_cassette_root, resolve_rejected_root
 
@@ -32,14 +33,14 @@ class VCRConfig:
         return model_slug(self.model)
 
     @property
-    def model_directory(self):
+    def model_directory(self) -> Path:
         return self.cassettes_root / self.model_slug
 
     @property
-    def manifest_path(self):
+    def manifest_path(self) -> Path:
         return self.model_directory / "_manifest.yaml"
 
-    def cassette_path(self, scenario_id: str):
+    def cassette_path(self, scenario_id: str) -> Path:
         return self.model_directory / f"{scenario_id}.yaml"
 
     @property
