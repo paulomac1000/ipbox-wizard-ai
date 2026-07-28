@@ -10,6 +10,7 @@ from typing import ClassVar
 import pytest
 
 from python_helper.allocation_precision import audit_revenue_allocation
+from scripts import benchmark_report, check_cassette_policy, vcr_precommit
 from scripts.local_env import load_local_env
 from scripts.record_model import (
     PAID_RUN_CONFIRMATION,
@@ -17,7 +18,9 @@ from scripts.record_model import (
     _rejected_root,
     _require_paid_confirmation,
 )
+from scripts.vcr_paths import resolve_cassette_root
 from tests.llm.client import LLMClient
+from tests.llm.models import BENCHMARK_MODELS, model_slug
 from tests.llm.request_spec import LLMRequestSpec
 from tests.llm.vcr.config import VCRConfig
 from tests.llm.vcr.recorder import RecordingRejectedError, VCRRecorder
@@ -99,6 +102,98 @@ def test_record_model_normalizes_relative_storage_roots_before_subprocess(
 
     assert _cassette_root() == (tmp_path / "relative/cassettes").resolve()
     assert _rejected_root(os.environ) == (tmp_path / "relative/rejected").resolve()
+
+
+def test_follow_up_tools_resolve_the_same_relative_cassette_root(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("VCR_CASSETTES_ROOT", "relative/cassettes")
+
+    expected = (tmp_path / "relative/cassettes").resolve()
+    assert _cassette_root() == expected
+    assert resolve_cassette_root() == expected
+
+
+def test_vcr_precommit_reads_the_configured_cassette_tree(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    cassette_root = (tmp_path / "custom-cassettes").resolve()
+    expected_manifest = cassette_root / model_slug(MODEL) / "_manifest.yaml"
+    observed: dict[str, object] = {}
+
+    def fake_manifest_load(path: Path, model: str) -> object:
+        observed.update(path=path, model=model)
+        raise FileNotFoundError("expected test stop")
+
+    monkeypatch.setattr(
+        vcr_precommit.CassetteManifest,
+        "load",
+        staticmethod(fake_manifest_load),
+    )
+
+    errors = vcr_precommit.validate_model(MODEL, cassette_root=cassette_root)
+
+    assert observed == {"path": expected_manifest, "model": MODEL}
+    assert errors and "invalid/missing manifest" in errors[0]
+    assert Path(os.environ["VCR_CASSETTES_ROOT"]) == cassette_root
+
+
+def test_benchmark_report_reads_and_validates_the_same_custom_tree(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    cassette_root = (tmp_path / "custom-cassettes").resolve()
+    expected_manifest = cassette_root / model_slug(MODEL) / "_manifest.yaml"
+    observed: dict[str, object] = {}
+
+    class _Manifest:
+        entries: dict = {}
+
+    def fake_manifest_load(path: Path, model: str) -> _Manifest:
+        observed.update(path=path, model=model)
+        return _Manifest()
+
+    def fake_validate(model: str, *, cassette_root: Path | None = None) -> list[str]:
+        observed["validated_model"] = model
+        observed["validated_root"] = cassette_root
+        return []
+
+    monkeypatch.setattr(
+        benchmark_report.CassetteManifest,
+        "load",
+        staticmethod(fake_manifest_load),
+    )
+    monkeypatch.setattr(benchmark_report, "validate_model", fake_validate)
+
+    row = benchmark_report.summarize_model(MODEL, set(), cassette_root)
+
+    assert row["complete_and_valid"] is True
+    assert observed == {
+        "path": expected_manifest,
+        "model": MODEL,
+        "validated_model": MODEL,
+        "validated_root": cassette_root,
+    }
+
+
+def test_cassette_policy_propagates_its_effective_root_to_validation(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    cassette_root = (tmp_path / "custom-cassettes").resolve()
+    model_directory = cassette_root / model_slug(MODEL)
+    model_directory.mkdir(parents=True)
+    (model_directory / "scenario.yaml").write_text("meta: {}\n", encoding="utf-8")
+    (model_directory / "_manifest.yaml").write_text("entries: {}\n", encoding="utf-8")
+    observed: list[tuple[str, Path | None]] = []
+
+    def fake_validate(model: str, *, cassette_root: Path | None = None) -> list[str]:
+        observed.append((model, cassette_root))
+        return []
+
+    monkeypatch.setattr(check_cassette_policy, "validate_model", fake_validate)
+
+    assert check_cassette_policy.main(cassette_root) == 0
+    assert observed == [(model, cassette_root) for model in BENCHMARK_MODELS]
 
 
 def test_record_model_rejects_empty_cassette_root(monkeypatch: pytest.MonkeyPatch) -> None:
