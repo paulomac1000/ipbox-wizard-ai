@@ -44,9 +44,7 @@ def test_paid_workflow_initializes_exactly_one_rejected_root_at_runtime() -> Non
     steps = job["steps"]
     run_scripts = [step.get("run", "") for step in steps]
     init_step = next(
-        step
-        for step in steps
-        if step.get("name") == "Initialize isolated rejected-attempt path"
+        step for step in steps if step.get("name") == "Initialize isolated rejected-attempt path"
     )
     record_step = next(step for step in steps if step.get("name") == "Record cassettes")
 
