@@ -5,7 +5,7 @@ on:
     branches: [main]
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   refresh:
@@ -15,7 +15,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.ref }}
+          persist-credentials: true
 
       - name: Setup Python 3.13
         uses: actions/setup-python@v5
@@ -37,6 +38,19 @@ jobs:
           unset OPENROUTER_API_KEY || true
           python scripts/refresh_vcr_metadata.py --all-models --write
           python scripts/check_cassette_policy.py
+
+      - name: Commit refreshed cassette metadata
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- tests/llm/vcr/cassettes; then
+            echo "Cassette metadata is already current."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add tests/llm/vcr/cassettes
+          git commit -m "test(vcr): refresh cassette metadata for path resolver"
+          git push origin "HEAD:${{ github.event.pull_request.head.ref }}"
 
       - name: Upload refreshed cassette tree
         uses: actions/upload-artifact@v4
