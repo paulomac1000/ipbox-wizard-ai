@@ -262,7 +262,10 @@ def test_billed_empty_response_is_preserved_as_rejected_attempt(
 ) -> None:
     monkeypatch.setenv("OPENROUTER_API_KEY", "test-key")
     monkeypatch.setenv("LLM_PROVIDER", "openrouter")
-    monkeypatch.setattr("tests.llm.client.requests.post", lambda *args, **kwargs: _Response())
+    monkeypatch.setattr(
+        "tests.llm.client.requests.post",
+        lambda *args, **kwargs: _Response(),
+    )
 
     billed = LLMClient().call({"model": MODEL})
     assert billed.content == ""
@@ -285,7 +288,9 @@ def test_billed_empty_response_is_preserved_as_rejected_attempt(
             validate_response=json.loads,
         )
 
-    files = list((recorder.config.rejected_root / recorder.config.model_slug).glob("*.json"))
+    files = list(
+        (recorder.config.rejected_root / recorder.config.model_slug).glob("*.json")
+    )
     assert len(files) == 1
     payload = json.loads(files[0].read_text(encoding="utf-8"))
     assert payload["metadata"]["cost"] == pytest.approx(0.12)
