@@ -50,14 +50,14 @@ def test_paid_workflow_initializes_rejected_root_at_runtime() -> None:
     )
     script = init_step["run"]
 
-    assert (
-        'rejected_root="$RUNNER_TEMP/ipbox_llm_rejected_${GITHUB_RUN_ID}"'
-        in script
+    expected_assignment = "".join(
+        ("rejected_root=", '"$RUNNER_TEMP/', 'ipbox_llm_rejected_${GITHUB_RUN_ID}"')
     )
-    assert (
-        "printf 'VCR_REJECTED_ROOT=%s\\n' \"$rejected_root\" >> \"$GITHUB_ENV\""
-        in script
+    expected_export = " ".join(
+        ("printf", "'VCR_REJECTED_ROOT=%s\\n'", '"$rejected_root"', ">>", '"$GITHUB_ENV"')
     )
+    assert expected_assignment in script
+    assert expected_export in script
 
 
 def test_paid_workflow_generates_benchmark_report_only_before_artifact_upload() -> None:
