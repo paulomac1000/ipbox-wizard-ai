@@ -147,7 +147,7 @@ def test_benchmark_report_reads_and_validates_the_same_custom_tree(
     observed: dict[str, object] = {}
 
     class _Manifest:
-        entries: dict = {}
+        entries: ClassVar[dict] = {}
 
     def fake_manifest_load(path: Path, model: str) -> _Manifest:
         observed.update(path=path, model=model)
