@@ -57,9 +57,7 @@ def summarize_model(
         entries = {}
         manifest_errors.append(f"{model}: invalid/missing manifest: {exc}")
 
-    cassette_ids = {
-        path.stem for path in directory.glob("*.yaml") if path.name != "_manifest.yaml"
-    }
+    cassette_ids = {path.stem for path in directory.glob("*.yaml") if path.name != "_manifest.yaml"}
     recorded = scenario_ids & set(entries) & cassette_ids
     cost = sum(entries[scenario_id].cost for scenario_id in recorded)
     errors = [
