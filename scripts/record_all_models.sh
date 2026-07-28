@@ -25,7 +25,14 @@ PY_REJECTED
 export VCR_REJECTED_ROOT="$vcr_rejected_root"
 
 generate_benchmark_report() {
-  python scripts/benchmark_report.py || true
+  original_status=$?
+  report_status=0
+  trap - EXIT
+  python scripts/benchmark_report.py || report_status=$?
+  if ((original_status != 0)); then
+    exit "$original_status"
+  fi
+  exit "$report_status"
 }
 trap generate_benchmark_report EXIT
 
