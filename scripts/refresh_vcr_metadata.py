@@ -15,6 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from python_helper.report_metadata import engine_source_hash  # noqa: E402
+from scripts.vcr_paths import resolve_cassette_root  # noqa: E402
 from tests.llm.models import BENCHMARK_MODELS  # noqa: E402
 from tests.llm.oracle import validate_scenario  # noqa: E402
 from tests.llm.runner import LLMTestRunner  # noqa: E402
@@ -22,17 +23,22 @@ from tests.llm.vcr.cassette import Cassette, CassetteManifest  # noqa: E402
 from tests.llm.vcr.config import VCRConfig  # noqa: E402
 from tests.llm.vcr.fingerprint import compute_fingerprint  # noqa: E402
 
-CASSETTE_ROOT = ROOT / "tests/llm/vcr/cassettes"
 SCENARIO_ROOT = ROOT / "tests/llm/scenarios"
 
 
-def refresh_model(model: str, *, write: bool) -> int:
+def refresh_model(
+    model: str,
+    *,
+    write: bool,
+    cassette_root: str | Path | None = None,
+) -> int:
+    effective_root = resolve_cassette_root(cassette_root)
     os.environ.update(
         {
             "LLM_PROVIDER": "openrouter",
             "LLM_MODEL": model,
             "VCR_MODE": "playback",
-            "VCR_CASSETTES_ROOT": str(CASSETTE_ROOT),
+            "VCR_CASSETTES_ROOT": str(effective_root),
             "IPBOX_CODE_REVISION": f"engine:{engine_source_hash(ROOT)}",
         }
     )
@@ -86,7 +92,10 @@ def refresh_model(model: str, *, write: bool) -> int:
         raise ValueError(f"{model}: cassette set mismatch; missing={missing}, extra={extra}")
     if write:
         manifest.save(config.manifest_path)
-    print(f"{model}: validated={len(expected_ids)}, refreshed={changed}, write={write}")
+    print(
+        f"{model}: validated={len(expected_ids)}, refreshed={changed}, "
+        f"write={write}, cassette_root={effective_root}"
+    )
     return changed
 
 
@@ -96,9 +105,19 @@ def main() -> int:
     group.add_argument("--model")
     group.add_argument("--all-models", action="store_true")
     parser.add_argument("--write", action="store_true")
+    parser.add_argument(
+        "--cassette-root",
+        help="Override VCR_CASSETTES_ROOT for this refresh run.",
+    )
     args = parser.parse_args()
+    try:
+        cassette_root = resolve_cassette_root(args.cassette_root)
+    except ValueError as exc:
+        parser.error(str(exc))
     models = BENCHMARK_MODELS if args.all_models else (args.model,)
-    total = sum(refresh_model(model, write=args.write) for model in models)
+    total = sum(
+        refresh_model(model, write=args.write, cassette_root=cassette_root) for model in models
+    )
     print(f"Total cassette payloads requiring refresh: {total}")
     return 0
 

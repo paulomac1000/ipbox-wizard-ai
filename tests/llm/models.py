@@ -76,6 +76,13 @@ MODEL_PROFILES: dict[str, ModelProfile] = {
         family="Mistral",
         temperature=0.0,
     ),
+    "openai/gpt-5-mini": ModelProfile(
+        model_id="openai/gpt-5-mini",
+        label="OpenAI GPT-5 Mini",
+        family="OpenAI GPT",
+        reasoning={"effort": "minimal"},
+        strip_unique_items_for_transport=True,
+    ),
 }
 
 DEFAULT_MODEL = "google/gemini-3-flash-preview"

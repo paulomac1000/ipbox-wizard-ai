@@ -1,237 +1,224 @@
 # IP Box Wizard AI
 
-**Asystent do przygotowania i niezależnego sprawdzenia rozliczenia IP Box dla programisty B2B.**
+> Deterministyczny silnik i instrukcja dla AI do analizy polskiego rozliczenia IP Box na podstawie dokumentów użytkownika.
 
-[![Deterministic CI](https://github.com/paulomac1000/ipbox-wizard-ai/actions/workflows/deterministic-ci.yml/badge.svg)](https://github.com/paulomac1000/ipbox-wizard-ai/actions/workflows/deterministic-ci.yml)
-[![Python](https://img.shields.io/badge/Python-3.11–3.13-blue.svg)](pyproject.toml)
-[![Release](https://img.shields.io/badge/release-0.2-informational.svg)](CHANGELOG.md)
-[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-
-IP Box Wizard AI łączy instrukcję dla agenta AI z deterministycznym kodem Python. Użytkownik przekazuje dokumenty w zwykłej rozmowie z Claude, ChatGPT lub Gemini, a agent:
-
-1. odczytuje dokumenty i pokazuje rozpoznane dane;
-2. pyta o braki i niejasności;
-3. uruchamia kod projektu do obliczeń;
-4. porównuje wynik z KPiR, ewidencją IP Box i PIT;
-5. wskazuje błędy, ryzyka oraz potrzebne korekty.
-
-> [!IMPORTANT]
-> Projekt jest narzędziem pomocniczym. Nie stanowi porady podatkowej i nie zastępuje księgowej, doradcy podatkowego ani interpretacji indywidualnej. Przed wysłaniem zeznania zweryfikuj wynik z profesjonalistą.
-
-## Dlaczego ten projekt istnieje
-
-Rozliczenie IP Box nie sprowadza się do pomnożenia dochodu przez 5%. Trzeba zachować spójność między dokumentami i osobno ustalić między innymi:
-
-- które przychody dotyczą kwalifikowanego prawa;
-- jak rozdzielić działalność IP i pozostałą;
-- które wydatki są kosztem podatkowym;
-- jak alokować koszty wspólne;
-- które koszty należą do NEXUS A/B/C/D;
-- jak zastosować składki, ulgi, straty i zaokrąglenia;
-- czy ewidencja, KPiR i formularze PIT mówią to samo.
-
-Projekt oddziela rozmowę z AI od krytycznej matematyki. **Model pomaga czytać dokumenty i prowadzić użytkownika, ale wynik oblicza i kontroluje Python.**
+Projekt pomaga uporządkować dokumenty, wykryć braki i niespójności, policzyć wariant rozliczenia oraz przygotować ścieżkę korekty. Nie opiera wyniku na swobodnej odpowiedzi modelu: obliczenia i reguły przechodzą przez kod, walidację oraz testy regresyjne.
 
 ## Dla kogo
 
-| Użytkownik | Typowe zastosowanie |
+Repozytorium jest przeznaczone dla:
+
+- przedsiębiorcy rozliczającego IP Box;
+- księgowej lub biura rachunkowego weryfikującego rozliczenie;
+- doradcy analizującego dane klienta;
+- programisty lub agenta rozwijającego algorytm;
+- użytkownika, który chce przekazać pliki do Claude, ChatGPT, Gemini albo lokalnego agenta i otrzymać ustrukturyzowaną analizę.
+
+Nie trzeba znać Pythona, aby użyć projektu do analizy dokumentów w rozmowie z AI. Lokalna instalacja jest potrzebna dopiero wtedy, gdy chcesz uruchamiać testy, rozwijać algorytm albo pracować na dużym zestawie plików.
+
+## Co robi projekt
+
+Typowa sesja obejmuje:
+
+1. rozpoznanie dokumentów i okresu rozliczenia;
+2. zbudowanie rejestru źródeł i pytań o brakujące dane;
+3. klasyfikację przychodów, kosztów, projektów i praw IP;
+4. obliczenia wykonywane przez `python_helper`, a nie „w pamięci” modelu;
+5. kontrole STOP i REVIEW;
+6. porównanie wariantu pierwotnego z poprawionym;
+7. raport z założeniami, wyliczeniami, ryzykami i listą dalszych działań;
+8. ocenę, czy przypadek jest bezpośrednio pokryty testami.
+
+Projekt nie zastępuje porady podatkowej ani decyzji użytkownika. Jego celem jest wymuszenie przejrzystej, powtarzalnej i możliwej do zweryfikowania analizy.
+
+## Szybki start — analiza dokumentów w rozmowie z AI
+
+### 1. Przygotuj materiały
+
+Możesz przekazać między innymi:
+
+- KPiR lub eksport z programu księgowego;
+- faktury sprzedażowe i kosztowe;
+- PIT-36L, PIT/IP albo projekt zeznania;
+- ewidencję IP Box;
+- zestawienie czasu pracy lub opis metody alokacji;
+- umowy, aneksy, opisy projektów i praw autorskich;
+- interpretację indywidualną;
+- wcześniejsze wyliczenia księgowej;
+- plik ZIP zawierający cały zestaw dokumentów;
+- link do tego repozytorium, gdy platforma potrafi czytać GitHub.
+
+Przed udostępnieniem danych usuń lub zamaskuj dane osobowe, numery rachunków, adresy i inne informacje, które nie są potrzebne do obliczeń.
+
+### 2. Przekaż repozytorium albo jego kluczowe pliki
+
+Najprościej podać agentowi link:
+
+```text
+https://github.com/paulomac1000/ipbox-wizard-ai
+```
+
+Gdy agent nie potrafi pobrać repozytorium, dołącz przynajmniej:
+
+- `AGENTS.md`;
+- `ipbox_algorytm.md`;
+- katalog `python_helper`;
+- własne dokumenty lub ZIP.
+
+### 3. Użyj gotowego promptu
+
+```text
+Przeanalizuj załączone dokumenty zgodnie z repozytorium
+https://github.com/paulomac1000/ipbox-wizard-ai.
+
+Najpierw przeczytaj AGENTS.md i ipbox_algorytm.md. Traktuj je jako instrukcję
+postępowania, ale wszystkie obliczenia wykonuj za pomocą kodu z python_helper.
+
+Nie zakładaj brakujących danych. Najpierw zbuduj rejestr dokumentów i wypisz
+pytania blokujące. Następnie wykonaj analizę, pokaż użyte założenia, źródła,
+formuły i wyniki. Rozdziel błędy blokujące od punktów wymagających weryfikacji.
+
+Na końcu nadaj dokładnie jeden status pokrycia przypadku:
+COVERED_DIRECTLY, COVERED_PARTIALLY albo NOT_COVERED.
+Jeżeli przypadek nie jest w pełni pokryty lub ujawnia błąd, przygotuj
+zanonimizowaną propozycję GitHub Issue, ale nie publikuj jej bez mojej zgody.
+```
+
+Rozbudowana wersja znajduje się w [`examples/przykladowy_prompt_startowy.md`](examples/przykladowy_prompt_startowy.md).
+
+## Jakiego wyniku oczekiwać
+
+Dobra odpowiedź agenta powinna zawierać:
+
+- spis przeanalizowanych dokumentów;
+- listę braków i pytań;
+- opis metody przypisania przychodów i kosztów;
+- miesięczne lub projektowe obliczenia W;
+- klasyfikację kosztów IP, MIX, NON i EXCLUDED;
+- wyliczenie NEXUS z dowodami dla koszyków A, B, C i D;
+- kontrole KPiR, składek, zaokrągleń, ulg i formy opodatkowania;
+- listę STOP i REVIEW;
+- wariant pierwotny oraz wariant po korekcie;
+- wynik podatku, zaliczek i nadpłaty albo dopłaty;
+- ocenę pokrycia testami;
+- propozycję dalszych działań.
+
+Każda ważna liczba powinna być możliwa do odtworzenia: źródło → dane wejściowe → funkcja → wynik.
+
+## Status pokrycia przypadku
+
+Każda analiza kończy się jednym statusem:
+
+| Status | Znaczenie |
 |---|---|
-| Programista prowadzący JDG | Przygotowanie danych do pierwszego rozliczenia IP Box |
-| Księgowa lub biuro rachunkowe | Niezależna kontrola ewidencji, alokacji i formularzy |
-| Doradca lub audytor | Odtworzenie sposobu obliczeń i identyfikacja rozbieżności |
-| Osoba z gotowym PIT | Porównanie rozliczenia z dokumentami źródłowymi |
-| Maintainer projektu | Dodawanie kolejnych reguł, lat i przypadków regresyjnych |
+| `COVERED_DIRECTLY` | Istniejący scenariusz regresyjny pokrywa ten sam mechanizm i istotne warunki przypadku. |
+| `COVERED_PARTIALLY` | Część mechanizmów jest testowana, ale brakuje co najmniej jednego istotnego warunku lub ich połączenia. |
+| `NOT_COVERED` | Brakuje reprezentatywnego scenariusza albo przypadek ujawnia potencjalny błąd algorytmu. |
 
-Nie trzeba być programistą. Najprostsza ścieżka nie wymaga terminala ani ręcznego przygotowania YAML-a.
+Status opisuje pokrycie przez testy repozytorium, a nie pewność prawną rozliczenia.
 
-## Szybki start — zwykła rozmowa z AI
+## Gdy przypadek nie jest pokryty
 
-To jest główny sposób użycia projektu.
+Agent powinien przygotować zanonimizowane zgłoszenie GitHub Issue zawierające:
 
-### 1. Przekaż agentowi projekt
+- skrócony opis przypadku;
+- oczekiwane zachowanie;
+- rzeczywiste zachowanie;
+- minimalne dane reprodukcyjne;
+- brakujący scenariusz regresyjny;
+- informację, czy problem dotyczy algorytmu, importu danych czy dokumentacji.
 
-Najwygodniejsza kolejność:
-
-1. **Archiwum ZIP repozytorium** — najlepsze, gdy okno rozmowy przyjmuje archiwa.
-2. **Link do publicznego repozytorium** — gdy agent potrafi otworzyć lub sklonować GitHub.
-3. **Wybrane pliki** — gdy obowiązuje limit rozmiaru:
-   - `README.md`,
-   - `ipbox_algorytm.md`,
-   - katalog `python_helper/`,
-   - `examples/przykladowy_prompt_startowy.md`.
-
-Pełne archiwum zawiera także testy i kasety odpowiedzi modeli. Podczas zwykłego rozliczenia agent powinien skupić się na algorytmie, kodzie Python i dokumentach podatnika.
-
-### 2. Dodaj dokumenty
-
-Prześlij materiały, które posiadasz. Najczęściej są to:
-
-- KPiR albo miesięczne i roczne zestawienia przychodów i kosztów;
-- ewidencja czasu pracy lub dotychczasowa ewidencja IP Box;
-- faktury albo zestawienie faktur;
-- umowy B2B i aneksy dotyczące praw autorskich;
-- interpretacja indywidualna KIS;
-- rozliczenie przygotowane przez księgową;
-- PIT-36L/PIT-36, PIT/IP, PIT/B, PIT/O i UPO;
-- potwierdzenia ZUS, składki zdrowotnej, IKZE, termomodernizacji, strat i zaliczek.
-
-Nie publikuj prywatnych dokumentów w repozytorium. Przekazuj je wyłącznie w prywatnej rozmowie albo trzymaj lokalnie w ignorowanym katalogu `input/`.
-
-### 3. Wklej prompt startowy
+Formularz znajduje się tutaj:
 
 ```text
-Chcę przygotować albo sprawdzić rozliczenie IP Box za rok [ROK].
-
-Przeczytaj README.md i ipbox_algorytm.md. Przeanalizuj załączone dokumenty,
-a do wszystkich krytycznych obliczeń używaj kodu z katalogu python_helper.
-Nie licz podatku w głowie i nie zgaduj brakujących danych.
-
-Najpierw:
-1. zrób listę otrzymanych dokumentów;
-2. wypisz dane odczytane z każdego dokumentu wraz ze stroną, arkuszem lub wierszem;
-3. wskaż braki i zadaj pytania;
-4. pokaż mi dane wejściowe do potwierdzenia;
-5. dopiero potem wykonaj obliczenia.
-
-Na końcu pokaż:
-- przychody i koszty IP oraz NIE-IP;
-- sposób obliczenia W i alokacji kosztów wspólnych;
-- koszty wykluczone z KUP;
-- NEXUS i dowody jego składników;
-- podatek, ulgi, nadpłatę albo dopłatę;
-- porównanie z KPiR, ewidencją i PIT;
-- błędy, STOP-y, REVIEW i potrzebne korekty;
-- listę rzeczy do potwierdzenia z księgową;
-- status COVERED_DIRECTLY, COVERED_PARTIALLY albo NOT_COVERED wraz z dowodami.
-
-Nie zmieniaj kodu, chyba że wyraźnie o to poproszę.
+https://github.com/paulomac1000/ipbox-wizard-ai/issues/new?template=new-tax-case.yml
 ```
 
-Więcej wariantów znajduje się w [`examples/przykladowy_prompt_startowy.md`](examples/przykladowy_prompt_startowy.md).
-
-## Jak wygląda dobra sesja
-
-```text
-inwentaryzacja dokumentów
-        ↓
-odczyt PDF/XLSX/CSV
-        ↓
-tabela danych wraz ze źródłami
-        ↓
-pytania i potwierdzenie użytkownika
-        ↓
-obliczenia w Pythonie
-        ↓
-uzgodnienie z KPiR, ewidencją i PIT
-        ↓
-raport, różnice, korekty i zakres testów
-```
-
-Użytkownik nie powinien ręcznie przepisywać dokumentów do YAML-a. Znormalizowane dane są wewnętrznym kontraktem silnika i mogą zostać przygotowane przez agenta. Przed finalnym wynikiem agent musi jednak pokazać, co odczytał z dokumentów — poprawny kalkulator nie naprawi błędnej ekstrakcji.
-
-## Co otrzymasz
-
-Dla kompletnych danych projekt potrafi przygotować lub sprawdzić:
-
-- podział przychodów na IP i NIE-IP;
-- miesięczny współczynnik czasu `W` z jawną metodą;
-- klasyfikację kosztów jako IP, NIE, MIX albo WYKLUCZONE;
-- alokację kosztów wspólnych z zachowaniem każdego grosza;
-- koszyki NEXUS A/B/C/D oraz współczynnik NEXUS;
-- dochód objęty stawką 5% i część opodatkowaną zwykłą stawką;
-- kaskadę podatku i ulg dla lat 2019–2026;
-- kontrolę podwójnego odliczenia ZUS i składki zdrowotnej;
-- uzgodnienie KPiR, ewidencji i formularzy PIT;
-- podgląd skutków korekty;
-- listę brakujących dokumentów, dowodów i pytań do księgowej.
-
-Wynik nie jest wyłącznie końcową liczbą. Raport ma pokazać, **skąd pochodzi każda ważna kwota i dlaczego została zaklasyfikowana w określony sposób**.
-
-## Drugi sposób — Codex, Claude Code lub inny agent programistyczny
-
-Ta ścieżka jest wygodna, gdy agent ma terminal, dostęp do całego repozytorium i może sam uruchamiać Python.
-
-1. Otwórz albo sklonuj repozytorium w wybranym narzędziu.
-2. Umieść prywatne dokumenty w katalogu `input/`.
-3. Upewnij się, że `input/` pozostaje ignorowany przez Git.
-4. Poproś agenta o przeczytanie `README.md`, `AGENTS.md` i `ipbox_algorytm.md`.
-5. Napisz wyraźnie, czy chcesz tylko sprawdzić rozliczenie, czy także rozwijać kod.
-
-Gotowy prompt:
-
-```text
-Pracuj na tym repozytorium jako narzędziu do analizy mojego rozliczenia IP Box.
-Przeczytaj README.md, AGENTS.md i ipbox_algorytm.md.
-
-Dokumenty prywatne znajdują się w input/. Nie commituj ich, nie kopiuj do testów
-i nie ujawniaj danych osobowych w logach ani raportach.
-
-Najpierw zinwentaryzuj i odczytaj dokumenty. Potem pokaż wyekstrahowane dane,
-zapytaj o braki i uruchom deterministyczne obliczenia w Pythonie. Porównaj wynik
-z KPiR, ewidencją i PIT. Nie zmieniaj kodu ani nie twórz commitów.
-
-Na końcu podaj COVERED_DIRECTLY, COVERED_PARTIALLY albo NOT_COVERED oraz dowody.
-Jeżeli przypadek nie jest pokryty albo ujawnia możliwy błąd algorytmu, przygotuj
-zanonimizowany minimalny przykład oraz propozycję zgłoszenia GitHub Issue.
-```
-
-Zasady pracy agentów programistycznych opisuje [`AGENTS.md`](AGENTS.md).
+Nie umieszczaj w Issue dokumentów źródłowych ani danych pozwalających zidentyfikować podatnika. Publikacja wymaga wyraźnej zgody użytkownika.
 
 ## Uruchomienie lokalne
 
-Zwykły użytkownik i księgowa mogą korzystać z projektu przez rozmowę z AI bez instalowania czegokolwiek. Poniższa instrukcja jest przydatna dla osób, które chcą odtworzyć testy lokalnie albo pracować z agentem terminalowym.
+Lokalne środowisko jest przydatne do uruchamiania testów, przeglądania kodu i rozwijania algorytmu.
 
-### Wymagania
-
-- Python 3.11, 3.12 albo 3.13;
-- Git lub pobrane archiwum ZIP;
-- terminal: PowerShell, Terminal albo powłoka Linux.
-
-### Windows PowerShell
+### Windows — PowerShell
 
 ```powershell
+git clone https://github.com/paulomac1000/ipbox-wizard-ai.git
+cd ipbox-wizard-ai
 py -3.12 -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
-python -m pip install -r requirements.txt -r requirements-test.txt
-python -m pytest tests/unit -q
+pip install -r requirements.txt -r requirements-test.txt
+pytest -q
 ```
 
-### macOS / Linux
+Gdy PowerShell blokuje aktywację środowiska:
+
+```powershell
+Set-ExecutionPolicy -Scope Process Bypass
+.\.venv\Scripts\Activate.ps1
+```
+
+### macOS i Linux
 
 ```bash
-python3.12 -m venv .venv
+git clone https://github.com/paulomac1000/ipbox-wizard-ai.git
+cd ipbox-wizard-ai
+python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip
-python -m pip install -r requirements.txt -r requirements-test.txt
-python -m pytest tests/unit -q
+pip install -r requirements.txt -r requirements-test.txt
+pytest -q
 ```
 
-Repozytorium nie ma jeszcze samodzielnej aplikacji okienkowej ani uniwersalnego importera każdego PDF/XLSX. W lokalnym użyciu rolę operatora pełni Codex, Claude Code lub inny agent z dostępem do plików i Pythona.
+### Pełna bramka jakości
 
-## Jak działa silnik
-
-```text
-Dokumenty użytkownika
-        ↓
-Agent: odczyt, pytania, źródła i wyjaśnienia
-        ↓
-Znormalizowane dane robocze
-        ↓
-Python: W, przychód, koszty, MIX, NEXUS, ulgi i podatek
-        ↓
-Kontrole spójności oraz STOP / REVIEW
-        ↓
-Raport dla użytkownika i księgowej
+```bash
+ruff format --check .
+ruff check .
+python -m compileall -q python_helper tests scripts
+pytest tests/unit --cov=python_helper --cov-report=term-missing --cov-fail-under=90
+pytest -q
+bash scripts/verify_all_models.sh
 ```
 
-Najważniejsze zasady:
+Nagrywanie nowych kaset LLM jest płatne i wymaga świadomego uruchomienia, klucza API oraz limitów kosztu. Zwykła praca i CI korzystają z odtwarzania offline.
 
-- przychód IP/NIE, `W`, alokacja MIX i NEXUS są odrębnymi decyzjami;
-- `W` nie jest automatycznie kluczem wszystkich kosztów wspólnych;
-- koszt prywatny lub `KUP: NIE` nie trafia ani do IP, ani do NIE-IP;
-- koszt obniżający dochód IP nie musi należeć do NEXUS A/B/C/D;
-- NEXUS wynosi `min(1, ((A+B) × 1,3)/(A+B+C+D))`;
+## Praca z agentem programującym
+
+Dla Codex, Claude Code lub innego agenta lokalnego punktem wejścia jest [`AGENTS.md`](AGENTS.md).
+
+Agent powinien:
+
+1. określić, czy pracuje nad analizą podatkową, czy nad kodem;
+2. przeczytać dokumenty wskazane w `AGENTS.md`;
+3. odtworzyć błąd albo brak scenariuszem;
+4. wprowadzić minimalną zmianę;
+5. uruchomić pełną bramkę jakości;
+6. nie nagrywać płatnych odpowiedzi bez jawnej zgody i limitu;
+7. nie uznawać zmiany za gotową, dopóki pełna macierz offline nie przechodzi.
+
+## Zakres algorytmu
+
+Silnik obejmuje między innymi:
+
+- współczynnik W liczony na podstawie rzeczywistego czasu pracy;
+- rozdzielenie kwalifikowanego i niekwalifikowanego przychodu;
+- koszty IP, MIX, NON i EXCLUDED;
+- miesięczne pule i zaokrąglenia zachowujące sumy groszowe;
+- NEXUS z limitem do `1`;
+- zwykłe opodatkowanie części dochodu IP nieobjętej preferencją;
+- straty i ulgi;
+- składki i kontrolę podwójnego odliczenia;
+- reguły roczne;
+- kody STOP i REVIEW;
+- podgląd korekty bez automatycznego księgowania.
+
+Ważne zasady:
+
+- brak dowodu nie może być zastępowany domysłem;
+- opis kosztu może prowadzić do REVIEW, ale nie powinien automatycznie przesądzać o wyłączeniu;
+- NEXUS wynosi `min(1, ((A+B) × 1.3) / (A+B+C+D))`;
 - część dochodu IP poza NEXUS podlega zwykłemu opodatkowaniu;
 - brak dokumentu, dowodu lub znaczenia pola prowadzi do pytania, STOP-u albo REVIEW;
 - wszystkie ważne kwoty muszą być odtwarzalne ze źródeł.
@@ -240,14 +227,16 @@ Szczegółowy kontrakt znajduje się w [`ipbox_algorytm.md`](ipbox_algorytm.md).
 
 ## Skąd wiadomo, że algorytm działa
 
-Projekt nie opiera zaufania na pojedynczej odpowiedzi modelu ani na jednym przykładowym rozliczeniu. Wydanie 0.2 zostało sprawdzone kilkoma niezależnymi warstwami.
+Projekt nie opiera zaufania na pojedynczej odpowiedzi modelu ani na jednym przykładowym rozliczeniu. Jakość jest sprawdzana kilkoma niezależnymi warstwami.
 
 ### Deterministyczne testy Pythona
 
-- **391 testów jednostkowych** obejmujących matematykę, reguły roczne, walidację, zaokrąglenia i przypadki brzegowe;
+- testy jednostkowe obejmujące matematykę, reguły roczne, walidację, zaokrąglenia i przypadki brzegowe;
 - ponad **90% pokrycia linii** kodu `python_helper`;
 - CI na Pythonie **3.11, 3.12 i 3.13**;
 - testy regresyjne zbudowane z abstrakcyjnych, zanonimizowanych przypadków odpowiadających realnym problemom rozliczeniowym.
+
+Dokładna bieżąca liczba testów jest raportowana przez CI, aby README nie stawał się źródłem ulotnego licznika.
 
 ### Scenariusze biznesowe
 
@@ -257,97 +246,45 @@ Scenariusz jest twardą granicą jakości: po dodaniu poprawnego testu algorytm 
 
 ### VCR i test przenośności między rodzinami AI
 
-Każdy z 46 scenariuszy został zweryfikowany na siedmiu rodzinach modeli objętych aktualnym wydaniem:
+Każdy z 46 scenariuszy jest odtwarzany dla ośmiu niezależnych rodzin modeli:
 
-- Google Gemini;
-- Anthropic Claude;
-- DeepSeek;
-- MiniMax;
-- Moonshot Kimi;
-- Qwen;
-- Mistral.
-
-Łącznie repozytorium utrzymuje **322 zweryfikowane kasety VCR**. Testy celowo używają mniejszych lub kosztowo oszczędnych modeli reprezentujących każdą rodzinę. Sprawdzają, czy kontrakt jest na tyle jednoznaczny, że różne architektury potrafią zwrócić ten sam ograniczony wynik bez zmiany matematyki ustalonej przez Python.
-
-To jest dowód przenośności protokołu i przewidywalności integracji, a nie obietnica, że każdy model zawsze poprawnie odczyta każdy dokument. Mocniejszy model może mieć większy margines na analizę plików i kontekstu, ale nadal musi korzystać z deterministycznego silnika i tych samych kontroli.
-
-VCR pozwala odtwarzać zaakceptowane odpowiedzi offline i wykrywać zmianę zachowania modelu, promptu, schemy albo algorytmu. Szczegóły znajdują się w [`docs/testing.md`](docs/testing.md) i [`docs/model-diversity-benchmark.md`](docs/model-diversity-benchmark.md).
-
-## Czy mój przypadek jest przetestowany
-
-Na końcu analizy agent powinien podać jeden z trzech statusów:
-
-1. **`COVERED_DIRECTLY`** — pełne potwierdzenie opisane poniżej;
-2. **`COVERED_PARTIALLY`** — część reguł jest chroniona, ale brakuje co najmniej jednego elementu pełnego potwierdzenia;
-3. **`NOT_COVERED`** — repozytorium nie ma bezpośredniego testu dla istotnej części przypadku.
-
-`COVERED_DIRECTLY` wolno zadeklarować wyłącznie wtedy, gdy łącznie:
-
-- istnieje bezpośredni scenariusz biznesowy;
-- scenariusz sprawdza tę samą istotną regułę działania;
-- macierz VCR wszystkich wymaganych rodzin jest kompletna i aktualna;
-- playback przechodzi bez sekretu i bez połączenia z siecią.
-
-Agent powinien wskazać nazwy testów i scenariuszy, sprawdzaną regułę, stan macierzy VCR oraz wynik playbacku. Podobny test bez pełnej bramki oznacza najwyżej `COVERED_PARTIALLY`.
-
-Nowy, poprawnie opisany przypadek pomaga utrzymywać jakość projektu w czasie. Należy go odtworzyć na minimalnych danych syntetycznych i dodać jako test regresyjny.
-
-[**Zgłoś nowy lub nieobsłużony przypadek przez gotowy formularz GitHub Issue**](https://github.com/paulomac1000/ipbox-wizard-ai/issues/new?template=new-tax-case.yml)
-
-Jeżeli agent ma dostęp do GitHuba, może — po Twojej zgodzie — utworzyć zgłoszenie samodzielnie. Jeżeli nie ma dostępu, powinien przygotować opis i podać powyższy link. Zgłoszenie nie może zawierać danych osobowych, nazw kontrahentów, numerów dokumentów ani prywatnych plików.
-
-## Ograniczenia
-
-- Projekt wspiera przygotowanie i kontrolę danych, nie składa formularza do urzędu.
-- Reguły są przypisane do lat 2019–2026; kolejny rok wymaga aktualizacji źródeł i testów.
-- Odczyt surowych dokumentów wykonuje agent, dlatego istotne wartości trzeba potwierdzić przed obliczeniem.
-- Interpretacja indywidualna chroni wyłącznie w zakresie zgodnego stanu faktycznego; algorytm nie zastępuje oceny prawnej.
-- Nietypowy przypadek bez bezpośredniego testu wymaga ostrożności i może ujawnić potrzebę rozwoju algorytmu.
-
-## Mapa repozytorium
-
-| Ścieżka | Rola |
+| Rodzina | Model benchmarkowy |
 |---|---|
-| [`README.md`](README.md) | pierwszy kontakt i sposób użycia |
-| [`ipbox_algorytm.md`](ipbox_algorytm.md) | kontrakt domenowy i kolejność decyzji |
-| [`python_helper/`](python_helper/) | deterministyczne obliczenia i walidacja |
-| [`examples/przykladowy_prompt_startowy.md`](examples/przykladowy_prompt_startowy.md) | gotowe prompty do rozmowy |
-| [`AGENTS.md`](AGENTS.md) | instrukcje dla agentów analizujących i rozwijających projekt |
-| [`tests/unit/`](tests/unit/) | testy matematyki, reguł i regresji |
-| [`tests/llm/scenarios/`](tests/llm/scenarios/) | abstrakcyjne scenariusze biznesowe |
-| [`tests/llm/vcr/`](tests/llm/vcr/) | zweryfikowane odpowiedzi rodzin modeli i playback offline |
-| [`docs/testing.md`](docs/testing.md) | procedura testów i wydania |
-| [`CHANGELOG.md`](CHANGELOG.md) | najważniejsze zmiany między wydaniami |
+| Google | `google/gemini-3-flash-preview` |
+| Anthropic | `anthropic/claude-haiku-4.5` |
+| DeepSeek | `deepseek/deepseek-chat-v3.1` |
+| MiniMax | `minimax/minimax-m2.5` |
+| Moonshot / Kimi | `moonshotai/kimi-k2.5` |
+| Qwen | `qwen/qwen3.5-flash-02-23` |
+| Mistral | `mistralai/mistral-small-24b-instruct-2501` |
+| OpenAI | `openai/gpt-5-mini` |
 
-## Rozwój projektu
+Daje to **368 nagranych kaset VCR** oraz osiem manifestów. Kasety pozwalają uruchomić pełny benchmark offline, bez wysyłania danych do API i bez ponoszenia kolejnego kosztu.
 
-Zmiany w regułach lub matematyce powinny zaczynać się od minimalnego testu odtwarzającego problem. Dopiero potem należy zmienić implementację, scenariusze i dokumentację.
+Macierz nie służy do rankingu modeli. Jej zadaniem jest sprawdzenie, czy instrukcja i kontrakt są wystarczająco jednoznaczne, aby różne rodziny modeli dochodziły do zgodnego, walidowalnego wyniku.
 
-Pełna bramka maintenera:
+## Granice odpowiedzialności
 
-```bash
-ruff format --check .
-ruff check .
-python -m compileall -q python_helper tests scripts
-pytest tests/unit --cov=python_helper --cov-report=term-missing --cov-fail-under=90
-pytest -q
-python scripts/check_cassette_policy.py
-python scripts/vcr_precommit.py --all-models
-python scripts/benchmark_report.py
-unset OPENROUTER_API_KEY
-./scripts/verify_all_models.sh
-```
+Projekt:
 
-Standardowy CI nie wykonuje płatnych zapytań do modeli. Procedurę zmian, VCR i nagrywania opisują [`AGENTS.md`](AGENTS.md) oraz [`docs/testing.md`](docs/testing.md).
+- nie składa deklaracji podatkowej;
+- nie dokonuje automatycznych zapisów w KPiR;
+- nie publikuje zgłoszeń bez zgody użytkownika;
+- nie powinien pracować na niezanonimizowanych danych w testach i repozytorium;
+- nie gwarantuje akceptacji rozliczenia przez organ podatkowy;
+- wymaga ludzkiej weryfikacji dokumentów, założeń i wyniku.
 
-## Prywatność
+## Dokumentacja
 
-- nie commituj KPiR, PIT-ów, faktur, umów, interpretacji ani danych podatnika;
-- przechowuj lokalne dokumenty w ignorowanym katalogu `input/`;
-- realny błąd odtwarzaj syntetycznym przypadkiem;
-- usuń dane osobowe i tajemnice kontrahentów przed publikacją raportu lub Issue;
-- nie umieszczaj sekretów API w zgłoszeniach, logach ani kasetach.
+| Dokument | Zastosowanie |
+|---|---|
+| [`AGENTS.md`](AGENTS.md) | Punkt wejścia dla agentów i zasady pracy w repozytorium. |
+| [`ipbox_algorytm.md`](ipbox_algorytm.md) | Kanoniczny opis algorytmu i bramek decyzyjnych. |
+| [`docs/testing.md`](docs/testing.md) | Testy deterministyczne, VCR, nagrywanie i playback. |
+| [`docs/model-diversity-benchmark.md`](docs/model-diversity-benchmark.md) | Cel i kryteria ośmiorodzinnej macierzy modeli. |
+| [`docs/openai-model-family.md`](docs/openai-model-family.md) | Profil transportowy i zasady GPT-5 Mini. |
+| [`CHANGELOG.md`](CHANGELOG.md) | Najważniejsze zmiany projektu. |
 
 ## Licencja
 
-Projekt jest dostępny na licencji [MIT](LICENSE).
+MIT. Szczegóły w [`LICENSE`](LICENSE).

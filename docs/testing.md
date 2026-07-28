@@ -37,12 +37,14 @@ python scripts/check_cassette_policy.py
 for script in scripts/*.sh; do bash -n "$script"; done
 ```
 
-Stan referencyjny przed końcowym nagraniem:
+Stan referencyjny:
 
 - wszystkie testy jednostkowe PASS; dokładną liczbę raportuje CI;
 - coverage `python_helper` powyżej wymaganego progu 90%;
-- pełny suite: wszystkie bezpłatne testy PASS i 46 kontrolowanych skipów LLM;
-- pusty katalog kaset jest dozwolony lokalnie, ale nie spełnia merge gate.
+- pełny suite: wszystkie bezpłatne testy PASS i kontrolowane skipy LLM;
+- kompletna macierz: 8 rodzin × 46 scenariuszy = 368 kaset i osiem manifestów;
+- każdy model ma 46/46, a pełny playback przechodzi offline;
+- pusty, częściowy albo nieaktualny katalog kaset nie spełnia merge gate.
 
 Standardowy workflow na Pythonie 3.13 dodatkowo uruchamia:
 
@@ -52,7 +54,7 @@ unset OPENROUTER_API_KEY
 ./scripts/verify_all_models.sh
 ```
 
-Dlatego PR z pustą, częściową albo nieaktualną macierzą nie może mieć zielonej bramki wydania.
+PR z pustą, częściową albo nieaktualną macierzą nie może mieć zielonej bramki wydania.
 
 ## 3. Testy semantyczne, które muszą pozostać
 
@@ -71,10 +73,12 @@ Szczególnie chronione regresje:
 - schema odrzuca kod REVIEW w `stops`, kod STOP w `reviews` i duplikaty;
 - dokumentacja kontraktu nie może opisywać starszego protokołu;
 - provider adapter nie mutuje ani nie osłabia lokalnej strict schema;
+- adapter GPT-5 Mini usuwa `uniqueItems` wyłącznie z kopii transportowej, a lokalna schema nadal wymaga unikalności;
 - playback nie wywołuje sieci i odrzuca `finish_reason` inny niż `stop`;
 - live run, playback i pre-commit odrzucają substytucję modelu;
 - pre-commit porównuje zapisane `parsed_response` z ponownym parsowaniem;
 - tryb record nie nadpisuje istniejącej kasety;
+- recorder respektuje `VCR_CASSETTES_ROOT` z procesu i bezpiecznie wczytanego `.env`;
 - miesiące muszą odpowiadać `input.rok`, a termomodernizacja nie przekracza 53 000 zł;
 - jawna semantyka W odróżnia iloczyn warunkowy, rozłączne składniki i sam czas;
 - podwójny procent faktury oraz nieudokumentowana zmiana metody w roku aktywują STOP;
@@ -85,7 +89,11 @@ Szczególnie chronione regresje:
 
 ## 4. Fingerprint i unieważnienie
 
-Fingerprint obejmuje treściowy hash silnika, treściowy hash harnessu VCR, scenariusz oraz pełny request hash. Zmiana któregokolwiek elementu unieważnia nagranie. Nie kopiuj ręcznie odpowiedzi, hashy, fingerprintów, manifestu ani `parsed_response`. Jeżeli zmienia się wyłącznie deterministyczny kod lub metadane, `scripts/refresh_vcr_metadata.py --all-models --write` może ponownie zwalidować istniejące surowe odpowiedzi bez requestów API; każda niezgodna odpowiedź zatrzymuje proces.
+Fingerprint obejmuje treściowy hash silnika, treściowy hash harnessu VCR, scenariusz oraz pełny request hash. Zmiana któregokolwiek elementu unieważnia nagranie.
+
+`tests/llm/models.py` nie należy do `engine_source_hash`, ponieważ profil danego modelu jest już częścią pełnego `request_hash`. Dodanie nowej rodziny nie powinno unieważniać kaset pozostałych modeli. Zmiana parametrów istniejącego modelu nadal zmienia jego request hash i unieważnia jego kasety.
+
+Nie kopiuj ręcznie odpowiedzi, hashy, fingerprintów, manifestu ani `parsed_response`. Jeżeli zmienia się wyłącznie deterministyczny kod lub metadane, `scripts/refresh_vcr_metadata.py --all-models --write` może ponownie zwalidować istniejące surowe odpowiedzi bez requestów API; każda niezgodna odpowiedź zatrzymuje proces.
 
 ## 5. Modele i adaptery transportowe
 
@@ -100,6 +108,7 @@ Wykonywalna lista znajduje się wyłącznie w `tests/llm/models.py`.
 | `moonshotai/kimi-k2.5` | `json_schema` | — |
 | `qwen/qwen3.5-flash-02-23` | `json_schema` | — |
 | `mistralai/mistral-small-24b-instruct-2501` | `json_schema` | — |
+| `openai/gpt-5-mini` | `json_schema` bez `uniqueItems`, `reasoning.effort=minimal`, bez temperatury | endpoint OpenAI odrzuca `uniqueItems` w strict transport; lokalna schema nadal wymaga unikalności |
 
 Adapter zmienia wyłącznie transport. Parser, `DECISION_JSON_SCHEMA`, output schema i evaluator są wspólne dla wszystkich modeli.
 
@@ -116,7 +125,9 @@ unset OPENROUTER_API_KEY
 
 Skrypt zachowuje surowe odpowiedzi, przelicza tożsamość i ponownie wykonuje pełną walidację. Jeżeli choć jedna odpowiedź nie odpowiada aktualnej semantyce, proces zatrzymuje się — wtedy usuń tylko wskazane, unieważnione kasety i nagraj je ponownie. Nie kasuj całej macierzy rutynowo.
 
-Płatne nagranie pełnej lub brakującej części macierzy:
+Przy dodawaniu całkowicie nowego modelu, który nie ma jeszcze katalogu kaset, najpierw nagraj jego brakujące kasety. Dopiero po skompletowaniu wszystkich rodzin uruchom `refresh_vcr_metadata.py --all-models --write`, ponieważ tryb `--all-models` celowo wymaga kompletnej macierzy.
+
+### Lokalne przygotowanie
 
 ```bash
 git switch <working-branch>
@@ -127,32 +138,67 @@ pip install -r requirements.txt -r requirements-test.txt
 
 cp .env.example .env
 chmod 600 .env
-# wpisz OPENROUTER_API_KEY oraz dwa dodatnie limity w .env albo przekaż je przez CLI
-# potwierdzenia nie zapisuj w .env — ustaw je tylko dla świadomie uruchamianego polecenia
+# wpisz OPENROUTER_API_KEY; limity możesz podać przez CLI
+```
+
+Potwierdzenia płatnego przebiegu nie zapisuj w `.env`. Ma być nową, świadomą decyzją dla bieżącego polecenia lub sesji powłoki.
+
+### Nagranie tylko GPT-5 Mini
+
+```bash
 LLM_PAID_RUN_CONFIRMATION=RUN_PAID_BENCHMARK \
-./scripts/record_all_models.sh \
+python scripts/record_model.py \
+  --model openai/gpt-5-mini \
   --max-cost-per-model-usd 5 \
   --max-total-cost-usd 5
 ```
 
-Pojedynczy model lub scenariusz:
+Pojedynczy scenariusz:
 
 ```bash
 LLM_PAID_RUN_CONFIRMATION=RUN_PAID_BENCHMARK \
-python scripts/record_model.py --model google/gemini-3-flash-preview \
-  --max-cost-per-model-usd 5 --max-total-cost-usd 5
-LLM_PAID_RUN_CONFIRMATION=RUN_PAID_BENCHMARK \
 python scripts/record_model.py \
-  --model google/gemini-3-flash-preview \
+  --model openai/gpt-5-mini \
   --scenario 45_multi_ip_two_stage \
-  --max-cost-per-model-usd 5 --max-total-cost-usd 5
+  --max-cost-per-model-usd 5 \
+  --max-total-cost-usd 5
 ```
 
-Skrypty lokalne automatycznie czytają tylko dozwolone ustawienia z `.env`. Plik nie jest wykonywany przez powłokę, nieznane klucze są ignorowane, a jawnie ustawione zmienne procesu mają pierwszeństwo. `.env` pozostaje w `.gitignore`; ustaw prawa `chmod 600`. Potwierdzenie płatnego przebiegu celowo nie jest czytane z `.env`: ma być nową, świadomą decyzją dla bieżącego polecenia lub sesji powłoki. Skrypt nie nadpisuje istniejącej kasety. Przy błędzie transportowym uruchom ponownie dopiero po sprawdzeniu, że plik nie powstał i przyczyna została sklasyfikowana. Odrzucenia trafiają do skonfigurowanego `VCR_REJECTED_ROOT` (domyślnie `/tmp/ipbox_llm_rejected/`) jako osobne, niezmienne pliki dla każdej płatnej próby, a wyniki do `/tmp/ipbox_llm_responses/`. Odpowiedź z naliczonym `usage.cost`, lecz pustą albo odrzuconą treścią, również musi pozostać w tym rejestrze.
+Pełna macierz korzysta z tego samego registry:
+
+```bash
+LLM_PAID_RUN_CONFIRMATION=RUN_PAID_BENCHMARK \
+./scripts/record_all_models.sh \
+  --max-cost-per-model-usd 5 \
+  --max-total-cost-usd 40
+```
+
+Skrypty lokalne automatycznie czytają tylko dozwolone ustawienia z `.env`. Plik nie jest wykonywany przez powłokę, nieznane klucze są ignorowane, a jawnie ustawione zmienne procesu mają pierwszeństwo. `.env` pozostaje w `.gitignore`; ustaw prawa `chmod 600`.
+
+Recorder nie nadpisuje istniejącej kasety. Odrzucenia trafiają do skonfigurowanego `VCR_REJECTED_ROOT` — domyślnie do katalogu tymczasowego rozdzielonego per użytkownik (`ipbox_llm_rejected_<scope>`) — jako osobne, niezmienne pliki dla każdej płatnej próby, a wyniki diagnostyczne do `/tmp/ipbox_llm_responses/`. Odpowiedź z naliczonym `usage.cost`, lecz pustą albo odrzuconą treścią, również musi pozostać w tym rejestrze.
 
 Nie ma `--force`. Nie ponawiaj błędu semantycznego aż do uzyskania „szczęśliwej” odpowiedzi.
 
 ## 7. Playback offline
+
+Dla GPT-5 Mini:
+
+```bash
+unset OPENROUTER_API_KEY
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 \
+LLM_PROVIDER=openrouter \
+LLM_MODEL=openai/gpt-5-mini \
+VCR_MODE=playback \
+python -m pytest tests/llm/test_scenarios.py \
+  --run-llm \
+  --vcr-mode=playback \
+  --llm-model openai/gpt-5-mini \
+  -q
+python scripts/vcr_precommit.py --model openai/gpt-5-mini
+python scripts/benchmark_report.py --model openai/gpt-5-mini
+```
+
+Dla całej macierzy:
 
 ```bash
 python scripts/check_cassette_policy.py
@@ -166,7 +212,7 @@ Playback musi przejść przy nieustawionym sekrecie. Live request w tym trybie j
 
 ## 8. Kryterium zaliczenia
 
-Model zalicza tylko przy 46/46, a cała macierz przy 322/322. Każda kaseta musi:
+Model zalicza tylko przy 46/46, a cała macierz przy 368/368. Każda kaseta musi:
 
 - mieć `finish_reason=stop`;
 - mieć `returned_model` identyczny z modelem żądanym;
@@ -196,13 +242,28 @@ Minimalny ręczny przegląd obejmuje scenariusze 13, 17, 22, 23, 26, 31, 34, 38,
 
 ## 10. Commit i merge gate
 
+Przed commitem sprawdź, że do Git trafiają wyłącznie zaakceptowane kasety oraz manifest:
+
 ```bash
+git status --short
+git diff --stat
+git diff -- tests/llm/vcr/cassettes/openai_gpt_5_mini
+```
+
+Nie commituj `.env`, `/tmp`, raportów lokalnych, odpowiedzi diagnostycznych ani katalogu odrzuceń.
+
+Końcowa bramka:
+
+```bash
+ruff format --check .
+ruff check .
+python -m compileall -q python_helper tests scripts
+pytest tests/unit --cov=python_helper --cov-report=term-missing --cov-fail-under=90
+pytest -q
 ./scripts/verify_all_models.sh
 python scripts/benchmark_report.py
 python scripts/vcr_precommit.py --all-models
 python scripts/check_cassette_policy.py
-git status --short
-git diff --stat
 ```
 
-Nie commituj `/tmp`, raportów lokalnych ani częściowej macierzy. Po wypchnięciu kaset poczekaj na CI Python 3.11–3.13. Job 3.13 musi wykonać raport i pełny playback offline. Dopiero potem można oznaczyć PR jako ready.
+Po wypchnięciu kaset poczekaj na CI Python 3.11–3.13. Job 3.13 musi wykonać raport i pełny playback offline. Dopiero wtedy można oznaczyć PR jako ready.

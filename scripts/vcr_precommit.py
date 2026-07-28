@@ -17,6 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from python_helper.report_metadata import engine_source_hash
+from scripts.vcr_paths import resolve_cassette_root
 from tests.llm.models import BENCHMARK_MODELS
 from tests.llm.oracle import validate_scenario
 from tests.llm.runner import LLMTestRunner
@@ -55,13 +56,18 @@ def cassette_payload_errors(
     return errors
 
 
-def validate_model(model: str) -> list[str]:
+def validate_model(
+    model: str,
+    *,
+    cassette_root: str | Path | None = None,
+) -> list[str]:
+    effective_root = resolve_cassette_root(cassette_root)
     os.environ.update(
         {
             "LLM_PROVIDER": "openrouter",
             "LLM_MODEL": model,
             "VCR_MODE": "playback",
-            "VCR_CASSETTES_ROOT": str(ROOT / "tests/llm/vcr/cassettes"),
+            "VCR_CASSETTES_ROOT": str(effective_root),
         }
     )
     config = VCRConfig()
@@ -143,16 +149,29 @@ def main() -> int:
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("--model")
     group.add_argument("--all-models", action="store_true")
+    parser.add_argument(
+        "--cassette-root",
+        help="Override VCR_CASSETTES_ROOT for this validation run.",
+    )
     args = parser.parse_args()
+    try:
+        cassette_root = resolve_cassette_root(args.cassette_root)
+    except ValueError as exc:
+        parser.error(str(exc))
     models = BENCHMARK_MODELS if args.all_models else (args.model,)
-    errors = [error for model in models for error in validate_model(model)]
+    errors = [
+        error for model in models for error in validate_model(model, cassette_root=cassette_root)
+    ]
     if errors:
         print("VCR validation failed:", file=sys.stderr)
         for error in errors:
             print(f"- {error}", file=sys.stderr)
         return 1
     scenario_count = len(list((ROOT / "tests/llm/scenarios").glob("*.yaml")))
-    print(f"VCR validation passed for {len(models)} model(s), {scenario_count} scenarios each")
+    print(
+        f"VCR validation passed for {len(models)} model(s), "
+        f"{scenario_count} scenarios each from {cassette_root}"
+    )
     return 0
 
 

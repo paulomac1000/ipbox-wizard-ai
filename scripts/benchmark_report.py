@@ -13,6 +13,7 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
+from scripts.vcr_paths import resolve_cassette_root  # noqa: E402
 from scripts.vcr_precommit import validate_model  # noqa: E402
 from tests.llm.models import BENCHMARK_MODELS, get_model_profile, model_slug  # noqa: E402
 from tests.llm.vcr.cassette import CassetteManifest  # noqa: E402
@@ -37,8 +38,13 @@ def scenario_ids_from_yaml() -> set[str]:
     return ids
 
 
-def summarize_model(model: str, scenario_ids: set[str]) -> dict[str, object]:
-    directory = ROOT / "tests/llm/vcr/cassettes" / slug(model)
+def summarize_model(
+    model: str,
+    scenario_ids: set[str],
+    cassette_root: str | Path | None = None,
+) -> dict[str, object]:
+    effective_root = resolve_cassette_root(cassette_root)
+    directory = effective_root / slug(model)
     manifest_path = directory / "_manifest.yaml"
     manifest_errors: list[str] = []
     try:
@@ -51,7 +57,10 @@ def summarize_model(model: str, scenario_ids: set[str]) -> dict[str, object]:
     cassette_ids = {path.stem for path in directory.glob("*.yaml") if path.name != "_manifest.yaml"}
     recorded = scenario_ids & set(entries) & cassette_ids
     cost = sum(entries[scenario_id].cost for scenario_id in recorded)
-    errors = [*manifest_errors, *validate_model(model)]
+    errors = [
+        *manifest_errors,
+        *validate_model(model, cassette_root=effective_root),
+    ]
     return {
         "model": model,
         "recorded": len(recorded),
@@ -68,16 +77,25 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--model", action="append", dest="models")
     parser.add_argument("--output", default="reports/benchmark-summary.json")
+    parser.add_argument(
+        "--cassette-root",
+        help="Override VCR_CASSETTES_ROOT for this report.",
+    )
     args = parser.parse_args()
 
     models = tuple(args.models) if args.models else BENCHMARK_MODELS
     for model in models:
         get_model_profile(model)
+    try:
+        cassette_root = resolve_cassette_root(args.cassette_root)
+    except ValueError as exc:
+        parser.error(str(exc))
 
     scenario_ids = scenario_ids_from_yaml()
-    rows = [summarize_model(model, scenario_ids) for model in models]
+    rows = [summarize_model(model, scenario_ids, cassette_root) for model in models]
     payload = {
         "scenario_count": len(scenario_ids),
+        "cassette_root": str(cassette_root),
         "models": rows,
         "all_complete_and_valid": all(row["complete_and_valid"] for row in rows),
     }

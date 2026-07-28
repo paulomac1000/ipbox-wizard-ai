@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
+
+vcr_cassettes_root="$(python - <<'PY_CASSETTES'
+from scripts.vcr_paths import resolve_cassette_root
+print(resolve_cassette_root())
+PY_CASSETTES
+)"
+export VCR_CASSETTES_ROOT="$vcr_cassettes_root"
 unset OPENROUTER_API_KEY || true
 
 mapfile -t models < <(python - <<'PY_MODELS'

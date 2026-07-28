@@ -2,81 +2,121 @@
 
 ## Cel
 
-Macierz sprawdza, czy mała koperta `status/stops/reviews` jest jednoznaczna dla modeli pochodzących od różnych dostawców i rodzin. Nie prosi modeli o liczenie podatku. Python wyznacza pełną autorytatywną kopertę `expected_decision`, a model ma ją skopiować do czystego JSON.
+Benchmark sprawdza, czy ograniczony kontrakt `status/stops/reviews` jest jednoznaczny dla modeli z różnych rodzin i od różnych dostawców.
 
-Przejście wielu tanich i relatywnie małych modeli jest silniejszym dowodem przenośności niż przejście kilku modeli z jednej lub dwóch rodzin. **Nie jest to jednak gwarancja**, że każdy większy model, przyszła wersja providera lub inny endpoint zawsze zachowa się identycznie. Zmiana modelu, schematu, promptu lub routingu wymaga własnej kasety i playbacku.
+Model nie liczy podatku i nie klasyfikuje reguł samodzielnie. Python wyznacza kompletną kopertę `expected_decision`, a model ma zwrócić jej dokładną reprezentację JSON. Dzięki temu macierz mierzy przenośność protokołu i przewidywalność integracji providera, a nie zdolność modelu do zastępowania silnika podatkowego.
 
-## Kryteria doboru
+Przejście wszystkich modeli nie gwarantuje poprawnego odczytu dowolnego PDF ani poprawności prawnej rozliczenia. Te granice nadal wymagają potwierdzenia danych źródłowych, deterministycznych testów i profesjonalnej oceny podatkowej.
 
-Model trafia do macierzy, gdy na dzień 19 lipca 2026 r.:
-
-1. reprezentuje odrębną rodzinę lub dostawcę;
-2. jest tani w porównaniu z modelami frontier;
-3. ma stabilny, jawny slug OpenRouter;
-4. pozwala wymusić co najmniej obiekt JSON i przechodzi pełną lokalną walidację;
-5. nie jest aliasem routera ani endpointem `:free` o zmiennej dostępności;
-6. wykonuje ten sam kontrakt bez wyjątków scenariuszowych;
-7. provider-specific adapter jest jawny, minimalny i objęty testem regresyjnym.
-
-## Aktualna macierz 7 × 46
+## Aktualna macierz
 
 | Rodzina | Model OpenRouter | Transport |
 |---|---|---|
 | Google Gemini | `google/gemini-3-flash-preview` | strict `json_schema` |
-| Anthropic Claude | `anthropic/claude-haiku-4.5` | `json_schema`; z kopii transportowej usuwane jest nieobsługiwane przez endpoint `uniqueItems` |
+| Anthropic Claude | `anthropic/claude-haiku-4.5` | `json_schema`; `uniqueItems` usuwane wyłącznie z kopii transportowej |
 | DeepSeek | `deepseek/deepseek-chat-v3.1` | strict `json_schema` |
-| MiniMax | `minimax/minimax-m2.5` | `json_object`; pełna schema jest nadal egzekwowana lokalnie |
+| MiniMax | `minimax/minimax-m2.5` | `json_object`; pełna schema egzekwowana lokalnie |
 | Moonshot Kimi | `moonshotai/kimi-k2.5` | strict `json_schema` |
 | Qwen | `qwen/qwen3.5-flash-02-23` | strict `json_schema` |
 | Mistral | `mistralai/mistral-small-24b-instruct-2501` | strict `json_schema` |
+| OpenAI GPT | `openai/gpt-5-mini` | `json_schema`; `uniqueItems` usuwane z kopii transportowej, `reasoning.effort=minimal`, bez temperatury |
 
-Łącznie wydanie wymaga **322 kaset** i siedmiu manifestów. Każdy model musi osiągnąć 46/46. Wynik częściowy jest wyłącznie diagnostyką.
+Bieżąca bramka obejmuje:
+
+- 8 rodzin modeli;
+- 46 scenariuszy na model;
+- 368/368 kaset VCR;
+- 8/8 manifestów;
+- zero braków, osieroconych kaset i błędów integralności;
+- pełny playback offline bez klucza API i bez połączenia z providerem.
+
+Wynik 45/46 albo brak jednego manifestu oznacza diagnostykę, a nie zaliczenie.
+
+## Kryteria przyjęcia modelu
+
+Model może wejść do macierzy, gdy:
+
+1. reprezentuje odrębną rodzinę lub dostawcę;
+2. ma jawny, stabilny identyfikator providera;
+3. jest rozsądny kosztowo względem celu benchmarku;
+4. wykonuje ten sam kontrakt bez wyjątków scenariuszowych;
+5. zwraca co najmniej obiekt JSON, który przechodzi wspólną lokalną walidację;
+6. nie jest aliasem routera ani niestabilnym endpointem `:free`;
+7. każdy wyjątek transportowy jest minimalny, jawny i chroniony testem regresyjnym;
+8. przechodzi komplet 46 kaset, manifest, pre-commit, raport i playback offline.
 
 ## Granica adaptera transportowego
 
-Provider nie jest źródłem kontraktu. Źródłem prawdy pozostają `DECISION_JSON_SCHEMA`, parser i evaluator działające lokalnie.
+Provider nie jest źródłem kontraktu. Źródłem prawdy pozostają lokalne:
 
-- Claude Haiku przez routing Anthropic/Azure/Bedrock odrzucał `uniqueItems` w przekazanym JSON Schema błędem HTTP 400. Adapter usuwa ten jeden keyword rekursywnie wyłącznie z głębokiej kopii wysyłanej do providera. Lokalna schema nadal wymaga unikalnych kodów.
-- MiniMax przez routing DigitalOcean zwracał `content: null` dla `json_schema`. Profil używa więc `json_object`, a pełna schema jest dołączona do instrukcji i bezwarunkowo wykonywana po odpowiedzi.
-- Parser nie usuwa Markdown fences, nie przenosi kodów między kanałami i nie deduplikuje odpowiedzi.
-- Każda odpowiedź nadal musi mieć właściwy model, `finish_reason=stop`, zgodny fingerprint i pełny semantic PASS.
+- `DECISION_JSON_SCHEMA`;
+- parser;
+- oracle;
+- evaluator.
 
-To są ograniczenia adapterów/providerów, a nie zmiany algorytmu podatkowego. Nie wolno rozszerzać ich na inne modele bez odtworzonego błędu transportowego i testu.
+Dopuszczone wyjątki dotyczą wyłącznie transportu:
 
-## Migawka cen OpenRouter
+- **Claude Haiku** i **GPT-5 Mini** nie akceptują `uniqueItems` w transportowym JSON Schema. Keyword jest usuwany rekursywnie tylko z głębokiej kopii wysyłanej do providera. Lokalna schema nadal wymaga unikalnych kodów.
+- **MiniMax** używa `json_object`, ponieważ jego routing zwracał pustą treść dla `json_schema`. Pełna schema nadal jest bezwarunkowo wykonywana po odpowiedzi.
 
-Ceny są informacyjne, za milion tokenów wejścia/wyjścia, według katalogu OpenRouter z 18 lipca 2026 r.; mogą się zmienić bez zmiany kodu:
+Adapter nie może:
 
-| Model | Wejście USD/M | Wyjście USD/M |
-|---|---:|---:|
-| Gemini 3 Flash Preview | 0,50 | 3,00 |
-| GPT-5 Nano | 0,05 | 0,40 |
-| Claude Haiku 4.5 | 1,00 | 5,00 |
-| DeepSeek | 0,21 | 0,79 |
-| MiniMax M2.5 | 0,15 | 0,90 |
-| Kimi K2.5 | 0,375 | 2,025 |
-| GLM 4.7 Flash | 0,06 | 0,40 |
-| Qwen 3.5 Flash | 0,065 | 0,26 |
-| Mistral Small 24B | 0,20 | 0,30 |
+- zmieniać znaczenia STOP lub REVIEW;
+- przenosić kodów między kanałami;
+- deduplikować wyniku;
+- usuwać Markdown fences;
+- naprawiać brakujących pól;
+- akceptować innego `returned_model`;
+- omijać `finish_reason=stop`.
 
-GPT-5 Nano i GLM pozostają w tabeli historycznej ceny, ale nie należą do wykonywalnej macierzy. Jedynym źródłem listy modeli jest `tests/llm/models.py`.
+## Tożsamość kasety
 
-Krótki prompt i odpowiedź utrzymują realny koszt macierzy na niskim poziomie, lecz źródłem prawdy jest koszt zapisany w kasetach i raporcie po nagraniu.
+`tests/llm/models.py` zawiera profile modeli, ale nie jest częścią `engine_source_hash` silnika podatkowego. Dodanie nowej rodziny nie powinno unieważniać kaset innych modeli.
 
-## Wnioski z kolejnych macierzy
+Tożsamość konkretnego wywołania chroni `request_hash`, który obejmuje między innymi:
 
-1. Pierwsza macierz pełnego raportu wykazała wymyślone kursy, klasyfikacje i TEST-y. Krytyczne obliczenia przeniesiono do Pythona.
-2. Macierz 3 × 36 pozornie miała 108/108, ale wszystkie odpowiedzi Claude zawierały Markdown fences naprawiane przez parser. Naprawę usunięto i kasety unieważniono.
-3. Protokół listy aktywnych reguł usunął nieaktywne fakty, lecz nadal wymagał klasyfikacji kodów do kanałów. MiniMax w scenariuszu 51 umieścił `REVIEW_09` w `stops`; podobny błąd wcześniej wykonał GPT-5 Nano. Zastąpiono go pełną kopertą `expected_decision` i oddzielnymi enumami STOP/REVIEW.
-4. Ostatnie odrzucenia Claude i MiniMax nie dotyczyły rozumowania ani podatku. Były ograniczeniami transportu opisanymi powyżej.
+- model;
+- prompt;
+- schema transportową;
+- reasoning;
+- temperaturę;
+- limit tokenów;
+- pozostałe parametry requestu.
 
-Sama liczba „46/46” nie wystarcza bez audytu surowych odpowiedzi, request hashy, manifestów, fingerprintów, provider adapterów i zasad parsera.
+Zmiana profilu danego modelu zmienia `request_hash` i blokuje ponowne użycie starej kasety. Osobny test regresyjny potwierdza tę granicę dla GPT-5 Mini.
 
-## Źródła migawki modeli
+Formularz `workflow_dispatch` w `.github/workflows/llm-benchmark.yml` wymaga statycznej listy wyboru. Test `test_paid_workflow_model_allowlist_matches_canonical_registry` pilnuje, aby ta lista była identyczna i w tej samej kolejności co `BENCHMARK_MODELS`.
 
-- katalog OpenRouter i strona Gemini 3 Flash Preview;
-- strony modelowe GPT-5 Nano i Claude Haiku 4.5;
-- strony modelowe DeepSeek, MiniMax M2.5, Kimi K2.5 i GLM 4.7 Flash;
-- strony modelowe Qwen 3.5 Flash i Ministral 3B.
+## Jedno drzewo kaset
 
-Przed kolejnym nagraniem należy sprawdzić, czy slugi, ceny i obsługiwane parametry nadal są aktualne. Kod celowo nie wybiera modelu automatycznie na podstawie ceny, aby zmiana katalogu nie modyfikowała bramki bez review.
+`VCR_CASSETTES_ROOT` może wskazywać katalog domyślny w repozytorium albo jawnie wybrane drzewo robocze. Ścieżka jest wczytywana z procesu lub dozwolonego `.env`, sprawdzana jako niepusta i normalizowana do postaci absolutnej przed przekroczeniem granicy `cwd` lub subprocessu.
+
+Recorder, odświeżanie metadanych, pre-commit, raport, polityka kaset oraz pełny playback muszą używać dokładnie tego samego drzewa. Żadne narzędzie następcze nie może po nagraniu do katalogu niestandardowego bez ostrzeżenia wrócić do kaset commitowanych w repozytorium. Narzędzia Python przyjmują także jawne `--cassette-root`, a skrypty macierzy eksportują jedną rozwiązaną wartość dla całego przebiegu.
+
+`VCR_REJECTED_ROOT` podlega tej samej walidacji i normalizacji, aby skaner kosztów obejmował wszystkie naliczone, także odrzucone próby. Domyślny katalog tymczasowy jest rozdzielony per użytkownik, aby nie używać wspólnej przewidywalnej lokalizacji.
+
+## Najważniejsze wnioski z regresji
+
+Historia macierzy ujawniła problemy architektoniczne, których nie powinno się ponownie wprowadzać:
+
+1. Model nie może obliczać kursów, NEXUS, klasyfikacji ani TEST 1–9 — krytyczne decyzje należą do Pythona.
+2. Parser nie może naprawiać odpowiedzi, ponieważ pozorne 46/46 może ukrywać niespełniony kontrakt.
+3. Model nie powinien ponownie przypisywać kodów do STOP i REVIEW. Scenariusz 51 ujawnił tę zbędną transformację; obecny protokół przekazuje gotową `expected_decision`.
+4. Błąd transportowy providera nie jest powodem do osłabienia lokalnej schemy ani evaluatora.
+5. Sama liczba kaset nie wystarcza bez zgodnych manifestów, fingerprintów, request hashy i playbacku bez sieci.
+
+Syntetyczne scenariusze regresyjne są źródłem prawdy dla tych przypadków. Repozytorium nie przechowuje dokumentów ani danych rzeczywistych podatników.
+
+## Zmiana lub dodanie modelu
+
+1. Dodaj profil bezpośrednio do `MODEL_PROFILES`.
+2. Zaktualizuj statyczną allowlistę workflow; test spójności musi przejść.
+3. Dodaj test profilu, payloadu i granicy `request_hash`.
+4. Użyj standardowego `scripts/record_model.py`; nie twórz osobnego wrappera.
+5. Nagraj 46 kaset i sprawdź odrzucone próby oraz koszt.
+6. Uruchom pre-commit i raport pojedynczego modelu.
+7. Uruchom formatowanie, lint, kompilację oraz testy z pokryciem.
+8. Uruchom politykę kaset i playback całej macierzy bez sekretu.
+9. Dopiero po pełnym wyniku zaktualizuj dokumentację i deklarację pokrycia.
+
+Procedurę operacyjną opisują [`docs/testing.md`](testing.md) oraz [`docs/openai-model-family.md`](openai-model-family.md).

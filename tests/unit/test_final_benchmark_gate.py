@@ -1,4 +1,4 @@
-"""Regression tests for the final seven-family cassette gate."""
+"""Regression tests for the final eight-family cassette gate."""
 
 from __future__ import annotations
 
@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 
 import pytest
+import yaml
 
 from tests.llm.models import BENCHMARK_MODELS, MODEL_PROFILES, ModelProfile
 from tests.llm.output_schema import DECISION_JSON_SCHEMA
@@ -14,21 +15,110 @@ from tests.llm.runner import LLMTestRunner
 ROOT = Path(__file__).resolve().parents[2]
 
 
-def test_release_gate_contains_exactly_seven_distinct_model_families() -> None:
-    assert len(BENCHMARK_MODELS) == 7
-    assert len({MODEL_PROFILES[model].family for model in BENCHMARK_MODELS}) == 7
+def _paid_workflow() -> dict:
+    workflow_path = ROOT / ".github/workflows/llm-benchmark.yml"
+    return yaml.safe_load(workflow_path.read_text(encoding="utf-8"))
+
+
+def test_release_gate_contains_exactly_eight_distinct_model_families() -> None:
+    assert len(BENCHMARK_MODELS) == 8
+    assert len({MODEL_PROFILES[model].family for model in BENCHMARK_MODELS}) == 8
+    assert "openai/gpt-5-mini" in BENCHMARK_MODELS
     assert "openai/gpt-5-nano" not in MODEL_PROFILES
     assert "z-ai/glm-4.7-flash" not in MODEL_PROFILES
+
+
+def test_paid_workflow_model_allowlist_matches_canonical_registry() -> None:
+    workflow = _paid_workflow()
+
+    # PyYAML 1.1 may parse the plain scalar `on` as the boolean True.
+    trigger = workflow.get("on", workflow.get(True))
+    options = trigger["workflow_dispatch"]["inputs"]["model"]["options"]
+
+    assert options == ["all", *BENCHMARK_MODELS]
+
+
+def test_paid_workflow_initializes_exactly_one_rejected_root_at_runtime() -> None:
+    workflow = _paid_workflow()
+    job = workflow["jobs"]["benchmark"]
+    run_scripts = [step.get("run", "") for step in job["steps"]]
+
+    assert "VCR_REJECTED_ROOT" not in job["env"]
+
+    expected_assignment = "".join(
+        ("rejected_root=", '"$RUNNER_TEMP/', 'ipbox_llm_rejected_${GITHUB_RUN_ID}"')
+    )
+    expected_export = " ".join(
+        ("printf", "'VCR_REJECTED_ROOT=%s\\n'", '"$rejected_root"', ">>", '"$GITHUB_ENV"')
+    )
+    assignment_count = sum(script.count(expected_assignment) for script in run_scripts)
+    rejected_root_exports = [
+        line.strip()
+        for script in run_scripts
+        for line in script.splitlines()
+        if "VCR_REJECTED_ROOT=" in line
+    ]
+
+    assert assignment_count == 1
+    assert rejected_root_exports == [expected_export]
+
+
+def test_all_model_workflow_generates_one_report_before_artifact_upload() -> None:
+    workflow = _paid_workflow()
+    steps = workflow["jobs"]["benchmark"]["steps"]
+    record_step = next(step for step in steps if step.get("name") == "Record cassettes")
+    offline_step = next(
+        step for step in steps if step.get("name") == "Offline verification (no API key)"
+    )
+    final_step = next(
+        step for step in steps if step.get("name") == "Require a complete matrix for all-model runs"
+    )
+
+    matrix_script = (ROOT / "scripts/record_all_models.sh").read_text(encoding="utf-8")
+    assert matrix_script.count("python scripts/benchmark_report.py") == 1
+    assert "trap generate_benchmark_report EXIT" in matrix_script
+    assert "original_status=$?" in matrix_script
+    assert 'exit "$original_status"' in matrix_script
+    assert 'exit "$report_status"' in matrix_script
+
+    record_run = record_step["run"]
+    assert record_run.count("./scripts/record_all_models.sh") == 1
+
+    offline_run = offline_step["run"]
+    all_model_branch, single_model_branch = offline_run.split("else", maxsplit=1)
+    single_model_report = 'python scripts/benchmark_report.py --model "$BENCHMARK_MODEL"'
+    assert "benchmark_report.py" not in all_model_branch
+    assert single_model_branch.count(single_model_report) == 1
+
+    direct_workflow_report_count = sum(
+        step.get("run", "").count("python scripts/benchmark_report.py") for step in steps
+    )
+    assert direct_workflow_report_count == 1
+
+    upload_index = next(
+        index
+        for index, step in enumerate(steps)
+        if step.get("name") == "Upload cassette candidates and reports"
+    )
+    assert steps.index(record_step) < upload_index
+
+    assert final_step is steps[-1]
+    assert final_step["run"].count("python scripts/check_cassette_policy.py") == 1
+    assert "benchmark_report.py" not in final_step["run"]
 
 
 def test_provider_transport_profiles_are_explicit_and_validated() -> None:
     claude = MODEL_PROFILES["anthropic/claude-haiku-4.5"]
     minimax = MODEL_PROFILES["minimax/minimax-m2.5"]
+    openai = MODEL_PROFILES["openai/gpt-5-mini"]
 
     assert claude.response_format_type == "json_schema"
     assert claude.strip_unique_items_for_transport is True
     assert minimax.response_format_type == "json_object"
     assert minimax.strip_unique_items_for_transport is False
+    assert openai.response_format_type == "json_schema"
+    assert openai.reasoning == {"effort": "minimal"}
+    assert openai.temperature is None
 
     with pytest.raises(ValueError, match="response_format_type"):
         ModelProfile(model_id="x", label="x", family="x", response_format_type="invalid")

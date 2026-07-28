@@ -6,6 +6,8 @@ from enum import Enum
 from os import environ
 from pathlib import Path
 
+from scripts.vcr_paths import resolve_cassette_root, resolve_rejected_root
+
 from ..models import DEFAULT_MODEL, get_model_profile, model_slug
 
 
@@ -23,13 +25,8 @@ class VCRConfig:
             raise ValueError("Only OpenRouter is supported by the benchmark harness")
         self.model = environ.get("LLM_MODEL", DEFAULT_MODEL)
         self.profile = get_model_profile(self.model)
-        self.cassettes_root = Path(
-            environ.get(
-                "VCR_CASSETTES_ROOT",
-                str(Path(__file__).parent / "cassettes"),
-            )
-        )
-        self.rejected_root = Path(environ.get("VCR_REJECTED_ROOT", "/tmp/ipbox_llm_rejected"))
+        self.cassettes_root = resolve_cassette_root(environ=environ)
+        self.rejected_root = resolve_rejected_root(environ=environ)
 
     @property
     def model_slug(self) -> str:

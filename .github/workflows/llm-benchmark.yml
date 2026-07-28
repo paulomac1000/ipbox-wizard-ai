@@ -8,7 +8,7 @@ on:
         required: true
         type: string
       model:
-        description: "Benchmark model (or 'all' for the full seven-family matrix)"
+        description: "Benchmark model (or 'all' for the full eight-family matrix)"
         required: true
         type: choice
         default: "all"
@@ -21,6 +21,7 @@ on:
           - "moonshotai/kimi-k2.5"
           - "qwen/qwen3.5-flash-02-23"
           - "mistralai/mistral-small-24b-instruct-2501"
+          - "openai/gpt-5-mini"
       max-cost-per-model-usd:
         description: "Required positive per-model paid-cost guard in USD"
         required: true
@@ -51,12 +52,17 @@ jobs:
       BENCHMARK_MODEL: ${{ inputs.model }}
       MAX_COST_PER_MODEL_USD: ${{ inputs.max-cost-per-model-usd }}
       MAX_TOTAL_COST_USD: ${{ inputs.max-total-cost-usd }}
-      VCR_REJECTED_ROOT: /tmp/ipbox_llm_rejected
 
     steps:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
+
+      - name: Initialize isolated rejected-attempt path
+        run: |
+          set -euo pipefail
+          rejected_root="$RUNNER_TEMP/ipbox_llm_rejected_${GITHUB_RUN_ID}"
+          printf 'VCR_REJECTED_ROOT=%s\n' "$rejected_root" >> "$GITHUB_ENV"
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -143,10 +149,6 @@ jobs:
             VCR_MODE=playback \
             python -m pytest tests/llm/test_scenarios.py --run-llm --vcr-mode=playback -q
             python scripts/vcr_precommit.py --model "$BENCHMARK_MODEL"
-          fi
-          if [ "$BENCHMARK_MODEL" = "all" ]; then
-            python scripts/benchmark_report.py
-          else
             python scripts/benchmark_report.py --model "$BENCHMARK_MODEL"
           fi
 
@@ -174,4 +176,3 @@ jobs:
         run: |
           set -euo pipefail
           python scripts/check_cassette_policy.py
-          python scripts/benchmark_report.py

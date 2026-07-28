@@ -4,14 +4,28 @@ import argparse
 import json
 import os
 import subprocess
+import tempfile
 from pathlib import Path
 from typing import ClassVar
 
 import pytest
 
 from python_helper.allocation_precision import audit_revenue_allocation
-from scripts.record_model import PAID_RUN_CONFIRMATION, _require_paid_confirmation
+from scripts import benchmark_report, check_cassette_policy, vcr_precommit
+from scripts.local_env import load_local_env
+from scripts.record_model import (
+    PAID_RUN_CONFIRMATION,
+    _cassette_root,
+    _rejected_root,
+    _require_paid_confirmation,
+)
+from scripts.vcr_paths import (
+    DEFAULT_REJECTED_ROOT,
+    resolve_cassette_root,
+    resolve_storage_path,
+)
 from tests.llm.client import LLMClient
+from tests.llm.models import BENCHMARK_MODELS, model_slug
 from tests.llm.request_spec import LLMRequestSpec
 from tests.llm.vcr.config import VCRConfig
 from tests.llm.vcr.recorder import RecordingRejectedError, VCRRecorder
@@ -71,6 +85,151 @@ def test_record_model_requires_exact_process_confirmation(
     _require_paid_confirmation(argparse.ArgumentParser())
 
 
+def test_record_model_resolves_cassette_root_after_loading_dotenv(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    expected = tmp_path / "custom-cassettes"
+    env_path = tmp_path / ".env"
+    env_path.write_text(f"VCR_CASSETTES_ROOT={expected}\n", encoding="utf-8")
+
+    monkeypatch.delenv("VCR_CASSETTES_ROOT", raising=False)
+    load_local_env(env_path)
+
+    assert _cassette_root() == expected
+
+
+def test_record_model_normalizes_relative_storage_roots_before_subprocess(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("VCR_CASSETTES_ROOT", "relative/cassettes")
+    monkeypatch.setenv("VCR_REJECTED_ROOT", "relative/rejected")
+
+    assert _cassette_root() == (tmp_path / "relative/cassettes").resolve()
+    assert _rejected_root(os.environ) == (tmp_path / "relative/rejected").resolve()
+
+
+def test_follow_up_tools_resolve_the_same_relative_cassette_root(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("VCR_CASSETTES_ROOT", "relative/cassettes")
+
+    expected = (tmp_path / "relative/cassettes").resolve()
+    assert _cassette_root() == expected
+    assert resolve_cassette_root() == expected
+
+
+def test_vcr_precommit_reads_the_configured_cassette_tree(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    cassette_root = (tmp_path / "custom-cassettes").resolve()
+    expected_manifest = cassette_root / model_slug(MODEL) / "_manifest.yaml"
+    observed: dict[str, object] = {}
+
+    monkeypatch.setenv("LLM_PROVIDER", "openrouter")
+    monkeypatch.setenv("LLM_MODEL", MODEL)
+    monkeypatch.setenv("VCR_MODE", "playback")
+    monkeypatch.setenv("VCR_CASSETTES_ROOT", str(cassette_root))
+
+    def fake_manifest_load(path: Path, model: str) -> object:
+        observed.update(path=path, model=model)
+        raise FileNotFoundError("expected test stop")
+
+    monkeypatch.setattr(
+        vcr_precommit.CassetteManifest,
+        "load",
+        staticmethod(fake_manifest_load),
+    )
+
+    errors = vcr_precommit.validate_model(MODEL, cassette_root=cassette_root)
+
+    assert observed == {"path": expected_manifest, "model": MODEL}
+    assert errors and "invalid/missing manifest" in errors[0]
+    assert Path(os.environ["VCR_CASSETTES_ROOT"]) == cassette_root
+
+
+def test_benchmark_report_reads_and_validates_the_same_custom_tree(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    cassette_root = (tmp_path / "custom-cassettes").resolve()
+    expected_manifest = cassette_root / model_slug(MODEL) / "_manifest.yaml"
+    observed: dict[str, object] = {}
+
+    class _Manifest:
+        entries: ClassVar[dict] = {}
+
+    def fake_manifest_load(path: Path, model: str) -> _Manifest:
+        observed.update(path=path, model=model)
+        return _Manifest()
+
+    def fake_validate(model: str, *, cassette_root: Path | None = None) -> list[str]:
+        observed["validated_model"] = model
+        observed["validated_root"] = cassette_root
+        return []
+
+    monkeypatch.setattr(
+        benchmark_report.CassetteManifest,
+        "load",
+        staticmethod(fake_manifest_load),
+    )
+    monkeypatch.setattr(benchmark_report, "validate_model", fake_validate)
+
+    row = benchmark_report.summarize_model(MODEL, set(), cassette_root)
+
+    assert row["complete_and_valid"] is True
+    assert observed == {
+        "path": expected_manifest,
+        "model": MODEL,
+        "validated_model": MODEL,
+        "validated_root": cassette_root,
+    }
+
+
+def test_cassette_policy_propagates_its_effective_root_to_validation(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    cassette_root = (tmp_path / "custom-cassettes").resolve()
+    model_directory = cassette_root / model_slug(MODEL)
+    model_directory.mkdir(parents=True)
+    (model_directory / "scenario.yaml").write_text("meta: {}\n", encoding="utf-8")
+    (model_directory / "_manifest.yaml").write_text("entries: {}\n", encoding="utf-8")
+    observed: list[tuple[str, Path | None]] = []
+
+    def fake_validate(model: str, *, cassette_root: Path | None = None) -> list[str]:
+        observed.append((model, cassette_root))
+        return []
+
+    monkeypatch.setattr(check_cassette_policy, "validate_model", fake_validate)
+
+    assert check_cassette_policy.main(cassette_root) == 0
+    assert observed == [(model, cassette_root) for model in BENCHMARK_MODELS]
+
+
+def test_record_model_rejects_empty_cassette_root(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("VCR_CASSETTES_ROOT", "")
+    with pytest.raises(ValueError, match="must not be empty"):
+        _cassette_root()
+
+
+def test_record_model_rejects_empty_rejected_root(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("VCR_REJECTED_ROOT", "")
+    with pytest.raises(ValueError, match="must not be empty"):
+        _rejected_root(os.environ)
+
+
+def test_storage_resolver_rejects_empty_path_object() -> None:
+    with pytest.raises(ValueError, match="must not be empty"):
+        resolve_storage_path(Path(), name="VCR_CASSETTES_ROOT")
+
+
+def test_default_rejected_root_is_user_scoped_temp_directory() -> None:
+    assert DEFAULT_REJECTED_ROOT.parent == Path(tempfile.gettempdir())
+    assert DEFAULT_REJECTED_ROOT.name.startswith("ipbox_llm_rejected_")
+    assert DEFAULT_REJECTED_ROOT.name != "ipbox_llm_rejected"
+    assert _rejected_root({}) == DEFAULT_REJECTED_ROOT.resolve(strict=False)
+
+
 class _Response:
     headers: ClassVar[dict[str, str]] = {"x-request-id": "req-billed-empty"}
 
@@ -104,7 +263,10 @@ def test_billed_empty_response_is_preserved_as_rejected_attempt(
 ) -> None:
     monkeypatch.setenv("OPENROUTER_API_KEY", "test-key")
     monkeypatch.setenv("LLM_PROVIDER", "openrouter")
-    monkeypatch.setattr("tests.llm.client.requests.post", lambda *args, **kwargs: _Response())
+    monkeypatch.setattr(
+        "tests.llm.client.requests.post",
+        lambda *args, **kwargs: _Response(),
+    )
 
     billed = LLMClient().call({"model": MODEL})
     assert billed.content == ""
