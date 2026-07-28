@@ -64,14 +64,19 @@ def test_paid_workflow_initializes_exactly_one_rejected_root_at_runtime() -> Non
     initialization_run: str | None = None
     record_index: int | None = None
     consumer_indices: list[int] = []
+    runtime_fields = ("run", "env", "if", "with")
 
     for index, step in enumerate(steps):
         name = step.get("name")
         run_script = step.get("run", "")
+        uses_rejected_root = any(
+            "VCR_REJECTED_ROOT" in str(step.get(field, ""))
+            for field in runtime_fields
+        )
         if name == "Initialize isolated rejected-attempt path":
             initialization_index = index
             initialization_run = run_script
-        elif "VCR_REJECTED_ROOT" in run_script:
+        elif uses_rejected_root:
             consumer_indices.append(index)
         if name == "Record cassettes":
             record_index = index
