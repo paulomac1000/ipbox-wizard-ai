@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 
 import pytest
+import yaml
 
 from tests.llm.models import BENCHMARK_MODELS, MODEL_PROFILES, ModelProfile
 from tests.llm.output_schema import DECISION_JSON_SCHEMA
@@ -20,6 +21,17 @@ def test_release_gate_contains_exactly_eight_distinct_model_families() -> None:
     assert "openai/gpt-5-mini" in BENCHMARK_MODELS
     assert "openai/gpt-5-nano" not in MODEL_PROFILES
     assert "z-ai/glm-4.7-flash" not in MODEL_PROFILES
+
+
+def test_paid_workflow_model_allowlist_matches_canonical_registry() -> None:
+    workflow_path = ROOT / ".github/workflows/llm-benchmark.yml"
+    workflow = yaml.safe_load(workflow_path.read_text(encoding="utf-8"))
+
+    # PyYAML 1.1 may parse the plain scalar `on` as the boolean True.
+    trigger = workflow.get("on", workflow.get(True))
+    options = trigger["workflow_dispatch"]["inputs"]["model"]["options"]
+
+    assert options == ["all", *BENCHMARK_MODELS]
 
 
 def test_provider_transport_profiles_are_explicit_and_validated() -> None:
