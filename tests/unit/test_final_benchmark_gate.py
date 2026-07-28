@@ -15,6 +15,11 @@ from tests.llm.runner import LLMTestRunner
 ROOT = Path(__file__).resolve().parents[2]
 
 
+def _paid_workflow() -> dict:
+    workflow_path = ROOT / ".github/workflows/llm-benchmark.yml"
+    return yaml.safe_load(workflow_path.read_text(encoding="utf-8"))
+
+
 def test_release_gate_contains_exactly_eight_distinct_model_families() -> None:
     assert len(BENCHMARK_MODELS) == 8
     assert len({MODEL_PROFILES[model].family for model in BENCHMARK_MODELS}) == 8
@@ -24,14 +29,43 @@ def test_release_gate_contains_exactly_eight_distinct_model_families() -> None:
 
 
 def test_paid_workflow_model_allowlist_matches_canonical_registry() -> None:
-    workflow_path = ROOT / ".github/workflows/llm-benchmark.yml"
-    workflow = yaml.safe_load(workflow_path.read_text(encoding="utf-8"))
+    workflow = _paid_workflow()
 
     # PyYAML 1.1 may parse the plain scalar `on` as the boolean True.
     trigger = workflow.get("on", workflow.get(True))
     options = trigger["workflow_dispatch"]["inputs"]["model"]["options"]
 
     assert options == ["all", *BENCHMARK_MODELS]
+
+
+def test_paid_workflow_initializes_rejected_root_at_runtime() -> None:
+    workflow = _paid_workflow()
+    job = workflow["jobs"]["benchmark"]
+
+    assert "VCR_REJECTED_ROOT" not in job["env"]
+    init_step = next(
+        step
+        for step in job["steps"]
+        if step.get("name") == "Initialize isolated rejected-attempt path"
+    )
+    script = init_step["run"]
+    assert "$RUNNER_TEMP" in script
+    assert "${GITHUB_RUN_ID}" in script
+    assert "VCR_REJECTED_ROOT" in script
+    assert "$GITHUB_ENV" in script
+
+
+def test_paid_workflow_generates_benchmark_report_only_before_artifact_upload() -> None:
+    workflow = _paid_workflow()
+    steps = workflow["jobs"]["benchmark"]["steps"]
+    offline_step = next(step for step in steps if step.get("name") == "Offline verification (no API key)")
+    final_step = next(
+        step for step in steps if step.get("name") == "Require a complete matrix for all-model runs"
+    )
+
+    assert "python scripts/benchmark_report.py" in offline_step["run"]
+    assert "python scripts/benchmark_report.py" not in final_step["run"]
+    assert "python scripts/check_cassette_policy.py" in final_step["run"]
 
 
 def test_provider_transport_profiles_are_explicit_and_validated() -> None:
