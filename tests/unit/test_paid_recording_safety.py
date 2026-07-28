@@ -288,9 +288,7 @@ def test_billed_empty_response_is_preserved_as_rejected_attempt(
             validate_response=json.loads,
         )
 
-    files = list(
-        (recorder.config.rejected_root / recorder.config.model_slug).glob("*.json")
-    )
+    files = list((recorder.config.rejected_root / recorder.config.model_slug).glob("*.json"))
     assert len(files) == 1
     payload = json.loads(files[0].read_text(encoding="utf-8"))
     assert payload["metadata"]["cost"] == pytest.approx(0.12)
