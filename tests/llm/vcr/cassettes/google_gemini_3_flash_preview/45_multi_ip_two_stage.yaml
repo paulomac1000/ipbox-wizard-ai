@@ -4,7 +4,7 @@ meta:
   provider: openrouter
   requested_model: google/gemini-3-flash-preview
   returned_model: google/gemini-3-flash-preview
-  fingerprint: canonical-source_6af62ae096f8fc3ba82771305c81028ffc8023f21ee7c94b667781ccd715cfaf
+  fingerprint: canonical-source_53c93463d820d775bb1a4cf086427773ba1f509529ada1a2841c622f3dc6d83d
   request_hash: 4f5296a2069b955b3ee5759d037f4b5f5b52009f0e9e40ccf0f631f529a765f9
   recorded_at: '2026-07-25T23:22:36.377425+00:00'
   request_id: gen-1785021754-HOG9B7qjarvrzQxuOjZM

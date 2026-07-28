@@ -4,7 +4,7 @@ meta:
   provider: openrouter
   requested_model: mistralai/mistral-small-24b-instruct-2501
   returned_model: mistralai/mistral-small-24b-instruct-2501
-  fingerprint: canonical-source_2c2aa918c59d8fec6c72091382c5f894a1fcfeb2a4d09f552769ce48041da60a
+  fingerprint: canonical-source_439f6edd1a16d8f6aebadd0b002151d031c17709adce534ff51d07b0333b0d28
   request_hash: 489520dcb9aff9332023e2a779a50ee446d8457866b80c63123fb2f84bf48dba
   recorded_at: '2026-07-26T00:04:00.209586+00:00'
   request_id: gen-1785024239-SbuFn9wp3BNo77NqsyZM

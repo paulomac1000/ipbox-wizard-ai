@@ -4,7 +4,7 @@ meta:
   provider: openrouter
   requested_model: openai/gpt-5-mini
   returned_model: openai/gpt-5-mini
-  fingerprint: canonical-source_55ba1e44b3961b55630dd64746c43377f8d7b2a15bf3929ca42382e503093fd5
+  fingerprint: canonical-source_9d5696d044ae3683f44515822298a292e5ef66159dab990fb1f43eebd7762555
   request_hash: 66c9d4ec9852f033dcd2597110a911dfa4b2ddd09b35e8e5231e88520a1faad5
   recorded_at: '2026-07-27T22:31:40.340050+00:00'
   request_id: gen-1785191497-uIqjutdY8Zfyh2zo8xjt

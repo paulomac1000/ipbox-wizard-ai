@@ -1,9 +1,9 @@
 model: openai/gpt-5-mini
-generated_at: '2026-07-28T09:40:11.005714+00:00'
+generated_at: '2026-07-28T18:24:47.205234+00:00'
 entries:
   01_basic_linear:
     file: 01_basic_linear.yaml
-    fingerprint: canonical-source_22ad7bd4206bdcd2e640c93758dc5038db4f9ec5da7d2058e27941be32baec7e
+    fingerprint: canonical-source_78d763ad92dfa303e150c13c1064728a92050e4b8844bef0b60645e34fdec8d4
     request_hash: 0a782e202a56644bb74f4bee51b58a542d1f16530972778780e2a8e02f95b9a1
     engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
     recorded_at: '2026-07-27T22:29:24.795159+00:00'
@@ -11,7 +11,7 @@ entries:
     cost: 0.00019025
   02_basic_scale_single_client:
     file: 02_basic_scale_single_client.yaml
-    fingerprint: canonical-source_3aa9b112d726b994c57446d2efcb25297a8140dff94c3c89326d586fd213ea39
+    fingerprint: canonical-source_8ef8580e85db42556601d07d106a6ea5875be563afd04190e1a44103d60082c7
     request_hash: 9636c9a4e07343e193d1255beabc672962cbf1f9f955fe5e52025e28842a2160
     engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
     recorded_at: '2026-07-27T22:29:26.755151+00:00'
@@ -19,7 +19,7 @@ entries:
     cost: 0.0002015
   03_fx_usd_single_client:
     file: 03_fx_usd_single_client.yaml
-    fingerprint: canonical-source_5bd2dcff7eed3df50da4343f5915327189d1f874933aa9ef8bcc64b3087e8130
+    fingerprint: canonical-source_28a020032b8e32a05307dc6fcf07ce543b1d4780817e87478351179d499d7c25
     request_hash: 9636c9a4e07343e193d1255beabc672962cbf1f9f955fe5e52025e28842a2160
     engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
     recorded_at: '2026-07-27T22:29:28.596127+00:00'
@@ -27,7 +27,7 @@ entries:
     cost: 0.0002015
   11_multi_client_mixed_currencies:
     file: 11_multi_client_mixed_currencies.yaml
-    fingerprint: canonical-source_e291b800a5dc8becb08dde9beabf12a23b334156569f8ea724451ee3cc97b91a
+    fingerprint: canonical-source_c431f76c99afb2b02f0132bb37b7b4a7338cc6ffc0ff921da2a9a434936bf5fd
     request_hash: 8cfdcecc57e916762e2a0ee104404096b2ac698a65cbccfb0f733ab46e57e639
     engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
     recorded_at: '2026-07-27T22:29:30.751484+00:00'
@@ -35,7 +35,7 @@ entries:
     cost: 0.00019025
   12_zus_in_pit_path:
     file: 12_zus_in_pit_path.yaml
-    fingerprint: canonical-source_90c8b190ba91ca5f629c7c57286426741887c4ee049306cac62fce8f02bacc9c
+    fingerprint: canonical-source_814844ee4fe2b1ebe82c49ddaac717d51907ec62623e89089124017b69342421
     request_hash: 8cfdcecc57e916762e2a0ee104404096b2ac698a65cbccfb0f733ab46e57e639
     engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
     recorded_at: '2026-07-27T22:29:32.780823+00:00'
@@ -43,7 +43,7 @@ entries:
     cost: 0.00019025
   13_income_from_employment_impact:
     file: 13_income_from_employment_impact.yaml
-    fingerprint: canonical-source_bb410b78ce5e728d70051cd172a12aee624ac8e55eef05e42b7f9eda23efa9ee
+    fingerprint: canonical-source_a1bef1f17e5502300e79c98b43bfc07d9fe3f508e1c08c4e2ca9df5c2f11593c
     request_hash: 8cfdcecc57e916762e2a0ee104404096b2ac698a65cbccfb0f733ab46e57e639
     engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
     recorded_at: '2026-07-27T22:29:34.986966+00:00'
@@ -51,7 +51,7 @@ entries:
     cost: 0.00019025
   14_lump_sum_ineligible_check:
     file: 14_lump_sum_ineligible_check.yaml
-    fingerprint: canonical-source_0a78b0f328ea32266cfba0b4d2d2af9eb398a5a4e7c7a6406d7be5640d7b855f
+    fingerprint: canonical-source_9cb7711c4240fbb85242e4409c43a3b4cb898588d93a6f2ec1d5a1e3a60a4683
     request_hash: 3d4d0a927356db0cf2d38f12edffc76e4f67a0a8030a0bcbc4ccc187d89d3e2c
     engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
     recorded_at: '2026-07-27T22:29:37.317418+00:00'
@@ -59,7 +59,7 @@ entries:
     cost: 0.00019025
   15_vacation_sick_mix:
     file: 15_vacation_sick_mix.yaml
-    fingerprint: canonical-source_d20b665a6404924add0bcc39707f95575f6a5d0e89407c9a7567fd8658a7cf2a
+    fingerprint: canonical-source_ff19ad3617a45f60142b24a1dee7ded1b7b8d8ab68c83dcd4af9af4b395db006
     request_hash: 0a782e202a56644bb74f4bee51b58a542d1f16530972778780e2a8e02f95b9a1
     engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
     recorded_at: '2026-07-27T22:29:40.069853+00:00'
@@ -67,7 +67,7 @@ entries:
     cost: 0.00019025
   16_high_w_review:
     file: 16_high_w_review.yaml
-    fingerprint: canonical-source_ef519a272c2636472969ae0c2e80c754e5b919db56e9522856e24d81c418e057
+    fingerprint: canonical-source_c2cb9f0d3db36804fe079825d8388920d4589291d344fa053830c7102c12567e
     request_hash: 9636c9a4e07343e193d1255beabc672962cbf1f9f955fe5e52025e28842a2160
     engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
     recorded_at: '2026-07-27T22:29:42.365635+00:00'
@@ -75,7 +75,7 @@ entries:
     cost: 0.0002015
   17_low_w_review:
     file: 17_low_w_review.yaml
-    fingerprint: canonical-source_773e13c086c798c6a07435be8a1ab19428c5c820e3968bb57e8254ce944b4f04
+    fingerprint: canonical-source_529983eac2420ab773456f6110989ae8b7a65fdb6bfb5d1e40c3e723fae7642f
     request_hash: e1532eb99f2c5e03f63d61a4ecabf66966e127e3eb98a68d23f7026d926ebed3
     engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
     recorded_at: '2026-07-27T22:29:44.846727+00:00'
@@ -83,7 +83,7 @@ entries:
     cost: 0.0002015
   18_logic_zero_work_hours:
     file: 18_logic_zero_work_hours.yaml
-    fingerprint: canonical-source_0e45aed162df12ee891d8341765f2a536db557ff3965bfe017b37e25b17bf50e
+    fingerprint: canonical-source_d43df2970033975b13f49f8cff423627fcfe8b658dab81e7f85940295bd6b0b6
     request_hash: fe461c8b26d9d86c5f1702049e263df0a3a8d3099f8899533290de384122d164
     engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
     recorded_at: '2026-07-27T22:29:47.265428+00:00'
@@ -91,7 +91,7 @@ entries:
     cost: 0.0002015
   21_monthly_loss_impact:
     file: 21_monthly_loss_impact.yaml
-    fingerprint: canonical-source_ee04a34cebae0d825c4b916aa4c1ad31071d38dd31ee1a4f6caa4917394420e9
+    fingerprint: canonical-source_f9077db2e63113eec66360d93c0ca75612eaa0b540f1990a085b4ae014ecdcea
     request_hash: 9636c9a4e07343e193d1255beabc672962cbf1f9f955fe5e52025e28842a2160
     engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
     recorded_at: '2026-07-27T22:29:49.604351+00:00'
@@ -99,7 +99,7 @@ entries:
     cost: 0.0002015
   22_related_parties_nexus_reduction:
     file: 22_related_parties_nexus_reduction.yaml
-    fingerprint: canonical-source_44d6db1e9ca479b817c84cac1afa623ab52d96ee2973c73485c50fa89897c6da
+    fingerprint: canonical-source_fa48ce08386b6544b611306dd6aacb86b52890b7273e69726e1cd461e0b4271f
     request_hash: 9636c9a4e07343e193d1255beabc672962cbf1f9f955fe5e52025e28842a2160
     engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
     recorded_at: '2026-07-27T22:29:52.688960+00:00'
@@ -107,7 +107,7 @@ entries:
     cost: 0.0002015
   23_loss_carry_forward:
     file: 23_loss_carry_forward.yaml
-    fingerprint: canonical-source_b50964a6f677289a1005b56b63b83acc7ba7f21e64bce33cd62c96d7d3b12ecf
+    fingerprint: canonical-source_29f587b4a9af8561ec17162f0496fdcc174e7fd6cd2e710ac741a47487f0f6fe
     request_hash: 66c9d4ec9852f033dcd2597110a911dfa4b2ddd09b35e8e5231e88520a1faad5
     engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
     recorded_at: '2026-07-27T22:29:54.898484+00:00'
@@ -115,7 +115,7 @@ entries:
     cost: 0.000179
   24_donations_relief:
     file: 24_donations_relief.yaml
-    fingerprint: canonical-source_930b7606a45c2c8681d6845156404a4c6e71438d72a7f600ecec5eec99d85e8c
+    fingerprint: canonical-source_d8cbc5565ebe993b84f414623a7af53d9713ed583a1560b77013ba068604a3c9
     request_hash: 66c9d4ec9852f033dcd2597110a911dfa4b2ddd09b35e8e5231e88520a1faad5
     engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
     recorded_at: '2026-07-27T22:29:57.372005+00:00'
@@ -123,7 +123,7 @@ entries:
     cost: 0.000179
   25_rehab_relief:
     file: 25_rehab_relief.yaml
-    fingerprint: canonical-source_0096d741d126c95f5524a06d84f9211d6e3a9d56d07366dd14a296f0825ac2a9
+    fingerprint: canonical-source_73e9d12453f4547e11efa04da631aab13ca3ad802f4c77d820a42efaf4ddd785
     request_hash: 66c9d4ec9852f033dcd2597110a911dfa4b2ddd09b35e8e5231e88520a1faad5
     engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
     recorded_at: '2026-07-27T22:30:00.481885+00:00'
@@ -131,7 +131,7 @@ entries:
     cost: 0.000179
   26_rd_relief_nexus:
     file: 26_rd_relief_nexus.yaml
-    fingerprint: canonical-source_3ec801e306c1036a0da067fc50c807716e593ebebc3c550d58e2663563daee8e
+    fingerprint: canonical-source_f43339ce1c324effb94a6d1c47f62cabb564a5c150a86872ae866e38cec70e57
     request_hash: 0a782e202a56644bb74f4bee51b58a542d1f16530972778780e2a8e02f95b9a1
     engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
     recorded_at: '2026-07-27T22:30:03.220963+00:00'
@@ -139,7 +139,7 @@ entries:
     cost: 0.00019025
   27_termomodernizacja_full:
     file: 27_termomodernizacja_full.yaml
-    fingerprint: canonical-source_c44c46b6315cd861fc821f6f82b908dd006a4af9e7890aafb3887a65791bf755
+    fingerprint: canonical-source_447961729b04fd82dc44de770edda72f8a048ae4f0bb5395f4a043be8190860b
     request_hash: 0a782e202a56644bb74f4bee51b58a542d1f16530972778780e2a8e02f95b9a1
     engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
     recorded_at: '2026-07-27T22:30:05.684073+00:00'
@@ -147,7 +147,7 @@ entries:
     cost: 0.00019025
   28_edge_multiple_carry-overs:
     file: 28_edge_multiple_carry-overs.yaml
-    fingerprint: canonical-source_206b53dca8093c71e8c594911adf92817489e87b207fd1e50d353db1209451d3
+    fingerprint: canonical-source_25d15476e093665b3566edd19e5edc9943b3ebc9cda3f9a92633d3a9fd26b7f6
     request_hash: 9636c9a4e07343e193d1255beabc672962cbf1f9f955fe5e52025e28842a2160
     engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
     recorded_at: '2026-07-27T22:30:08.299829+00:00'
@@ -155,7 +155,7 @@ entries:
     cost: 0.0002015
   29_edge_related_parties_nexus_0:
     file: 29_edge_related_parties_nexus_0.yaml
-    fingerprint: canonical-source_039071e38c695ec056c808cafd0aa3e6958676f69427838c790564c10dcff9e3
+    fingerprint: canonical-source_4344bc12240dc5cfc234fc2f06bbdcda55a8c906f5808b569f08a18b3e2d98c0
     request_hash: 9636c9a4e07343e193d1255beabc672962cbf1f9f955fe5e52025e28842a2160
     engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
     recorded_at: '2026-07-27T22:30:10.883910+00:00'
@@ -163,7 +163,7 @@ entries:
     cost: 0.0002015
   30_edge_related_parties_nexus_mixed:
     file: 30_edge_related_parties_nexus_mixed.yaml
-    fingerprint: canonical-source_a2dcb3556946c33e02dc5a963bc9c5c0ae9943a40a1e34b4df4ec5c26f88ca7c
+    fingerprint: canonical-source_e5172646d7b0d6d720aa98a86dd44a2835f2a503c6fc307265ee6719c652e14b
     request_hash: 9636c9a4e07343e193d1255beabc672962cbf1f9f955fe5e52025e28842a2160
     engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
     recorded_at: '2026-07-27T22:30:13.548864+00:00'
@@ -171,7 +171,7 @@ entries:
     cost: 0.0002015
   31_zus_double_dip_fail:
     file: 31_zus_double_dip_fail.yaml
-    fingerprint: canonical-source_aed88e83ca341f60d15f0c747f277703b204dc20c843fa4b6dd8fa01c1be2128
+    fingerprint: canonical-source_a9069d6fe19aa1f8ba7be8465b0e4b9d3500e20fa03c781e864fe77a8aca7a1d
     request_hash: 7eacfec56d07488cabc5c29f09b4678703a6e9f348e42893f0c19201bfb88faa
     engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
     recorded_at: '2026-07-27T22:30:16.501610+00:00'
@@ -179,7 +179,7 @@ entries:
     cost: 0.000215
   32_private_costs_ip_fail:
     file: 32_private_costs_ip_fail.yaml
-    fingerprint: canonical-source_c5192194366a6966b90bf69d0c399c721d3ab3cdd8781b2fa7982bd006b7925a
+    fingerprint: canonical-source_c9f26cc0723fad0593362103d0cc3c270b9eaad1d8d6927c9393b87730139edb
     request_hash: 49a4a1ebeab4e807dc380eb5d44e8736e99083fab46335e9e415536b890adf70
     engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
     recorded_at: '2026-07-27T22:30:20.620278+00:00'
@@ -187,7 +187,7 @@ entries:
     cost: 0.0002375
   33_kpir_balance_fail:
     file: 33_kpir_balance_fail.yaml
-    fingerprint: canonical-source_f11870664c9cc12341c226443f315b9fe98b5f736edc58b10e6894bec27ec4a6
+    fingerprint: canonical-source_4376902d5366c815023ab36a1965c3120944cc6a4b816a59193abf394f1f77ad
     request_hash: 9636c9a4e07343e193d1255beabc672962cbf1f9f955fe5e52025e28842a2160
     engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
     recorded_at: '2026-07-27T22:30:23.464004+00:00'
@@ -195,7 +195,7 @@ entries:
     cost: 0.0002015
   34_verify_fixed_asset_threshold_fail:
     file: 34_verify_fixed_asset_threshold_fail.yaml
-    fingerprint: canonical-source_bc87136c0e15d50fd2e49f359d401d5a4eca583807e7aaef92af62d5c607b307
+    fingerprint: canonical-source_c88e3c6bb04b3452468095e4bf458d9316f500b4ea57f2f08d344a49c4d27390
     request_hash: 9636c9a4e07343e193d1255beabc672962cbf1f9f955fe5e52025e28842a2160
     engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
     recorded_at: '2026-07-27T22:30:26.979006+00:00'
@@ -203,7 +203,7 @@ entries:
     cost: 0.0002015
   35_verify_monthly_w_jump_inconsistency:
     file: 35_verify_monthly_w_jump_inconsistency.yaml
-    fingerprint: canonical-source_805853be0f557627dcd041b2573157285fc0e2f7331c37f033a5ae0a2356ff45
+    fingerprint: canonical-source_43118d219ffc6531f27aca8704cf8ebe2ee30585ebacd9e0854cb6ad3e1535bb
     request_hash: 732c083776d6b44d7754455b11160bde2b2406e4e3a99c7c2e4dd558b206fbb3
     engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
     recorded_at: '2026-07-27T22:30:30.021683+00:00'
@@ -211,7 +211,7 @@ entries:
     cost: 0.00021275
   36_verify_negative_income_error:
     file: 36_verify_negative_income_error.yaml
-    fingerprint: canonical-source_c41e7c2952fb1b43ddff35d358985285abcddd2049a57f137c86471b9a10da77
+    fingerprint: canonical-source_30e10c05f3b8a06a9427573c49a124a9da739a845300bd74a10f433a05d7ba74
     request_hash: 9636c9a4e07343e193d1255beabc672962cbf1f9f955fe5e52025e28842a2160
     engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
     recorded_at: '2026-07-27T22:30:32.921677+00:00'
@@ -219,7 +219,7 @@ entries:
     cost: 0.0002015
   37_verify_invalid_tax_form_stop:
     file: 37_verify_invalid_tax_form_stop.yaml
-    fingerprint: canonical-source_50aff9e826bb53d60f1e4fd904239c2c27297cacbe49c77fa4a5b6c1912f609d
+    fingerprint: canonical-source_8285c27c9d23c0967bbe5107d236049d37212f288c8a799351712f1818d8ab3a
     request_hash: 5678db6306d37eb05d03a65090fdf14e300802b5f5222b775898b580d826748e
     engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
     recorded_at: '2026-07-27T22:30:35.910651+00:00'
@@ -227,7 +227,7 @@ entries:
     cost: 0.00021275
   38_verify_missing_kpir_data:
     file: 38_verify_missing_kpir_data.yaml
-    fingerprint: canonical-source_07d232f76e35e26a43a8433fde189afb0f2ed8275fd3afd1eeb9732b614033a7
+    fingerprint: canonical-source_7faa9ac24273beb4c080fde648c59c16cb206ce5376fcb89b9191a05c9e0277c
     request_hash: 2c8a48d145817f72edc79355248fcb047bb6d486fc77012ed72c1fc2896d2fcf
     engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
     recorded_at: '2026-07-27T22:30:39.038677+00:00'
@@ -235,7 +235,7 @@ entries:
     cost: 0.0002015
   39_multi_project_weighted_W:
     file: 39_multi_project_weighted_W.yaml
-    fingerprint: canonical-source_1f12a9a4c0fc845df14d0ca3d06f34953f24dbf19da46575401bc049107d56ff
+    fingerprint: canonical-source_f4132dbc36b5d2869da3269b85fac47288396f79e971f40fb411a8d30fc2fdb0
     request_hash: 979b0c22f089d9ba68dc16d3871057ef4daca52f846b06ef9050505909cdedc1
     engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
     recorded_at: '2026-07-27T22:30:42.282166+00:00'
@@ -243,7 +243,7 @@ entries:
     cost: 0.00019025
   40_mixed_ip_clause:
     file: 40_mixed_ip_clause.yaml
-    fingerprint: canonical-source_f1750a0863933bbf079a99ed907fc196e647a78ff160825c6e5d93fa3ea3b5e7
+    fingerprint: canonical-source_45c09dbe9d91d89258802e085aaf82f200ffd512aca87bef059f72b7c3f6be78
     request_hash: 8cfdcecc57e916762e2a0ee104404096b2ac698a65cbccfb0f733ab46e57e639
     engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
     recorded_at: '2026-07-27T22:30:45.897775+00:00'
@@ -251,7 +251,7 @@ entries:
     cost: 0.00019025
   41_ikze_cascade:
     file: 41_ikze_cascade.yaml
-    fingerprint: canonical-source_bca74580980a4d3a3c63083da5a5a90f9b2a39991ac2770195233c89b135b0ca
+    fingerprint: canonical-source_750afc0660145c6878b6a5aa38e815104ba4dd50c4df89979c6715de83e7d2dc
     request_hash: 0a782e202a56644bb74f4bee51b58a542d1f16530972778780e2a8e02f95b9a1
     engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
     recorded_at: '2026-07-27T22:30:49.372025+00:00'
@@ -259,7 +259,7 @@ entries:
     cost: 0.00019025
   42_stop_08_no_documentation:
     file: 42_stop_08_no_documentation.yaml
-    fingerprint: canonical-source_3240a4eb5b8154ef5469cadad670deec22b4eceaa06283abbaf85b2acdeea5eb
+    fingerprint: canonical-source_c0c3d315a7f7273bf408b3b2568765bb83bcf2e15c2c5bc26b8a2a05bf912213
     request_hash: 2c8a48d145817f72edc79355248fcb047bb6d486fc77012ed72c1fc2896d2fcf
     engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
     recorded_at: '2026-07-27T22:30:52.456805+00:00'
@@ -267,7 +267,7 @@ entries:
     cost: 0.0002015
   43_review_09_single_client_100pct:
     file: 43_review_09_single_client_100pct.yaml
-    fingerprint: canonical-source_e5200e067cdab6f50b87d8eadfeff59d380f63f9e1628a5772923820db8756a7
+    fingerprint: canonical-source_f7d18dbdb85d048f9ae306b964eaaa1c353568fa81d61cd8453adc65e927c89d
     request_hash: 9636c9a4e07343e193d1255beabc672962cbf1f9f955fe5e52025e28842a2160
     engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
     recorded_at: '2026-07-27T22:30:56.153252+00:00'
@@ -275,7 +275,7 @@ entries:
     cost: 0.0002015
   44_mix_revenue_key_kis:
     file: 44_mix_revenue_key_kis.yaml
-    fingerprint: canonical-source_e9556b0d3e905fdcf4c3db8ca6574f8ad54f41cee5158e67c0b4c6f0f3b29843
+    fingerprint: canonical-source_caf74d84a56bcfdb1698e62014aad7c2c98495662a61e6a0003be61123ad541e
     request_hash: 0d815c08b928138d04668715059fc1df1baf0ec8cc78633441fa398ed54f98ad
     engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
     recorded_at: '2026-07-27T22:30:59.523773+00:00'
@@ -283,7 +283,7 @@ entries:
     cost: 0.00021275
   45_multi_ip_two_stage:
     file: 45_multi_ip_two_stage.yaml
-    fingerprint: canonical-source_26cdbf613da0b7bc93ca19493e963a56421be22256be2c4e4fed3d20d130884a
+    fingerprint: canonical-source_a7d4e847e60a33d93afa19905894c65deb0b46b6d49fe2be70d193e9d5600bc1
     request_hash: 75133cdd12cf0b241ed0a4c074762f899ff9ebd2d6e888ff9de488cc98a79204
     engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
     recorded_at: '2026-07-27T22:31:02.777927+00:00'
@@ -291,7 +291,7 @@ entries:
     cost: 0.00021275
   46_historical_2019_health_credit:
     file: 46_historical_2019_health_credit.yaml
-    fingerprint: canonical-source_d419419f1d9690fde77a1827dbe223e86195fe2585e80bebef5e78ce63b33eee
+    fingerprint: canonical-source_76be25e2380ba680675360f8ed0d08454ec2a488fa148a6fcc0fe528ef3d8b54
     request_hash: 0a782e202a56644bb74f4bee51b58a542d1f16530972778780e2a8e02f95b9a1
     engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
     recorded_at: '2026-07-27T22:31:06.045727+00:00'
@@ -299,7 +299,7 @@ entries:
     cost: 0.00019025
   47_historical_2021_br_ipbox_stop:
     file: 47_historical_2021_br_ipbox_stop.yaml
-    fingerprint: canonical-source_e2bef654627d8c5e0df5af2a00cd5fe62f2c22ca3fd776c08b56d9e27ab5407f
+    fingerprint: canonical-source_cf8aa56ac9304e6931e4d4608c3fe0d5bd0a72dc0de914af1c581a53561cbcf1
     request_hash: 30d7d1edfecac945a2d1659f5b6ec1bb5279537f99f6c618c02be34089e690b0
     engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
     recorded_at: '2026-07-27T22:31:09.209625+00:00'
@@ -307,7 +307,7 @@ entries:
     cost: 0.0002015
   48_historical_2024_pit_like_cascade:
     file: 48_historical_2024_pit_like_cascade.yaml
-    fingerprint: canonical-source_a78cc66bd7ce0e84b3c9f5701866f11660879da55b63333d4a70b852b4c8ef20
+    fingerprint: canonical-source_da266956e97896052295d6eb4cd9ca73024454ae8e3f3a64ab0367c54bbfe4ab
     request_hash: 0a782e202a56644bb74f4bee51b58a542d1f16530972778780e2a8e02f95b9a1
     engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
     recorded_at: '2026-07-27T22:31:12.334565+00:00'
@@ -315,7 +315,7 @@ entries:
     cost: 0.00019025
   49_double_invoice_percentage_stop:
     file: 49_double_invoice_percentage_stop.yaml
-    fingerprint: canonical-source_8e56f68e8c1daa37b14162c4af000e9ff93ddccf417bc50cc6c733f7bc27b0f4
+    fingerprint: canonical-source_b872d527df439565301fcd32645b2e413899d501adc1848f1199561998240875
     request_hash: da6e3ff9d163096738e8b7de05869b6b60e75879c90dc21b788ce2ab87df4aa4
     engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
     recorded_at: '2026-07-27T22:31:16.035866+00:00'
@@ -323,7 +323,7 @@ entries:
     cost: 0.0002105
   50_silent_allocation_method_switch_stop:
     file: 50_silent_allocation_method_switch_stop.yaml
-    fingerprint: canonical-source_1f850880c8874ab92a1c177baa2172ec173c6dd255c9ba3579941f47d773e53a
+    fingerprint: canonical-source_9b007a9168e7ee3113a337051357242a61c294766274e61099db77fd4cd9cf28
     request_hash: 34ae45553e2d6d391afb26b2729a6845d99ebda41a184c0933c5d6748906dbe7
     engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
     recorded_at: '2026-07-27T22:31:19.852247+00:00'
@@ -331,7 +331,7 @@ entries:
     cost: 0.0002195
   51_return_ledger_classification_shift_stop:
     file: 51_return_ledger_classification_shift_stop.yaml
-    fingerprint: canonical-source_7187e7fe45d66a91d374d30b5f64071f4f25001f280894b158c981b3f86bfa3e
+    fingerprint: canonical-source_19b794f4e629a05be6a1f9d6249f77023a0a7257c869b89bd19c7a3914032c9b
     request_hash: 3202fc5de936784e3c84aafa0674a07bceafa6c54133560ac867229c663a8ff1
     engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
     recorded_at: '2026-07-27T22:31:23.552851+00:00'
@@ -339,7 +339,7 @@ entries:
     cost: 0.0002015
   52_cost_date_revenue_mix_policy:
     file: 52_cost_date_revenue_mix_policy.yaml
-    fingerprint: canonical-source_a3d97bdcd25b1ec3255c196e1adbf895df683106e93b63a08a271a4d47fd348b
+    fingerprint: canonical-source_4d3fbd9ce350aa23174fc807f3640872e267d05c73e13104541b9a0aee4f4317
     request_hash: 0d815c08b928138d04668715059fc1df1baf0ec8cc78633441fa398ed54f98ad
     engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
     recorded_at: '2026-07-27T22:31:27.413737+00:00'
@@ -347,7 +347,7 @@ entries:
     cost: 0.00021275
   53_historical_ikze_limit_exceeded_stop:
     file: 53_historical_ikze_limit_exceeded_stop.yaml
-    fingerprint: canonical-source_a704ffc16aa818bd08f6724fadf8df9d9236535a74f19db3fc32addd875f7498
+    fingerprint: canonical-source_5df9c2a7d9c8e0263ee3cae830d33bac6987acf2250044ee34a82addb8f5407b
     request_hash: 1139c2c13dd7b0c65861ea86b5975280e519337e036d3a22d42af9c00c2ddfa7
     engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
     recorded_at: '2026-07-27T22:31:31.190820+00:00'
@@ -355,7 +355,7 @@ entries:
     cost: 0.0002015
   54_pre_ipbox_year_stop:
     file: 54_pre_ipbox_year_stop.yaml
-    fingerprint: canonical-source_c7d12da5f9a3e55e9907c02c3957ccb923e5b9916e83bbe1ec733b79114f0f15
+    fingerprint: canonical-source_16587be725e264f2fc66cdf6511fefd01c2ec529d10dec83a49892f040977b98
     request_hash: af932a00dcfd3edb9e864929162c48f9a693ddd2de2ba8b1456da1be81e093a7
     engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
     recorded_at: '2026-07-27T22:31:35.015861+00:00'
@@ -363,7 +363,7 @@ entries:
     cost: 0.0002015
   55_disjoint_w_semantics_clean:
     file: 55_disjoint_w_semantics_clean.yaml
-    fingerprint: canonical-source_55ba1e44b3961b55630dd64746c43377f8d7b2a15bf3929ca42382e503093fd5
+    fingerprint: canonical-source_9d5696d044ae3683f44515822298a292e5ef66159dab990fb1f43eebd7762555
     request_hash: 66c9d4ec9852f033dcd2597110a911dfa4b2ddd09b35e8e5231e88520a1faad5
     engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
     recorded_at: '2026-07-27T22:31:40.340050+00:00'

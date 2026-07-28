@@ -4,7 +4,7 @@ meta:
   provider: openrouter
   requested_model: qwen/qwen3.5-flash-02-23
   returned_model: qwen/qwen3.5-flash-02-23
-  fingerprint: canonical-source_b81567532182496f638e947adb3105053d18439327a0785afad6e9e879d83c09
+  fingerprint: canonical-source_22879df6e94325b84700e74b4cdbf3a272e1fe91cd9171e3febeda76745ec6e9
   request_hash: 95c7207e19c640c9dd863c3b26561a403abe5fe160215c27e8a9da74ca6a2717
   recorded_at: '2026-07-25T23:54:18.854122+00:00'
   request_id: gen-1785023655-yaGKZykVQDMeNYtz1YQ3

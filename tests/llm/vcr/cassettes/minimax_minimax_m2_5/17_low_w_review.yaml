@@ -4,7 +4,7 @@ meta:
   provider: openrouter
   requested_model: minimax/minimax-m2.5
   returned_model: minimax/minimax-m2.5
-  fingerprint: canonical-source_fe04289c73f12f31a308ec962d64aff5fea39270d5b5fb01f2c96ffad2831e8a
+  fingerprint: canonical-source_cdfeb47351ac62e407892314be4fd4059e9951a869345aab066da6d7b95c636b
   request_hash: 7c738c84a4aec499ac0550b87847bffc9d231a417845828a76e9a32f73b70a51
   recorded_at: '2026-07-25T23:32:42.185059+00:00'
   request_id: gen-1785022360-CjjFVLthnLUBQlFxbyGq
