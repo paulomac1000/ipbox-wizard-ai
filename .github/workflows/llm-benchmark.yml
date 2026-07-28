@@ -52,12 +52,17 @@ jobs:
       BENCHMARK_MODEL: ${{ inputs.model }}
       MAX_COST_PER_MODEL_USD: ${{ inputs.max-cost-per-model-usd }}
       MAX_TOTAL_COST_USD: ${{ inputs.max-total-cost-usd }}
-      VCR_REJECTED_ROOT: "${{ runner.temp }}/ipbox_llm_rejected_${{ github.run_id }}"
 
     steps:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
+
+      - name: Initialize isolated rejected-attempt path
+        run: |
+          set -euo pipefail
+          rejected_root="$RUNNER_TEMP/ipbox_llm_rejected_${GITHUB_RUN_ID}"
+          printf 'VCR_REJECTED_ROOT=%s\n' "$rejected_root" >> "$GITHUB_ENV"
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -172,4 +177,3 @@ jobs:
         run: |
           set -euo pipefail
           python scripts/check_cassette_policy.py
-          python scripts/benchmark_report.py
