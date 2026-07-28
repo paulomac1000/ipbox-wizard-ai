@@ -58,7 +58,9 @@ def test_paid_workflow_initializes_rejected_root_at_runtime() -> None:
 def test_paid_workflow_generates_benchmark_report_only_before_artifact_upload() -> None:
     workflow = _paid_workflow()
     steps = workflow["jobs"]["benchmark"]["steps"]
-    offline_step = next(step for step in steps if step.get("name") == "Offline verification (no API key)")
+    offline_step = next(
+        step for step in steps if step.get("name") == "Offline verification (no API key)"
+    )
     final_step = next(
         step for step in steps if step.get("name") == "Require a complete matrix for all-model runs"
     )
