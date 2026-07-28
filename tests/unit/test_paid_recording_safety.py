@@ -227,6 +227,7 @@ def test_default_rejected_root_is_user_scoped_temp_directory() -> None:
     assert DEFAULT_REJECTED_ROOT.parent == Path(tempfile.gettempdir())
     assert DEFAULT_REJECTED_ROOT.name.startswith("ipbox_llm_rejected_")
     assert DEFAULT_REJECTED_ROOT.name != "ipbox_llm_rejected"
+    assert _rejected_root({}) == DEFAULT_REJECTED_ROOT.resolve(strict=False)
 
 
 class _Response:
