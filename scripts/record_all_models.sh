@@ -7,6 +7,17 @@ if [[ "${LLM_PAID_RUN_CONFIRMATION:-}" != "$EXPECTED_CONFIRMATION" ]]; then
   exit 2
 fi
 
+export VCR_CASSETTES_ROOT="$(python - <<'PY_CASSETTES'
+from scripts.vcr_paths import resolve_cassette_root
+print(resolve_cassette_root())
+PY_CASSETTES
+)"
+export VCR_REJECTED_ROOT="$(python - <<'PY_REJECTED'
+from scripts.vcr_paths import resolve_rejected_root
+print(resolve_rejected_root())
+PY_REJECTED
+)"
+
 ruff format --check .
 ruff check .
 python -m compileall -q python_helper tests scripts
@@ -19,19 +30,8 @@ import time
 print(time.time())
 PY_TIME
 )}"
-if [[ ! -v VCR_REJECTED_ROOT ]]; then
-  export VCR_REJECTED_ROOT="$(
-    python scripts/local_env.py \
-      --get VCR_REJECTED_ROOT \
-      --default /tmp/ipbox_llm_rejected
-  )"
-fi
-if [[ -z "$VCR_REJECTED_ROOT" ]]; then
-  echo 'VCR_REJECTED_ROOT must not be empty' >&2
-  exit 2
-fi
-printf 'Recording session started at %s; rejected responses: %s\n' \
-  "$LLM_RECORDING_STARTED_AT" "$VCR_REJECTED_ROOT"
+printf 'Recording session started at %s; cassettes: %s; rejected responses: %s\n' \
+  "$LLM_RECORDING_STARTED_AT" "$VCR_CASSETTES_ROOT" "$VCR_REJECTED_ROOT"
 
 mapfile -t models < <(python - <<'PY_MODELS'
 from tests.llm.models import BENCHMARK_MODELS
