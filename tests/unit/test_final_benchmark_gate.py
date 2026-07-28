@@ -32,6 +32,26 @@ def _bounded_shell_branches(script: str) -> tuple[str, str, str, str]:
     return before_if, first_branch, second_branch, after_fi
 
 
+def _logical_shell_commands(script: str) -> list[str]:
+    commands: list[str] = []
+    pending = ""
+
+    for raw_line in script.splitlines():
+        line = raw_line.strip()
+        if not line:
+            continue
+        pending = f"{pending} {line}".strip()
+        if pending.endswith("\\"):
+            pending = pending[:-1].rstrip()
+            continue
+        commands.append(pending)
+        pending = ""
+
+    if pending:
+        commands.append(pending)
+    return commands
+
+
 def test_release_gate_contains_exactly_eight_distinct_model_families() -> None:
     assert len(BENCHMARK_MODELS) == 8
     assert len({MODEL_PROFILES[model].family for model in BENCHMARK_MODELS}) == 8
@@ -115,11 +135,14 @@ def test_all_model_workflow_generates_one_report_before_artifact_upload() -> Non
     )
 
     matrix_script = (ROOT / "scripts/record_all_models.sh").read_text(encoding="utf-8")
+    matrix_commands = _logical_shell_commands(matrix_script)
     assert matrix_script.count("python scripts/benchmark_report.py") == 1
     assert "trap generate_benchmark_report EXIT" in matrix_script
     assert "original_status=$?" in matrix_script
+    assert "python scripts/benchmark_report.py || report_status=$?" in matrix_commands
     assert 'exit "$original_status"' in matrix_script
     assert 'exit "$report_status"' in matrix_script
+    assert "|| true" not in matrix_script
 
     recorder_commands = ("scripts/record_all_models.sh", "scripts/record_model.py")
     for step in steps:
@@ -131,21 +154,47 @@ def test_all_model_workflow_generates_one_report_before_artifact_upload() -> Non
     before_record_if, all_record_branch, single_record_branch, after_record_fi = (
         _bounded_shell_branches(record_step["run"])
     )
+    before_record_commands = _logical_shell_commands(before_record_if)
+    all_record_commands = _logical_shell_commands(all_record_branch)
+    single_record_commands = _logical_shell_commands(single_record_branch)
+    expected_all_recorder = " ".join(
+        (
+            "./scripts/record_all_models.sh",
+            '--max-cost-per-model-usd "$MAX_COST_PER_MODEL_USD"',
+            '--max-total-cost-usd "$MAX_TOTAL_COST_USD"',
+        )
+    )
+    expected_single_recorder = " ".join(
+        (
+            "python scripts/record_model.py",
+            '--model "$BENCHMARK_MODEL"',
+            '--max-cost-per-model-usd "$MAX_COST_PER_MODEL_USD"',
+            '--max-total-cost-usd "$MAX_TOTAL_COST_USD"',
+        )
+    )
+
+    assert "set -euo pipefail" in before_record_commands
+    assert "set +e" not in record_step["run"]
     for outside_branch in (before_record_if, after_record_fi):
         assert "record_all_models.sh" not in outside_branch
         assert "record_model.py" not in outside_branch
-    assert all_record_branch.count("./scripts/record_all_models.sh") == 1
-    assert "record_model.py" not in all_record_branch
-    assert single_record_branch.count("python scripts/record_model.py") == 1
-    assert "record_all_models.sh" not in single_record_branch
+    assert all_record_commands.count(expected_all_recorder) == 1
+    assert all("record_model.py" not in command for command in all_record_commands)
+    assert single_record_commands.count(expected_single_recorder) == 1
+    assert all("record_all_models.sh" not in command for command in single_record_commands)
 
     before_offline_if, all_offline_branch, single_offline_branch, after_offline_fi = (
         _bounded_shell_branches(offline_step["run"])
     )
+    before_offline_commands = _logical_shell_commands(before_offline_if)
+    single_offline_commands = _logical_shell_commands(single_offline_branch)
     single_model_report = 'python scripts/benchmark_report.py --model "$BENCHMARK_MODEL"'
+
+    assert "set -euo pipefail" in before_offline_commands
+    assert "set +e" not in offline_step["run"]
     assert "benchmark_report.py" not in before_offline_if
     assert "benchmark_report.py" not in all_offline_branch
-    assert single_offline_branch.count(single_model_report) == 1
+    assert single_offline_commands.count(single_model_report) == 1
     assert "benchmark_report.py" not in after_offline_fi
 
     direct_workflow_report_count = sum(
@@ -158,8 +207,9 @@ def test_all_model_workflow_generates_one_report_before_artifact_upload() -> Non
         for index, step in enumerate(steps)
         if step.get("name") == "Upload cassette candidates and reports"
     )
-    assert steps.index(record_step) < upload_index
-    assert steps.index(offline_step) < upload_index
+    record_index = steps.index(record_step)
+    offline_index = steps.index(offline_step)
+    assert record_index < offline_index < upload_index
 
     assert final_step is steps[-1]
     assert final_step["run"].count("python scripts/check_cassette_policy.py") == 1
