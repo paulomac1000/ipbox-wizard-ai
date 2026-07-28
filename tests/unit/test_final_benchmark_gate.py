@@ -88,10 +88,22 @@ def test_all_model_workflow_generates_one_report_before_artifact_upload() -> Non
     assert 'exit "$report_status"' in matrix_script
 
     record_run = record_step["run"]
-    all_record_branch, single_record_branch = record_run.split("else", maxsplit=1)
+    before_if, if_marker, conditional = record_run.partition(
+        'if [ "$BENCHMARK_MODEL" = "all" ]; then\n'
+    )
+    all_record_branch, else_marker, conditional = conditional.partition("\nelse\n")
+    single_record_branch, fi_marker, after_fi = conditional.partition("\nfi")
+
+    assert if_marker
+    assert else_marker
+    assert fi_marker
+    for outside_branch in (before_if, after_fi):
+        assert "record_all_models.sh" not in outside_branch
+        assert "record_model.py" not in outside_branch
     assert all_record_branch.count("./scripts/record_all_models.sh") == 1
-    assert "./scripts/record_all_models.sh" not in single_record_branch
+    assert "record_model.py" not in all_record_branch
     assert single_record_branch.count("python scripts/record_model.py") == 1
+    assert "record_all_models.sh" not in single_record_branch
 
     offline_run = offline_step["run"]
     all_model_branch, single_model_branch = offline_run.split("else", maxsplit=1)
