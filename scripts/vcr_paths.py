@@ -24,9 +24,7 @@ def _user_scope() -> str:
     return hashlib.sha256(identity.encode("utf-8")).hexdigest()[:12]
 
 
-DEFAULT_REJECTED_ROOT = (
-    Path(tempfile.gettempdir()) / f"ipbox_llm_rejected_{_user_scope()}"
-)
+DEFAULT_REJECTED_ROOT = Path(tempfile.gettempdir()) / f"ipbox_llm_rejected_{_user_scope()}"
 
 
 def resolve_storage_path(value: str | Path, *, name: str) -> Path:
