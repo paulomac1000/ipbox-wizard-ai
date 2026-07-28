@@ -4,6 +4,7 @@ import argparse
 import json
 import os
 import subprocess
+import tempfile
 from pathlib import Path
 from typing import ClassVar
 
@@ -18,7 +19,11 @@ from scripts.record_model import (
     _rejected_root,
     _require_paid_confirmation,
 )
-from scripts.vcr_paths import resolve_cassette_root
+from scripts.vcr_paths import (
+    DEFAULT_REJECTED_ROOT,
+    resolve_cassette_root,
+    resolve_storage_path,
+)
 from tests.llm.client import LLMClient
 from tests.llm.models import BENCHMARK_MODELS, model_slug
 from tests.llm.request_spec import LLMRequestSpec
@@ -122,6 +127,11 @@ def test_vcr_precommit_reads_the_configured_cassette_tree(
     expected_manifest = cassette_root / model_slug(MODEL) / "_manifest.yaml"
     observed: dict[str, object] = {}
 
+    monkeypatch.setenv("LLM_PROVIDER", "openrouter")
+    monkeypatch.setenv("LLM_MODEL", MODEL)
+    monkeypatch.setenv("VCR_MODE", "playback")
+    monkeypatch.setenv("VCR_CASSETTES_ROOT", str(cassette_root))
+
     def fake_manifest_load(path: Path, model: str) -> object:
         observed.update(path=path, model=model)
         raise FileNotFoundError("expected test stop")
@@ -206,6 +216,17 @@ def test_record_model_rejects_empty_rejected_root(monkeypatch: pytest.MonkeyPatc
     monkeypatch.setenv("VCR_REJECTED_ROOT", "")
     with pytest.raises(ValueError, match="must not be empty"):
         _rejected_root(os.environ)
+
+
+def test_storage_resolver_rejects_empty_path_object() -> None:
+    with pytest.raises(ValueError, match="must not be empty"):
+        resolve_storage_path(Path(), name="VCR_CASSETTES_ROOT")
+
+
+def test_default_rejected_root_is_user_scoped_temp_directory() -> None:
+    assert DEFAULT_REJECTED_ROOT.parent == Path(tempfile.gettempdir())
+    assert DEFAULT_REJECTED_ROOT.name.startswith("ipbox_llm_rejected_")
+    assert DEFAULT_REJECTED_ROOT.name != "ipbox_llm_rejected"
 
 
 class _Response:
