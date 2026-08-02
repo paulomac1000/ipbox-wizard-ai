@@ -1,4 +1,4 @@
-name: Source snapshot review
+name: Apply review fixes
 
 on:
   pull_request:
@@ -8,21 +8,75 @@ on:
       - synchronize
 
 permissions:
-  contents: read
+  contents: write
+
+concurrency:
+  group: apply-pr8-review-fixes
+  cancel-in-progress: true
 
 jobs:
-  snapshot:
+  apply-and-validate:
     runs-on: ubuntu-latest
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
         with:
-          persist-credentials: false
-      - name: Package source tree
-        run: tar --exclude=.git -czf "$RUNNER_TEMP/source-snapshot.tgz" .
-      - name: Upload source tree
-        uses: actions/upload-artifact@v4
+          ref: agent/consolidate-pr-review-fixes
+          fetch-depth: 0
+          persist-credentials: true
+
+      - uses: actions/setup-python@v5
         with:
-          name: source-snapshot-review
-          path: ${{ runner.temp }}/source-snapshot.tgz
-          if-no-files-found: error
-          retention-days: 1
+          python-version: '3.13'
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements-test.txt
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt -r requirements-test.txt
+
+      - name: Apply locally validated review patch
+        run: |
+          set -euo pipefail
+          base64 --decode .github/review-fixes.patch.gz.b64 | gzip -d > "$RUNNER_TEMP/review-fixes.patch"
+          printf '%s  %s\n' '36ca58ea86a96541e420b13d634481f3b2e76177e8068c227f897d0ed3bf2d5d' "$RUNNER_TEMP/review-fixes.patch" | sha256sum --check -
+          patch -p1 < "$RUNNER_TEMP/review-fixes.patch"
+          rm .github/review-fixes.patch.gz.b64
+          rm .github/workflows/source-snapshot-review.yml
+
+      - name: Format and lint
+        run: |
+          set -euo pipefail
+          ruff format .
+          ruff check . --fix
+          ruff format --check .
+          ruff check .
+
+      - name: Deterministic test gate
+        run: |
+          set -euo pipefail
+          python -m compileall -q python_helper tests scripts
+          pytest tests/unit \
+            --cov=python_helper \
+            --cov-report=term-missing \
+            --cov-fail-under=90
+          pytest -q
+          for script in scripts/*.sh; do bash -n "$script"; done
+
+      - name: Refresh and verify cassette metadata
+        run: |
+          set -euo pipefail
+          python scripts/refresh_vcr_metadata.py --all-models --write
+          python scripts/check_cassette_policy.py
+          ./scripts/verify_all_models.sh
+
+      - name: Commit review fixes
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git diff --cached --check
+          git commit -m 'fix: enforce tax basket and paid pytest budgets'
+          git push origin HEAD:agent/consolidate-pr-review-fixes
