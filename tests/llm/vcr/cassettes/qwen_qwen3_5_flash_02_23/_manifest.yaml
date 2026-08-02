@@ -1,371 +1,371 @@
 model: qwen/qwen3.5-flash-02-23
-generated_at: '2026-08-02T21:57:33.067074+00:00'
+generated_at: '2026-08-02T22:46:52.950941+00:00'
 entries:
   01_basic_linear:
     file: 01_basic_linear.yaml
-    fingerprint: canonical-source_16081aa6e0bd762e1c16ebf10504465d92ab1baad9bb1da50658784269c77979
+    fingerprint: canonical-source_fcc20ef4586f91f8b5c43299de51684c8de73e86d6eb7efe7ad9a36f36d33319
     request_hash: 838a6de8483ea9a0ba05a61b2046445cf8b5e67422a61baee6504033095a5a6b
-    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
+    engine_source_hash: b03aa6b34281109c7a2a7726f0788bbbd1368e5df1d15ca94a1791bbaf273d17
     recorded_at: '2026-07-25T23:46:03.604142+00:00'
     returned_model: qwen/qwen3.5-flash-02-23
     cost: 0.00022061
   02_basic_scale_single_client:
     file: 02_basic_scale_single_client.yaml
-    fingerprint: canonical-source_0b2015d0536541acfce2f12296dfe0d792c7071ce4bd72ca07c4763361489e24
+    fingerprint: canonical-source_a711358bf30cb9420d5f26e0cd1b8e5947a58ad16c26d5b2b2aabfd9678920d5
     request_hash: e0bda137a2b3a5947e6949b413630ea34c0069d04282adc90ada7dfd30fa9af1
-    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
+    engine_source_hash: b03aa6b34281109c7a2a7726f0788bbbd1368e5df1d15ca94a1791bbaf273d17
     recorded_at: '2026-07-25T23:46:12.497165+00:00'
     returned_model: qwen/qwen3.5-flash-02-23
     cost: 0.00020202
   03_fx_usd_single_client:
     file: 03_fx_usd_single_client.yaml
-    fingerprint: canonical-source_aa9c08df1e31d7db7c8950beca3e041373343891f5cb6549e9c8ac69b6222495
+    fingerprint: canonical-source_88d3afc3d0925dc5721e89871abb8a9088bbe3e214bda7b1376a7815bf3df0c5
     request_hash: e0bda137a2b3a5947e6949b413630ea34c0069d04282adc90ada7dfd30fa9af1
-    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
+    engine_source_hash: b03aa6b34281109c7a2a7726f0788bbbd1368e5df1d15ca94a1791bbaf273d17
     recorded_at: '2026-07-25T23:46:21.435486+00:00'
     returned_model: qwen/qwen3.5-flash-02-23
     cost: 0.00020202
   11_multi_client_mixed_currencies:
     file: 11_multi_client_mixed_currencies.yaml
-    fingerprint: canonical-source_b8a1df758f51554fbf829f5ac59806b9dac9386be38b378d49292727637a8372
+    fingerprint: canonical-source_ef7f42509ce8a3d57ecdfa5c18142cb09664e735f1294329b3abc3d0496f0e09
     request_hash: ca1ff116b6b90647a398406511ac5b487dfe4e2133a2ac00d87793f0bfdd6ee8
-    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
+    engine_source_hash: b03aa6b34281109c7a2a7726f0788bbbd1368e5df1d15ca94a1791bbaf273d17
     recorded_at: '2026-07-25T23:46:30.907672+00:00'
     returned_model: qwen/qwen3.5-flash-02-23
     cost: 0.00023595
   12_zus_in_pit_path:
     file: 12_zus_in_pit_path.yaml
-    fingerprint: canonical-source_ccc6b462b63c56d0e3adf704539f931b195b2390c4c0d2bd33926672659fbf39
+    fingerprint: canonical-source_2fda4dcbe5ac8a62bb8e838d8c43cc4f940bd2814a53fe4d91cd241b084b897f
     request_hash: ca1ff116b6b90647a398406511ac5b487dfe4e2133a2ac00d87793f0bfdd6ee8
-    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
+    engine_source_hash: b03aa6b34281109c7a2a7726f0788bbbd1368e5df1d15ca94a1791bbaf273d17
     recorded_at: '2026-07-25T23:46:40.529549+00:00'
     returned_model: qwen/qwen3.5-flash-02-23
     cost: 0.00023595
   13_income_from_employment_impact:
     file: 13_income_from_employment_impact.yaml
-    fingerprint: canonical-source_1bf55917be4c3d1fbce23ab8c0d72e8606825cc0c0f706eaccddaadab2cefea2
+    fingerprint: canonical-source_2e34f5af928a908fa72e931a52f7e1fa5e89e2647b0f7d5627d42986dfc3ec10
     request_hash: ca1ff116b6b90647a398406511ac5b487dfe4e2133a2ac00d87793f0bfdd6ee8
-    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
+    engine_source_hash: b03aa6b34281109c7a2a7726f0788bbbd1368e5df1d15ca94a1791bbaf273d17
     recorded_at: '2026-07-25T23:46:49.944001+00:00'
     returned_model: qwen/qwen3.5-flash-02-23
     cost: 0.00023595
   14_lump_sum_ineligible_check:
     file: 14_lump_sum_ineligible_check.yaml
-    fingerprint: canonical-source_9c43a64ef8daa2f653e296e357618cac38344573b3212b5a1090d1af82a04391
+    fingerprint: canonical-source_4d20182749282eaac2a4483d0901e826feaa25937cf3df9eb50dee7c23bb57a2
     request_hash: 9317f3ba9646168ed157dec97427c0c4d47d152c98cceb70b65ed830dd18a604
-    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
+    engine_source_hash: b03aa6b34281109c7a2a7726f0788bbbd1368e5df1d15ca94a1791bbaf273d17
     recorded_at: '2026-07-25T23:46:59.193108+00:00'
     returned_model: qwen/qwen3.5-flash-02-23
     cost: 0.00020761
   15_vacation_sick_mix:
     file: 15_vacation_sick_mix.yaml
-    fingerprint: canonical-source_3022375fa8db6b4ac38085eca1baddb3dbfe75f778269400a47a771014508e3d
+    fingerprint: canonical-source_f42f37a182c5901f1514b106e563f6fe9c639f6dd11b74615ff2797f54b6e555
     request_hash: 838a6de8483ea9a0ba05a61b2046445cf8b5e67422a61baee6504033095a5a6b
-    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
+    engine_source_hash: b03aa6b34281109c7a2a7726f0788bbbd1368e5df1d15ca94a1791bbaf273d17
     recorded_at: '2026-07-25T23:47:08.329413+00:00'
     returned_model: qwen/qwen3.5-flash-02-23
     cost: 0.00017641
   16_high_w_review:
     file: 16_high_w_review.yaml
-    fingerprint: canonical-source_42d11aee54c5a0d0dd06f76d6fefd5ace7214fd7f5650d5b6e1a0c6c8c8a2476
+    fingerprint: canonical-source_4b8957fb63ff7b204646c9f6871772edb545c09fa98e41b14435e1e6f3223740
     request_hash: e0bda137a2b3a5947e6949b413630ea34c0069d04282adc90ada7dfd30fa9af1
-    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
+    engine_source_hash: b03aa6b34281109c7a2a7726f0788bbbd1368e5df1d15ca94a1791bbaf273d17
     recorded_at: '2026-07-25T23:47:17.256729+00:00'
     returned_model: qwen/qwen3.5-flash-02-23
     cost: 0.00020202
   17_low_w_review:
     file: 17_low_w_review.yaml
-    fingerprint: canonical-source_8e2e60a16d2f118d4a8c215d0f4d844b7594a54e2fc75a5b8f1c31aae70e7fe4
+    fingerprint: canonical-source_1a9e5f2003f8be1235dbda94fe707f3e1b376b80210ef05616c124432326ecaf
     request_hash: ff417279d9917dfd91ed2219f21a547d26403d78d59039c0deb27c2204e7b77e
-    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
+    engine_source_hash: b03aa6b34281109c7a2a7726f0788bbbd1368e5df1d15ca94a1791bbaf273d17
     recorded_at: '2026-07-25T23:47:26.739222+00:00'
     returned_model: qwen/qwen3.5-flash-02-23
     cost: 0.00020852
   18_logic_zero_work_hours:
     file: 18_logic_zero_work_hours.yaml
-    fingerprint: canonical-source_e3f48982c65c71abff568ddc9a244551584782b8c77a8131c78053052e431645
+    fingerprint: canonical-source_c7fa3d4233c3c5c8aae4e7704e6a48d1dddf74959eadabb78feadda6ba5c268c
     request_hash: 376d808730ba7c8890c2dc380de8ca67ddc7aaee2885bc5315ff94b6e82d8ae6
-    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
+    engine_source_hash: b03aa6b34281109c7a2a7726f0788bbbd1368e5df1d15ca94a1791bbaf273d17
     recorded_at: '2026-07-25T23:47:38.112992+00:00'
     returned_model: qwen/qwen3.5-flash-02-23
     cost: 0.000328315
   21_monthly_loss_impact:
     file: 21_monthly_loss_impact.yaml
-    fingerprint: canonical-source_8b6b89a9b07003b3e3af287697326156e064cd74610f02ee1f61577e4a152731
+    fingerprint: canonical-source_4bcd94390b97fda2bbbe88e7456ca6c987333e9ee8b12613410dec24bfe37440
     request_hash: e0bda137a2b3a5947e6949b413630ea34c0069d04282adc90ada7dfd30fa9af1
-    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
+    engine_source_hash: b03aa6b34281109c7a2a7726f0788bbbd1368e5df1d15ca94a1791bbaf273d17
     recorded_at: '2026-07-25T23:47:47.424924+00:00'
     returned_model: qwen/qwen3.5-flash-02-23
     cost: 0.00020202
   22_related_parties_nexus_reduction:
     file: 22_related_parties_nexus_reduction.yaml
-    fingerprint: canonical-source_b4a77752c39fc06a57c302231672c2f48576800628d218892ebb238555b6e574
+    fingerprint: canonical-source_aa128bf12c7c301bcbb1765339cf19d93b0dd35dd579a43709a4775d05957e40
     request_hash: e0bda137a2b3a5947e6949b413630ea34c0069d04282adc90ada7dfd30fa9af1
-    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
+    engine_source_hash: b03aa6b34281109c7a2a7726f0788bbbd1368e5df1d15ca94a1791bbaf273d17
     recorded_at: '2026-07-25T23:47:56.739807+00:00'
     returned_model: qwen/qwen3.5-flash-02-23
     cost: 0.00020202
   23_loss_carry_forward:
     file: 23_loss_carry_forward.yaml
-    fingerprint: canonical-source_3e262836b2cd7035ad4dd9f2c527ff4881aeb3c03c2f4d11cb92c0987cef61f1
+    fingerprint: canonical-source_97d13216e7ce7dc0ff6478b7848c8fe8796d7885de63e0b973ff48324860f8d7
     request_hash: 95c7207e19c640c9dd863c3b26561a403abe5fe160215c27e8a9da74ca6a2717
-    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
+    engine_source_hash: b03aa6b34281109c7a2a7726f0788bbbd1368e5df1d15ca94a1791bbaf273d17
     recorded_at: '2026-07-25T23:48:06.605986+00:00'
     returned_model: qwen/qwen3.5-flash-02-23
     cost: 0.000237185
   24_donations_relief:
     file: 24_donations_relief.yaml
-    fingerprint: canonical-source_7fe66653edf427a9aca2741d5e6f3e612c8e9c13cc441eb9971abf9778b672e2
+    fingerprint: canonical-source_d89806a3e3dc6b518277f3644c256629178f028bd0bae078c88fe2f893b4e347
     request_hash: 95c7207e19c640c9dd863c3b26561a403abe5fe160215c27e8a9da74ca6a2717
-    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
+    engine_source_hash: b03aa6b34281109c7a2a7726f0788bbbd1368e5df1d15ca94a1791bbaf273d17
     recorded_at: '2026-07-25T23:48:16.840925+00:00'
     returned_model: qwen/qwen3.5-flash-02-23
     cost: 0.000237185
   25_rehab_relief:
     file: 25_rehab_relief.yaml
-    fingerprint: canonical-source_274d4f154a9f94e80802059106bf38069cd46df190cdab49218eba5433448149
+    fingerprint: canonical-source_56abe13788a6e1a1cbb9a707bc74c4cc3a93bcc489a8472d89e4c005abb6a1b7
     request_hash: 95c7207e19c640c9dd863c3b26561a403abe5fe160215c27e8a9da74ca6a2717
-    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
+    engine_source_hash: b03aa6b34281109c7a2a7726f0788bbbd1368e5df1d15ca94a1791bbaf273d17
     recorded_at: '2026-07-25T23:48:26.633064+00:00'
     returned_model: qwen/qwen3.5-flash-02-23
     cost: 0.000237185
   26_rd_relief_nexus:
     file: 26_rd_relief_nexus.yaml
-    fingerprint: canonical-source_90780fdb79a1a0c463edd145f33fe085ef5e2478993bd10a262f8976508ea534
+    fingerprint: canonical-source_69195661967565ac2251c21fb4db784bd49fff86b9eb49925dd9b027d265ded8
     request_hash: 838a6de8483ea9a0ba05a61b2046445cf8b5e67422a61baee6504033095a5a6b
-    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
+    engine_source_hash: b03aa6b34281109c7a2a7726f0788bbbd1368e5df1d15ca94a1791bbaf273d17
     recorded_at: '2026-07-25T23:48:37.161679+00:00'
     returned_model: qwen/qwen3.5-flash-02-23
     cost: 0.00024973
   27_termomodernizacja_full:
     file: 27_termomodernizacja_full.yaml
-    fingerprint: canonical-source_6f2ca5d142f6c20348133d9afe7de78246d245de3480a986e79bd0a79af69906
+    fingerprint: canonical-source_dc9d89c25966b3a6461ea3b8b7a8a2e3b4df940d64a5ebce7f9a9801bdfb5479
     request_hash: 838a6de8483ea9a0ba05a61b2046445cf8b5e67422a61baee6504033095a5a6b
-    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
+    engine_source_hash: b03aa6b34281109c7a2a7726f0788bbbd1368e5df1d15ca94a1791bbaf273d17
     recorded_at: '2026-07-25T23:48:46.666616+00:00'
     returned_model: qwen/qwen3.5-flash-02-23
     cost: 0.00017641
   28_edge_multiple_carry-overs:
     file: 28_edge_multiple_carry-overs.yaml
-    fingerprint: canonical-source_a338017f5a2245b7ee75cd435dcd568f3cbbeb1dab089e10a80e148877fd4171
+    fingerprint: canonical-source_e6044cf34169cf96efa5cd087a31cbfcb12c039cd2b756f6ff07e9937e1d56cf
     request_hash: e0bda137a2b3a5947e6949b413630ea34c0069d04282adc90ada7dfd30fa9af1
-    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
+    engine_source_hash: b03aa6b34281109c7a2a7726f0788bbbd1368e5df1d15ca94a1791bbaf273d17
     recorded_at: '2026-07-25T23:48:56.677321+00:00'
     returned_model: qwen/qwen3.5-flash-02-23
     cost: 0.00020176
   29_edge_related_parties_nexus_0:
     file: 29_edge_related_parties_nexus_0.yaml
-    fingerprint: canonical-source_d4b6a04103009c6537824d6ef3c46f68c7ddeff85577c77e5090e6ff91e0f753
+    fingerprint: canonical-source_74c23d6379ab4579a2154421df146edee9254a6a2d81941c766eeced7862793b
     request_hash: e0bda137a2b3a5947e6949b413630ea34c0069d04282adc90ada7dfd30fa9af1
-    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
+    engine_source_hash: b03aa6b34281109c7a2a7726f0788bbbd1368e5df1d15ca94a1791bbaf273d17
     recorded_at: '2026-07-25T23:49:06.661076+00:00'
     returned_model: qwen/qwen3.5-flash-02-23
     cost: 0.00020202
   30_edge_related_parties_nexus_mixed:
     file: 30_edge_related_parties_nexus_mixed.yaml
-    fingerprint: canonical-source_37cacd5a2696a1c967ce7aa8753e82a535dbea2cd91286477d4b7384cd59e2c5
+    fingerprint: canonical-source_00b9a2e46245f28316c0ae5ff6b8ffcbaba4e7932d74ae0187723bfd02ee54f5
     request_hash: e0bda137a2b3a5947e6949b413630ea34c0069d04282adc90ada7dfd30fa9af1
-    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
+    engine_source_hash: b03aa6b34281109c7a2a7726f0788bbbd1368e5df1d15ca94a1791bbaf273d17
     recorded_at: '2026-07-25T23:49:18.802788+00:00'
     returned_model: qwen/qwen3.5-flash-02-23
     cost: 0.00035854
   31_zus_double_dip_fail:
     file: 31_zus_double_dip_fail.yaml
-    fingerprint: canonical-source_56f32c4b8970788e4c3b898e5c7affb6a6cc8a58ae5b5e9f0735091ae9cfba4b
+    fingerprint: canonical-source_aab338590128b67577458e3b196279f395ec4a0fa468e38b23f5e5259cb612ba
     request_hash: 77fa686bcf245fd4cb944e48a72096a9606675b9fcb9abe39f791f008926e1c6
-    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
+    engine_source_hash: b03aa6b34281109c7a2a7726f0788bbbd1368e5df1d15ca94a1791bbaf273d17
     recorded_at: '2026-07-25T23:49:29.161894+00:00'
     returned_model: qwen/qwen3.5-flash-02-23
     cost: 0.000224965
   32_private_costs_ip_fail:
     file: 32_private_costs_ip_fail.yaml
-    fingerprint: canonical-source_21e77a42d8addf7eb479742642c1aa61dfd4b68bf58b9e687d2deb26cf8d2008
+    fingerprint: canonical-source_1df48311469822482892dd4d9e7fcdc20da36b3f634dbb29f6825fe630f51091
     request_hash: f97be4475d555ebcee0b0862df2429d83243d90587f9d1a0982220779074c7d4
-    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
+    engine_source_hash: b03aa6b34281109c7a2a7726f0788bbbd1368e5df1d15ca94a1791bbaf273d17
     recorded_at: '2026-07-25T23:49:40.254995+00:00'
     returned_model: qwen/qwen3.5-flash-02-23
     cost: 0.000204035
   33_kpir_balance_fail:
     file: 33_kpir_balance_fail.yaml
-    fingerprint: canonical-source_1f30e411f3613e2fb32e5a61669d19a6789ed6729b1795fb7fd5f2d1738a42ea
+    fingerprint: canonical-source_6414c6edb3e4385dfca30eeea5d52e264646a8982fdc0e3128b24fcafae3fea8
     request_hash: e0bda137a2b3a5947e6949b413630ea34c0069d04282adc90ada7dfd30fa9af1
-    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
+    engine_source_hash: b03aa6b34281109c7a2a7726f0788bbbd1368e5df1d15ca94a1791bbaf273d17
     recorded_at: '2026-07-25T23:49:49.732012+00:00'
     returned_model: qwen/qwen3.5-flash-02-23
     cost: 0.00020202
   34_verify_fixed_asset_threshold_fail:
     file: 34_verify_fixed_asset_threshold_fail.yaml
-    fingerprint: canonical-source_da2f3dc26418ac11c5f56493bf96938f6a628cdd2346bcd134e8ee2bdc84ac6b
+    fingerprint: canonical-source_bbdde87b32b7336210b34ef77dbf19511ebe7679fadd69d39dc7217c02499a21
     request_hash: e0bda137a2b3a5947e6949b413630ea34c0069d04282adc90ada7dfd30fa9af1
-    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
+    engine_source_hash: b03aa6b34281109c7a2a7726f0788bbbd1368e5df1d15ca94a1791bbaf273d17
     recorded_at: '2026-07-25T23:50:01.080397+00:00'
     returned_model: qwen/qwen3.5-flash-02-23
     cost: 0.000273
   35_verify_monthly_w_jump_inconsistency:
     file: 35_verify_monthly_w_jump_inconsistency.yaml
-    fingerprint: canonical-source_a57472a63df14dec4be7a23f7e5fcaccbc3f7cfba70251c2b5b353c7395eaa56
+    fingerprint: canonical-source_2afd5b3d3eba7ad8e130f8ae57595cd35f24f765fe3245fcaef9406e9e62cba5
     request_hash: 2e7719c3c09fc1093065de9ad30a16bd658e44b12d524d2259b8c10e841c6f94
-    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
+    engine_source_hash: b03aa6b34281109c7a2a7726f0788bbbd1368e5df1d15ca94a1791bbaf273d17
     recorded_at: '2026-07-25T23:50:15.829592+00:00'
     returned_model: qwen/qwen3.5-flash-02-23
     cost: 0.00037609
   36_verify_negative_income_error:
     file: 36_verify_negative_income_error.yaml
-    fingerprint: canonical-source_7b9e45850293e9868bc4a31de6dca21fad08361057c0c035d1116b95c6d10e00
+    fingerprint: canonical-source_8caa958f9e2dc223e7eb6a26e9de3e7ef499accab497d42421973360203dfc2b
     request_hash: e0bda137a2b3a5947e6949b413630ea34c0069d04282adc90ada7dfd30fa9af1
-    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
+    engine_source_hash: b03aa6b34281109c7a2a7726f0788bbbd1368e5df1d15ca94a1791bbaf273d17
     recorded_at: '2026-07-25T23:50:26.454975+00:00'
     returned_model: qwen/qwen3.5-flash-02-23
     cost: 0.00022568
   37_verify_invalid_tax_form_stop:
     file: 37_verify_invalid_tax_form_stop.yaml
-    fingerprint: canonical-source_f93a109a8138946cc0dd91a51a9c744d5287b09f7ef813ab29b2f9d56b760bdd
+    fingerprint: canonical-source_bd259554cd46c0ce6662df0ec68b4f817385aa48c59a9a042d8d78bbb7aa9bfd
     request_hash: 37534d99edaa943c7dd8cce0512680c41d5f201a481d1bbeb21f0e12d65855e6
-    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
+    engine_source_hash: b03aa6b34281109c7a2a7726f0788bbbd1368e5df1d15ca94a1791bbaf273d17
     recorded_at: '2026-07-25T23:50:37.185661+00:00'
     returned_model: qwen/qwen3.5-flash-02-23
     cost: 0.000220545
   38_verify_missing_kpir_data:
     file: 38_verify_missing_kpir_data.yaml
-    fingerprint: canonical-source_66a66d24eca02b3c4a18e74f7224293266c67324cf548e58dbe7f554c3b4d930
+    fingerprint: canonical-source_fdfba87abe5b6abb73a1b7496cfea3214f6bd8c5d1c5be9be4dcf725787c19b8
     request_hash: 1ad472ab2a421fbb23351b22a887dd9245ac610c82c49b59a3c03c2b6341fb57
-    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
+    engine_source_hash: b03aa6b34281109c7a2a7726f0788bbbd1368e5df1d15ca94a1791bbaf273d17
     recorded_at: '2026-07-25T23:50:49.128715+00:00'
     returned_model: qwen/qwen3.5-flash-02-23
     cost: 0.000277355
   39_multi_project_weighted_W:
     file: 39_multi_project_weighted_W.yaml
-    fingerprint: canonical-source_b8111cf1ccb6aa9d60046ba19dc8e9b53e7a04275a6fe5915c882fb33a267c45
+    fingerprint: canonical-source_4dc5d974fae392c85a24c7cd8c4c960f986c52af88fa35c33fdfeed11586c539
     request_hash: 17762b49d4c173eaa8a74a0a18c03b5b25cae2ea28b1b84daf91cbbc172c39fb
-    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
+    engine_source_hash: b03aa6b34281109c7a2a7726f0788bbbd1368e5df1d15ca94a1791bbaf273d17
     recorded_at: '2026-07-25T23:51:04.615941+00:00'
     returned_model: qwen/qwen3.5-flash-02-23
     cost: 0.00050479
   40_mixed_ip_clause:
     file: 40_mixed_ip_clause.yaml
-    fingerprint: canonical-source_7a80615e8bd0ad484ade7d95b60b14540cedc7dfce87c12c30fba000cc6bec86
+    fingerprint: canonical-source_41bc716aaf0339e9d662b28e157c120e805f8f17fdc84cb81c81854ee197e43a
     request_hash: ca1ff116b6b90647a398406511ac5b487dfe4e2133a2ac00d87793f0bfdd6ee8
-    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
+    engine_source_hash: b03aa6b34281109c7a2a7726f0788bbbd1368e5df1d15ca94a1791bbaf273d17
     recorded_at: '2026-07-25T23:51:15.119704+00:00'
     returned_model: qwen/qwen3.5-flash-02-23
     cost: 0.00020553
   41_ikze_cascade:
     file: 41_ikze_cascade.yaml
-    fingerprint: canonical-source_97f04ae06b3c3bb2c1f5633fc7240297e1a57b81a3b817e9aad92cf92c1e2f15
+    fingerprint: canonical-source_601ceda86c744b5146563268c98ae8a4440937868dc83dd10615a0b78afdd8c1
     request_hash: 838a6de8483ea9a0ba05a61b2046445cf8b5e67422a61baee6504033095a5a6b
-    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
+    engine_source_hash: b03aa6b34281109c7a2a7726f0788bbbd1368e5df1d15ca94a1791bbaf273d17
     recorded_at: '2026-07-25T23:51:25.106635+00:00'
     returned_model: qwen/qwen3.5-flash-02-23
     cost: 0.00017641
   42_stop_08_no_documentation:
     file: 42_stop_08_no_documentation.yaml
-    fingerprint: canonical-source_ee7a1d3f51a0394f0a7b47f4d6966b3de759b1169bf0c58fa35f24ce6df087b3
+    fingerprint: canonical-source_fd9be0ddf155b42ed08c7b5308e9de66eff562f9b74152cb52b81fc14a41ce94
     request_hash: 1ad472ab2a421fbb23351b22a887dd9245ac610c82c49b59a3c03c2b6341fb57
-    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
+    engine_source_hash: b03aa6b34281109c7a2a7726f0788bbbd1368e5df1d15ca94a1791bbaf273d17
     recorded_at: '2026-07-25T23:51:44.230308+00:00'
     returned_model: qwen/qwen3.5-flash-02-23
     cost: 0.000730535
   43_review_09_single_client_100pct:
     file: 43_review_09_single_client_100pct.yaml
-    fingerprint: canonical-source_d569b0dba1bd0ce97279581f4b1c6107d75d3f8f908df7013c204794cfe69056
+    fingerprint: canonical-source_80d8c2528891a39249e1cd3359803a519052322fcbcc306d41d2eb3a24a7aa0c
     request_hash: e0bda137a2b3a5947e6949b413630ea34c0069d04282adc90ada7dfd30fa9af1
-    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
+    engine_source_hash: b03aa6b34281109c7a2a7726f0788bbbd1368e5df1d15ca94a1791bbaf273d17
     recorded_at: '2026-07-25T23:51:56.117318+00:00'
     returned_model: qwen/qwen3.5-flash-02-23
     cost: 0.00025246
   44_mix_revenue_key_kis:
     file: 44_mix_revenue_key_kis.yaml
-    fingerprint: canonical-source_ace067526bf95553bf31b08e303b5f3df1ca7a24dc4f803b0e045d1ea2c0241f
+    fingerprint: canonical-source_2f3058207d6dc64e358970bb4c96f629103670d71ddff49d220c64922cfe745c
     request_hash: 2e18f2894bc8152427cdd3076e733c7772ad2d0af0026f65c29088e822ac6c4c
-    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
+    engine_source_hash: b03aa6b34281109c7a2a7726f0788bbbd1368e5df1d15ca94a1791bbaf273d17
     recorded_at: '2026-07-25T23:52:07.379732+00:00'
     returned_model: qwen/qwen3.5-flash-02-23
     cost: 0.00024583
   45_multi_ip_two_stage:
     file: 45_multi_ip_two_stage.yaml
-    fingerprint: canonical-source_8bc05b18e7fb8abb0f0ce7d295035e674f30e72e333b52745d675dcb755fe562
+    fingerprint: canonical-source_de6e6dc1dfe8da60762495a7295fe30996bc165ca28f8d7629b01f64b77e9dc0
     request_hash: bd3f50c2ec2f2f766617e584fc796cca88629c426e901c32be7f45bd5051b5f1
-    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
+    engine_source_hash: b03aa6b34281109c7a2a7726f0788bbbd1368e5df1d15ca94a1791bbaf273d17
     recorded_at: '2026-07-25T23:52:19.333184+00:00'
     returned_model: qwen/qwen3.5-flash-02-23
     cost: 0.00029341
   46_historical_2019_health_credit:
     file: 46_historical_2019_health_credit.yaml
-    fingerprint: canonical-source_8a4e299ef89486f45939c3584c0c41f52d44e1c8ff1d8bd99747ef69d3ac7512
+    fingerprint: canonical-source_8d0e2208f3cad1494c8b6a2544794f9a984538b9636506bc42c95c1fb4056b73
     request_hash: 838a6de8483ea9a0ba05a61b2046445cf8b5e67422a61baee6504033095a5a6b
-    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
+    engine_source_hash: b03aa6b34281109c7a2a7726f0788bbbd1368e5df1d15ca94a1791bbaf273d17
     recorded_at: '2026-07-25T23:52:29.788664+00:00'
     returned_model: qwen/qwen3.5-flash-02-23
     cost: 0.00019331
   47_historical_2021_br_ipbox_stop:
     file: 47_historical_2021_br_ipbox_stop.yaml
-    fingerprint: canonical-source_45dec042bce9b96972b642ea91276993c7b54551323e2cd2bf9699b282f86c13
+    fingerprint: canonical-source_82f2b157f8cbadb3ccec8d10b7e5f87821dab3984b2aab19775164f2afdc69e1
     request_hash: 9c4ee8d35e707fedf8309a18ddba936bd5e60e81ea6da264a5fc1094adde842b
-    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
+    engine_source_hash: b03aa6b34281109c7a2a7726f0788bbbd1368e5df1d15ca94a1791bbaf273d17
     recorded_at: '2026-07-25T23:52:39.528141+00:00'
     returned_model: qwen/qwen3.5-flash-02-23
     cost: 0.000134355
   48_historical_2024_pit_like_cascade:
     file: 48_historical_2024_pit_like_cascade.yaml
-    fingerprint: canonical-source_472c98e11539102cc600c0b3f696ab08a3d68b32c99a170707ebac2fd1ac01d1
+    fingerprint: canonical-source_bee53e9b94d493d91343b4dde159ddbf1f1a748d0a573db19a9deb84fa110cb2
     request_hash: 838a6de8483ea9a0ba05a61b2046445cf8b5e67422a61baee6504033095a5a6b
-    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
+    engine_source_hash: b03aa6b34281109c7a2a7726f0788bbbd1368e5df1d15ca94a1791bbaf273d17
     recorded_at: '2026-07-25T23:52:49.730190+00:00'
     returned_model: qwen/qwen3.5-flash-02-23
     cost: 0.00017641
   49_double_invoice_percentage_stop:
     file: 49_double_invoice_percentage_stop.yaml
-    fingerprint: canonical-source_7a0d68d9e09b212673301af69808de1fad676eb1299f7fac9f5771abdb3bb060
+    fingerprint: canonical-source_e773dfcb4d7008f0224626262e0aeaa956b76c56c117a43e397550253feac15f
     request_hash: 4b2a95d0473930f73375080b8b088de8e022cf7af7ff00e9c94d438838761582
-    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
+    engine_source_hash: b03aa6b34281109c7a2a7726f0788bbbd1368e5df1d15ca94a1791bbaf273d17
     recorded_at: '2026-07-25T23:53:02.195800+00:00'
     returned_model: qwen/qwen3.5-flash-02-23
     cost: 0.0002548
   50_silent_allocation_method_switch_stop:
     file: 50_silent_allocation_method_switch_stop.yaml
-    fingerprint: canonical-source_21d63d1a3412895e5c3521d873f8cc5ec0f16d6d10c3f2e86e6f18861f5b241b
+    fingerprint: canonical-source_88c4669a7c62fdfa2e67e53f9b22e36f5337f23ff138030e0f9368f8a62b5deb
     request_hash: 9a81c3334517853ee02f37264b40948ec3264ccb88565e1909c9d2e9ed54b781
-    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
+    engine_source_hash: b03aa6b34281109c7a2a7726f0788bbbd1368e5df1d15ca94a1791bbaf273d17
     recorded_at: '2026-07-25T23:53:16.573361+00:00'
     returned_model: qwen/qwen3.5-flash-02-23
     cost: 0.000364065
   51_return_ledger_classification_shift_stop:
     file: 51_return_ledger_classification_shift_stop.yaml
-    fingerprint: canonical-source_14dff95d028bfee439374b8c9b33c693f50f257febe2b122cd4addf075ee9db7
+    fingerprint: canonical-source_346e55864b6f9c9eb4d0a8f5144749f529e6966f604776aa6b2db5e3e82099de
     request_hash: b5a3bdf1656f574ca1012bf083bebafbb7e3fb270404c98d45deb2c2dd339e81
-    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
+    engine_source_hash: b03aa6b34281109c7a2a7726f0788bbbd1368e5df1d15ca94a1791bbaf273d17
     recorded_at: '2026-07-25T23:53:32.032874+00:00'
     returned_model: qwen/qwen3.5-flash-02-23
     cost: 0.000454935
   52_cost_date_revenue_mix_policy:
     file: 52_cost_date_revenue_mix_policy.yaml
-    fingerprint: canonical-source_d518d72c1c2fd917f8978e375098a65d4d4285fa99fe7da920e5895278cc3e7c
+    fingerprint: canonical-source_414b725d576f14da01844ab91f27c0d1878169278b86659f5e863a3627730626
     request_hash: 2e18f2894bc8152427cdd3076e733c7772ad2d0af0026f65c29088e822ac6c4c
-    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
+    engine_source_hash: b03aa6b34281109c7a2a7726f0788bbbd1368e5df1d15ca94a1791bbaf273d17
     recorded_at: '2026-07-25T23:53:43.841100+00:00'
     returned_model: qwen/qwen3.5-flash-02-23
     cost: 0.00023309
   53_historical_ikze_limit_exceeded_stop:
     file: 53_historical_ikze_limit_exceeded_stop.yaml
-    fingerprint: canonical-source_4ad150ec9e61a68a43d7372a8960db4046f59156cd6c6caddf702888afb5933d
+    fingerprint: canonical-source_c2b93e853d981efaab5ea3fd623cd25e703d8d7ae5cf42c08224efc688145a96
     request_hash: dc07723d175f687a22c0ff34b05291bc02268ab1286dcb72512f18adc29ea7cc
-    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
+    engine_source_hash: b03aa6b34281109c7a2a7726f0788bbbd1368e5df1d15ca94a1791bbaf273d17
     recorded_at: '2026-07-25T23:53:55.804674+00:00'
     returned_model: qwen/qwen3.5-flash-02-23
     cost: 0.000202215
   54_pre_ipbox_year_stop:
     file: 54_pre_ipbox_year_stop.yaml
-    fingerprint: canonical-source_4e971893fc5c173936c0014be9e72d9d4dc30a296d92d35e795cb8d45269c02b
+    fingerprint: canonical-source_9cc08af5906d9dea364aede89427e84d21e72ac9fe240531eff099592961e2af
     request_hash: acd2b771ae3241e824bd88efc2b8ea1e4290a389ff17da257986cc7609817648
-    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
+    engine_source_hash: b03aa6b34281109c7a2a7726f0788bbbd1368e5df1d15ca94a1791bbaf273d17
     recorded_at: '2026-07-25T23:54:07.646055+00:00'
     returned_model: qwen/qwen3.5-flash-02-23
     cost: 0.000245635
   55_disjoint_w_semantics_clean:
     file: 55_disjoint_w_semantics_clean.yaml
-    fingerprint: canonical-source_4dfd13d0b39512f56aaca1141c6c0fafecae26eab7b6c6ed669c1b052be1be2c
+    fingerprint: canonical-source_2a2d9af21594974fa42b889350fa89ba35475e8889bc8a6919ee0add194e9334
     request_hash: 95c7207e19c640c9dd863c3b26561a403abe5fe160215c27e8a9da74ca6a2717
-    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
+    engine_source_hash: b03aa6b34281109c7a2a7726f0788bbbd1368e5df1d15ca94a1791bbaf273d17
     recorded_at: '2026-07-25T23:54:18.854122+00:00'
     returned_model: qwen/qwen3.5-flash-02-23
     cost: 0.000162045

@@ -4,7 +4,7 @@ meta:
   provider: openrouter
   requested_model: deepseek/deepseek-chat-v3.1
   returned_model: deepseek/deepseek-chat-v3.1
-  fingerprint: canonical-source_7e05719c5b9003daa5df53102e2723ed71b7d21591780207fd043ad60bdf899d
+  fingerprint: canonical-source_b2e1d369e08cd6f79b42a901a8e29627d5bd717cc770566e92de4271b0c95ba3
   request_hash: 083080f78c2afccc7b5899d4ac380e67011dcb7d6a132d963048971f402403e9
   recorded_at: '2026-07-25T23:31:13.924459+00:00'
   request_id: gen-1785022270-8UfN3qHgvj7KRyTXVLwF
@@ -28,9 +28,9 @@ parsed_response:
     - MF_SCALE_HISTORY
     - MF_HEALTH_HISTORY
     input_hash: 28a747a2e831850cf03268fbc1d9e84f72194ff89206f9a0d78119a77799f445
-    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
+    engine_source_hash: b03aa6b34281109c7a2a7726f0788bbbd1368e5df1d15ca94a1791bbaf273d17
     calculated_at: '2026-07-25T23:31:13Z'
-    code_revision: engine:64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
+    code_revision: engine:b03aa6b34281109c7a2a7726f0788bbbd1368e5df1d15ca94a1791bbaf273d17
   result:
     rok: 2019
     przychody_roczne:

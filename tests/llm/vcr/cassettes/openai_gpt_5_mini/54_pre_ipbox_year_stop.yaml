@@ -4,7 +4,7 @@ meta:
   provider: openrouter
   requested_model: openai/gpt-5-mini
   returned_model: openai/gpt-5-mini
-  fingerprint: canonical-source_a3825085bf11bf612900b78c9bf727b6b81726881d55b4114eda936cbd594a67
+  fingerprint: canonical-source_994b518a3591039914446fdce7e1b3e6ef37ba68be3795dbb9a8c48835aa732b
   request_hash: af932a00dcfd3edb9e864929162c48f9a693ddd2de2ba8b1456da1be81e093a7
   recorded_at: '2026-07-27T22:31:35.015861+00:00'
   request_id: gen-1785191493-FzXnjBEzZrn2huJeDDsJ
@@ -25,9 +25,9 @@ parsed_response:
     rules_source_ids:
     - UNVERIFIED_YEAR
     input_hash: 027f2f907cd374b0d6ef7c0a68d6625eb1af4e1a42769ec3c92629ac793cb211
-    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
+    engine_source_hash: b03aa6b34281109c7a2a7726f0788bbbd1368e5df1d15ca94a1791bbaf273d17
     calculated_at: '2026-07-27T22:31:35Z'
-    code_revision: engine:64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
+    code_revision: engine:b03aa6b34281109c7a2a7726f0788bbbd1368e5df1d15ca94a1791bbaf273d17
   result:
     rok: 2018
     przychody_roczne:

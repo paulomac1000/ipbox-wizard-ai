@@ -4,7 +4,7 @@ meta:
   provider: openrouter
   requested_model: openai/gpt-5-mini
   returned_model: openai/gpt-5-mini
-  fingerprint: canonical-source_a577f99b6ab92cd5937ac4b1cf1d85121c9da0c2a2878f264e5eab29ee5c9390
+  fingerprint: canonical-source_0763b0552e372f52bee43323c4c96c19255a2ef0a14101f58194608c347ec514
   request_hash: 2c8a48d145817f72edc79355248fcb047bb6d486fc77012ed72c1fc2896d2fcf
   recorded_at: '2026-07-27T22:30:39.038677+00:00'
   request_id: gen-1785191437-R2Ozg8lHIUTTTndIYti0
@@ -29,9 +29,9 @@ parsed_response:
     - MF_HEALTH
     - MF_IPBOX_BR
     input_hash: 90c8bced06ab45719c44d8513b81df1ccfdfe007c306bfcd5132b507378c1c9e
-    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
+    engine_source_hash: b03aa6b34281109c7a2a7726f0788bbbd1368e5df1d15ca94a1791bbaf273d17
     calculated_at: '2026-07-27T22:30:39Z'
-    code_revision: engine:64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
+    code_revision: engine:b03aa6b34281109c7a2a7726f0788bbbd1368e5df1d15ca94a1791bbaf273d17
   result:
     rok: 2025
     przychody_roczne:
