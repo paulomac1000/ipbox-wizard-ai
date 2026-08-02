@@ -1,371 +1,371 @@
 model: anthropic/claude-haiku-4.5
-generated_at: '2026-08-02T20:17:52.134065+00:00'
+generated_at: '2026-08-02T21:17:39.740162+00:00'
 entries:
   01_basic_linear:
     file: 01_basic_linear.yaml
-    fingerprint: canonical-source_db19c3fa9097adb4448521095bc043e75f0386de6aa1001bf078cee48742e13e
+    fingerprint: canonical-source_ad7afa54ee6b999ab01001fc0458be6d7be0dd5487db09fa6011b6f8baf6a8b2
     request_hash: b03223a96bf977f3d05d1a1b20b40481314e1aabec1534bc4bd0f0f43e20e63d
-    engine_source_hash: 68b9a195f0689028c7c3ac5fe07a5e3c6c82233ec15f0588cbc1b6b7a3787046
+    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
     recorded_at: '2026-07-25T23:23:19.570123+00:00'
     returned_model: anthropic/claude-haiku-4.5
     cost: 0.000871
   02_basic_scale_single_client:
     file: 02_basic_scale_single_client.yaml
-    fingerprint: canonical-source_40e17f07d1a8c2b62eed1d81fe0b7bf36584f71c81782f6eb88d2b4b7a66177f
+    fingerprint: canonical-source_1c32209ad550ce5b3b49ccb5b579ae468728f6f8d043b94f10233d9d4ad60eb1
     request_hash: 3bcfd0fe9cc23fd8a8b342c08e31b8f18c22d380f8974c1f39afd425cec3ccd0
-    engine_source_hash: 68b9a195f0689028c7c3ac5fe07a5e3c6c82233ec15f0588cbc1b6b7a3787046
+    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
     recorded_at: '2026-07-25T23:23:22.839892+00:00'
     returned_model: anthropic/claude-haiku-4.5
     cost: 0.000901
   03_fx_usd_single_client:
     file: 03_fx_usd_single_client.yaml
-    fingerprint: canonical-source_4ad839751d70c741abdb70efb24ebae8c5f6fd63e8a42bb0ef68c672d3b23688
+    fingerprint: canonical-source_4082a24676e6f6cc7f89973091c531b5251f6654b0e243fce9f8de15057493d7
     request_hash: 3bcfd0fe9cc23fd8a8b342c08e31b8f18c22d380f8974c1f39afd425cec3ccd0
-    engine_source_hash: 68b9a195f0689028c7c3ac5fe07a5e3c6c82233ec15f0588cbc1b6b7a3787046
+    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
     recorded_at: '2026-07-25T23:23:25.740821+00:00'
     returned_model: anthropic/claude-haiku-4.5
     cost: 0.000901
   11_multi_client_mixed_currencies:
     file: 11_multi_client_mixed_currencies.yaml
-    fingerprint: canonical-source_4797959cb7d4f3663206477c4b54b5b498e81b11beccfe2e10a9ced79d994704
+    fingerprint: canonical-source_5a7240cf40db00adf527db716ff0c20010ad2472609b95c37baa1460128c752d
     request_hash: 8b64f7ee89e5aa152215836043620acc0a715ccd0e6b01f8efcbca51320a067a
-    engine_source_hash: 68b9a195f0689028c7c3ac5fe07a5e3c6c82233ec15f0588cbc1b6b7a3787046
+    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
     recorded_at: '2026-07-25T23:23:28.808443+00:00'
     returned_model: anthropic/claude-haiku-4.5
     cost: 0.000871
   12_zus_in_pit_path:
     file: 12_zus_in_pit_path.yaml
-    fingerprint: canonical-source_c6014ae7a0d8b4fdd7ed41f40b5f66d80bd25cfc382dd2d4116f691ae7c2b013
+    fingerprint: canonical-source_d07c049905645a1a6a83109a19ce0be07cf8c6fea4c50f92092fdfde95a07324
     request_hash: 8b64f7ee89e5aa152215836043620acc0a715ccd0e6b01f8efcbca51320a067a
-    engine_source_hash: 68b9a195f0689028c7c3ac5fe07a5e3c6c82233ec15f0588cbc1b6b7a3787046
+    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
     recorded_at: '2026-07-25T23:23:33.337473+00:00'
     returned_model: anthropic/claude-haiku-4.5
     cost: 0.000871
   13_income_from_employment_impact:
     file: 13_income_from_employment_impact.yaml
-    fingerprint: canonical-source_21a3900dbb751ae26e88e18dfc1c386decd52898f1329576cf393b90360f9ac6
+    fingerprint: canonical-source_0beaf043b9c94ee909d35529dfb35467bdc8d49b781bdd64733251e42648d86d
     request_hash: 8b64f7ee89e5aa152215836043620acc0a715ccd0e6b01f8efcbca51320a067a
-    engine_source_hash: 68b9a195f0689028c7c3ac5fe07a5e3c6c82233ec15f0588cbc1b6b7a3787046
+    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
     recorded_at: '2026-07-25T23:23:36.800414+00:00'
     returned_model: anthropic/claude-haiku-4.5
     cost: 0.000871
   14_lump_sum_ineligible_check:
     file: 14_lump_sum_ineligible_check.yaml
-    fingerprint: canonical-source_2fadf1844ca0b48f9664dd0e8ac30b10b50d9797fde6e09f822089a88d0bd920
+    fingerprint: canonical-source_48f49f156ce190ca55961da26290bd80520ee7bbee23718ea99ba55a99a38dc6
     request_hash: ef58ad39d0ad0ae1766ce0da5ab70ac325957f92e9d0eca7c0487afef3d43636
-    engine_source_hash: 68b9a195f0689028c7c3ac5fe07a5e3c6c82233ec15f0588cbc1b6b7a3787046
+    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
     recorded_at: '2026-07-25T23:23:39.941108+00:00'
     returned_model: anthropic/claude-haiku-4.5
     cost: 0.000871
   15_vacation_sick_mix:
     file: 15_vacation_sick_mix.yaml
-    fingerprint: canonical-source_a7b9768383a3a68007593ff1c9f8c241fca36a8776d83cee590d171e1ea38853
+    fingerprint: canonical-source_e916bb9b607091a1f203bd8c86c2908b527d12e48516820772b663e771ac14b4
     request_hash: b03223a96bf977f3d05d1a1b20b40481314e1aabec1534bc4bd0f0f43e20e63d
-    engine_source_hash: 68b9a195f0689028c7c3ac5fe07a5e3c6c82233ec15f0588cbc1b6b7a3787046
+    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
     recorded_at: '2026-07-25T23:23:43.294367+00:00'
     returned_model: anthropic/claude-haiku-4.5
     cost: 0.000871
   16_high_w_review:
     file: 16_high_w_review.yaml
-    fingerprint: canonical-source_fdcb48594ebb2f5d4c0c8d9ff589681f06679c0d3cc388676a0066073dfb4d32
+    fingerprint: canonical-source_7eec7b084be981c12fd90657741bc0e72699cb5eb8afb43693bc4b62dd777a9b
     request_hash: 3bcfd0fe9cc23fd8a8b342c08e31b8f18c22d380f8974c1f39afd425cec3ccd0
-    engine_source_hash: 68b9a195f0689028c7c3ac5fe07a5e3c6c82233ec15f0588cbc1b6b7a3787046
+    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
     recorded_at: '2026-07-25T23:23:46.700172+00:00'
     returned_model: anthropic/claude-haiku-4.5
     cost: 0.000901
   17_low_w_review:
     file: 17_low_w_review.yaml
-    fingerprint: canonical-source_e1b4058399eec683212009dd11b6d100579d8bac0bb46fd6e465a4cfd1cd9e71
+    fingerprint: canonical-source_9cd7242328b271c18af4c8124ab85857aa466ae69df1b109cb9b3bdc34ff9fee
     request_hash: d1aa79f807d51c409610b96a68161574be9df980be7de1ac3f3b0a31227f22ba
-    engine_source_hash: 68b9a195f0689028c7c3ac5fe07a5e3c6c82233ec15f0588cbc1b6b7a3787046
+    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
     recorded_at: '2026-07-25T23:23:49.884809+00:00'
     returned_model: anthropic/claude-haiku-4.5
     cost: 0.000901
   18_logic_zero_work_hours:
     file: 18_logic_zero_work_hours.yaml
-    fingerprint: canonical-source_dbe5bc7d84c137d9078638d55f2e0a723503170dc1205df80260aae48471d132
+    fingerprint: canonical-source_4d79ebea26fd4535ac3f26a6e071c10ce7abccb95ad9e2578c9c3aed39b54c08
     request_hash: ce727ea89a0e7c961be44a0605de0d0b3f0a6fe477a7a0bd70932ac5c192b8d0
-    engine_source_hash: 68b9a195f0689028c7c3ac5fe07a5e3c6c82233ec15f0588cbc1b6b7a3787046
+    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
     recorded_at: '2026-07-25T23:23:52.976285+00:00'
     returned_model: anthropic/claude-haiku-4.5
     cost: 0.000901
   21_monthly_loss_impact:
     file: 21_monthly_loss_impact.yaml
-    fingerprint: canonical-source_a32656ee1c76d901a802486341e3f0549bf6591e4d27f8592d579f767b8dffb2
+    fingerprint: canonical-source_aca1d4dd525e7f31e82f5fc276928106eced0d234a5623c31d4f4c03e5fc4318
     request_hash: 3bcfd0fe9cc23fd8a8b342c08e31b8f18c22d380f8974c1f39afd425cec3ccd0
-    engine_source_hash: 68b9a195f0689028c7c3ac5fe07a5e3c6c82233ec15f0588cbc1b6b7a3787046
+    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
     recorded_at: '2026-07-25T23:23:57.494557+00:00'
     returned_model: anthropic/claude-haiku-4.5
     cost: 0.000901
   22_related_parties_nexus_reduction:
     file: 22_related_parties_nexus_reduction.yaml
-    fingerprint: canonical-source_87fb6e4d3a618019ec1618199667798c85a831028ea820c88eee6703ca958af8
+    fingerprint: canonical-source_d4d6c2b440e30fb77d5e3eabf92111d15063c1e2cab2f6e9c9f15c539e9a71a8
     request_hash: 3bcfd0fe9cc23fd8a8b342c08e31b8f18c22d380f8974c1f39afd425cec3ccd0
-    engine_source_hash: 68b9a195f0689028c7c3ac5fe07a5e3c6c82233ec15f0588cbc1b6b7a3787046
+    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
     recorded_at: '2026-07-25T23:24:00.666474+00:00'
     returned_model: anthropic/claude-haiku-4.5
     cost: 0.000901
   23_loss_carry_forward:
     file: 23_loss_carry_forward.yaml
-    fingerprint: canonical-source_0a245059666ecf98c2b62e0be0d9cfcaca73ece1e76867da5610de9be6a14718
+    fingerprint: canonical-source_02625c55ba19926ed2b6746135fc279d64e964aba909d6dc3d781d2b9ea43f4a
     request_hash: 230dfa26c8d9da355cd2f802587d9506d982df3485587812e9f79b9458ac74fd
-    engine_source_hash: 68b9a195f0689028c7c3ac5fe07a5e3c6c82233ec15f0588cbc1b6b7a3787046
+    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
     recorded_at: '2026-07-25T23:24:04.272979+00:00'
     returned_model: anthropic/claude-haiku-4.5
     cost: 0.000841
   24_donations_relief:
     file: 24_donations_relief.yaml
-    fingerprint: canonical-source_2ad0c1715e86511e785cc72a9b6c602125649bf11cf979522779c36ffd674810
+    fingerprint: canonical-source_ba4724f132e8f74d51bca8af857cf9958c5f060df490b594befce685b77cea0f
     request_hash: 230dfa26c8d9da355cd2f802587d9506d982df3485587812e9f79b9458ac74fd
-    engine_source_hash: 68b9a195f0689028c7c3ac5fe07a5e3c6c82233ec15f0588cbc1b6b7a3787046
+    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
     recorded_at: '2026-07-25T23:24:08.561621+00:00'
     returned_model: anthropic/claude-haiku-4.5
     cost: 0.000841
   25_rehab_relief:
     file: 25_rehab_relief.yaml
-    fingerprint: canonical-source_5ce469fcc33819d958e895ffbf70838d8f12aa19b9f9f43126b25ec30ab95949
+    fingerprint: canonical-source_c8e9e601bb723654072be44102a9d4f0ccb0fdb99b1e2da2f91d5d23eeb5442a
     request_hash: 230dfa26c8d9da355cd2f802587d9506d982df3485587812e9f79b9458ac74fd
-    engine_source_hash: 68b9a195f0689028c7c3ac5fe07a5e3c6c82233ec15f0588cbc1b6b7a3787046
+    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
     recorded_at: '2026-07-25T23:24:11.927780+00:00'
     returned_model: anthropic/claude-haiku-4.5
     cost: 0.000841
   26_rd_relief_nexus:
     file: 26_rd_relief_nexus.yaml
-    fingerprint: canonical-source_7a610c1a221e5eac7b504b589e49af25d189924ad648ed4f8f6ed1bd6cc38eab
+    fingerprint: canonical-source_7156e409b90b9d5a13139261d663e763c80d3afe3a184534d3103ee2cc3842a2
     request_hash: b03223a96bf977f3d05d1a1b20b40481314e1aabec1534bc4bd0f0f43e20e63d
-    engine_source_hash: 68b9a195f0689028c7c3ac5fe07a5e3c6c82233ec15f0588cbc1b6b7a3787046
+    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
     recorded_at: '2026-07-25T23:24:15.483870+00:00'
     returned_model: anthropic/claude-haiku-4.5
     cost: 0.000871
   27_termomodernizacja_full:
     file: 27_termomodernizacja_full.yaml
-    fingerprint: canonical-source_369290cab6faf1ab10bb4aa3bfd8bead13b91362c732452d0bdabbb6f4fff9ef
+    fingerprint: canonical-source_9e93d45b6169475e5971ee148ca62dd1471f61bfbcea7dc922718123becf06f2
     request_hash: b03223a96bf977f3d05d1a1b20b40481314e1aabec1534bc4bd0f0f43e20e63d
-    engine_source_hash: 68b9a195f0689028c7c3ac5fe07a5e3c6c82233ec15f0588cbc1b6b7a3787046
+    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
     recorded_at: '2026-07-25T23:24:18.865895+00:00'
     returned_model: anthropic/claude-haiku-4.5
     cost: 0.000871
   28_edge_multiple_carry-overs:
     file: 28_edge_multiple_carry-overs.yaml
-    fingerprint: canonical-source_05c7b70afa355d744550ca078f6187994f9a3a31bd723e782bd089472b09a594
+    fingerprint: canonical-source_835e660c1620ba256500d12399f34c353b06c8b22f9e38d88970b0f39acdfa8d
     request_hash: 3bcfd0fe9cc23fd8a8b342c08e31b8f18c22d380f8974c1f39afd425cec3ccd0
-    engine_source_hash: 68b9a195f0689028c7c3ac5fe07a5e3c6c82233ec15f0588cbc1b6b7a3787046
+    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
     recorded_at: '2026-07-25T23:24:22.487685+00:00'
     returned_model: anthropic/claude-haiku-4.5
     cost: 0.000901
   29_edge_related_parties_nexus_0:
     file: 29_edge_related_parties_nexus_0.yaml
-    fingerprint: canonical-source_84addfbc3d441f0e653117f154ed94d1d79cd68ab61ec58570165f82652b7c8b
+    fingerprint: canonical-source_f46f721becedb40d71633aed923e2eb55fbe8fcd2f54113f3f6490dc374ae355
     request_hash: 3bcfd0fe9cc23fd8a8b342c08e31b8f18c22d380f8974c1f39afd425cec3ccd0
-    engine_source_hash: 68b9a195f0689028c7c3ac5fe07a5e3c6c82233ec15f0588cbc1b6b7a3787046
+    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
     recorded_at: '2026-07-25T23:24:26.051943+00:00'
     returned_model: anthropic/claude-haiku-4.5
     cost: 0.000901
   30_edge_related_parties_nexus_mixed:
     file: 30_edge_related_parties_nexus_mixed.yaml
-    fingerprint: canonical-source_51b2cc51ba87f6c78abd5bdc1ee3a76ef34754aa8130fe803b37395e41025e68
+    fingerprint: canonical-source_24740089e35b3cbe8918c21748ce01916f9b3911ef168ce8567a7fb730c1f2d7
     request_hash: 3bcfd0fe9cc23fd8a8b342c08e31b8f18c22d380f8974c1f39afd425cec3ccd0
-    engine_source_hash: 68b9a195f0689028c7c3ac5fe07a5e3c6c82233ec15f0588cbc1b6b7a3787046
+    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
     recorded_at: '2026-07-25T23:24:29.690105+00:00'
     returned_model: anthropic/claude-haiku-4.5
     cost: 0.000901
   31_zus_double_dip_fail:
     file: 31_zus_double_dip_fail.yaml
-    fingerprint: canonical-source_4bd013473e6da10e6d6716732e535f874dbe456d52420606b8a802d47a19ec49
+    fingerprint: canonical-source_25d6f84f9640452ff18267e8805305e0283e900aba8118e3430860973627af60
     request_hash: d7ce56dcc8b9060ad5ead96051248ab554bb72c5216e7a4b2bf39ee2967a2bea
-    engine_source_hash: 68b9a195f0689028c7c3ac5fe07a5e3c6c82233ec15f0588cbc1b6b7a3787046
+    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
     recorded_at: '2026-07-25T23:24:33.398917+00:00'
     returned_model: anthropic/claude-haiku-4.5
     cost: 0.000955
   32_private_costs_ip_fail:
     file: 32_private_costs_ip_fail.yaml
-    fingerprint: canonical-source_720ca9e1ac7d36c484996415a9a72d0461c445725551561d088a7af21af1b8bb
+    fingerprint: canonical-source_c33061fb896db743f9e402e0125a1b0435cae924c0a2f337970e553ff780998e
     request_hash: dbeab6197ce641656d4edb70e49240a358dba8ddf98ebeb80e93b9592603ac08
-    engine_source_hash: 68b9a195f0689028c7c3ac5fe07a5e3c6c82233ec15f0588cbc1b6b7a3787046
+    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
     recorded_at: '2026-07-25T23:24:37.447081+00:00'
     returned_model: anthropic/claude-haiku-4.5
     cost: 0.001009
   33_kpir_balance_fail:
     file: 33_kpir_balance_fail.yaml
-    fingerprint: canonical-source_762cb7b8d18eaa04db0b831bab6a1253cf48a12b9bf6ab1b5a7a001fe04e5f4d
+    fingerprint: canonical-source_f9916ce5efcd46a085fdcb53e1f882fa106c2fb13029e7d18c5c78a152dc6fbf
     request_hash: 3bcfd0fe9cc23fd8a8b342c08e31b8f18c22d380f8974c1f39afd425cec3ccd0
-    engine_source_hash: 68b9a195f0689028c7c3ac5fe07a5e3c6c82233ec15f0588cbc1b6b7a3787046
+    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
     recorded_at: '2026-07-25T23:24:41.356188+00:00'
     returned_model: anthropic/claude-haiku-4.5
     cost: 0.000901
   34_verify_fixed_asset_threshold_fail:
     file: 34_verify_fixed_asset_threshold_fail.yaml
-    fingerprint: canonical-source_284b4e2526cb26d0047a795f5a818e3cc3d1c819de73a89df0cfbe15aed13fde
+    fingerprint: canonical-source_fe603f06b996681caef444d74ad04a4e5775139e883fca3c69c6d22222f68766
     request_hash: 3bcfd0fe9cc23fd8a8b342c08e31b8f18c22d380f8974c1f39afd425cec3ccd0
-    engine_source_hash: 68b9a195f0689028c7c3ac5fe07a5e3c6c82233ec15f0588cbc1b6b7a3787046
+    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
     recorded_at: '2026-07-25T23:24:45.053200+00:00'
     returned_model: anthropic/claude-haiku-4.5
     cost: 0.000901
   35_verify_monthly_w_jump_inconsistency:
     file: 35_verify_monthly_w_jump_inconsistency.yaml
-    fingerprint: canonical-source_bc2d9f25daea5435825cd68dff5d114fc73df3e84761dbe458a32f89716c57fb
+    fingerprint: canonical-source_c81c75d04475b0d9d153f8ae40df1816b209003a29c936ea0f72519be6cb916a
     request_hash: 43d65c3aaa5bd39bca80f7146ef7a08f11cc332b2c81d260a362f69e1a02d1e0
-    engine_source_hash: 68b9a195f0689028c7c3ac5fe07a5e3c6c82233ec15f0588cbc1b6b7a3787046
+    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
     recorded_at: '2026-07-25T23:24:49.024310+00:00'
     returned_model: anthropic/claude-haiku-4.5
     cost: 0.000931
   36_verify_negative_income_error:
     file: 36_verify_negative_income_error.yaml
-    fingerprint: canonical-source_8a67d987a96a3fda1a66b66bc3512da43a3ec97e756a4b65e13f60a8466f6e39
+    fingerprint: canonical-source_17f2f23e5085a1e35c34c0fd5db9cacb9e9e4ee74f4d1fd85cea01958ca59d83
     request_hash: 3bcfd0fe9cc23fd8a8b342c08e31b8f18c22d380f8974c1f39afd425cec3ccd0
-    engine_source_hash: 68b9a195f0689028c7c3ac5fe07a5e3c6c82233ec15f0588cbc1b6b7a3787046
+    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
     recorded_at: '2026-07-25T23:24:52.737529+00:00'
     returned_model: anthropic/claude-haiku-4.5
     cost: 0.000901
   37_verify_invalid_tax_form_stop:
     file: 37_verify_invalid_tax_form_stop.yaml
-    fingerprint: canonical-source_4661316d535bb1d6c455ed4a74171f885ac1dd8f98a4b942d61494717858c871
+    fingerprint: canonical-source_34ad17684721203da3974043a17a7424f009014c89b8ae99f3194eefd2395806
     request_hash: f6032347d0211f9cfe5533e3ad7f22c0f7af20fec52b27abe0c8220f02cccfc3
-    engine_source_hash: 68b9a195f0689028c7c3ac5fe07a5e3c6c82233ec15f0588cbc1b6b7a3787046
+    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
     recorded_at: '2026-07-25T23:24:56.807411+00:00'
     returned_model: anthropic/claude-haiku-4.5
     cost: 0.000931
   38_verify_missing_kpir_data:
     file: 38_verify_missing_kpir_data.yaml
-    fingerprint: canonical-source_7551bcc442192d7b1268656a771c742b8949424f3dd25b6c30a12ece0a30b281
+    fingerprint: canonical-source_5357abc6d210017953087eb44a74c1b3a5427480804b76ec0673c501c393c9b5
     request_hash: 262d21b70433853af1b64ad38ad1b61ff55a3fc1c2d53aefb8a9ba076e89eef2
-    engine_source_hash: 68b9a195f0689028c7c3ac5fe07a5e3c6c82233ec15f0588cbc1b6b7a3787046
+    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
     recorded_at: '2026-07-25T23:25:00.632430+00:00'
     returned_model: anthropic/claude-haiku-4.5
     cost: 0.000901
   39_multi_project_weighted_W:
     file: 39_multi_project_weighted_W.yaml
-    fingerprint: canonical-source_a2df122e723c0275091f6c2261d1485a331feaab80ab19fcc9c02fa658f6f4ec
+    fingerprint: canonical-source_cd6276bbfaf206cc29b4675272367287ebb06cd3cb72cf277c213e06a0632d4c
     request_hash: 9925851f9944f40d03cee5330f8ee58287ed1f62ed183b1a0ae84b6a40cb3842
-    engine_source_hash: 68b9a195f0689028c7c3ac5fe07a5e3c6c82233ec15f0588cbc1b6b7a3787046
+    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
     recorded_at: '2026-07-25T23:25:04.775315+00:00'
     returned_model: anthropic/claude-haiku-4.5
     cost: 0.000871
   40_mixed_ip_clause:
     file: 40_mixed_ip_clause.yaml
-    fingerprint: canonical-source_b0a6b9755ccfa2d77270b2d2aafc2ce884cad5749f0fdb9724438d2bea31164b
+    fingerprint: canonical-source_afbf20f9dc9ee74e0378a78f85e6915a7601457bc4f60fc390a426aa2e8d8cc8
     request_hash: 8b64f7ee89e5aa152215836043620acc0a715ccd0e6b01f8efcbca51320a067a
-    engine_source_hash: 68b9a195f0689028c7c3ac5fe07a5e3c6c82233ec15f0588cbc1b6b7a3787046
+    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
     recorded_at: '2026-07-25T23:25:08.694146+00:00'
     returned_model: anthropic/claude-haiku-4.5
     cost: 0.000871
   41_ikze_cascade:
     file: 41_ikze_cascade.yaml
-    fingerprint: canonical-source_081f08b8c16857aabd31b8eabf56dbf29b07ae8b150b24acb3d50716f13cde7e
+    fingerprint: canonical-source_ebada49384e99ec0ab8bcbb0c27e6435d7dd8794a566610cbfa49e39a0115aaa
     request_hash: b03223a96bf977f3d05d1a1b20b40481314e1aabec1534bc4bd0f0f43e20e63d
-    engine_source_hash: 68b9a195f0689028c7c3ac5fe07a5e3c6c82233ec15f0588cbc1b6b7a3787046
+    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
     recorded_at: '2026-07-25T23:25:13.041114+00:00'
     returned_model: anthropic/claude-haiku-4.5
     cost: 0.000871
   42_stop_08_no_documentation:
     file: 42_stop_08_no_documentation.yaml
-    fingerprint: canonical-source_d6ef68aa928982cf04273cf9e23abe482c0ebf361eb2b36b3e7822f0301e31be
+    fingerprint: canonical-source_b96b7f3cb286abb7940b9b307ce29067a75a1a0afbbe82a326909da38078f916
     request_hash: 262d21b70433853af1b64ad38ad1b61ff55a3fc1c2d53aefb8a9ba076e89eef2
-    engine_source_hash: 68b9a195f0689028c7c3ac5fe07a5e3c6c82233ec15f0588cbc1b6b7a3787046
+    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
     recorded_at: '2026-07-25T23:25:17.288603+00:00'
     returned_model: anthropic/claude-haiku-4.5
     cost: 0.000901
   43_review_09_single_client_100pct:
     file: 43_review_09_single_client_100pct.yaml
-    fingerprint: canonical-source_aabbd65986aae601c7cc392b17672ec75e9279067b26e0afdf17536d7074688b
+    fingerprint: canonical-source_a6bf51d095219d60747235e2433d5358665645b5cc6c487dfd78837ba358d64f
     request_hash: 3bcfd0fe9cc23fd8a8b342c08e31b8f18c22d380f8974c1f39afd425cec3ccd0
-    engine_source_hash: 68b9a195f0689028c7c3ac5fe07a5e3c6c82233ec15f0588cbc1b6b7a3787046
+    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
     recorded_at: '2026-07-25T23:25:21.618898+00:00'
     returned_model: anthropic/claude-haiku-4.5
     cost: 0.000901
   44_mix_revenue_key_kis:
     file: 44_mix_revenue_key_kis.yaml
-    fingerprint: canonical-source_8b7b44dce308040d1be827e25c99c01d6838c4bba384ddd88cf70631d806adaf
+    fingerprint: canonical-source_1a916d7318633fcf6827678d04cc09354ce90bcc06025dcba91de6391228c8ab
     request_hash: 60a2ed5f564d1b8f269efd68d9e2ba0312727ba5940abf3616b3243e8ed6cd76
-    engine_source_hash: 68b9a195f0689028c7c3ac5fe07a5e3c6c82233ec15f0588cbc1b6b7a3787046
+    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
     recorded_at: '2026-07-25T23:25:26.044018+00:00'
     returned_model: anthropic/claude-haiku-4.5
     cost: 0.000931
   45_multi_ip_two_stage:
     file: 45_multi_ip_two_stage.yaml
-    fingerprint: canonical-source_376eab0275a9f4079ed3e25ae1700b805e5d02754295a8af3b9aef3e7720bcd3
+    fingerprint: canonical-source_ee25018e1e3a1300eb08aefe7640266947d4931cbf8080d75fe8002f28f02188
     request_hash: a8685bd6b3989b961e640ef4ec3c14e842946bb642013c14165d5cd4ba8f9526
-    engine_source_hash: 68b9a195f0689028c7c3ac5fe07a5e3c6c82233ec15f0588cbc1b6b7a3787046
+    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
     recorded_at: '2026-07-25T23:25:30.494393+00:00'
     returned_model: anthropic/claude-haiku-4.5
     cost: 0.000931
   46_historical_2019_health_credit:
     file: 46_historical_2019_health_credit.yaml
-    fingerprint: canonical-source_cb397bc0a5d08717b0c6ec15e0fab627a4a447f1dc0e8a9785d29b90dceaff92
+    fingerprint: canonical-source_04d9b52eac31fc8ca6f1ae8c6d97fcc5cd882f87989a7c6d4c507e08a4893103
     request_hash: b03223a96bf977f3d05d1a1b20b40481314e1aabec1534bc4bd0f0f43e20e63d
-    engine_source_hash: 68b9a195f0689028c7c3ac5fe07a5e3c6c82233ec15f0588cbc1b6b7a3787046
+    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
     recorded_at: '2026-07-25T23:25:35.073520+00:00'
     returned_model: anthropic/claude-haiku-4.5
     cost: 0.000871
   47_historical_2021_br_ipbox_stop:
     file: 47_historical_2021_br_ipbox_stop.yaml
-    fingerprint: canonical-source_d9cb9021d0fc0d8ed64ab38e4448dcb7cc8fd0b9c4549e8fb969555a55a1071e
+    fingerprint: canonical-source_0df2119d43c523b680c1637e532a97a8f6a20125f8e5b637d33d4321c404dcbe
     request_hash: 9f1cd167953464d0631e484d0d32157b6266c4bdc23a4140b9f7b4916bbf12ce
-    engine_source_hash: 68b9a195f0689028c7c3ac5fe07a5e3c6c82233ec15f0588cbc1b6b7a3787046
+    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
     recorded_at: '2026-07-25T23:25:39.925124+00:00'
     returned_model: anthropic/claude-haiku-4.5
     cost: 0.000901
   48_historical_2024_pit_like_cascade:
     file: 48_historical_2024_pit_like_cascade.yaml
-    fingerprint: canonical-source_a3075504a3f16f647d98952178d29ea05ef8b3fd276910adff4dd2cd9c273edb
+    fingerprint: canonical-source_d45ae8f68fac66ed5befe1aef61c9bc89f82cacfc552c350c50c14d8f4b958c5
     request_hash: b03223a96bf977f3d05d1a1b20b40481314e1aabec1534bc4bd0f0f43e20e63d
-    engine_source_hash: 68b9a195f0689028c7c3ac5fe07a5e3c6c82233ec15f0588cbc1b6b7a3787046
+    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
     recorded_at: '2026-07-25T23:25:44.290161+00:00'
     returned_model: anthropic/claude-haiku-4.5
     cost: 0.000871
   49_double_invoice_percentage_stop:
     file: 49_double_invoice_percentage_stop.yaml
-    fingerprint: canonical-source_f228626a77a38347b24781ea6cdb8e814f0c21cde738487ac622fac841eec439
+    fingerprint: canonical-source_0b482ce493e522b4c1fcce3eef3f7538e684aeb89714a03524e504a6a0469bb9
     request_hash: 4993f07a40973dd09bbabbc6389c786796561df4164306520b05ce94e182c8e1
-    engine_source_hash: 68b9a195f0689028c7c3ac5fe07a5e3c6c82233ec15f0588cbc1b6b7a3787046
+    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
     recorded_at: '2026-07-25T23:25:48.772837+00:00'
     returned_model: anthropic/claude-haiku-4.5
     cost: 0.000931
   50_silent_allocation_method_switch_stop:
     file: 50_silent_allocation_method_switch_stop.yaml
-    fingerprint: canonical-source_72344aeb3dfaa6c96e0328e008934a23abecb0a8fd4ef7542ed4ffd2acf15aea
+    fingerprint: canonical-source_283d741fdd2a4b7ef2ef65e643abef5caf63fbc5f72b801b4dccfe71051b695c
     request_hash: e6a10570419bc34a6ba11932960083d81abcb51243fd1703fc55618601941296
-    engine_source_hash: 68b9a195f0689028c7c3ac5fe07a5e3c6c82233ec15f0588cbc1b6b7a3787046
+    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
     recorded_at: '2026-07-25T23:25:53.455203+00:00'
     returned_model: anthropic/claude-haiku-4.5
     cost: 0.000961
   51_return_ledger_classification_shift_stop:
     file: 51_return_ledger_classification_shift_stop.yaml
-    fingerprint: canonical-source_81d885ad0e2125024c7969756601910ecc9660839e775b8bff32dab8aa9fd897
+    fingerprint: canonical-source_7b2f77be6a8950ff861f492deb34d82d1e8b71cb37e5862c19ae0449fd6b8b82
     request_hash: 3d3a093f2f341415bfa839ebf18677280a98d093400101b547cb232fcdc6a23e
-    engine_source_hash: 68b9a195f0689028c7c3ac5fe07a5e3c6c82233ec15f0588cbc1b6b7a3787046
+    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
     recorded_at: '2026-07-25T23:25:57.798903+00:00'
     returned_model: anthropic/claude-haiku-4.5
     cost: 0.000901
   52_cost_date_revenue_mix_policy:
     file: 52_cost_date_revenue_mix_policy.yaml
-    fingerprint: canonical-source_fce29d51d3af1bc6190f05b947253fa092dbe876e2e39b7ef460b220232df592
+    fingerprint: canonical-source_a913bb75ff65a6213d344142ddcb2831d55a7e5416559444f86af8cb1e64acfb
     request_hash: 60a2ed5f564d1b8f269efd68d9e2ba0312727ba5940abf3616b3243e8ed6cd76
-    engine_source_hash: 68b9a195f0689028c7c3ac5fe07a5e3c6c82233ec15f0588cbc1b6b7a3787046
+    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
     recorded_at: '2026-07-25T23:26:02.294817+00:00'
     returned_model: anthropic/claude-haiku-4.5
     cost: 0.000931
   53_historical_ikze_limit_exceeded_stop:
     file: 53_historical_ikze_limit_exceeded_stop.yaml
-    fingerprint: canonical-source_294ed60c072083db757724b11529d012bd36716117db41215c7bd6b6b89b9e72
+    fingerprint: canonical-source_0bbd04ca4abca6a49a415bbb45e82bad1e53df10fe22a4535bc8ea4a5a6eab63
     request_hash: b9678a11919995a539485fe2a0e7582b05c237be3fef143fc7f69c9386501578
-    engine_source_hash: 68b9a195f0689028c7c3ac5fe07a5e3c6c82233ec15f0588cbc1b6b7a3787046
+    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
     recorded_at: '2026-07-25T23:26:07.154932+00:00'
     returned_model: anthropic/claude-haiku-4.5
     cost: 0.000901
   54_pre_ipbox_year_stop:
     file: 54_pre_ipbox_year_stop.yaml
-    fingerprint: canonical-source_73529ba2e95f2bb38d51f2ea4c0dd6d7b68de4b6f43933ac044b7cc1135cac9e
+    fingerprint: canonical-source_13e50daac5ec2810d159a9cd90608a4e1a45176a7f1da183152a07c374108f71
     request_hash: 047806c2b55752da03998c85df71c128d8f4bde72f67f89485bbbb04b7992d50
-    engine_source_hash: 68b9a195f0689028c7c3ac5fe07a5e3c6c82233ec15f0588cbc1b6b7a3787046
+    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
     recorded_at: '2026-07-25T23:26:13.005990+00:00'
     returned_model: anthropic/claude-haiku-4.5
     cost: 0.000901
   55_disjoint_w_semantics_clean:
     file: 55_disjoint_w_semantics_clean.yaml
-    fingerprint: canonical-source_daf7313d9231e2f67b0155a97d90ccc37d23c1d54ceae1dfc2f85b8cf44b1e67
+    fingerprint: canonical-source_37b5e9a4cf7e72a72f96cad315c0686b5409027960bd90dbf6d86484363097dc
     request_hash: 230dfa26c8d9da355cd2f802587d9506d982df3485587812e9f79b9458ac74fd
-    engine_source_hash: 68b9a195f0689028c7c3ac5fe07a5e3c6c82233ec15f0588cbc1b6b7a3787046
+    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
     recorded_at: '2026-07-25T23:26:17.304866+00:00'
     returned_model: anthropic/claude-haiku-4.5
     cost: 0.000841

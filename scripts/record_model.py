@@ -266,6 +266,10 @@ def main() -> int:
             "VCR_MODE": "record",
             "VCR_CASSETTES_ROOT": str(cassette_root),
             "VCR_REJECTED_ROOT": str(rejected_root),
+            # The child pytest process performs an independent fail-closed
+            # accounting pass. Propagate effective CLI/.env limits explicitly.
+            "LLM_MAX_COST_PER_MODEL_USD": format(per_model_limit, ".17g"),
+            "LLM_MAX_TOTAL_COST_USD": format(total_limit, ".17g"),
         }
     )
     model_slug = slug(args.model)

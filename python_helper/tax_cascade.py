@@ -181,7 +181,10 @@ def calculate_tax_for_year(
                 }
             )
 
-    combined_remaining = business_remaining
+    # A current-year business loss may offset the ordinary IP remainder because
+    # both belong to the same business-income basket. Any unused loss must not
+    # spill into unrelated employment or other income taxed on the scale.
+    combined_remaining = max(Decimal("0"), business_remaining)
     if normalized_form == "scale":
         combined_remaining += values["extra_income_scale"]
     for label, field in (

@@ -83,6 +83,22 @@ def test_current_non_ip_loss_offsets_nexus_remainder() -> None:
     assert result["non_ip_tax_final"] == 950
 
 
+def test_current_business_loss_does_not_offset_unrelated_scale_income() -> None:
+    result = calculate_tax_for_year(
+        2025,
+        non_ip_income=-10_000,
+        ip_income=10_000,
+        nexus=0.5,
+        tax_form="skala",
+        extra_income_scale=100_000,
+    )
+
+    assert result["ordinary_ip_income"] == 5_000.0
+    assert result["ordinary_business_income_before_deductions"] == -5_000.0
+    assert result["ordinary_base_rounded"] == 100_000
+    assert result["extra_income_scale_included"] == 100_000.0
+
+
 def test_oracle_preserves_current_non_ip_loss_before_taxing_nexus_remainder() -> None:
     loaded = deepcopy(_scenario(30))
     loaded["input"]["kontrahenci"].append({"nazwa": "ClientB", "klauzula_IP": False})

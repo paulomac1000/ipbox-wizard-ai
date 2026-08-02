@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 import time
 from dataclasses import dataclass
 from datetime import UTC, datetime
@@ -12,6 +13,103 @@ from typing import Any
 import requests
 
 OPENROUTER_BASE = "https://openrouter.ai/api/v1/chat/completions"
+
+
+class PaidCostLimitError(RuntimeError):
+    """Raised when a paid pytest run reaches or exceeds its declared budget."""
+
+
+class PaidCostGuard:
+    """Process-local paid-cost accounting shared by the session-scoped client."""
+
+    def __init__(self, per_model_limit: float, total_limit: float) -> None:
+        self.per_model_limit = self._positive("LLM_MAX_COST_PER_MODEL_USD", per_model_limit)
+        self.total_limit = self._positive("LLM_MAX_TOTAL_COST_USD", total_limit)
+        self.model_costs: dict[str, float] = {}
+        self.total_cost = 0.0
+        self._exceeded_message: str | None = None
+
+    @staticmethod
+    def _positive(name: str, value: object) -> float:
+        if isinstance(value, bool):
+            raise ValueError(f"{name} must be a finite positive number")
+        try:
+            number = float(value)
+        except (TypeError, ValueError) as exc:
+            raise ValueError(f"{name} must be a finite positive number") from exc
+        if not math.isfinite(number) or number <= 0:
+            raise ValueError(f"{name} must be a finite positive number")
+        return number
+
+    @staticmethod
+    def _cost(value: object) -> float:
+        if isinstance(value, bool):
+            raise PaidCostLimitError("provider response cost must be a finite non-negative number")
+        try:
+            number = float(value)
+        except (TypeError, ValueError) as exc:
+            raise PaidCostLimitError(
+                "provider response cost must be a finite non-negative number"
+            ) from exc
+        if not math.isfinite(number) or number < 0:
+            raise PaidCostLimitError("provider response cost must be a finite non-negative number")
+        return number
+
+    @classmethod
+    def from_environment(cls) -> PaidCostGuard:
+        return cls(
+            environ.get("LLM_MAX_COST_PER_MODEL_USD"),
+            environ.get("LLM_MAX_TOTAL_COST_USD"),
+        )
+
+    def require_request_allowed(self, model: str) -> None:
+        if self._exceeded_message is not None:
+            raise PaidCostLimitError(self._exceeded_message)
+        model_cost = self.model_costs.get(model, 0.0)
+        if model_cost >= self.per_model_limit:
+            raise PaidCostLimitError(
+                f"paid cost limit reached for {model}: "
+                f"${model_cost:.6f} / ${self.per_model_limit:.6f}"
+            )
+        if self.total_cost >= self.total_limit:
+            raise PaidCostLimitError(
+                f"total paid cost limit reached: ${self.total_cost:.6f} / ${self.total_limit:.6f}"
+            )
+
+    def block_unaccounted_response(self, reason: str) -> None:
+        self._exceeded_message = (
+            "paid response could not be cost-accounted fail-closed: "
+            f"{reason}. No further provider request is allowed."
+        )
+
+    def account_cost(self, model: str, value: object) -> None:
+        try:
+            cost = self._cost(value)
+        except PaidCostLimitError as exc:
+            self.block_unaccounted_response(str(exc))
+            return
+        model_cost = self.model_costs.get(model, 0.0) + cost
+        total_cost = self.total_cost + cost
+        if not math.isfinite(model_cost) or not math.isfinite(total_cost):
+            raise PaidCostLimitError("paid cost accumulation overflowed")
+        self.model_costs[model] = model_cost
+        self.total_cost = total_cost
+
+        violations: list[str] = []
+        if model_cost > self.per_model_limit:
+            violations.append(f"{model} paid ${model_cost:.6f} > ${self.per_model_limit:.6f}")
+        if total_cost > self.total_limit:
+            violations.append(f"total paid ${total_cost:.6f} > ${self.total_limit:.6f}")
+        if violations:
+            self._exceeded_message = (
+                "paid cost guard exceeded after accounting the latest response; "
+                + "; ".join(violations)
+                + ". No further provider request is allowed."
+            )
+
+    def raise_if_exceeded(self) -> None:
+        if self._exceeded_message is not None:
+            raise PaidCostLimitError(self._exceeded_message)
 
 
 @dataclass(frozen=True, slots=True)
@@ -31,17 +129,26 @@ class LLMResponse:
 
 
 class LLMClient:
-    def __init__(self, require_api_key: bool = True):
+    def __init__(
+        self,
+        require_api_key: bool = True,
+        *,
+        enforce_cost_limits: bool = False,
+    ):
         provider = environ.get("LLM_PROVIDER", "openrouter")
         if provider != "openrouter":
             raise ValueError("Only OpenRouter is supported by the benchmark client")
         self.api_key = environ.get("OPENROUTER_API_KEY")
         if require_api_key and not self.api_key:
             raise ValueError("OPENROUTER_API_KEY is not set")
+        self.cost_guard = PaidCostGuard.from_environment() if enforce_cost_limits else None
 
     def call(self, payload: dict[str, Any], timeout: int = 180) -> LLMResponse:
         if not self.api_key:
             raise ValueError("OPENROUTER_API_KEY is not set")
+        model = str(payload["model"])
+        if self.cost_guard is not None:
+            self.cost_guard.require_request_allowed(model)
         response = requests.post(
             OPENROUTER_BASE,
             headers={
@@ -54,7 +161,21 @@ class LLMClient:
             timeout=timeout,
         )
         response.raise_for_status()
-        data = response.json()
+        try:
+            data = response.json()
+        except (TypeError, ValueError):
+            if self.cost_guard is not None:
+                self.cost_guard.block_unaccounted_response("provider returned invalid JSON")
+            raise
+        if not isinstance(data, dict):
+            if self.cost_guard is not None:
+                self.cost_guard.block_unaccounted_response("provider JSON root is not an object")
+            raise ValueError("OpenRouter response root must be an object")
+        usage = data.get("usage") or {}
+        if not isinstance(usage, dict):
+            usage = {}
+        if self.cost_guard is not None:
+            self.cost_guard.account_cost(model, usage.get("cost"))
         choices = data.get("choices") or []
         if not choices:
             raise ValueError("OpenRouter returned no choices")
@@ -78,8 +199,7 @@ class LLMClient:
                 if refusal is not None
                 else f"non-string content: {type(raw_content).__name__}"
             )
-        usage = data.get("usage") or {}
-        return LLMResponse(
+        result = LLMResponse(
             content=content,
             request_id=data.get("id") or response.headers.get("x-request-id"),
             requested_model=str(payload["model"]),
@@ -93,6 +213,11 @@ class LLMClient:
             cost=usage.get("cost"),
             provider_error=provider_error,
         )
+        return result
+
+    def raise_if_cost_limit_exceeded(self) -> None:
+        if self.cost_guard is not None:
+            self.cost_guard.raise_if_exceeded()
 
     @staticmethod
     def _retry_after_seconds(response: requests.Response | None) -> float | None:

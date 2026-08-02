@@ -4,7 +4,7 @@ meta:
   provider: openrouter
   requested_model: moonshotai/kimi-k2.5
   returned_model: moonshotai/kimi-k2.5
-  fingerprint: canonical-source_eccfeee8e5ee1e2b33c2fc1c1666a5e24ea3d4d92f2950668b250557bc789482
+  fingerprint: canonical-source_203118dff89924810884b81723856fe9afa284272555d478ebad8a72af8a18cf
   request_hash: 6441c3c9eabd8da2fb49e17ad804bdb7e53a63dfe9657aa7ca8a3eed49b60a51
   recorded_at: '2026-07-25T23:42:44.512158+00:00'
   request_id: gen-1785022954-QQL2fb7TJW6MGd5yuEsD
@@ -29,9 +29,9 @@ parsed_response:
     - MF_HEALTH
     - MF_IPBOX_BR
     input_hash: d389329b415f36570714687a745bf16281eb9d7a9dc1ad0d500f4549989eee72
-    engine_source_hash: 68b9a195f0689028c7c3ac5fe07a5e3c6c82233ec15f0588cbc1b6b7a3787046
+    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
     calculated_at: '2026-07-25T23:42:44Z'
-    code_revision: engine:68b9a195f0689028c7c3ac5fe07a5e3c6c82233ec15f0588cbc1b6b7a3787046
+    code_revision: engine:36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
   result:
     rok: 2025
     przychody_roczne:

@@ -4,7 +4,7 @@ meta:
   provider: openrouter
   requested_model: openai/gpt-5-mini
   returned_model: openai/gpt-5-mini
-  fingerprint: canonical-source_548756d3eae24dee7ca57e1a41758704911b233769eafa0d664e49a30d743f66
+  fingerprint: canonical-source_78b3231ce558d1df6616e32ad4187692f133b4245a274d62b0a7296ed981d195
   request_hash: 1139c2c13dd7b0c65861ea86b5975280e519337e036d3a22d42af9c00c2ddfa7
   recorded_at: '2026-07-27T22:31:31.190820+00:00'
   request_id: gen-1785191489-yRsAdzlf6Z7z43S1c4Dm
@@ -28,9 +28,9 @@ parsed_response:
     - MF_SCALE_HISTORY
     - MF_HEALTH_HISTORY
     input_hash: 28a747a2e831850cf03268fbc1d9e84f72194ff89206f9a0d78119a77799f445
-    engine_source_hash: 68b9a195f0689028c7c3ac5fe07a5e3c6c82233ec15f0588cbc1b6b7a3787046
+    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
     calculated_at: '2026-07-27T22:31:31Z'
-    code_revision: engine:68b9a195f0689028c7c3ac5fe07a5e3c6c82233ec15f0588cbc1b6b7a3787046
+    code_revision: engine:36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
   result:
     rok: 2019
     przychody_roczne:
