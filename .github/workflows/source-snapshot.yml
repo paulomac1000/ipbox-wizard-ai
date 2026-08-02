@@ -12,7 +12,7 @@ permissions:
 
 concurrency:
   group: apply-consolidated-fixes
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   apply-and-validate:
@@ -28,7 +28,7 @@ jobs:
       - name: Detect pending patch
         id: patch
         run: |
-          if [[ -f .github/consolidated.patch.gz.b64 ]]; then
+          if [[ -f .github/consolidated.patch.part00 ]]; then
             echo 'apply=true' >> "$GITHUB_OUTPUT"
           else
             echo 'apply=false' >> "$GITHUB_OUTPUT"
@@ -51,9 +51,9 @@ jobs:
         if: steps.patch.outputs.apply == 'true'
         run: |
           set -euo pipefail
-          base64 --decode .github/consolidated.patch.gz.b64 | gzip -d > "$RUNNER_TEMP/consolidated.patch"
+          cat .github/consolidated.patch.part* | base64 --decode | gzip -d > "$RUNNER_TEMP/consolidated.patch"
           patch -p1 < "$RUNNER_TEMP/consolidated.patch"
-          rm .github/consolidated.patch.gz.b64
+          rm -f .github/consolidated.patch.part* .github/consolidated.patch.gz.b64
 
       - name: Format and lint
         if: steps.patch.outputs.apply == 'true'
