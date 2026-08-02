@@ -230,3 +230,26 @@ def test_kpir_balance_excludes_rows_explicitly_absent_from_source_ledger() -> No
     }
 
     assert _recompute_kpir_balance_test(input_data) == "PASS"
+
+
+@pytest.mark.parametrize("field", ["source_ledger_included", "ujęty_w_kpir", "ujety_w_kpir"])
+@pytest.mark.parametrize("value", [0, "false", "nie"])
+def test_kpir_balance_rejects_non_boolean_source_ledger_flags(field: str, value: object) -> None:
+    input_data = {
+        "podsumowanie_kpir": {"przychody": 0, "koszty": 0},
+        "miesiace": [
+            {
+                "miesiac": "2025-01",
+                "koszty": [
+                    {
+                        "opis": "Ambiguous source flag",
+                        "kwota": 50,
+                        field: value,
+                    }
+                ],
+            }
+        ],
+    }
+
+    with pytest.raises(ValueError, match="cost.source_ledger_included must be a boolean"):
+        _recompute_kpir_balance_test(input_data)

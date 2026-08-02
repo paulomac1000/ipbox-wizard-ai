@@ -1,371 +1,371 @@
 model: moonshotai/kimi-k2.5
-generated_at: '2026-08-02T21:17:44.960390+00:00'
+generated_at: '2026-08-02T21:57:31.367084+00:00'
 entries:
   01_basic_linear:
     file: 01_basic_linear.yaml
-    fingerprint: canonical-source_1b4a12f89fa610732566d86e49d104cc69b87fed6a5c0ec435749552529e9ac6
+    fingerprint: canonical-source_e1c149893fd3b3d0e282286c29a4525c5ce41792ee1462fb55fe25f3b999fb01
     request_hash: f2c0aa04416726714b9f67d84ebf148f13e919b2a941a678609853cd203a0ee7
-    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
+    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
     recorded_at: '2026-07-25T23:37:47.519295+00:00'
     returned_model: moonshotai/kimi-k2.5
     cost: 0.0005679
   02_basic_scale_single_client:
     file: 02_basic_scale_single_client.yaml
-    fingerprint: canonical-source_597adbfd4a265bb447ad0e0c97cb5d0de335b8ecf28d3ad802f5cf2e6d8ff069
+    fingerprint: canonical-source_2d847bd033aae088969c1c450c9e300ced886fbf7197a493c6fd7bd22f9b9dc1
     request_hash: d7f1c95999b75d9a9e36ae64475bb885a53de09defcc0004413df13900946077
-    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
+    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
     recorded_at: '2026-07-25T23:37:56.298413+00:00'
     returned_model: moonshotai/kimi-k2.5
     cost: 0.00052515
   03_fx_usd_single_client:
     file: 03_fx_usd_single_client.yaml
-    fingerprint: canonical-source_aed1d71850c0ff878dfb23efd8209686017e3d54526aa36e3c225c13d79a03e1
+    fingerprint: canonical-source_6a760eb5f36b54e25614839214851a0b7710517f92b49c9f3aad052ff96c2b34
     request_hash: d7f1c95999b75d9a9e36ae64475bb885a53de09defcc0004413df13900946077
-    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
+    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
     recorded_at: '2026-07-25T23:38:03.999342+00:00'
     returned_model: moonshotai/kimi-k2.5
     cost: 0.00029694
   11_multi_client_mixed_currencies:
     file: 11_multi_client_mixed_currencies.yaml
-    fingerprint: canonical-source_8d0e5950f43a26c239f38274f41c89a4dcfcbf718e4fefebc13727ae0e9d4730
+    fingerprint: canonical-source_88749d800be4973ffa79241947f9ced3a36504ec2b46007ec4f2238d97bac431
     request_hash: 46f9f9acf2799539568764f846a71e6c5f6bc63f27d434681a769577242f22dd
-    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
+    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
     recorded_at: '2026-07-25T23:38:13.687624+00:00'
     returned_model: moonshotai/kimi-k2.5
     cost: 0.00068265
   12_zus_in_pit_path:
     file: 12_zus_in_pit_path.yaml
-    fingerprint: canonical-source_c8c12385656ff2ae7771ca39aa6338f39d9e6072c1bcc8c69ab4c47500a8c39f
+    fingerprint: canonical-source_2668a57280b5c58d273f08e5af572f0b85c230d36f79e377dbae82a308cb41a3
     request_hash: 46f9f9acf2799539568764f846a71e6c5f6bc63f27d434681a769577242f22dd
-    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
+    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
     recorded_at: '2026-07-25T23:38:22.285027+00:00'
     returned_model: moonshotai/kimi-k2.5
     cost: 0.00044544
   13_income_from_employment_impact:
     file: 13_income_from_employment_impact.yaml
-    fingerprint: canonical-source_2bb70baf7ea28f99ec80f73c7f677eb2ace86e03c712ce12237846ec1a9f0669
+    fingerprint: canonical-source_4a98d81d9f313b5ce27ae58170f9eda4765289ff6ccbb3adb1ddcfbc9fce75ae
     request_hash: 46f9f9acf2799539568764f846a71e6c5f6bc63f27d434681a769577242f22dd
-    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
+    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
     recorded_at: '2026-07-25T23:38:36.465422+00:00'
     returned_model: moonshotai/kimi-k2.5
     cost: 0.00117765
   14_lump_sum_ineligible_check:
     file: 14_lump_sum_ineligible_check.yaml
-    fingerprint: canonical-source_5aa80af3dc0bfe415d1f150cd39a92911c6febbb7ad8dbbed642a8a50bb7294c
+    fingerprint: canonical-source_29838c5c1912fb0b0dbd6965fe9409d5e5ae2f026513fbc92893e85ac06d80f0
     request_hash: a402de6236a2e3444fd39b57ce5a4c7a019008b4ef925e74f2ab01ba8ba3b3b6
-    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
+    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
     recorded_at: '2026-07-25T23:38:44.667524+00:00'
     returned_model: moonshotai/kimi-k2.5
     cost: 0.00030054
   15_vacation_sick_mix:
     file: 15_vacation_sick_mix.yaml
-    fingerprint: canonical-source_c000bf003b0b851532912b3dffbc9c1cc557bdc066672d7ba13fac1dfd829c3b
+    fingerprint: canonical-source_3146f212bc535f4dabc90cb0a4e1f243e4164229d0564054214f2c160abe2799
     request_hash: f2c0aa04416726714b9f67d84ebf148f13e919b2a941a678609853cd203a0ee7
-    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
+    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
     recorded_at: '2026-07-25T23:38:57.321795+00:00'
     returned_model: moonshotai/kimi-k2.5
     cost: 0.00097419
   16_high_w_review:
     file: 16_high_w_review.yaml
-    fingerprint: canonical-source_19ab04a043f6f7f36f4d495df584ea29d3c56bb77a57c1b3b873da9cb04e2487
+    fingerprint: canonical-source_012d90ccdb264c437dc471b439f6e520bf47a2fc84fecef4c2dc6af74ff93a6e
     request_hash: d7f1c95999b75d9a9e36ae64475bb885a53de09defcc0004413df13900946077
-    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
+    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
     recorded_at: '2026-07-25T23:39:08.926695+00:00'
     returned_model: moonshotai/kimi-k2.5
     cost: 0.00087294
   17_low_w_review:
     file: 17_low_w_review.yaml
-    fingerprint: canonical-source_e2f8f1997445eb064a6e6ac308a1384001be91417ba36c6095740ea1dbd00000
+    fingerprint: canonical-source_79706b6b092743756d2ff2eb6fb323e70304fda2b116742ddfbea82accd26452
     request_hash: 089467a3e4896f634cd9315753867645960bacdb784f7edd243ec48df3c224c8
-    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
+    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
     recorded_at: '2026-07-25T23:39:16.813366+00:00'
     returned_model: moonshotai/kimi-k2.5
     cost: 0.00042165
   18_logic_zero_work_hours:
     file: 18_logic_zero_work_hours.yaml
-    fingerprint: canonical-source_619842418556bf90a875e88eb1f0169cd252b06c22db190dfa0bc8ec67a07d64
+    fingerprint: canonical-source_221e857b3d883b0ac32adde209eb632b1e8b0a1605c582526d11549619ecf545
     request_hash: ec43196ade4322a460cde1fa583ba079652a108f353fd8a3382492f6fa28aa45
-    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
+    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
     recorded_at: '2026-07-25T23:39:24.169156+00:00'
     returned_model: moonshotai/kimi-k2.5
     cost: 0.00032079
   21_monthly_loss_impact:
     file: 21_monthly_loss_impact.yaml
-    fingerprint: canonical-source_11acbcfad76d4565a0b3c3ccca260e9e548866df6c68e15201f1182897a1bf2e
+    fingerprint: canonical-source_3215f1fe83794843c2fc137d3df0132d07774aef36a5d7e727f1934281f49518
     request_hash: d7f1c95999b75d9a9e36ae64475bb885a53de09defcc0004413df13900946077
-    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
+    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
     recorded_at: '2026-07-25T23:39:32.147547+00:00'
     returned_model: moonshotai/kimi-k2.5
     cost: 0.00038019
   22_related_parties_nexus_reduction:
     file: 22_related_parties_nexus_reduction.yaml
-    fingerprint: canonical-source_43bd9474064d4944a91c685e5faf4caf546cca5dc5d473a26e52d7fff6e94f7f
+    fingerprint: canonical-source_f53198782f0d9340fe88e1d12679242ec6f90bc4b67641b3d1814c383259bbbe
     request_hash: d7f1c95999b75d9a9e36ae64475bb885a53de09defcc0004413df13900946077
-    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
+    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
     recorded_at: '2026-07-25T23:39:40.490153+00:00'
     returned_model: moonshotai/kimi-k2.5
     cost: 0.00042069
   23_loss_carry_forward:
     file: 23_loss_carry_forward.yaml
-    fingerprint: canonical-source_c7711e77794003cea45b1f564fb1dc1fdb5233fec06322a2d7a3f606e9f3adc6
+    fingerprint: canonical-source_8626daf102c4488d49f32800a21e002811ce5fc4e9f9fed6aff4b11adfcfe8a4
     request_hash: 09abe895a3d2793342f683fb2ea2115663a892db14423d75ad64116b8d739be4
-    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
+    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
     recorded_at: '2026-07-25T23:39:48.900810+00:00'
     returned_model: moonshotai/kimi-k2.5
     cost: 0.00040269
   24_donations_relief:
     file: 24_donations_relief.yaml
-    fingerprint: canonical-source_f9645f736c0fd13d1ef9d15a9e6eddf9debdfe2cb207a559a918259797c2d785
+    fingerprint: canonical-source_d00aa9a437b865dcaf418a848bafae109d63e586bad55275a3606781a9e57af2
     request_hash: 09abe895a3d2793342f683fb2ea2115663a892db14423d75ad64116b8d739be4
-    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
+    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
     recorded_at: '2026-07-25T23:39:56.938384+00:00'
     returned_model: moonshotai/kimi-k2.5
     cost: 0.00035769
   25_rehab_relief:
     file: 25_rehab_relief.yaml
-    fingerprint: canonical-source_a95c32bfd99d86dc6ae15c4e23adf29847a3933f8029c92441963c11fd31e1c7
+    fingerprint: canonical-source_eeaa2eb96d06efac38b7c26039f3a773c8ca894045e7ea6ce8b685435b8cca80
     request_hash: 09abe895a3d2793342f683fb2ea2115663a892db14423d75ad64116b8d739be4
-    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
+    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
     recorded_at: '2026-07-25T23:40:05.074771+00:00'
     returned_model: moonshotai/kimi-k2.5
     cost: 0.00035094
   26_rd_relief_nexus:
     file: 26_rd_relief_nexus.yaml
-    fingerprint: canonical-source_28f394b6852c82f897488ff8b9298854ac9d022b0468ee9311a638a6f9b2709a
+    fingerprint: canonical-source_501460bda8b1e750133bc1e1b8179ddb8d2854fb1ca2fc7abec79ee613ed131d
     request_hash: f2c0aa04416726714b9f67d84ebf148f13e919b2a941a678609853cd203a0ee7
-    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
+    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
     recorded_at: '2026-07-25T23:40:14.190225+00:00'
     returned_model: moonshotai/kimi-k2.5
     cost: 0.0005229
   27_termomodernizacja_full:
     file: 27_termomodernizacja_full.yaml
-    fingerprint: canonical-source_2eaeeccccca9472e60ccd107ffcb7065b05fb16dcfed59bdda7f5ae3e8da54c8
+    fingerprint: canonical-source_b10225ebf07b1aec451b2da61e68f19f314c8724cda9eb8296a2031fa36eb035
     request_hash: f2c0aa04416726714b9f67d84ebf148f13e919b2a941a678609853cd203a0ee7
-    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
+    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
     recorded_at: '2026-07-25T23:40:26.785585+00:00'
     returned_model: moonshotai/kimi-k2.5
     cost: 0.00076494
   28_edge_multiple_carry-overs:
     file: 28_edge_multiple_carry-overs.yaml
-    fingerprint: canonical-source_24467fd48e935ffe6648246e9d73f247d10691fee6e4872d2b27af9da3ebcc8c
+    fingerprint: canonical-source_268788715577b99853e7f127eade1aa61f0ea8ad845192f550e85f9e698ce8da
     request_hash: d7f1c95999b75d9a9e36ae64475bb885a53de09defcc0004413df13900946077
-    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
+    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
     recorded_at: '2026-07-25T23:40:34.406091+00:00'
     returned_model: moonshotai/kimi-k2.5
     cost: 0.00029694
   29_edge_related_parties_nexus_0:
     file: 29_edge_related_parties_nexus_0.yaml
-    fingerprint: canonical-source_00f5e33c754279a2cd8e1fbcfe22da226e178a16b7d3711a2028fafcdf636e46
+    fingerprint: canonical-source_805f31c9e5066a540c381666b2c160e9ff3c8fe4408e938f6698878fcbd83d68
     request_hash: d7f1c95999b75d9a9e36ae64475bb885a53de09defcc0004413df13900946077
-    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
+    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
     recorded_at: '2026-07-25T23:40:42.983282+00:00'
     returned_model: moonshotai/kimi-k2.5
     cost: 0.00045669
   30_edge_related_parties_nexus_mixed:
     file: 30_edge_related_parties_nexus_mixed.yaml
-    fingerprint: canonical-source_08749694baa0d03a3362233feafc003fb0f500bcd98523ef3425e8827a41190a
+    fingerprint: canonical-source_f23d85a9a644519d47d9e167cb9623fbc119633b82c51d6070c8540bf22dce57
     request_hash: d7f1c95999b75d9a9e36ae64475bb885a53de09defcc0004413df13900946077
-    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
+    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
     recorded_at: '2026-07-25T23:40:51.493415+00:00'
     returned_model: moonshotai/kimi-k2.5
     cost: 0.00034869
   31_zus_double_dip_fail:
     file: 31_zus_double_dip_fail.yaml
-    fingerprint: canonical-source_4143129ea578255732a3ddf0bd0410e0e74d989b7465a719cc438302ceeaad14
+    fingerprint: canonical-source_6a8338739a565884b8975c51cd3ef731083a9d9dfada746a04de09f4de9617e0
     request_hash: 6a26bdbb017ec5f61a0309ab3d38dbff66f905f840529006870fc7cd6f21a796
-    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
+    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
     recorded_at: '2026-07-25T23:41:03.700655+00:00'
     returned_model: moonshotai/kimi-k2.5
     cost: 0.00057549
   32_private_costs_ip_fail:
     file: 32_private_costs_ip_fail.yaml
-    fingerprint: canonical-source_5b9fdf5422383619303df6f68e9a037a953c6fedb3b15ebec7f34674767cd1f2
+    fingerprint: canonical-source_4d560c6758aea5a8cc69806e5d307a3e07f814c0761151dd4c8fdf93446ffa52
     request_hash: a506d16e85e9414a805d674f1df444071f730b3536731300cb79f4ebf7ed18b1
-    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
+    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
     recorded_at: '2026-07-25T23:41:13.894218+00:00'
     returned_model: moonshotai/kimi-k2.5
     cost: 0.00043734
   33_kpir_balance_fail:
     file: 33_kpir_balance_fail.yaml
-    fingerprint: canonical-source_02a6e6ece7bed9e5ef29542e8b702d7dbc31df2f9b37d1d5344f1ce555669b0c
+    fingerprint: canonical-source_6ca5f384f11c96dbd647e9d73ccba49bff0ad7a3ab211b23f566aa1d89292fa8
     request_hash: d7f1c95999b75d9a9e36ae64475bb885a53de09defcc0004413df13900946077
-    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
+    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
     recorded_at: '2026-07-25T23:41:28.075934+00:00'
     returned_model: moonshotai/kimi-k2.5
     cost: 0.00103494
   34_verify_fixed_asset_threshold_fail:
     file: 34_verify_fixed_asset_threshold_fail.yaml
-    fingerprint: canonical-source_b3bb6d260f59a635c00825977f7a451c4cc424d7992b9bcc40b06eef8a1e527f
+    fingerprint: canonical-source_3e20860fe8fd0b8c061639075e205d960b9dd2c821d873b49bee7c529daf354a
     request_hash: d7f1c95999b75d9a9e36ae64475bb885a53de09defcc0004413df13900946077
-    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
+    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
     recorded_at: '2026-07-25T23:41:37.608424+00:00'
     returned_model: moonshotai/kimi-k2.5
     cost: 0.00048819
   35_verify_monthly_w_jump_inconsistency:
     file: 35_verify_monthly_w_jump_inconsistency.yaml
-    fingerprint: canonical-source_0f709093b3cd5268aa3fc7d989d87938bb328dc3016357fc075df9375cb539db
+    fingerprint: canonical-source_e8c3014f95e9790624df9051f85b7019cfce9adadd151b2fa721cf138b7898e0
     request_hash: 667989e7db2137228c825d5f6fd563a7dd9440e625204e3c6659e9d786c741e0
-    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
+    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
     recorded_at: '2026-07-25T23:41:46.652835+00:00'
     returned_model: moonshotai/kimi-k2.5
     cost: 0.00040944
   36_verify_negative_income_error:
     file: 36_verify_negative_income_error.yaml
-    fingerprint: canonical-source_058a29e961f2d95d7193367088543d321373ad03883f171f03f3306aff36d943
+    fingerprint: canonical-source_744438876685f46a7a4a75a801bdeb61f772ef5404f5b776f729e99c78f41c3c
     request_hash: d7f1c95999b75d9a9e36ae64475bb885a53de09defcc0004413df13900946077
-    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
+    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
     recorded_at: '2026-07-25T23:42:05.507408+00:00'
     returned_model: moonshotai/kimi-k2.5
     cost: 0.00160644
   37_verify_invalid_tax_form_stop:
     file: 37_verify_invalid_tax_form_stop.yaml
-    fingerprint: canonical-source_26db02e958cd9f05f3b27157254017e368a234f5d85a05f9039ca184e6fb5a32
+    fingerprint: canonical-source_308d5d9e0cf27c6b3024e5e7e1310b63c455239c7574ba20b5056ab5b267ece3
     request_hash: 416b92b4340820f9992e9eec9848b9d57a9a2423f9b741bc7fec7aa9f2c9c54d
-    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
+    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
     recorded_at: '2026-07-25T23:42:19.649845+00:00'
     returned_model: moonshotai/kimi-k2.5
     cost: 0.00107229
   38_verify_missing_kpir_data:
     file: 38_verify_missing_kpir_data.yaml
-    fingerprint: canonical-source_741f4a0316250c4780dfef2195be5382c145f0562ce9f06f58b060458bd047ce
+    fingerprint: canonical-source_41eb4bbcb5efd77412bb853f54142c9b94f6bc4ec3703395500ae8d9d3610e36
     request_hash: f59214c9492f574d714b83bd8806d06398fcea438168917e1f06526dffdc78ed
-    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
+    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
     recorded_at: '2026-07-25T23:42:29.286011+00:00'
     returned_model: moonshotai/kimi-k2.5
     cost: 0.00051429
   39_multi_project_weighted_W:
     file: 39_multi_project_weighted_W.yaml
-    fingerprint: canonical-source_203118dff89924810884b81723856fe9afa284272555d478ebad8a72af8a18cf
+    fingerprint: canonical-source_eaba0be580ee4981dad82f5db846ba6a8867f8c0d9dbe4772e145d960e15d373
     request_hash: 6441c3c9eabd8da2fb49e17ad804bdb7e53a63dfe9657aa7ca8a3eed49b60a51
-    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
+    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
     recorded_at: '2026-07-25T23:42:44.512158+00:00'
     returned_model: moonshotai/kimi-k2.5
     cost: 0.00106419
   40_mixed_ip_clause:
     file: 40_mixed_ip_clause.yaml
-    fingerprint: canonical-source_eb65684fdc33dc2fd5d7902c775f7354fd3e2a6420fefe1f220332fe39f211b5
+    fingerprint: canonical-source_16db28c66d28d0a589601d06b277f239fdccc325154f966d0e218301f016289b
     request_hash: 46f9f9acf2799539568764f846a71e6c5f6bc63f27d434681a769577242f22dd
-    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
+    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
     recorded_at: '2026-07-25T23:42:56.006300+00:00'
     returned_model: moonshotai/kimi-k2.5
     cost: 0.00071094
   41_ikze_cascade:
     file: 41_ikze_cascade.yaml
-    fingerprint: canonical-source_03eaf29164e1356d3b9398a307e08d503fc85109a39237eb8b357ed0dbf32c61
+    fingerprint: canonical-source_e50708daf8279c2049185b662a1ef6b490fa756cf567b7ab73e0d3b73931834e
     request_hash: f2c0aa04416726714b9f67d84ebf148f13e919b2a941a678609853cd203a0ee7
-    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
+    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
     recorded_at: '2026-07-25T23:43:06.700198+00:00'
     returned_model: moonshotai/kimi-k2.5
     cost: 0.00060519
   42_stop_08_no_documentation:
     file: 42_stop_08_no_documentation.yaml
-    fingerprint: canonical-source_cfe285cc653ee20dd25684c7d3dda0327fedbc15ebb778447d4db0e2dc227349
+    fingerprint: canonical-source_45a6a347e9bf3669c951d7aef334ee9a3fb152f989be7cef5fca814f27d1a327
     request_hash: f59214c9492f574d714b83bd8806d06398fcea438168917e1f06526dffdc78ed
-    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
+    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
     recorded_at: '2026-07-25T23:43:17.531970+00:00'
     returned_model: moonshotai/kimi-k2.5
     cost: 0.00061104
   43_review_09_single_client_100pct:
     file: 43_review_09_single_client_100pct.yaml
-    fingerprint: canonical-source_3fa2f0b035967609f609d57c9a70e769511637738e6c58cb35a98e89426954b5
+    fingerprint: canonical-source_d174f912aa92d98a85d451e802213f57dd0c13b27bd8f8f6690e9d3d939d5d0b
     request_hash: d7f1c95999b75d9a9e36ae64475bb885a53de09defcc0004413df13900946077
-    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
+    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
     recorded_at: '2026-07-25T23:43:26.746603+00:00'
     returned_model: moonshotai/kimi-k2.5
     cost: 0.00041169
   44_mix_revenue_key_kis:
     file: 44_mix_revenue_key_kis.yaml
-    fingerprint: canonical-source_d0a808ff0410869891018a35b2f266d0f980ce7c2e2e54a7e40ebcfc49c70fd5
+    fingerprint: canonical-source_243694ce8fe64aefb2dbaa94b3015f1894368b3d5d99bd237d6869b1a78ec74b
     request_hash: 2a1d36e2268126f8a1fd33f490f803423e1702ec92fa645f7cc911aba7105df4
-    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
+    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
     recorded_at: '2026-07-25T23:43:37.621579+00:00'
     returned_model: moonshotai/kimi-k2.5
     cost: 0.00055119
   45_multi_ip_two_stage:
     file: 45_multi_ip_two_stage.yaml
-    fingerprint: canonical-source_de77e6d5a9e3bdf6c01b1a0ce2770599a1024e5a5af8f75b6352bd51abba4102
+    fingerprint: canonical-source_a42891d2191c31fda6e5ccaa4aae5c94b85d2b08c7cace86fab8e7ada02cf35d
     request_hash: dd776a8d088501f575700d714e49f434ab07da75ac7fc632006e2d44524875d8
-    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
+    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
     recorded_at: '2026-07-25T23:43:47.796199+00:00'
     returned_model: moonshotai/kimi-k2.5
     cost: 0.000918
   46_historical_2019_health_credit:
     file: 46_historical_2019_health_credit.yaml
-    fingerprint: canonical-source_06e8d181aa34139d68cfc1b3f3549aa96246b73ea6e93cf70a3e7c8723b52ce8
+    fingerprint: canonical-source_cf4704faa832022388ee30fd99a893855bed7a32355942792a95ef2ea598e4ce
     request_hash: f2c0aa04416726714b9f67d84ebf148f13e919b2a941a678609853cd203a0ee7
-    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
+    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
     recorded_at: '2026-07-25T23:43:57.068073+00:00'
     returned_model: moonshotai/kimi-k2.5
     cost: 0.00041169
   47_historical_2021_br_ipbox_stop:
     file: 47_historical_2021_br_ipbox_stop.yaml
-    fingerprint: canonical-source_3bd8aa3fd609d778a7e79d776edd89da791ce5fa140975cef497f01522824d9f
+    fingerprint: canonical-source_a153da9cc05f8013f5e219774d9bad5620290c2600c113b6202f22ff67990b9d
     request_hash: c7507a9c2aa5478ec8a56149424d06cb87634b2259ecc61a7914c02fe38850dd
-    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
+    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
     recorded_at: '2026-07-25T23:44:07.807420+00:00'
     returned_model: moonshotai/kimi-k2.5
     cost: 0.00055704
   48_historical_2024_pit_like_cascade:
     file: 48_historical_2024_pit_like_cascade.yaml
-    fingerprint: canonical-source_8dff1f7e41223cf19473abcd62789e6b54ef539ba418529947f3afb282516318
+    fingerprint: canonical-source_bb34a0a0c35359dccbe031c8944f84b3cf4a66a272c54089b65dd533d950b442
     request_hash: f2c0aa04416726714b9f67d84ebf148f13e919b2a941a678609853cd203a0ee7
-    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
+    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
     recorded_at: '2026-07-25T23:44:17.361155+00:00'
     returned_model: moonshotai/kimi-k2.5
     cost: 0.00047019
   49_double_invoice_percentage_stop:
     file: 49_double_invoice_percentage_stop.yaml
-    fingerprint: canonical-source_f4fe7d677aeb7f60ddaf8529b13d016778a2b03f825385da7d52dcc5cd07a5f9
+    fingerprint: canonical-source_140488f3fae844a0adf3a13191e94331fd828249a9281eb660dd024103e017ef
     request_hash: 06b219065904f05535159e8798c9784181de1be527289ba1db3f01ce52adfe96
-    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
+    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
     recorded_at: '2026-07-25T23:44:27.113886+00:00'
     returned_model: moonshotai/kimi-k2.5
     cost: 0.0005643
   50_silent_allocation_method_switch_stop:
     file: 50_silent_allocation_method_switch_stop.yaml
-    fingerprint: canonical-source_42747c1737905642d7c2bbe3e2311f3116e9baf95202b1bf7c7fac739ed3ad0b
+    fingerprint: canonical-source_817a7b9d41a69cf75d93bbe5e734d90cd861fa706b3743f2bf0417df79f5da40
     request_hash: f6003b8cf16dbf1eddc147afec217f1125f06c46a1ee0379c82815b653211d91
-    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
+    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
     recorded_at: '2026-07-25T23:44:44.523987+00:00'
     returned_model: moonshotai/kimi-k2.5
     cost: 0.00142689
   51_return_ledger_classification_shift_stop:
     file: 51_return_ledger_classification_shift_stop.yaml
-    fingerprint: canonical-source_599c8964d943cd674326365b0e6851c3f54afbc33a8c5769c1c75727c319fe3e
+    fingerprint: canonical-source_7dfd32f65eaf08095f0e3d54c1efd249d6387f2394b533f49f4db308c06b7626
     request_hash: 51bbf990a6372791143d0fb29019e09be41d6b5829de7905542b014f38d625e8
-    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
+    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
     recorded_at: '2026-07-25T23:45:00.164276+00:00'
     returned_model: moonshotai/kimi-k2.5
     cost: 0.00084504
   52_cost_date_revenue_mix_policy:
     file: 52_cost_date_revenue_mix_policy.yaml
-    fingerprint: canonical-source_7346b1d2fc9dd7060a034830ae9ef9d184fabc51ca4c4f7037db5c3a8a688846
+    fingerprint: canonical-source_fa3dc7b53058783f2c497a9b0a396c82a29c412908e254a6f4c1976b66220602
     request_hash: 2a1d36e2268126f8a1fd33f490f803423e1702ec92fa645f7cc911aba7105df4
-    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
+    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
     recorded_at: '2026-07-25T23:45:09.840664+00:00'
     returned_model: moonshotai/kimi-k2.5
     cost: 0.00039819
   53_historical_ikze_limit_exceeded_stop:
     file: 53_historical_ikze_limit_exceeded_stop.yaml
-    fingerprint: canonical-source_c57bbbe86aa6896c5a671891a0046c1a5574c4bd50c821302902d196f2d60efc
+    fingerprint: canonical-source_8875c05b75f0dd3f81e64e975282e08d70b5c7844350f224c240798adbf74d9f
     request_hash: b68a5770175b3c4b026a8a451a3450cf7ff6fb849036a99bbc7cc6ee3a850df9
-    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
+    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
     recorded_at: '2026-07-25T23:45:20.591385+00:00'
     returned_model: moonshotai/kimi-k2.5
     cost: 0.00061554
   54_pre_ipbox_year_stop:
     file: 54_pre_ipbox_year_stop.yaml
-    fingerprint: canonical-source_cd4e4c99d7ebb99654c384b2290b0afe926af496afa896dd4372bf1d1b78101d
+    fingerprint: canonical-source_3b2d4a42ec8a122744e710d12b7b58f32b1b59b5ad064292a02a72419814bb09
     request_hash: 4e9aed86ff60109c05f9cda98f75966a56ba9c4f35e8eb01f7b83090b3a67c2c
-    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
+    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
     recorded_at: '2026-07-25T23:45:32.304649+00:00'
     returned_model: moonshotai/kimi-k2.5
     cost: 0.00059079
   55_disjoint_w_semantics_clean:
     file: 55_disjoint_w_semantics_clean.yaml
-    fingerprint: canonical-source_cfeee78653d8fbcd587db99d1d5d8df0fc915175e18724534923f2819177d1a6
+    fingerprint: canonical-source_e9d8e7638720db8962959b39791c8f311f54553d64d22f10375ed5925dd62ca5
     request_hash: 09abe895a3d2793342f683fb2ea2115663a892db14423d75ad64116b8d739be4
-    engine_source_hash: 36246f5040f330bf435b31247650e978512ee0aed57ec4e926bb1cdad67a886e
+    engine_source_hash: 64c8233d8573ad38f60985e487f956d0a754dc1be60e10b7dee7d5a6d0fe440b
     recorded_at: '2026-07-25T23:45:50.543686+00:00'
     returned_model: moonshotai/kimi-k2.5
     cost: 0.00125544

@@ -16,7 +16,7 @@ from collections.abc import Mapping
 from decimal import ROUND_DOWN, ROUND_HALF_UP, Decimal
 from typing import Any
 
-from .input_validation import strict_decimal
+from .input_validation import strict_bool, strict_decimal
 
 MONEY = Decimal("0.01")
 QUALIFIED_NEXUS_BASKETS = {"A", "B", "C", "D"}
@@ -64,6 +64,19 @@ def _bool_flag(value: Any) -> bool | None:
     if normalized in {"nie", "no", "false", "0", "wykluczone", "non-kup", "not_kup"}:
         return False
     raise ValueError(f"unsupported boolean flag {value!r}")
+
+
+def source_ledger_included_flag(cost: Mapping[str, Any]) -> bool | None:
+    """Read an optional source-ledger flag using the strict scalar contract."""
+    value = _first(
+        cost,
+        "source_ledger_included",
+        "ujęty_w_kpir",
+        "ujety_w_kpir",
+    )
+    if value is None:
+        return None
+    return strict_bool(value, "cost.source_ledger_included")
 
 
 def validate_cost_policy(input_data: Mapping[str, Any]) -> tuple[str, str | None]:
@@ -185,14 +198,7 @@ def _source_ledger_audit(
     explicitly_included = Decimal("0")
     explicit_status_seen = False
     for (_, cost), classification in zip(rows, source_classifications, strict=False):
-        flag = _bool_flag(
-            _first(
-                cost,
-                "source_ledger_included",
-                "ujęty_w_kpir",
-                "ujety_w_kpir",
-            )
-        )
+        flag = source_ledger_included_flag(cost)
         if flag is not None:
             explicit_status_seen = True
         if flag is True and classification.get("basket") == "WYKLUCZONE":

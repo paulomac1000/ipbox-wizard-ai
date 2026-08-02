@@ -160,32 +160,22 @@ class LLMClient:
             json=payload,
             timeout=timeout,
         )
-        http_error: requests.HTTPError | None = None
-        try:
-            response.raise_for_status()
-        except requests.HTTPError as exc:
-            http_error = exc
+        response.raise_for_status()
         try:
             data = response.json()
-        except (TypeError, ValueError) as exc:
+        except (TypeError, ValueError):
             if self.cost_guard is not None:
                 self.cost_guard.block_unaccounted_response("provider returned invalid JSON")
-            if http_error is not None:
-                raise http_error from exc
             raise
         if not isinstance(data, dict):
             if self.cost_guard is not None:
                 self.cost_guard.block_unaccounted_response("provider JSON root is not an object")
-            if http_error is not None:
-                raise http_error
             raise ValueError("OpenRouter response root must be an object")
         usage = data.get("usage") or {}
         if not isinstance(usage, dict):
             usage = {}
         if self.cost_guard is not None:
             self.cost_guard.account_cost(model, usage.get("cost"))
-        if http_error is not None:
-            raise http_error
         choices = data.get("choices") or []
         if not choices:
             raise ValueError("OpenRouter returned no choices")

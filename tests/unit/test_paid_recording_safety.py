@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import ClassVar
 
 import pytest
+import requests
 
 from python_helper.allocation_precision import audit_revenue_allocation
 from scripts import benchmark_report, check_cassette_policy, vcr_precommit
@@ -446,12 +447,13 @@ def test_direct_pytest_live_mode_accepts_complete_paid_guard_contract() -> None:
 class _PaidResponse:
     headers: ClassVar[dict[str, str]] = {"x-request-id": "req-paid-budget"}
 
-    def __init__(self, cost: object) -> None:
+    def __init__(self, cost: object, *, status_code: int = 200) -> None:
         self.cost = cost
+        self.status_code = status_code
 
-    @staticmethod
-    def raise_for_status() -> None:
-        return None
+    def raise_for_status(self) -> None:
+        if self.status_code >= 400:
+            raise requests.HTTPError(f"provider returned HTTP {self.status_code}", response=self)
 
     def json(self) -> dict:
         return {
@@ -517,6 +519,32 @@ def test_direct_live_client_accounts_and_enforces_total_cost_limit(
     client = LLMClient(enforce_cost_limits=True)
 
     client.call({"model": MODEL})
+    with pytest.raises(PaidCostLimitError, match=r"total paid \$0\.120000"):
+        client.raise_if_cost_limit_exceeded()
+    with pytest.raises(PaidCostLimitError, match="No further provider request"):
+        client.call({"model": MODEL})
+    assert calls == 1
+
+
+def test_direct_live_client_accounts_http_error_cost_before_reraising(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("OPENROUTER_API_KEY", "test-key")
+    monkeypatch.setenv("LLM_PROVIDER", "openrouter")
+    monkeypatch.setenv("LLM_MAX_COST_PER_MODEL_USD", "1.00")
+    monkeypatch.setenv("LLM_MAX_TOTAL_COST_USD", "0.10")
+    calls = 0
+
+    def post(*args: object, **kwargs: object) -> _PaidResponse:
+        nonlocal calls
+        calls += 1
+        return _PaidResponse(0.12, status_code=500)
+
+    monkeypatch.setattr("tests.llm.client.requests.post", post)
+    client = LLMClient(enforce_cost_limits=True)
+
+    with pytest.raises(requests.HTTPError, match="HTTP 500"):
+        client.call({"model": MODEL})
     with pytest.raises(PaidCostLimitError, match=r"total paid \$0\.120000"):
         client.raise_if_cost_limit_exceeded()
     with pytest.raises(PaidCostLimitError, match="No further provider request"):

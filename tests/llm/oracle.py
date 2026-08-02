@@ -7,7 +7,11 @@ from decimal import Decimal
 from typing import Any
 
 from python_helper import calculate_tax_for_year, strict_year
-from python_helper.cost_audit import apply_cost_audit, validate_cost_policy
+from python_helper.cost_audit import (
+    apply_cost_audit,
+    source_ledger_included_flag,
+    validate_cost_policy,
+)
 from python_helper.cost_normalization import normalize_known_non_deductible_costs
 from python_helper.input_validation import strict_bool
 from python_helper.ipbox_calculator import calculate_overpayment, money, tax_round
@@ -224,12 +228,7 @@ def _recompute_kpir_balance_test(input_data: Mapping[str, Any]) -> str | None:
         for cost in month.get("koszty", []) or []:
             if not isinstance(cost, Mapping):
                 continue
-            source_included = _first(
-                cost,
-                "source_ledger_included",
-                "ujęty_w_kpir",
-                "ujety_w_kpir",
-            )
+            source_included = source_ledger_included_flag(cost)
             if source_included is False:
                 continue
             costs += money(number(cost.get("kwota", 0), "cost.kwota"))
