@@ -1,9 +1,11 @@
 name: Apply consolidated fixes
 
 on:
-  push:
+  pull_request:
     branches:
-      - agent/consolidate-pr-review-fixes
+      - main
+    types:
+      - synchronize
 
 permissions:
   contents: write
@@ -14,7 +16,6 @@ concurrency:
 
 jobs:
   apply-and-validate:
-    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
@@ -24,7 +25,17 @@ jobs:
           fetch-depth: 0
           persist-credentials: true
 
+      - name: Detect pending patch
+        id: patch
+        run: |
+          if [[ -f .github/consolidated.patch.gz.b64 ]]; then
+            echo 'apply=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'apply=false' >> "$GITHUB_OUTPUT"
+          fi
+
       - uses: actions/setup-python@v5
+        if: steps.patch.outputs.apply == 'true'
         with:
           python-version: '3.13'
           cache: pip
@@ -33,9 +44,11 @@ jobs:
             requirements-test.txt
 
       - name: Install dependencies
+        if: steps.patch.outputs.apply == 'true'
         run: python -m pip install -r requirements.txt -r requirements-test.txt
 
       - name: Apply locally validated patch
+        if: steps.patch.outputs.apply == 'true'
         run: |
           set -euo pipefail
           base64 --decode .github/consolidated.patch.gz.b64 | gzip -d > "$RUNNER_TEMP/consolidated.patch"
@@ -43,6 +56,7 @@ jobs:
           rm .github/consolidated.patch.gz.b64
 
       - name: Format and lint
+        if: steps.patch.outputs.apply == 'true'
         run: |
           set -euo pipefail
           ruff format .
@@ -51,6 +65,7 @@ jobs:
           ruff check .
 
       - name: Deterministic test gate
+        if: steps.patch.outputs.apply == 'true'
         run: |
           set -euo pipefail
           python -m compileall -q python_helper tests scripts
@@ -62,6 +77,7 @@ jobs:
           for script in scripts/*.sh; do bash -n "$script"; done
 
       - name: Refresh and verify cassette metadata
+        if: steps.patch.outputs.apply == 'true'
         run: |
           set -euo pipefail
           python scripts/refresh_vcr_metadata.py --all-models --write
@@ -69,6 +85,7 @@ jobs:
           ./scripts/verify_all_models.sh
 
       - name: Commit consolidated result
+        if: steps.patch.outputs.apply == 'true'
         run: |
           set -euo pipefail
           git config user.name 'github-actions[bot]'
