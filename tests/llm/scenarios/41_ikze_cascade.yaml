@@ -32,6 +32,11 @@ input:
     klauzula_IP: true
   ulgi:
     ikze: 7000
+    weryfikacja:
+      ikze:
+        zweryfikowana: true
+        kategoria: wplata_ikze
+        dowod: synthetic-ikze-payment-41
   miesiace:
   - miesiac: 2025-01
     faktury:

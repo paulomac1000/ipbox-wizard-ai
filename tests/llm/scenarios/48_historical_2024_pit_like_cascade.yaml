@@ -27,11 +27,21 @@ input:
   zus:
     sposob: brak
     odliczenie_spoleczne_PIT: 15000
+    weryfikacja:
+      odliczenie_spoleczne_PIT:
+        zweryfikowana: true
+        kategoria: zaplacone_skladki_spoleczne
+        dowod: synthetic-zus-48
   kontrahenci:
     - nazwa: ClientA
       klauzula_IP: true
   ulgi:
     ikze: 14000
+    weryfikacja:
+      ikze:
+        zweryfikowana: true
+        kategoria: wplata_ikze
+        dowod: synthetic-ikze-payment-48
     termomodernizacja_loty:
       - origin_year: 2024
         remaining_amount: 10000

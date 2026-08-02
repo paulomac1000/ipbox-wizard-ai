@@ -39,6 +39,11 @@ input:
       remaining_amount: 8000
       evidence_ref: synthetic-thermo-28-2024
     ikze: 2000
+    weryfikacja:
+      ikze:
+        zweryfikowana: true
+        kategoria: wplata_ikze
+        dowod: synthetic-ikze-payment-28
   miesiace:
   - miesiac: 2025-01
     faktury:

@@ -29,11 +29,21 @@ input:
   zus:
     sposob: brak
     odliczenie_zdrowotne_od_podatku: 300
+    weryfikacja:
+      odliczenie_zdrowotne_od_podatku:
+        zweryfikowana: true
+        kategoria: historyczne_odliczenie_zdrowotne
+        dowod: synthetic-health-payment-46
   kontrahenci:
     - nazwa: ClientA
       klauzula_IP: true
   ulgi:
     ikze: 1000
+    weryfikacja:
+      ikze:
+        zweryfikowana: true
+        kategoria: wplata_ikze
+        dowod: synthetic-ikze-payment-46
   miesiace:
     - miesiac: 2019-01
       faktury:

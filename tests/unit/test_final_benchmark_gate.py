@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import json
+import os
+import subprocess
 from pathlib import Path
 
 import pytest
@@ -50,6 +52,76 @@ def _logical_shell_commands(script: str) -> list[str]:
     if pending:
         commands.append(pending)
     return commands
+
+
+def _step_script(name: str) -> str:
+    steps = _paid_workflow()["jobs"]["benchmark"]["steps"]
+    return next(step["run"] for step in steps if step.get("name") == name)
+
+
+def _write_executable(path: Path, content: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(content, encoding="utf-8")
+    path.chmod(0o755)
+
+
+def _stubbed_shell_environment(tmp_path: Path) -> tuple[Path, dict[str, str], Path]:
+    workspace = tmp_path / "workspace"
+    fake_bin = tmp_path / "bin"
+    command_log = tmp_path / "commands.log"
+    workspace.mkdir(parents=True)
+    fake_bin.mkdir(parents=True)
+
+    _write_executable(
+        fake_bin / "python",
+        """#!/usr/bin/env bash
+set -u
+printf 'python %s\\n' "$*" >> "$COMMAND_LOG"
+if [[ -n "${FAIL_COMMAND:-}" && "python $*" == *"$FAIL_COMMAND"* ]]; then
+  exit "${FAIL_STATUS:-42}"
+fi
+exit 0
+""",
+    )
+    for command in ("record_all_models.sh", "verify_all_models.sh"):
+        _write_executable(
+            workspace / "scripts" / command,
+            f"""#!/usr/bin/env bash
+set -u
+printf '{command} %s\\n' "$*" >> "$COMMAND_LOG"
+if [[ "${{FAIL_COMMAND:-}}" == "{command}" ]]; then
+  exit "${{FAIL_STATUS:-42}}"
+fi
+exit 0
+""",
+        )
+
+    env = os.environ.copy()
+    env.update(
+        {
+            "PATH": f"{fake_bin}:{env['PATH']}",
+            "COMMAND_LOG": str(command_log),
+            "VCR_REJECTED_ROOT": str(tmp_path / "rejected"),
+            "MAX_COST_PER_MODEL_USD": "1",
+            "MAX_TOTAL_COST_USD": "2",
+        }
+    )
+    return workspace, env, command_log
+
+
+def _run_workflow_shell(
+    script: str,
+    workspace: Path,
+    env: dict[str, str],
+) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        ["bash", "-c", script],
+        cwd=workspace,
+        env=env,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
 
 
 def test_release_gate_contains_exactly_eight_distinct_model_families() -> None:
@@ -214,6 +286,140 @@ def test_all_model_workflow_generates_one_report_before_artifact_upload() -> Non
     assert final_step is steps[-1]
     assert final_step["run"].count("python scripts/check_cassette_policy.py") == 1
     assert "benchmark_report.py" not in final_step["run"]
+
+
+def test_paid_workflow_executes_only_the_selected_recorder(tmp_path: Path) -> None:
+    script = _step_script("Record cassettes")
+
+    workspace, env, command_log = _stubbed_shell_environment(tmp_path / "all")
+    env["BENCHMARK_MODEL"] = "all"
+    result = _run_workflow_shell(script, workspace, env)
+    assert result.returncode == 0, result.stderr
+    assert command_log.read_text(encoding="utf-8").splitlines() == [
+        "record_all_models.sh --max-cost-per-model-usd 1 --max-total-cost-usd 2"
+    ]
+
+    workspace, env, command_log = _stubbed_shell_environment(tmp_path / "single")
+    env["BENCHMARK_MODEL"] = "openai/gpt-5-mini"
+    result = _run_workflow_shell(script, workspace, env)
+    assert result.returncode == 0, result.stderr
+    assert command_log.read_text(encoding="utf-8").splitlines() == [
+        "python scripts/record_model.py --model openai/gpt-5-mini "
+        "--max-cost-per-model-usd 1 --max-total-cost-usd 2"
+    ]
+
+
+@pytest.mark.parametrize(
+    ("model", "failure"),
+    [
+        ("all", "record_all_models.sh"),
+        ("openai/gpt-5-mini", "scripts/record_model.py"),
+    ],
+)
+def test_paid_workflow_propagates_recorder_failures(
+    tmp_path: Path,
+    model: str,
+    failure: str,
+) -> None:
+    workspace, env, _command_log = _stubbed_shell_environment(tmp_path)
+    env.update(BENCHMARK_MODEL=model, FAIL_COMMAND=failure, FAIL_STATUS="43")
+
+    result = _run_workflow_shell(_step_script("Record cassettes"), workspace, env)
+
+    assert result.returncode == 43
+
+
+@pytest.mark.parametrize(
+    ("model", "expected"),
+    [
+        (
+            "all",
+            [
+                "verify_all_models.sh ",
+                "python scripts/vcr_precommit.py --all-models",
+                "python scripts/check_cassette_policy.py",
+            ],
+        ),
+        (
+            "openai/gpt-5-mini",
+            [
+                "python -m pytest tests/llm/test_scenarios.py --run-llm --vcr-mode=playback -q",
+                "python scripts/vcr_precommit.py --model openai/gpt-5-mini",
+                "python scripts/benchmark_report.py --model openai/gpt-5-mini",
+            ],
+        ),
+    ],
+)
+def test_paid_workflow_runs_required_offline_verification_commands_in_order(
+    tmp_path: Path,
+    model: str,
+    expected: list[str],
+) -> None:
+    workspace, env, command_log = _stubbed_shell_environment(tmp_path)
+    env["BENCHMARK_MODEL"] = model
+    env["OPENROUTER_API_KEY"] = "must-be-unset"
+
+    result = _run_workflow_shell(_step_script("Offline verification (no API key)"), workspace, env)
+
+    assert result.returncode == 0, result.stderr
+    assert command_log.read_text(encoding="utf-8").splitlines() == expected
+
+
+@pytest.mark.parametrize(
+    ("model", "failure"),
+    [
+        ("all", "verify_all_models.sh"),
+        ("all", "scripts/vcr_precommit.py"),
+        ("all", "scripts/check_cassette_policy.py"),
+        ("openai/gpt-5-mini", "-m pytest"),
+        ("openai/gpt-5-mini", "scripts/vcr_precommit.py"),
+        ("openai/gpt-5-mini", "scripts/benchmark_report.py"),
+    ],
+)
+def test_paid_workflow_propagates_each_offline_verification_failure(
+    tmp_path: Path,
+    model: str,
+    failure: str,
+) -> None:
+    workspace, env, _command_log = _stubbed_shell_environment(tmp_path)
+    env.update(BENCHMARK_MODEL=model, FAIL_COMMAND=failure, FAIL_STATUS="44")
+
+    result = _run_workflow_shell(_step_script("Offline verification (no API key)"), workspace, env)
+
+    assert result.returncode == 44
+
+
+@pytest.mark.parametrize(
+    ("original_status", "report_status", "expected_status"),
+    [(0, 0, 0), (7, 0, 7), (0, 9, 9), (7, 9, 7)],
+)
+def test_matrix_report_trap_preserves_original_and_report_failures(
+    tmp_path: Path,
+    original_status: int,
+    report_status: int,
+    expected_status: int,
+) -> None:
+    source = (ROOT / "scripts/record_all_models.sh").read_text(encoding="utf-8")
+    start = source.index("generate_benchmark_report() {")
+    end = source.index("\ntrap generate_benchmark_report EXIT", start)
+    function = source[start:end]
+
+    workspace, env, command_log = _stubbed_shell_environment(tmp_path)
+    env.update(FAIL_COMMAND="scripts/benchmark_report.py", FAIL_STATUS=str(report_status))
+    if report_status == 0:
+        env.pop("FAIL_COMMAND")
+    harness = f"""set -uo pipefail
+{function}
+trap generate_benchmark_report EXIT
+exit {original_status}
+"""
+
+    result = _run_workflow_shell(harness, workspace, env)
+
+    assert result.returncode == expected_status
+    assert command_log.read_text(encoding="utf-8").splitlines() == [
+        "python scripts/benchmark_report.py"
+    ]
 
 
 def test_provider_transport_profiles_are_explicit_and_validated() -> None:

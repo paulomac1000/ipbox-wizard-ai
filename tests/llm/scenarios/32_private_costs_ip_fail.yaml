@@ -27,8 +27,18 @@ input:
   zus:
     sposob: brak
     odliczenie_spoleczne_PIT: 2000
+    weryfikacja:
+      odliczenie_spoleczne_PIT:
+        zweryfikowana: true
+        kategoria: zaplacone_skladki_spoleczne
+        dowod: synthetic-zus-32
   ulgi:
     ikze: 3000
+    weryfikacja:
+      ikze:
+        zweryfikowana: true
+        kategoria: wplata_ikze
+        dowod: synthetic-ikze-payment-32
     termomodernizacja_pula: 5000
   zaliczki:
     suma: 5000

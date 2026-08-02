@@ -34,6 +34,11 @@ input:
     klauzula_IP: false
   ulgi:
     strata_NIE_z_lat_poprzednich: 5000
+    weryfikacja:
+      strata_NIE_z_lat_poprzednich:
+        zweryfikowana: true
+        kategoria: strata_z_poprzednich_lat
+        dowod: synthetic-loss-ledger-23
   miesiace:
   - miesiac: 2025-01
     faktury:

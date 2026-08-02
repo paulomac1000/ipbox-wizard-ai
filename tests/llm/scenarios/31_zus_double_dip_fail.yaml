@@ -28,6 +28,11 @@ input:
   zus:
     sposob: w_KPiR
     odliczenie_spoleczne_PIT: 18000
+    weryfikacja:
+      odliczenie_spoleczne_PIT:
+        zweryfikowana: true
+        kategoria: zaplacone_skladki_spoleczne
+        dowod: synthetic-zus-31
   kontrahenci:
   - nazwa: ClientA
     klauzula_IP: true

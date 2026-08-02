@@ -51,12 +51,13 @@ def _first(mapping: Mapping[str, Any], *keys: str) -> Any | None:
 
 
 def validate_scenario(scenario: dict[str, Any]) -> None:
-    transformed, _shares, _method = prepare_scenario(scenario)
+    input_data = scenario.get("input")
+    if not isinstance(input_data, dict):
+        raise ScenarioError("input must be a mapping")
     try:
+        legacy.validate_deduction_evidence(input_data)
+        transformed, _shares, _method = prepare_scenario(scenario)
         legacy.validate_scenario(legacy_safe_copy(transformed, for_validation=True))
-        input_data = scenario.get("input")
-        if not isinstance(input_data, Mapping):
-            raise ScenarioError("input must be a mapping")
         validate_cost_policy(input_data)
     except legacy.ScenarioError:
         raise
@@ -106,7 +107,7 @@ def _calculate_tax(
     social = input_data.get("zus", {}) if isinstance(input_data.get("zus"), dict) else {}
     tax = calculate_tax_for_year(
         strict_year(input_data["rok"], "input.rok"),
-        non_ip_income=max(0.0, float(base["result"]["dochód_NIE"])),
+        non_ip_income=float(base["result"]["dochód_NIE"]),
         ip_income=max(0.0, float(base["result"]["dochód_IP"])),
         nexus=float(base["result"]["nexus"]),
         tax_form=str(input_data["forma_opodatkowania"]),
@@ -221,8 +222,17 @@ def _recompute_kpir_balance_test(input_data: Mapping[str, Any]) -> str | None:
             elif fx_difference < 0:
                 costs += -fx_difference
         for cost in month.get("koszty", []) or []:
-            if isinstance(cost, Mapping):
-                costs += money(number(cost.get("kwota", 0), "cost.kwota"))
+            if not isinstance(cost, Mapping):
+                continue
+            source_included = _first(
+                cost,
+                "source_ledger_included",
+                "ujęty_w_kpir",
+                "ujety_w_kpir",
+            )
+            if source_included is False:
+                continue
+            costs += money(number(cost.get("kwota", 0), "cost.kwota"))
     revenue_matches = abs(revenue - money(summary.get("przychody", 0))) <= Decimal("1.00")
     costs_match = abs(costs - money(summary.get("koszty", 0))) <= Decimal("1.00")
     return "PASS" if revenue_matches and costs_match else "FAIL"

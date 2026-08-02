@@ -4,6 +4,7 @@ import argparse
 import json
 import os
 import subprocess
+import sys
 import tempfile
 from pathlib import Path
 from typing import ClassVar
@@ -327,3 +328,66 @@ def test_positive_integer_rounding_steps_remain_supported() -> None:
         "rounding_steps": 2,
     }
     assert audit_revenue_allocation([stream]) == []
+
+
+@pytest.mark.parametrize("mode", ["record", "none"])
+def test_direct_pytest_live_modes_require_paid_confirmation_and_limits(mode: str) -> None:
+    env = os.environ.copy()
+    for name in (
+        "LLM_PAID_RUN_CONFIRMATION",
+        "LLM_MAX_COST_PER_MODEL_USD",
+        "LLM_MAX_TOTAL_COST_USD",
+    ):
+        env.pop(name, None)
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "pytest",
+            "--collect-only",
+            "-q",
+            "tests/llm/test_scenarios.py",
+            "--run-llm",
+            f"--vcr-mode={mode}",
+        ],
+        cwd=ROOT,
+        env=env,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode == 4
+    assert "LLM_PAID_RUN_CONFIRMATION" in result.stderr
+
+
+def test_direct_pytest_live_mode_accepts_complete_paid_guard_contract() -> None:
+    env = os.environ.copy()
+    env.update(
+        {
+            "LLM_PAID_RUN_CONFIRMATION": "RUN_PAID_BENCHMARK",
+            "LLM_MAX_COST_PER_MODEL_USD": "1",
+            "LLM_MAX_TOTAL_COST_USD": "2",
+        }
+    )
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "pytest",
+            "--collect-only",
+            "-q",
+            "tests/llm/test_scenarios.py",
+            "--run-llm",
+            "--vcr-mode=record",
+        ],
+        cwd=ROOT,
+        env=env,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode == 0, result.stderr
