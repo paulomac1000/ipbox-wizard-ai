@@ -1,0 +1,206 @@
+--- a/python_helper/cost_audit.py
++++ b/python_helper/cost_audit.py
+@@ -16,7 +16,7 @@
+ from decimal import ROUND_DOWN, ROUND_HALF_UP, Decimal
+ from typing import Any
+ 
+-from .input_validation import strict_decimal
++from .input_validation import strict_bool, strict_decimal
+ 
+ MONEY = Decimal("0.01")
+ QUALIFIED_NEXUS_BASKETS = {"A", "B", "C", "D"}
+@@ -66,6 +66,19 @@
+     raise ValueError(f"unsupported boolean flag {value!r}")
+ 
+ 
++def source_ledger_included_flag(cost: Mapping[str, Any]) -> bool | None:
++    """Read an optional source-ledger flag using the strict scalar contract."""
++    value = _first(
++        cost,
++        "source_ledger_included",
++        "ujęty_w_kpir",
++        "ujety_w_kpir",
++    )
++    if value is None:
++        return None
++    return strict_bool(value, "cost.source_ledger_included")
++
++
+ def validate_cost_policy(input_data: Mapping[str, Any]) -> tuple[str, str | None]:
+     policy = input_data.get("polityka_alokacji")
+     mix = policy.get("koszty_MIX") if isinstance(policy, Mapping) else None
+@@ -185,14 +198,7 @@
+     explicitly_included = Decimal("0")
+     explicit_status_seen = False
+     for (_, cost), classification in zip(rows, source_classifications, strict=False):
+-        flag = _bool_flag(
+-            _first(
+-                cost,
+-                "source_ledger_included",
+-                "ujęty_w_kpir",
+-                "ujety_w_kpir",
+-            )
+-        )
++        flag = source_ledger_included_flag(cost)
+         if flag is not None:
+             explicit_status_seen = True
+         if flag is True and classification.get("basket") == "WYKLUCZONE":
+--- a/tests/llm/oracle.py
++++ b/tests/llm/oracle.py
+@@ -7,7 +7,11 @@
+ from typing import Any
+ 
+ from python_helper import calculate_tax_for_year, strict_year
+-from python_helper.cost_audit import apply_cost_audit, validate_cost_policy
++from python_helper.cost_audit import (
++    apply_cost_audit,
++    source_ledger_included_flag,
++    validate_cost_policy,
++)
+ from python_helper.cost_normalization import normalize_known_non_deductible_costs
+ from python_helper.input_validation import strict_bool
+ from python_helper.ipbox_calculator import calculate_overpayment, money, tax_round
+@@ -224,12 +228,7 @@
+         for cost in month.get("koszty", []) or []:
+             if not isinstance(cost, Mapping):
+                 continue
+-            source_included = _first(
+-                cost,
+-                "source_ledger_included",
+-                "ujęty_w_kpir",
+-                "ujety_w_kpir",
+-            )
++            source_included = source_ledger_included_flag(cost)
+             if source_included is False:
+                 continue
+             costs += money(number(cost.get("kwota", 0), "cost.kwota"))
+--- a/tests/unit/test_final_audit_regressions.py
++++ b/tests/unit/test_final_audit_regressions.py
+@@ -230,3 +230,32 @@
+     }
+ 
+     assert _recompute_kpir_balance_test(input_data) == "PASS"
++
++
++@pytest.mark.parametrize(
++    "field", ["source_ledger_included", "ujęty_w_kpir", "ujety_w_kpir"]
++)
++@pytest.mark.parametrize("value", [0, "false", "nie"])
++def test_kpir_balance_rejects_non_boolean_source_ledger_flags(
++    field: str, value: object
++) -> None:
++    input_data = {
++        "podsumowanie_kpir": {"przychody": 0, "koszty": 0},
++        "miesiace": [
++            {
++                "miesiac": "2025-01",
++                "koszty": [
++                    {
++                        "opis": "Ambiguous source flag",
++                        "kwota": 50,
++                        field: value,
++                    }
++                ],
++            }
++        ],
++    }
++
++    with pytest.raises(
++        ValueError, match="cost.source_ledger_included must be a boolean"
++    ):
++        _recompute_kpir_balance_test(input_data)
+--- a/tests/unit/test_paid_recording_safety.py
++++ b/tests/unit/test_paid_recording_safety.py
+@@ -10,6 +10,7 @@
+ from typing import ClassVar
+ 
+ import pytest
++import requests
+ 
+ from python_helper.allocation_precision import audit_revenue_allocation
+ from scripts import benchmark_report, check_cassette_policy, vcr_precommit
+@@ -446,12 +447,15 @@
+ class _PaidResponse:
+     headers: ClassVar[dict[str, str]] = {"x-request-id": "req-paid-budget"}
+ 
+-    def __init__(self, cost: object) -> None:
++    def __init__(self, cost: object, *, status_code: int = 200) -> None:
+         self.cost = cost
++        self.status_code = status_code
+ 
+-    @staticmethod
+-    def raise_for_status() -> None:
+-        return None
++    def raise_for_status(self) -> None:
++        if self.status_code >= 400:
++            raise requests.HTTPError(
++                f"provider returned HTTP {self.status_code}", response=self
++            )
+ 
+     def json(self) -> dict:
+         return {
+@@ -520,6 +524,32 @@
+     with pytest.raises(PaidCostLimitError, match=r"total paid \$0\.120000"):
+         client.raise_if_cost_limit_exceeded()
+     with pytest.raises(PaidCostLimitError, match="No further provider request"):
++        client.call({"model": MODEL})
++    assert calls == 1
++
++
++def test_direct_live_client_accounts_http_error_cost_before_reraising(
++    monkeypatch: pytest.MonkeyPatch,
++) -> None:
++    monkeypatch.setenv("OPENROUTER_API_KEY", "test-key")
++    monkeypatch.setenv("LLM_PROVIDER", "openrouter")
++    monkeypatch.setenv("LLM_MAX_COST_PER_MODEL_USD", "1.00")
++    monkeypatch.setenv("LLM_MAX_TOTAL_COST_USD", "0.10")
++    calls = 0
++
++    def post(*args: object, **kwargs: object) -> _PaidResponse:
++        nonlocal calls
++        calls += 1
++        return _PaidResponse(0.12, status_code=500)
++
++    monkeypatch.setattr("tests.llm.client.requests.post", post)
++    client = LLMClient(enforce_cost_limits=True)
++
++    with pytest.raises(requests.HTTPError, match="HTTP 500"):
++        client.call({"model": MODEL})
++    with pytest.raises(PaidCostLimitError, match=r"total paid \$0\.120000"):
++        client.raise_if_cost_limit_exceeded()
++    with pytest.raises(PaidCostLimitError, match="No further provider request"):
+         client.call({"model": MODEL})
+     assert calls == 1
+ 
+--- a/tests/llm/client.py
++++ b/tests/llm/client.py
+@@ -1,17 +1,27 @@
+-        response.raise_for_status()
++        http_error: requests.HTTPError | None = None
++        try:
++            response.raise_for_status()
++        except requests.HTTPError as exc:
++            http_error = exc
+         try:
+             data = response.json()
+-        except (TypeError, ValueError):
++        except (TypeError, ValueError) as exc:
+             if self.cost_guard is not None:
+                 self.cost_guard.block_unaccounted_response("provider returned invalid JSON")
++            if http_error is not None:
++                raise http_error from exc
+             raise
+         if not isinstance(data, dict):
+             if self.cost_guard is not None:
+                 self.cost_guard.block_unaccounted_response("provider JSON root is not an object")
++            if http_error is not None:
++                raise http_error
+             raise ValueError("OpenRouter response root must be an object")
+         usage = data.get("usage") or {}
+         if not isinstance(usage, dict):
+             usage = {}
+         if self.cost_guard is not None:
+             self.cost_guard.account_cost(model, usage.get("cost"))
++        if http_error is not None:
++            raise http_error
+         choices = data.get("choices") or []
