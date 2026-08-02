@@ -68,15 +68,14 @@ def _bool_flag(value: Any) -> bool | None:
 
 def source_ledger_included_flag(cost: Mapping[str, Any]) -> bool | None:
     """Read an optional source-ledger flag using the strict scalar contract."""
-    value = _first(
-        cost,
+    for field in (
         "source_ledger_included",
         "ujęty_w_kpir",
         "ujety_w_kpir",
-    )
-    if value is None:
-        return None
-    return strict_bool(value, "cost.source_ledger_included")
+    ):
+        if field in cost:
+            return strict_bool(cost[field], "cost.source_ledger_included")
+    return None
 
 
 def validate_cost_policy(input_data: Mapping[str, Any]) -> tuple[str, str | None]:

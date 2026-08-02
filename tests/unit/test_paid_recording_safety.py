@@ -559,10 +559,14 @@ def test_direct_live_client_fails_closed_when_provider_cost_is_missing(
     monkeypatch.setenv("LLM_PROVIDER", "openrouter")
     monkeypatch.setenv("LLM_MAX_COST_PER_MODEL_USD", "1")
     monkeypatch.setenv("LLM_MAX_TOTAL_COST_USD", "2")
-    monkeypatch.setattr(
-        "tests.llm.client.requests.post",
-        lambda *args, **kwargs: _PaidResponse(None),
-    )
+    calls = 0
+
+    def post(*args: object, **kwargs: object) -> _PaidResponse:
+        nonlocal calls
+        calls += 1
+        return _PaidResponse(None)
+
+    monkeypatch.setattr("tests.llm.client.requests.post", post)
     client = LLMClient(enforce_cost_limits=True)
 
     client.call({"model": MODEL})
@@ -570,3 +574,4 @@ def test_direct_live_client_fails_closed_when_provider_cost_is_missing(
         client.raise_if_cost_limit_exceeded()
     with pytest.raises(PaidCostLimitError, match="could not be cost-accounted"):
         client.call({"model": MODEL})
+    assert calls == 1

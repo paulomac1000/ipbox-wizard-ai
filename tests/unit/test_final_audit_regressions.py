@@ -233,7 +233,7 @@ def test_kpir_balance_excludes_rows_explicitly_absent_from_source_ledger() -> No
 
 
 @pytest.mark.parametrize("field", ["source_ledger_included", "ujęty_w_kpir", "ujety_w_kpir"])
-@pytest.mark.parametrize("value", [0, "false", "nie"])
+@pytest.mark.parametrize("value", [None, 0, "false", "nie"])
 def test_kpir_balance_rejects_non_boolean_source_ledger_flags(field: str, value: object) -> None:
     input_data = {
         "podsumowanie_kpir": {"przychody": 0, "koszty": 0},
