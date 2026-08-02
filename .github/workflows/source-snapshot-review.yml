@@ -1,0 +1,28 @@
+name: Source snapshot review
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - synchronize
+
+permissions:
+  contents: read
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Package source tree
+        run: tar --exclude=.git -czf "$RUNNER_TEMP/source-snapshot.tgz" .
+      - name: Upload source tree
+        uses: actions/upload-artifact@v4
+        with:
+          name: source-snapshot-review
+          path: ${{ runner.temp }}/source-snapshot.tgz
+          if-no-files-found: error
+          retention-days: 1
