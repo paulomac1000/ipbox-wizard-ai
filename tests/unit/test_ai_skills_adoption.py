@@ -4,7 +4,7 @@ from typing import Any
 import yaml
 
 _REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
-_AI_SKILLS_REVISION = "ff2f7bb62e34fbb759f93f4127e07c1b6542caba"
+_AI_SKILLS_REVISION = "43a448cb03df41b9ca6d3e321923698327247bc0"
 
 
 def _read(relative: str) -> str:
@@ -106,16 +106,15 @@ def test_deterministic_ci_runs_pinned_upstream_validators_outside_repository() -
     assert validate.endswith("AGENTS.md 2>&1 | tee reports/agents-md-validation.txt")
     assert "docs/agent-development.md" in afds
     assert "docs/agent-tax-analysis.md" in afds
-    assert "docs/decisions/ai-skills-adoption.md" in afds
+    assert "docs/decisions/" not in afds
 
 
-def test_adoption_decision_and_dependencies_use_the_same_revision() -> None:
-    decision = _read("docs/decisions/ai-skills-adoption.md")
+def test_dependencies_match_upstream_runtime_contract_without_decision_document() -> None:
     requirements = _read("requirements.txt")
 
-    assert _AI_SKILLS_REVISION in decision
     assert "PyYAML==6.0.3" in requirements
     assert "requests==2.33.0" in requirements
+    assert not (_REPOSITORY_ROOT / "docs/decisions/ai-skills-adoption.md").exists()
 
 
 def test_makefile_remains_the_canonical_full_quality_gate() -> None:
