@@ -97,6 +97,38 @@ jobs:
     assert _messages(workflow) == []
 
 
+def test_policy_rejects_additional_read_scopes_in_pull_request_workflows(
+    tmp_path: Path,
+) -> None:
+    workflow = tmp_path / "pr-permissions.yml"
+    workflow.write_text(
+        """
+name: pr-permissions
+on: pull_request
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: pr-permissions
+  cancel-in-progress: true
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      packages: read
+    steps:
+      - run: echo test
+""".lstrip(),
+        encoding="utf-8",
+    )
+
+    messages = _messages(workflow)
+    assert any("workflow grants actions: read" in message for message in messages)
+    assert any("job 'test' grants packages: read" in message for message in messages)
+
+
 @pytest.mark.parametrize(
     "secret_reference",
     (
