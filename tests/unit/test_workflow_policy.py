@@ -1,5 +1,7 @@
 from pathlib import Path
 
+import pytest
+
 from scripts.check_workflow_policy import audit_repository, audit_workflow
 
 _REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
@@ -44,7 +46,18 @@ jobs:
     assert any("pin a concrete runner" in message for message in messages)
 
 
-def test_policy_rejects_secret_in_pull_request_workflow(tmp_path: Path) -> None:
+@pytest.mark.parametrize(
+    "secret_reference",
+    (
+        "${{ secrets.SOME_TOKEN }}",
+        "${{ secrets['SOME_TOKEN'] }}",
+        '${{ secrets["SOME_TOKEN"] }}',
+    ),
+)
+def test_policy_rejects_secret_in_pull_request_workflow(
+    tmp_path: Path,
+    secret_reference: str,
+) -> None:
     workflow = tmp_path / "secret.yml"
     workflow.write_text(
         """
@@ -60,10 +73,10 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     env:
-      TOKEN: ${{ secrets.SOME_TOKEN }}
+      TOKEN: SECRET_REFERENCE
     steps:
       - run: echo test
-""".lstrip(),
+""".lstrip().replace("SECRET_REFERENCE", secret_reference),
         encoding="utf-8",
     )
 
@@ -93,6 +106,69 @@ jobs:
     )
 
     assert any("events must be" in message for message in _messages(workflow))
+
+
+@pytest.mark.parametrize("event_declaration", ("{}", "[]"))
+def test_policy_rejects_empty_event_declaration(
+    tmp_path: Path,
+    event_declaration: str,
+) -> None:
+    workflow = tmp_path / "empty-events.yml"
+    workflow.write_text(
+        f"""
+name: empty-events
+on: {event_declaration}
+permissions:
+  contents: read
+concurrency:
+  group: empty-events
+  cancel-in-progress: true
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - run: echo test
+""".lstrip(),
+        encoding="utf-8",
+    )
+
+    assert any("must declare events" in message for message in _messages(workflow))
+
+
+@pytest.mark.parametrize(
+    ("runs_on", "expected_message"),
+    (
+        ("[ubuntu-latest]", "non-empty literal string"),
+        ("${{ matrix.os }}", "runs-on expressions are forbidden"),
+    ),
+)
+def test_policy_rejects_nonliteral_runner_values(
+    tmp_path: Path,
+    runs_on: str,
+    expected_message: str,
+) -> None:
+    workflow = tmp_path / "runner.yml"
+    workflow.write_text(
+        f"""
+name: runner
+on: workflow_dispatch
+permissions:
+  contents: read
+concurrency:
+  group: runner
+  cancel-in-progress: true
+jobs:
+  test:
+    runs-on: {runs_on}
+    timeout-minutes: 10
+    steps:
+      - run: echo test
+""".lstrip(),
+        encoding="utf-8",
+    )
+
+    assert any(expected_message in message for message in _messages(workflow))
 
 
 def test_policy_rejects_mutable_docker_action(tmp_path: Path) -> None:
