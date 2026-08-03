@@ -70,17 +70,21 @@ def _permission_findings(
     findings: list[Finding] = []
     if permissions is None:
         return [Finding(path, f"{scope} must declare explicit permissions")]
-    if isinstance(permissions, str):
-        if permissions not in {"read-all", "none"}:
-            findings.append(
-                Finding(path, f"{scope} uses unsupported permissions value {permissions!r}")
-            )
-        return findings
     if not isinstance(permissions, dict):
-        return [Finding(path, f"{scope} permissions must be a mapping or read-all/none")]
+        return [
+            Finding(
+                path,
+                f"{scope} permissions must be an explicit mapping; shorthand values are forbidden",
+            )
+        ]
 
     for name, access in permissions.items():
-        normalized = str(access).lower()
+        if not isinstance(name, str) or not isinstance(access, str):
+            findings.append(
+                Finding(path, f"{scope} permission names and access values must be strings")
+            )
+            continue
+        normalized = access.lower()
         if _WRITE_PERMISSION.search(normalized):
             findings.append(
                 Finding(path, f"{scope} grants {name}: {access}; this repository has no write job")
