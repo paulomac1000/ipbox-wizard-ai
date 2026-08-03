@@ -142,6 +142,8 @@ Lokalne środowisko jest przydatne do uruchamiania testów, przeglądania kodu i
 
 ### Windows — PowerShell
 
+Czysty PowerShell wystarcza do przygotowania środowiska Python, ale pełna bramka używa GNU Make i Bash do kontroli skryptów oraz playbacku. Na Windows uruchom `make full` w WSL (zalecane) albo w innym środowisku POSIX, w którym dostępne są polecenia `make` i `bash`.
+
 ```powershell
 git clone https://github.com/paulomac1000/ipbox-wizard-ai.git
 cd ipbox-wizard-ai
@@ -149,7 +151,6 @@ py -3.12 -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
 python -m pip install -r requirements.txt -r requirements-test.txt
-make full
 ```
 
 Gdy PowerShell blokuje aktywację środowiska:
@@ -157,6 +158,12 @@ Gdy PowerShell blokuje aktywację środowiska:
 ```powershell
 Set-ExecutionPolicy -Scope Process Bypass
 .\.venv\Scripts\Activate.ps1
+```
+
+Po przygotowaniu zależności otwórz ten sam checkout w WSL lub równoważnym środowisku z GNU Make i Bash, a następnie uruchom:
+
+```bash
+make full
 ```
 
 ### macOS i Linux
