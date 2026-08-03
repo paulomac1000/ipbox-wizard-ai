@@ -16,7 +16,8 @@ record: test
 	./scripts/record_all_models.sh
 
 verify:
-	@unset OPENROUTER_API_KEY; \
+	@set -eu; \
+	unset OPENROUTER_API_KEY; \
 	python scripts/vcr_precommit.py --all-models; \
 	python scripts/benchmark_report.py; \
 	VCR_MODE=playback ./scripts/verify_all_models.sh
