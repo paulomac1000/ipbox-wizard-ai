@@ -2,9 +2,11 @@ from pathlib import Path
 
 from scripts.check_workflow_policy import audit_repository, audit_workflow
 
+_REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
+
 
 def test_repository_workflows_follow_policy() -> None:
-    assert audit_repository(Path.cwd()) == []
+    assert audit_repository(_REPOSITORY_ROOT) == []
 
 
 def test_policy_rejects_mutable_action_write_permission_and_missing_timeout(
