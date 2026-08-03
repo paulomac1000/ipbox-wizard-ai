@@ -47,7 +47,7 @@ defaults:
 jobs:
   benchmark:
     if: inputs.confirmation == 'RUN_PAID_BENCHMARK'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 90
     env:
       OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
@@ -60,6 +60,8 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
           persist-credentials: false
 
       - name: Initialize isolated rejected-attempt path
@@ -117,6 +119,8 @@ jobs:
           ruff format --check .
           ruff check .
           python -m compileall -q python_helper tests scripts
+          python -m bandit -q -lll -iii -r python_helper scripts
+          python -m pip_audit -r requirements.txt
           pytest tests/unit \
             --cov=python_helper \
             --cov-report=term-missing \
