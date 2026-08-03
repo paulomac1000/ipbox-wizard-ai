@@ -4,6 +4,29 @@ Najważniejsze zmiany w kolejnych wydaniach projektu. Changelog opisuje możliwo
 
 ## Unreleased
 
+### Poprawność podatkowa
+
+- Bieżąca strata z działalności kompensuje dochód IP opodatkowany zwykłą stawką (poza preferencją 5%); niewykorzystana część straty nie pomniejsza niezależnych dochodów ze skali (`extra_income_scale`).
+- Wszystkie odliczenia (ZUS, IKZE, darowizny, ulgi, termomodernizacja) działają wyłącznie na nieujemnej podstawie — wprowadzono `max(0, ...)` przed każdym odliczeniem i na końcowej podstawie zwykłej.
+- Każde dodatnie odliczenie wymaga pełnego rekordu weryfikacyjnego (`zweryfikowana: true`, niepusta `kategoria`, niepusty `dowod`). Brak dowodu odrzuca scenariusz fail-closed zamiast cichego obniżenia podatku.
+- Flaga `source_ledger_included` oraz polskie aliasy (`ujęty_w_kpir`, `ujety_w_kpir`) mają jeden ścisły kontrakt boolean — jawne `null`, `0`, `"false"` i `"nie"` są odrzucane. Koszt oznaczony `false` nie jest doliczany do odtworzonego salda KPiR.
+
+### Bezpieczeństwo płatnych testów LLM
+
+- Bezpośrednie uruchomienie pytest w trybach `record` i `none` wymaga jawnej flagi potwierdzenia (`LLM_PAID_RUN_CONFIRMATION`) oraz dwóch skończonych, dodatnich limitów budżetowych.
+- Dodano `PaidCostGuard` — strażnika kosztów śledzącego limity per-model i całkowity, księgującego koszt każdej odpowiedzi i blokującego kolejne żądania przed warstwą transportu po przekroczeniu.
+- Koszt odpowiedzi z błędem HTTP (np. 500, 503) jest księgowany przed ponownym rzuceniem oryginalnego `HTTPError`. Nieparsowalne odpowiedzi (np. HTML przy 502) aktywują tryb fail-closed i blokują dalsze żądania.
+- Limity budżetowe są propagowane z `record_model.py` do podprocesu pytest, tworząc dwie niezależne warstwy ochrony. Playback pozostaje bezpłatny.
+
+### Kontrakt workflow i jakość
+
+- Utwardzono testy workflow benchmarku: wymuszono hermetyczność środowiska testowego, ścisłą kolejność kroków (record → offline verification → upload → polityka kompletności), propagację kodów wyjścia oraz zakaz maskowania błędów przez `|| true`.
+- Scentralizowano rozwiązywanie ścieżek VCR (`VCR_CASSETTES_ROOT`, `VCR_REJECTED_ROOT`) w `scripts/vcr_paths.py` z obsługą `.env` i scopes per użytkownik.
+- Odświeżono metadane (fingerprinty, `engine_source_hash`, `code_revision`) kompletnej macierzy 368 kaset bez wykonywania nowych, płatnych zapytań do API.
+- Usunięto nieużywany duplikat klienta (`tests/llm/client.py.orig`).
+
+### Macierz benchmarkowa
+
 - Rozszerzono kanoniczną macierz benchmarkową o rodzinę OpenAI przez `openai/gpt-5-mini`.
 - Nagrano i zweryfikowano 46/46 kaset GPT-5 Mini; pełna macierz obejmuje obecnie 8 rodzin × 46 scenariuszy, czyli 368 kaset i osiem manifestów z playbackiem offline.
 - GPT-5 Mini używa tego samego recordera, manifestu, pre-commit, raportu i playbacku co pozostałe modele — bez osobnego rejestru kandydatów ani alternatywnej bramki.
