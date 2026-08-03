@@ -11,8 +11,10 @@ from typing import Any
 import yaml
 
 _FULL_SHA = re.compile(r"^[0-9a-f]{40}$")
+_SECRET_REFERENCE = re.compile(r"\$\{\{\s*secrets\.", re.IGNORECASE)
 _WRITE_PERMISSION = re.compile(r"(^|-)write$")
 _WORKFLOW_SUFFIXES = {".yml", ".yaml"}
+_MUTABLE_RUNNERS = {"ubuntu-latest", "windows-latest", "macos-latest"}
 
 
 @dataclass(frozen=True)
@@ -27,6 +29,18 @@ class Finding:
 def _events(document: dict[str, Any]) -> Any:
     """Return the workflow event declaration despite YAML 1.1 parsing `on` as bool."""
     return document.get("on", document.get(True))
+
+
+def _event_names(events: Any) -> tuple[set[str], str | None]:
+    if isinstance(events, str):
+        return {events}, None
+    if isinstance(events, dict):
+        return {str(name) for name in events}, None
+    if isinstance(events, list) and all(isinstance(name, str) for name in events):
+        return set(events), None
+    if events is None:
+        return set(), "workflow must declare events"
+    return set(), "workflow events must be a string, list of strings, or mapping"
 
 
 def _is_false(value: Any) -> bool:
@@ -68,27 +82,35 @@ def _permission_findings(
     return findings
 
 
+def _external_action_finding(path: Path, label: str, uses: Any) -> list[Finding]:
+    if not isinstance(uses, str):
+        return [Finding(path, f"{label} has non-string uses value")]
+    if uses.startswith("./"):
+        return []
+    if uses.startswith("docker://"):
+        image = uses.removeprefix("docker://")
+        if "@sha256:" not in image:
+            return [Finding(path, f"{label} Docker action must use an immutable sha256 digest")]
+        return []
+    if "@" not in uses:
+        return [Finding(path, f"{label} action {uses!r} has no immutable revision")]
+    action, revision = uses.rsplit("@", 1)
+    if not _FULL_SHA.fullmatch(revision):
+        return [Finding(path, f"{label} action {action!r} must use a full 40-character SHA")]
+    return []
+
+
 def _action_findings(path: Path, job_name: str, step_index: int, step: Any) -> list[Finding]:
     if not isinstance(step, dict) or "uses" not in step:
         return []
 
-    findings: list[Finding] = []
     uses = step["uses"]
     label = f"job {job_name!r} step {step_index}"
+    findings = _external_action_finding(path, label, uses)
     if not isinstance(uses, str):
-        return [Finding(path, f"{label} has non-string uses value")]
-
-    if uses.startswith("./") or uses.startswith("docker://"):
         return findings
-    if "@" not in uses:
-        return [Finding(path, f"{label} action {uses!r} has no immutable revision")]
 
-    action, revision = uses.rsplit("@", 1)
-    if not _FULL_SHA.fullmatch(revision):
-        findings.append(
-            Finding(path, f"{label} action {action!r} must use a full 40-character SHA")
-        )
-
+    action = uses.rsplit("@", 1)[0]
     with_block = step.get("with")
     if action == "actions/checkout":
         if not isinstance(with_block, dict) or not _is_false(
@@ -115,19 +137,19 @@ def _action_findings(path: Path, job_name: str, step_index: int, step: Any) -> l
 
 
 def audit_workflow(path: Path) -> list[Finding]:
-    findings: list[Finding] = []
     try:
-        document = yaml.safe_load(path.read_text(encoding="utf-8"))
+        raw_text = path.read_text(encoding="utf-8")
+        document = yaml.safe_load(raw_text)
     except (OSError, UnicodeError, yaml.YAMLError) as exc:
         return [Finding(path, f"cannot parse workflow: {exc}")]
 
     if not isinstance(document, dict):
         return [Finding(path, "workflow root must be a mapping")]
 
-    events = _events(document)
-    if events is None:
-        findings.append(Finding(path, "workflow must declare events"))
-    event_names = {events} if isinstance(events, str) else set(events or {})
+    findings: list[Finding] = []
+    event_names, event_error = _event_names(_events(document))
+    if event_error:
+        findings.append(Finding(path, event_error))
     if "pull_request_target" in event_names:
         findings.append(Finding(path, "pull_request_target is forbidden for repository code"))
 
@@ -151,8 +173,21 @@ def audit_workflow(path: Path) -> list[Finding]:
         if not isinstance(job, dict):
             findings.append(Finding(path, f"job {job_name!r} must be a mapping"))
             continue
+        if "uses" in job:
+            findings.append(
+                Finding(path, f"job {job_name!r} reusable workflow calls are not supported")
+            )
+            findings.extend(
+                _external_action_finding(path, f"job {job_name!r}", job.get("uses"))
+            )
+            continue
         if not _positive_int(job.get("timeout-minutes")):
             findings.append(Finding(path, f"job {job_name!r} needs positive timeout-minutes"))
+        runs_on = job.get("runs-on")
+        if runs_on in _MUTABLE_RUNNERS:
+            findings.append(
+                Finding(path, f"job {job_name!r} must pin a concrete runner instead of {runs_on}")
+            )
         if "permissions" in job:
             findings.extend(
                 _permission_findings(
@@ -169,13 +204,8 @@ def audit_workflow(path: Path) -> list[Finding]:
         for index, step in enumerate(steps, start=1):
             findings.extend(_action_findings(path, str(job_name), index, step))
 
-    raw_text = path.read_text(encoding="utf-8")
-    if "secrets.OPENROUTER_API_KEY" in raw_text and (
-        "pull_request" in event_names or "pull_request_target" in event_names
-    ):
-        findings.append(
-            Finding(path, "workflow using OPENROUTER_API_KEY must not run on pull requests")
-        )
+    if "pull_request" in event_names and _SECRET_REFERENCE.search(raw_text):
+        findings.append(Finding(path, "pull-request workflows must not reference repository secrets"))
 
     return findings
 
