@@ -17,6 +17,14 @@ def _load_workflow(relative: str) -> dict[str, Any]:
     return document
 
 
+def _active_requirement_lines(text: str) -> set[str]:
+    return {
+        line.split("#", 1)[0].strip()
+        for line in text.splitlines()
+        if line.split("#", 1)[0].strip()
+    }
+
+
 def _shell_commands(script: str) -> list[str]:
     commands: list[str] = []
     current = ""
@@ -110,10 +118,10 @@ def test_deterministic_ci_runs_pinned_upstream_validators_outside_repository() -
 
 
 def test_dependencies_match_upstream_runtime_contract_without_decision_document() -> None:
-    requirements = _read("requirements.txt")
+    active_requirements = _active_requirement_lines(_read("requirements.txt"))
 
-    assert "PyYAML==6.0.3" in requirements
-    assert "requests==2.33.0" in requirements
+    assert "PyYAML==6.0.3" in active_requirements
+    assert "requests==2.33.0" in active_requirements
     assert not (_REPOSITORY_ROOT / "docs/decisions/ai-skills-adoption.md").exists()
 
 
