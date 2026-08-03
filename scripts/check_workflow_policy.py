@@ -76,9 +76,7 @@ def _permission_findings(
                 Finding(path, f"{scope} grants {name}: {access}; this repository has no write job")
             )
         elif normalized not in {"read", "none"}:
-            findings.append(
-                Finding(path, f"{scope} has unsupported permission {name}: {access}")
-            )
+            findings.append(Finding(path, f"{scope} has unsupported permission {name}: {access}"))
     return findings
 
 
@@ -113,9 +111,7 @@ def _action_findings(path: Path, job_name: str, step_index: int, step: Any) -> l
     action = uses.rsplit("@", 1)[0]
     with_block = step.get("with")
     if action == "actions/checkout":
-        if not isinstance(with_block, dict) or not _is_false(
-            with_block.get("persist-credentials")
-        ):
+        if not isinstance(with_block, dict) or not _is_false(with_block.get("persist-credentials")):
             findings.append(
                 Finding(path, f"{label} actions/checkout must set persist-credentials: false")
             )
@@ -153,16 +149,15 @@ def audit_workflow(path: Path) -> list[Finding]:
     if "pull_request_target" in event_names:
         findings.append(Finding(path, "pull_request_target is forbidden for repository code"))
 
-    findings.extend(
-        _permission_findings(path, document.get("permissions"), scope="workflow")
-    )
+    findings.extend(_permission_findings(path, document.get("permissions"), scope="workflow"))
 
     concurrency = document.get("concurrency")
     if not isinstance(concurrency, dict) or not concurrency.get("group"):
         findings.append(Finding(path, "workflow must declare a concurrency group"))
-    elif not _is_false(concurrency.get("cancel-in-progress")) and concurrency.get(
-        "cancel-in-progress"
-    ) is not True:
+    elif (
+        not _is_false(concurrency.get("cancel-in-progress"))
+        and concurrency.get("cancel-in-progress") is not True
+    ):
         findings.append(Finding(path, "concurrency cancel-in-progress must be boolean"))
 
     jobs = document.get("jobs")
@@ -177,9 +172,7 @@ def audit_workflow(path: Path) -> list[Finding]:
             findings.append(
                 Finding(path, f"job {job_name!r} reusable workflow calls are not supported")
             )
-            findings.extend(
-                _external_action_finding(path, f"job {job_name!r}", job.get("uses"))
-            )
+            findings.extend(_external_action_finding(path, f"job {job_name!r}", job.get("uses")))
             continue
         if not _positive_int(job.get("timeout-minutes")):
             findings.append(Finding(path, f"job {job_name!r} needs positive timeout-minutes"))
@@ -205,7 +198,9 @@ def audit_workflow(path: Path) -> list[Finding]:
             findings.extend(_action_findings(path, str(job_name), index, step))
 
     if "pull_request" in event_names and _SECRET_REFERENCE.search(raw_text):
-        findings.append(Finding(path, "pull-request workflows must not reference repository secrets"))
+        findings.append(
+            Finding(path, "pull-request workflows must not reference repository secrets")
+        )
 
     return findings
 
