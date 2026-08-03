@@ -28,6 +28,11 @@ input:
   zus:
     sposob: PIT
     odliczenie_spoleczne_PIT: 1800
+    weryfikacja:
+      odliczenie_spoleczne_PIT:
+        zweryfikowana: true
+        kategoria: zaplacone_skladki_spoleczne
+        dowod: synthetic-zus-12
   kontrahenci:
   - nazwa: ClientA
     klauzula_IP: true

@@ -126,6 +126,78 @@ def _verified_donation_limit(reliefs: dict[str, Any]) -> float:
     return limit
 
 
+def _require_verified_deduction(
+    *,
+    value: Any,
+    verification: dict[str, Any],
+    key: str,
+    path: str,
+) -> None:
+    if _number(value, path) <= 0:
+        return
+    record_path = f"{path.rsplit('.', 1)[0]}.weryfikacja.{key}"
+    record = _mapping(verification.get(key), record_path)
+    if record.get("zweryfikowana") is not True:
+        raise ScenarioError(f"{path} requires zweryfikowana=true")
+    if not str(record.get("kategoria", "")).strip():
+        raise ScenarioError(f"{path} requires a verified category")
+    if not str(record.get("dowod", "")).strip():
+        raise ScenarioError(f"{path} requires an evidence reference")
+
+
+def validate_deduction_evidence(input_data: dict[str, Any]) -> None:
+    """Require evidence for every positive deduction that can reduce tax."""
+    reliefs = input_data.get("ulgi", {})
+    if reliefs is None:
+        reliefs = {}
+    reliefs = _mapping(reliefs, "input.ulgi")
+    relief_verification = reliefs.get("weryfikacja", {})
+    if relief_verification is None:
+        relief_verification = {}
+    relief_verification = _mapping(relief_verification, "input.ulgi.weryfikacja")
+    for key in (
+        "darowizny",
+        "ulga_internet",
+        "ulga_rehabilitacyjna",
+        "ulga_prorodzinna",
+        "ikze",
+        "IKZE",
+        "strata_NIE_z_lat_poprzednich",
+    ):
+        _require_verified_deduction(
+            value=reliefs.get(key, 0),
+            verification=relief_verification,
+            key=key,
+            path=f"input.ulgi.{key}",
+        )
+        if key == "darowizny" and _number(reliefs.get(key, 0), f"input.ulgi.{key}") > 0:
+            _verified_donation_limit(reliefs)
+
+    social = input_data.get("zus")
+    if social is None:
+        return
+    social = _mapping(social, "input.zus")
+    social_verification = social.get("weryfikacja", {})
+    if social_verification is None:
+        social_verification = {}
+    social_verification = _mapping(social_verification, "input.zus.weryfikacja")
+    for key in (
+        "odliczenie_spoleczne_PIT",
+        "odliczenie_zdrowotne_PIT",
+        "odliczenie_zdrowotne_od_dochodu",
+        "odliczenie_zdrowotne_od_podatku",
+    ):
+        value = social.get(key, 0)
+        if _number(value, f"input.zus.{key}") < 0:
+            raise ScenarioError(f"input.zus.{key} must be non-negative")
+        _require_verified_deduction(
+            value=value,
+            verification=social_verification,
+            key=key,
+            path=f"input.zus.{key}",
+        )
+
+
 def _month_evidence(month: dict[str, Any]) -> dict[str, Any] | None:
     value = month.get("ewidencja")
     if isinstance(value, dict):
@@ -280,18 +352,7 @@ def validate_scenario(scenario: dict[str, Any]) -> None:
             continue
         if _number(value, f"input.ulgi.{key}") < 0:
             raise ScenarioError(f"input.ulgi.{key} must be non-negative")
-    for key in ("darowizny", "ulga_internet", "ulga_rehabilitacyjna", "ulga_prorodzinna"):
-        if _number(reliefs.get(key, 0), f"input.ulgi.{key}") <= 0:
-            continue
-        record = _mapping(relief_verification.get(key), f"input.ulgi.weryfikacja.{key}")
-        if record.get("zweryfikowana") is not True:
-            raise ScenarioError(f"input.ulgi.{key} requires zweryfikowana=true")
-        if not str(record.get("kategoria", "")).strip():
-            raise ScenarioError(f"input.ulgi.{key} requires a verified category")
-        if not str(record.get("dowod", "")).strip():
-            raise ScenarioError(f"input.ulgi.{key} requires an evidence reference")
-        if key == "darowizny":
-            _verified_donation_limit(reliefs)
+    validate_deduction_evidence(input_data)
     if _number(reliefs.get("ulga_BR", 0), "input.ulgi.ulga_BR") > 0:
         raise ScenarioError(
             "input.ulgi.ulga_BR is ambiguous; use ulga_BR_IP and/or ulga_BR_NIE "
@@ -306,11 +367,6 @@ def validate_scenario(scenario: dict[str, Any]) -> None:
     if _number(input_data.get("dochody_dodatkowe_skala", 0), "input.dochody_dodatkowe_skala") < 0:
         raise ScenarioError("input.dochody_dodatkowe_skala must be non-negative")
 
-    if "zus" in input_data and input_data["zus"] is not None:
-        social = _mapping(input_data["zus"], "input.zus")
-        for key in ("odliczenie_spoleczne_PIT", "odliczenie_zdrowotne_PIT"):
-            if _number(social.get(key, 0), f"input.zus.{key}") < 0:
-                raise ScenarioError(f"input.zus.{key} must be non-negative")
     if "zaliczki" in input_data and input_data["zaliczki"] is not None:
         advances = _mapping(input_data["zaliczki"], "input.zaliczki")
         if _number(advances.get("suma", 0), "input.zaliczki.suma") < 0:

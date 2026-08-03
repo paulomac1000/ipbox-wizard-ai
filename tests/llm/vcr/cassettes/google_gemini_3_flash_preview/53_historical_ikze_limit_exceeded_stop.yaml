@@ -4,7 +4,7 @@ meta:
   provider: openrouter
   requested_model: google/gemini-3-flash-preview
   returned_model: google/gemini-3-flash-preview
-  fingerprint: canonical-source_94097c4be3fcc8f585de709c8a747f475f7c3e0b7ffffb27e788c3bd0881b212
+  fingerprint: canonical-source_8d3fe50e66ffaf16a422e0a275e3f48d9dbe188d5c37f7f12333e6f251be3819
   request_hash: 9f982afc3fcd970fcb80f2a14799a697540d3fb1901450ed96f526c980f1cd38
   recorded_at: '2026-07-25T23:23:05.378434+00:00'
   request_id: gen-1785021783-Mf8RvxAJ0wXWRzSDHPiX
@@ -28,10 +28,10 @@ parsed_response:
     - KNF_IKZE
     - MF_SCALE_HISTORY
     - MF_HEALTH_HISTORY
-    input_hash: aea3cee73a63b94e4b1532c732d429fba0997ea7be30b4238d091b731e31ca53
-    engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
+    input_hash: 28a747a2e831850cf03268fbc1d9e84f72194ff89206f9a0d78119a77799f445
+    engine_source_hash: b03aa6b34281109c7a2a7726f0788bbbd1368e5df1d15ca94a1791bbaf273d17
     calculated_at: '2026-07-25T23:23:05Z'
-    code_revision: engine:ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
+    code_revision: engine:b03aa6b34281109c7a2a7726f0788bbbd1368e5df1d15ca94a1791bbaf273d17
   result:
     rok: 2019
     przychody_roczne:

@@ -31,6 +31,11 @@ input:
       klauzula_IP: true
   ulgi:
     ikze: 5718.01
+    weryfikacja:
+      ikze:
+        zweryfikowana: true
+        kategoria: wplata_ikze
+        dowod: synthetic-ikze-payment-53
   miesiace:
     - miesiac: 2019-01
       faktury:

@@ -13,7 +13,12 @@ import yaml
 from python_helper.ipbox_calculator import calculate_w_coefficient
 from scripts.check_cassette_policy import main as cassette_policy_main
 from scripts.record_model import paid_cost_since, select_scenarios
-from tests.llm.oracle import ScenarioError, compute_reference, validate_scenario
+from tests.llm.oracle import (
+    ScenarioError,
+    _recompute_kpir_balance_test,
+    compute_reference,
+    validate_scenario,
+)
 from tests.llm.runner import LLMTestRunner, build_tool_context
 from tests.llm.test_scenarios import discover_scenarios
 
@@ -204,3 +209,47 @@ def test_legacy_thermomodernization_pool_is_explicitly_provisional() -> None:
     assert "REVIEW_22" in reference["stops_reviews"]["reviews"]
     assert reference["result"]["podatek"]["thermomodernization_mode"] == "legacy_pool"
     assert reference["result"]["podatek"]["thermomodernization_evidence_status"] == "PROVISIONAL"
+
+
+def test_kpir_balance_excludes_rows_explicitly_absent_from_source_ledger() -> None:
+    input_data = {
+        "podsumowanie_kpir": {"przychody": 0, "koszty": 100},
+        "miesiace": [
+            {
+                "miesiac": "2025-01",
+                "koszty": [
+                    {"opis": "Recorded", "kwota": 100},
+                    {
+                        "opis": "Not present in source KPiR",
+                        "kwota": 50,
+                        "source_ledger_included": False,
+                    },
+                ],
+            }
+        ],
+    }
+
+    assert _recompute_kpir_balance_test(input_data) == "PASS"
+
+
+@pytest.mark.parametrize("field", ["source_ledger_included", "ujęty_w_kpir", "ujety_w_kpir"])
+@pytest.mark.parametrize("value", [None, 0, "false", "nie"])
+def test_kpir_balance_rejects_non_boolean_source_ledger_flags(field: str, value: object) -> None:
+    input_data = {
+        "podsumowanie_kpir": {"przychody": 0, "koszty": 0},
+        "miesiace": [
+            {
+                "miesiac": "2025-01",
+                "koszty": [
+                    {
+                        "opis": "Ambiguous source flag",
+                        "kwota": 50,
+                        field: value,
+                    }
+                ],
+            }
+        ],
+    }
+
+    with pytest.raises(ValueError, match="cost.source_ledger_included must be a boolean"):
+        _recompute_kpir_balance_test(input_data)

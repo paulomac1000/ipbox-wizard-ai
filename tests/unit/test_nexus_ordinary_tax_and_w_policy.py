@@ -68,6 +68,67 @@ def test_scale_combines_nexus_remainder_with_ordinary_income() -> None:
     assert result["total_tax"] == 6100
 
 
+def test_current_non_ip_loss_offsets_nexus_remainder() -> None:
+    result = calculate_tax_for_year(
+        2025,
+        non_ip_income=-5_000,
+        ip_income=20_000,
+        nexus=0.5,
+        tax_form="liniowy_19%",
+    )
+
+    assert result["ordinary_ip_income"] == 10_000.0
+    assert result["ordinary_business_income_before_deductions"] == 5_000.0
+    assert result["ordinary_base_rounded"] == 5_000
+    assert result["non_ip_tax_final"] == 950
+
+
+def test_current_business_loss_does_not_offset_unrelated_scale_income() -> None:
+    result = calculate_tax_for_year(
+        2025,
+        non_ip_income=-10_000,
+        ip_income=10_000,
+        nexus=0.5,
+        tax_form="skala",
+        extra_income_scale=100_000,
+    )
+
+    assert result["ordinary_ip_income"] == 5_000.0
+    assert result["ordinary_business_income_before_deductions"] == -5_000.0
+    assert result["ordinary_base_rounded"] == 100_000
+    assert result["extra_income_scale_included"] == 100_000.0
+
+
+def test_oracle_preserves_current_non_ip_loss_before_taxing_nexus_remainder() -> None:
+    loaded = deepcopy(_scenario(30))
+    loaded["input"]["kontrahenci"].append({"nazwa": "ClientB", "klauzula_IP": False})
+    month = loaded["input"]["miesiace"][0]
+    month["faktury"].append(
+        {
+            "kwota_PLN": 10_000,
+            "kontrahent": "ClientB",
+            "kwalifikuje_IP": False,
+        }
+    )
+    month["koszty"].append(
+        {
+            "opis": "Syntetyczny koszt działalności NIE",
+            "kwota": 15_000,
+            "kategoria": "NIE",
+            "nexus_source": "outside_nexus",
+        }
+    )
+
+    result = compute_reference(loaded)
+    tax = result["result"]["podatek"]
+    expected_ordinary_base = round(
+        result["result"]["dochód_NIE"] + tax["dochód_IP_poza_preferencją"]
+    )
+
+    assert result["result"]["dochód_NIE"] == -5_000
+    assert tax["podstawa_zwykła"] == expected_ordinary_base
+
+
 def test_scenario_with_nexus_zero_no_longer_erases_tax() -> None:
     result = compute_reference(_scenario(29))
     tax = result["result"]["podatek"]

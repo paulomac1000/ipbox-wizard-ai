@@ -4,7 +4,7 @@ meta:
   provider: openrouter
   requested_model: qwen/qwen3.5-flash-02-23
   returned_model: qwen/qwen3.5-flash-02-23
-  fingerprint: canonical-source_6b15c5fd5dad21a8cbadfcd60937705b452a9ccfee9f79bf96e743b1e9a434b4
+  fingerprint: canonical-source_c2b93e853d981efaab5ea3fd623cd25e703d8d7ae5cf42c08224efc688145a96
   request_hash: dc07723d175f687a22c0ff34b05291bc02268ab1286dcb72512f18adc29ea7cc
   recorded_at: '2026-07-25T23:53:55.804674+00:00'
   request_id: gen-1785023630-hcD7AJKbmEo15IEaBHBs
@@ -27,10 +27,10 @@ parsed_response:
     - KNF_IKZE
     - MF_SCALE_HISTORY
     - MF_HEALTH_HISTORY
-    input_hash: aea3cee73a63b94e4b1532c732d429fba0997ea7be30b4238d091b731e31ca53
-    engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
+    input_hash: 28a747a2e831850cf03268fbc1d9e84f72194ff89206f9a0d78119a77799f445
+    engine_source_hash: b03aa6b34281109c7a2a7726f0788bbbd1368e5df1d15ca94a1791bbaf273d17
     calculated_at: '2026-07-25T23:53:55Z'
-    code_revision: engine:ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
+    code_revision: engine:b03aa6b34281109c7a2a7726f0788bbbd1368e5df1d15ca94a1791bbaf273d17
   result:
     rok: 2019
     przychody_roczne:

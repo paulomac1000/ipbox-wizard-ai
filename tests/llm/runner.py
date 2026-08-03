@@ -235,6 +235,11 @@ class LLMTestRunner:
             api_call=self._call_live if self.client is not None else None,
             validate_response=lambda content: self.validate_semantics(content, scenario),
         )
+        # The response has already been persisted (record mode) or fully validated
+        # (none mode). Fail the current test after accounting any request that
+        # crossed a declared budget, and block every later request in this process.
+        if self.client is not None:
+            self.client.raise_if_cost_limit_exceeded()
         self._save_response(config.model_slug, str(scenario["meta"]["id"]), response, parsed)
         return {
             "scenario_id": str(scenario["meta"]["id"]),

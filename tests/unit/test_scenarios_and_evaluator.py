@@ -32,6 +32,14 @@ def scenario(name: str) -> dict:
     return load(next(path for path in SCENARIOS if path.stem == name))
 
 
+def _verify_zus_deduction(payload: dict, key: str, *, evidence: str) -> None:
+    payload["input"]["zus"].setdefault("weryfikacja", {})[key] = {
+        "zweryfikowana": True,
+        "kategoria": "synthetic_verified_contribution",
+        "dowod": evidence,
+    }
+
+
 def decision_for(reference: dict) -> dict:
     return {
         "status": reference["status"],
@@ -225,6 +233,7 @@ def test_year_dependent_limits_fail_closed() -> None:
     health = scenario("12_zus_in_pit_path")
     health = deepcopy(health)
     health["input"]["zus"]["odliczenie_zdrowotne_PIT"] = 1
+    _verify_zus_deduction(health, "odliczenie_zdrowotne_PIT", evidence="health-2027")
     health["input"]["rok"] = 2027
     for month in health["input"]["miesiace"]:
         month["miesiac"] = month["miesiac"].replace("2025-", "2027-")
@@ -382,6 +391,7 @@ def test_revenue_key_outside_fraction_fails_closed() -> None:
 def test_health_deduction_applies_once_and_double_dip_stops() -> None:
     loaded = deepcopy(scenario("12_zus_in_pit_path"))
     loaded["input"]["zus"]["odliczenie_zdrowotne_PIT"] = 1000
+    _verify_zus_deduction(loaded, "odliczenie_zdrowotne_PIT", evidence="health-1000")
     reference = compute_reference(loaded)
     assert reference["result"]["podatek"]["podstawa_NIE"] == 2200
     assert reference["result"]["podatek"]["podatek_NIE_finalny"] == 418
@@ -396,6 +406,7 @@ def test_health_deduction_applies_once_and_double_dip_stops() -> None:
 def test_health_deduction_year_limit_is_enforced() -> None:
     loaded = deepcopy(scenario("12_zus_in_pit_path"))
     loaded["input"]["zus"]["odliczenie_zdrowotne_PIT"] = 12900.01
+    _verify_zus_deduction(loaded, "odliczenie_zdrowotne_PIT", evidence="health-limit")
     reference = compute_reference(loaded)
     assert reference["status"] == "STOPPED"
     assert "STOP_14" in reference["stops_reviews"]["stops"]
@@ -619,4 +630,23 @@ def test_donation_scenario_rejects_missing_or_exceeded_verified_limit() -> None:
     loaded = deepcopy(scenario("24_donations_relief"))
     loaded["input"]["ulgi"]["weryfikacja"]["darowizny"]["limit_kwotowy"] = 999
     with pytest.raises(ScenarioError, match="exceeds verified"):
+        validate_scenario(loaded)
+
+
+@pytest.mark.parametrize(
+    ("scenario_name", "container", "deduction_key"),
+    [
+        ("41_ikze_cascade", "ulgi", "ikze"),
+        ("23_loss_carry_forward", "ulgi", "strata_NIE_z_lat_poprzednich"),
+        ("12_zus_in_pit_path", "zus", "odliczenie_spoleczne_PIT"),
+        ("46_historical_2019_health_credit", "zus", "odliczenie_zdrowotne_od_podatku"),
+    ],
+)
+def test_every_positive_deduction_requires_explicit_evidence(
+    scenario_name: str, container: str, deduction_key: str
+) -> None:
+    loaded = deepcopy(scenario(scenario_name))
+    loaded["input"][container]["weryfikacja"].pop(deduction_key)
+
+    with pytest.raises(ScenarioError, match=f"{deduction_key}.*weryfikacja|weryfikacja.*mapping"):
         validate_scenario(loaded)

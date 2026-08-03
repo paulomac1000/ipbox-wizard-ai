@@ -4,7 +4,7 @@ meta:
   provider: openrouter
   requested_model: mistralai/mistral-small-24b-instruct-2501
   returned_model: mistralai/mistral-small-24b-instruct-2501
-  fingerprint: canonical-source_7f273ab4958035b6485483bed89e993fa1e1c0a80eea02f4f5f5f0d398829d7f
+  fingerprint: canonical-source_c050d1ad63a23f60007a1d5ccef4850566029271c44d4eabc4b37e2a9c751614
   request_hash: c9d4dd0f0f338871aec22cbade78001c39c66383d51f762b212da3fb19d11a24
   recorded_at: '2026-07-26T00:05:39.953586+00:00'
   request_id: gen-1785024338-vSgqwSnB34U8SXSDZ0se
@@ -27,10 +27,10 @@ parsed_response:
     - KNF_IKZE
     - MF_SCALE_HISTORY
     - MF_HEALTH_HISTORY
-    input_hash: aea3cee73a63b94e4b1532c732d429fba0997ea7be30b4238d091b731e31ca53
-    engine_source_hash: ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
+    input_hash: 28a747a2e831850cf03268fbc1d9e84f72194ff89206f9a0d78119a77799f445
+    engine_source_hash: b03aa6b34281109c7a2a7726f0788bbbd1368e5df1d15ca94a1791bbaf273d17
     calculated_at: '2026-07-26T00:05:39Z'
-    code_revision: engine:ba129b862c33c471862fcdfce4e837847bcf8e8505cbf24b82b6d76fccc5bd53
+    code_revision: engine:b03aa6b34281109c7a2a7726f0788bbbd1368e5df1d15ca94a1791bbaf273d17
   result:
     rok: 2019
     przychody_roczne:

@@ -32,7 +32,7 @@ def llm_client() -> LLMClient | None:
     config = VCRConfig()
     if config.is_playback:
         return None
-    return LLMClient(require_api_key=True)
+    return LLMClient(require_api_key=True, enforce_cost_limits=True)
 
 
 @pytest.mark.llm

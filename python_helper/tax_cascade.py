@@ -91,7 +91,13 @@ def calculate_tax_for_year(
         "child_tax_credit": child_tax_credit,
         "extra_income_scale": extra_income_scale,
     }
-    values = {name: _nonnegative(name, value) for name, value in inputs.items()}
+    values = {
+        name: _nonnegative(name, value) for name, value in inputs.items() if name != "non_ip_income"
+    }
+    # A current-year non-IP business loss is signed input. It must offset the
+    # ordinary-rate remainder of IP income instead of being discarded before
+    # both amounts enter the same business-income basket.
+    values["non_ip_income"] = _decimal("non_ip_income", non_ip_income)
     nexus_dec = _decimal("nexus", nexus)
     if not Decimal("0") <= nexus_dec <= Decimal("1"):
         raise ValueError("nexus must be between 0 and 1")
@@ -162,7 +168,7 @@ def calculate_tax_for_year(
         ("R&D relief — ordinary income", "rd_relief_non_ip"),
     ):
         requested = values[field]
-        used = min(requested, business_remaining)
+        used = min(requested, max(Decimal("0"), business_remaining))
         business_remaining -= used
         if field == "rd_relief_non_ip":
             rd_non_used = used
@@ -175,7 +181,10 @@ def calculate_tax_for_year(
                 }
             )
 
-    combined_remaining = business_remaining
+    # A current-year business loss may offset the ordinary IP remainder because
+    # both belong to the same business-income basket. Any unused loss must not
+    # spill into unrelated employment or other income taxed on the scale.
+    combined_remaining = max(Decimal("0"), business_remaining)
     if normalized_form == "scale":
         combined_remaining += values["extra_income_scale"]
     for label, field in (
@@ -185,7 +194,7 @@ def calculate_tax_for_year(
         ("Internet relief", "internet_tax_relief"),
         ("Rehabilitative relief", "rehabilitative_relief_income"),
     ):
-        used = min(values[field], combined_remaining)
+        used = min(values[field], max(Decimal("0"), combined_remaining))
         combined_remaining -= used
         if used:
             steps.append(
@@ -197,18 +206,19 @@ def calculate_tax_for_year(
             )
 
     thermo_lot_result: dict[str, Any] | None = None
+    deduction_base = max(Decimal("0"), combined_remaining)
     if thermomodernization_lots is not None:
         thermo_lot_result = apply_thermomodernization_lots(
             year,
             thermomodernization_lots,
-            combined_remaining,
+            deduction_base,
         )
         thermo_used = Decimal(str(thermo_lot_result["used"]))
         thermo_carry = Decimal(str(thermo_lot_result["carry_over"]))
         combined_remaining = Decimal(str(thermo_lot_result["remaining_income"]))
     else:
-        thermo_used = min(values["thermomodernization_pool"], combined_remaining)
-        combined_remaining -= thermo_used
+        thermo_used = min(values["thermomodernization_pool"], deduction_base)
+        combined_remaining = deduction_base - thermo_used
         thermo_carry = values["thermomodernization_pool"] - thermo_used
     if thermo_used:
         steps.append(
@@ -219,7 +229,7 @@ def calculate_tax_for_year(
             }
         )
 
-    ordinary_base = tax_round(combined_remaining)
+    ordinary_base = tax_round(max(Decimal("0"), combined_remaining))
     if normalized_form == "linear":
         ordinary_tax_before_credits = tax_round(Decimal(ordinary_base) * Decimal("0.19"))
     else:
