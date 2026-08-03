@@ -6,7 +6,7 @@ status: active
 rigor: operational
 owners: [repository-maintainers]
 verification: Porównaj procedurę z README.md, ipbox_algorytm.md oraz testami pokrycia; dla konkretnego przypadku uruchom wskazane testy i playback offline.
-upstream: [README.md, ipbox_algorytm.md, tests/llm/models.py]
+upstream: [README.md, ipbox_algorytm.md, docs/testing.md, tests/llm/models.py]
 downstream: [AGENTS.md, examples/przykladowy_prompt_startowy.md]
 review_triggers: [zmiana kontraktu algorytmu, zmiana statusów pokrycia, zmiana polityki prywatności, zmiana macierzy modeli]
 ---
@@ -29,7 +29,7 @@ Status opisuje pokrycie przypadku przez testy repozytorium, a nie pewność praw
 
 1. Przeczytaj `README.md`, `AGENTS.md` i `ipbox_algorytm.md`.
 2. Ustal rok, formę opodatkowania, zakres analizy i oczekiwany rezultat.
-3. Potwierdź, że przekazane pliki są potrzebne do zadania. Nie kopiuj ich do Git ani do zewnętrznego narzędzia bez zgody.
+3. Potwierdź, że przekazane pliki są potrzebne do zadania. Nie kopiuj ich do repozytorium ani nie commituj ich do Git. Do zewnętrznego narzędzia nie wysyłaj ich bez jawnej zgody i ustalonego zakresu.
 4. Oddziel dane źródłowe od założeń, pytań, obliczeń i wniosków.
 
 ## Procedura
@@ -69,7 +69,7 @@ Podobny test albo częściowe pokrycie oznacza `COVERED_PARTIALLY`. Brak repreze
 4. Opisz wynik rzeczywisty, oczekiwany i źródło oczekiwania.
 5. Ustal, czy problem dotyczy ekstrakcji, danych wejściowych, reguły podatkowej czy implementacji.
 6. Zaproponuj brakujący test jednostkowy i scenariusz biznesowy.
-7. Utwórz zanonimizowane GitHub Issue wyłącznie po jawnej zgodzie użytkownika.
+7. Utwórz zanonimizowane GitHub Issue wyłącznie po jawnym poleceniu użytkownika oraz dodatkowej zgodzie na publikację zanonimizowanego Issue.
 
 Formularz:
 
