@@ -111,8 +111,7 @@ def _action_findings(path: Path, job_name: str, step_index: int, step: Any) -> l
     action = uses.rsplit("@", 1)[0]
     with_block = step.get("with")
     if action == "actions/checkout" and (
-        not isinstance(with_block, dict)
-        or not _is_false(with_block.get("persist-credentials"))
+        not isinstance(with_block, dict) or not _is_false(with_block.get("persist-credentials"))
     ):
         findings.append(
             Finding(path, f"{label} actions/checkout must set persist-credentials: false")
