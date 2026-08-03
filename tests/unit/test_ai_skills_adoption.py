@@ -28,10 +28,11 @@ def test_adoption_decision_and_dependencies_use_the_same_revision() -> None:
 
     assert _AI_SKILLS_REVISION in decision
     assert "PyYAML==6.0.3" in requirements
+    assert "requests==2.33.0" in requirements
 
 
 def test_changelog_records_the_adoption_contract() -> None:
     changelog = _read("CHANGELOG.md")
 
     assert "### Instrukcje agentów, dokumentacja i bezpieczeństwo CI" in changelog
-    assert "upstreamowych validatorów" in changelog
+    assert "upstreamowe validatory" in changelog
