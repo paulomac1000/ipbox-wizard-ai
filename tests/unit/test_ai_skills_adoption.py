@@ -1,7 +1,7 @@
 from pathlib import Path
 
 _REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
-_AI_SKILLS_REVISION = "5fdd72d8cbd06e7358d4f585f7cd06cbd43d82f2"
+_AI_SKILLS_REVISION = "1caa380151bdcf3285c9f9e59bdaf7b618e4bb16"
 
 
 def _read(relative: str) -> str:
