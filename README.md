@@ -140,31 +140,29 @@ Nie umieszczaj w Issue dokumentów źródłowych ani danych pozwalających ziden
 
 Lokalne środowisko jest przydatne do uruchamiania testów, przeglądania kodu i rozwijania algorytmu.
 
-### Windows — PowerShell
+### Windows — WSL
 
-Czysty PowerShell wystarcza do przygotowania środowiska Python, ale pełna bramka używa GNU Make i Bash do kontroli skryptów oraz playbacku. Na Windows uruchom `make full` w WSL (zalecane) albo w innym środowisku POSIX, w którym dostępne są polecenia `make` i `bash`.
+Czysty PowerShell nie uruchamia pełnej bramki, ponieważ repozytorium wymaga GNU Make i Bash do kontroli skryptów oraz playbacku. Na Windows użyj WSL albo równoważnego środowiska POSIX. Całe środowisko Python dla pełnej bramki utwórz **wewnątrz WSL**; nie używaj w WSL wirtualnego środowiska utworzonego przez `py -m venv` w Windows.
 
-```powershell
-git clone https://github.com/paulomac1000/ipbox-wizard-ai.git
-cd ipbox-wizard-ai
-py -3.12 -m venv .venv
-.\.venv\Scripts\Activate.ps1
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt -r requirements-test.txt
-```
-
-Gdy PowerShell blokuje aktywację środowiska:
+Uruchom WSL z PowerShell:
 
 ```powershell
-Set-ExecutionPolicy -Scope Process Bypass
-.\.venv\Scripts\Activate.ps1
+wsl
 ```
 
-Po przygotowaniu zależności otwórz ten sam checkout w WSL lub równoważnym środowisku z GNU Make i Bash, a następnie uruchom:
+Następnie wykonaj cały setup w powłoce WSL:
 
 ```bash
+git clone https://github.com/paulomac1000/ipbox-wizard-ai.git
+cd ipbox-wizard-ai
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt -r requirements-test.txt
 make full
 ```
+
+Jeżeli korzystasz z checkoutu znajdującego się na dysku Windows, nadal utwórz nowe linuksowe `.venv` z poziomu WSL. Środowisko `.venv\Scripts` utworzone w PowerShell nie jest zgodne z Linuksem i nie może być użyte przez pełną bramkę.
 
 ### macOS i Linux
 
