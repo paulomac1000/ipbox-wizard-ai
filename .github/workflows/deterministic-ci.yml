@@ -8,11 +8,14 @@ on:
 
 permissions:
   contents: read
-  checks: write
 
 concurrency:
   group: deterministic-ci-${{ github.ref }}
   cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
 
 jobs:
   deterministic:
@@ -24,12 +27,12 @@ jobs:
         python-version: ["3.11", "3.12", "3.13"]
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
       - name: Setup Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: ${{ matrix.python-version }}
           cache: pip
@@ -38,10 +41,14 @@ jobs:
             requirements-test.txt
 
       - name: Install dependencies
-        run: pip install -r requirements.txt -r requirements-test.txt
+        run: python -m pip install -r requirements.txt -r requirements-test.txt
+
+      - name: Validate workflow policy
+        run: python scripts/check_workflow_policy.py
 
       - name: Ruff format
         run: |
+          set -euo pipefail
           mkdir -p reports
           if ! ruff format --check .; then
             ruff format --diff . > reports/ruff-format.diff
@@ -50,7 +57,7 @@ jobs:
 
       - name: Ruff lint
         run: |
-          set -o pipefail
+          set -euo pipefail
           mkdir -p reports
           ruff check . 2>&1 | tee reports/ruff-lint.txt
 
@@ -59,6 +66,7 @@ jobs:
 
       - name: Unit tests with coverage
         run: |
+          set -euo pipefail
           mkdir -p reports
           pytest tests/unit \
             --cov=python_helper \
@@ -79,7 +87,7 @@ jobs:
 
       - name: Cassette policy
         run: |
-          set -o pipefail
+          set -euo pipefail
           mkdir -p reports
           python scripts/check_cassette_policy.py 2>&1 | tee reports/cassette-policy.txt
 
@@ -89,13 +97,13 @@ jobs:
           VCR_MODE: playback
         run: |
           set -euo pipefail
-          unset OPENROUTER_API_KEY || true
+          unset OPENROUTER_API_KEY
           python scripts/benchmark_report.py --output reports/benchmark-summary.json
           ./scripts/verify_all_models.sh
 
       - name: Upload reports
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: deterministic-reports-py${{ matrix.python-version }}
           path: reports/
