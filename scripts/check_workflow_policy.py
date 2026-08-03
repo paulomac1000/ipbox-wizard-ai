@@ -110,11 +110,13 @@ def _action_findings(path: Path, job_name: str, step_index: int, step: Any) -> l
 
     action = uses.rsplit("@", 1)[0]
     with_block = step.get("with")
-    if action == "actions/checkout":
-        if not isinstance(with_block, dict) or not _is_false(with_block.get("persist-credentials")):
-            findings.append(
-                Finding(path, f"{label} actions/checkout must set persist-credentials: false")
-            )
+    if action == "actions/checkout" and (
+        not isinstance(with_block, dict)
+        or not _is_false(with_block.get("persist-credentials"))
+    ):
+        findings.append(
+            Finding(path, f"{label} actions/checkout must set persist-credentials: false")
+        )
 
     if action == "actions/upload-artifact":
         if not isinstance(with_block, dict):
@@ -162,7 +164,7 @@ def audit_workflow(path: Path) -> list[Finding]:
 
     jobs = document.get("jobs")
     if not isinstance(jobs, dict) or not jobs:
-        return findings + [Finding(path, "workflow must declare at least one job")]
+        return [*findings, Finding(path, "workflow must declare at least one job")]
 
     for job_name, job in jobs.items():
         if not isinstance(job, dict):
