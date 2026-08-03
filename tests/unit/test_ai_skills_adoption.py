@@ -42,7 +42,11 @@ def _named_step(steps: list[dict[str, Any]], name: str) -> dict[str, Any]:
 
 
 def _command_with_prefix(commands: list[str], prefix: str) -> tuple[int, str]:
-    matches = [(index, command) for index, command in enumerate(commands) if command.startswith(prefix)]
+    matches = [
+        (index, command)
+        for index, command in enumerate(commands)
+        if command.startswith(prefix)
+    ]
     assert len(matches) == 1
     return matches[0]
 
@@ -117,6 +121,20 @@ def test_adoption_decision_and_dependencies_use_the_same_revision() -> None:
     assert _AI_SKILLS_REVISION in decision
     assert "PyYAML==6.0.3" in requirements
     assert "requests==2.33.0" in requirements
+
+
+def test_makefile_remains_the_canonical_full_quality_gate() -> None:
+    readme = _read("README.md")
+    testing = _read("docs/testing.md")
+    makefile = _read("Makefile")
+
+    assert "full: test verify" in makefile
+    assert "`Makefile` jest kanonicznym właścicielem" in readme
+    assert "`Makefile` jest kanonicznym właścicielem" in testing
+    assert "make full" in readme
+    assert "make full" in testing
+    assert "ruff format --check ." not in readme
+    assert "ruff format --check ." not in testing
 
 
 def test_changelog_records_the_adoption_contract() -> None:
