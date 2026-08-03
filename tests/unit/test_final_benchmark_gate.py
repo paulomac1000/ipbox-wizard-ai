@@ -77,6 +77,7 @@ def _stubbed_shell_environment(tmp_path: Path) -> tuple[Path, dict[str, str], Pa
         """#!/usr/bin/env bash
 set -u
 printf 'python %s\\n' "$*" >> "$COMMAND_LOG"
+printf 'api_key=%s\\n' "${OPENROUTER_API_KEY:-}" >> "${COMMAND_LOG}.env"
 if [[ -n "${FAIL_COMMAND:-}" && "python $*" == *"$FAIL_COMMAND"* ]]; then
   exit "${FAIL_STATUS:-42}"
 fi
@@ -89,6 +90,7 @@ exit 0
             f"""#!/usr/bin/env bash
 set -u
 printf '{command} %s\\n' "$*" >> "$COMMAND_LOG"
+printf 'api_key=%s\\n' "${{OPENROUTER_API_KEY:-}}" >> "${{COMMAND_LOG}}.env"
 if [[ "${{FAIL_COMMAND:-}}" == "{command}" ]]; then
   exit "${{FAIL_STATUS:-42}}"
 fi
@@ -96,16 +98,14 @@ exit 0
 """,
         )
 
-    env = os.environ.copy()
-    env.update(
-        {
-            "PATH": f"{fake_bin}:{env['PATH']}",
-            "COMMAND_LOG": str(command_log),
-            "VCR_REJECTED_ROOT": str(tmp_path / "rejected"),
-            "MAX_COST_PER_MODEL_USD": "1",
-            "MAX_TOTAL_COST_USD": "2",
-        }
-    )
+    parent_path = os.environ.get("PATH", "/usr/bin:/bin")
+    env = {
+        "PATH": f"{fake_bin}:{parent_path}",
+        "COMMAND_LOG": str(command_log),
+        "VCR_REJECTED_ROOT": str(tmp_path / "rejected"),
+        "MAX_COST_PER_MODEL_USD": "1",
+        "MAX_TOTAL_COST_USD": "2",
+    }
     return workspace, env, command_log
 
 
@@ -195,7 +195,7 @@ def test_paid_workflow_initializes_exactly_one_rejected_root_at_runtime() -> Non
     assert init_index < min(consumer_indices)
 
 
-def test_all_model_workflow_generates_one_report_before_artifact_upload() -> None:
+def test_paid_workflow_enforces_static_execution_contract_and_step_ordering() -> None:
     workflow = _paid_workflow()
     steps = workflow["jobs"]["benchmark"]["steps"]
     record_step = next(step for step in steps if step.get("name") == "Record cassettes")
@@ -363,6 +363,8 @@ def test_paid_workflow_runs_required_offline_verification_commands_in_order(
 
     assert result.returncode == 0, result.stderr
     assert command_log.read_text(encoding="utf-8").splitlines() == expected
+    api_key_log = Path(f"{command_log}.env")
+    assert api_key_log.read_text(encoding="utf-8").splitlines() == ["api_key="] * len(expected)
 
 
 @pytest.mark.parametrize(
