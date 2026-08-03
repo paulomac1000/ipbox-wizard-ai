@@ -5,6 +5,7 @@ quality:
 	ruff check .
 	python -m compileall -q python_helper tests scripts
 	python scripts/check_workflow_policy.py
+	python -m bandit -q -lll -iii -r python_helper scripts
 	for script in scripts/*.sh; do bash -n "$$script"; done
 
 test: quality
