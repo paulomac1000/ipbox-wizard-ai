@@ -67,7 +67,8 @@ jobs:
         encoding="utf-8",
     )
 
-    assert any("must not reference repository secrets" in message for message in _messages(workflow))
+    messages = _messages(workflow)
+    assert any("must not reference repository secrets" in message for message in messages)
 
 
 def test_policy_reports_invalid_event_shape_without_crashing(tmp_path: Path) -> None:
@@ -115,4 +116,5 @@ jobs:
         encoding="utf-8",
     )
 
-    assert any("immutable sha256 digest" in message for message in _messages(workflow))
+    messages = _messages(workflow)
+    assert any("immutable sha256 digest" in message for message in messages)
