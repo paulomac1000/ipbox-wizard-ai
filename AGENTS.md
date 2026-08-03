@@ -52,9 +52,9 @@ Nie mieszaj analizy danych podatnika z rozwojem kodu bez osobnej, jawnej decyzji
 
 Zmiana kontraktu wymaga spójnej aktualizacji jego właściciela, implementacji, testów i dokumentacji. Nie utrzymuj równoległych „aktualnych” wersji ani numerowanych wariantów.
 
-## Dane, sekrety i działania kosztowe
+## Granice danych i bezpieczeństwo
 
-- Nie commituj dokumentów podatnika, KPiR, PIT, faktur, umów, interpretacji, danych osobowych, kluczy API ani surowych raportów użytkownika.
+- Nie commituj dokumentów podatnika, KPiR, PIT, faktur, umów, interpretacji, danych osobowych, sekretów, kluczy API ani surowych raportów użytkownika.
 - Testy, kasety, logi, Issue i komentarze używają wyłącznie danych syntetycznych lub skutecznie zanonimizowanych.
 - Nie kopiuj prywatnych danych do zewnętrznego narzędzia bez zgody i ustalonego zakresu.
 - Płatne wywołania LLM wymagają jawnego polecenia, potwierdzenia przewidzianego przez skrypt oraz dodatnich limitów kosztu.
@@ -85,16 +85,16 @@ python -m pip install --upgrade pip
 python -m pip install -r requirements.txt -r requirements-test.txt
 ```
 
-Najmniejszy test wybierz z pliku związanego z zadaniem, na przykład:
+Przykładowy test celowany dla NEXUS i zwykłego opodatkowania:
 
 ```bash
-pytest tests/unit/test_nexus.py -q
+pytest tests/unit/test_nexus_ordinary_tax_and_w_policy.py -q
 ```
 
 Bramki repozytorium:
 
 ```bash
-make quality   # format, lint, compile, shell syntax i polityka workflow
+make quality   # format, lint, compile, statyczne bezpieczeństwo i polityka workflow
 make test      # quality + unit/coverage + pełny bezpłatny suite + polityka kaset
 make verify    # pełna macierz VCR w trybie offline
 make full      # test + verify
@@ -104,13 +104,6 @@ Płatne nagrywanie, zależności sieciowe i integracje zewnętrzne mają osobne 
 
 ## Kryterium zakończenia
 
-Raport końcowy podaje:
-
-- branch i dokładny SHA;
-- zmienione kanoniczne kontrakty i konsumentów;
-- uruchomione komendy wraz z wynikiem;
-- komendy tylko odnalezione, ale niewykonane;
-- pominięte bramki i powód;
-- ryzyka resztkowe, stan CI i wymagany dalszy review.
+Raport końcowy podaje branch i dokładny SHA, zmienione kontrakty i konsumentów, wykonane komendy z wynikami, niewykonane bramki z powodem oraz ryzyka resztkowe, stan CI i wymagany dalszy review.
 
 Lokalny PASS nie jest dowodem zielonego GitHub Actions, działania płatnej integracji ani niezależnej akceptacji. Nie oznaczaj zmiany jako gotowej, jeżeli wymagana macierz VCR jest częściowa, playback nie przechodzi offline albo istotny konflikt pozostaje nierozstrzygnięty.
