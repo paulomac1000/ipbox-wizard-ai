@@ -43,9 +43,7 @@ def _named_step(steps: list[dict[str, Any]], name: str) -> dict[str, Any]:
 
 def _command_with_prefix(commands: list[str], prefix: str) -> tuple[int, str]:
     matches = [
-        (index, command)
-        for index, command in enumerate(commands)
-        if command.startswith(prefix)
+        (index, command) for index, command in enumerate(commands) if command.startswith(prefix)
     ]
     assert len(matches) == 1
     return matches[0]
@@ -74,10 +72,7 @@ def test_deterministic_ci_runs_pinned_upstream_validators_outside_repository() -
     assert isinstance(script, str)
     commands = _shell_commands(script)
 
-    sha_check = (
-        'test "$(git -C .ai-skills-source rev-parse HEAD)" = '
-        f'"{_AI_SKILLS_REVISION}"'
-    )
+    sha_check = f'test "$(git -C .ai-skills-source rev-parse HEAD)" = "{_AI_SKILLS_REVISION}"'
     assert sha_check in commands
 
     move_command = 'mv .ai-skills-source "$RUNNER_TEMP/ai-skills"'
