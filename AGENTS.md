@@ -13,7 +13,7 @@ Repozytorium ma profil `safety-critical`: wspiera analizę podatkową, ale nie s
 
 | Tryb | Kiedy | Przeczytaj przed działaniem |
 |---|---|---|
-| Analiza rozliczenia | Użytkownik przekazuje dokumenty lub dane podatkowe | [`docs/agent-tax-analysis.md`](docs/agent-tax-analysis.md), następnie `ipbox_algorytm.md` |
+| Analiza rozliczenia | Użytkownik przekazuje dokumenty lub dane podatkowe | [`docs/agent-tax-analysis.md`](docs/agent-tax-analysis.md), następnie [`ipbox_algorytm.md`](ipbox_algorytm.md) |
 | Rozwój repozytorium | Użytkownik zleca zmianę kodu, testów, dokumentacji lub CI | [`docs/agent-development.md`](docs/agent-development.md), następnie pliki i testy związane z zadaniem |
 | Audyt read-only | Użytkownik prosi wyłącznie o ocenę | Odpowiedni dokument powyżej; nie twórz brancha, commitów, Issue ani PR |
 
@@ -23,18 +23,17 @@ Nie mieszaj analizy danych podatnika z rozwojem kodu bez osobnej, jawnej decyzji
 
 | Obszar | Właściciel |
 |---|---|
-| Produkt, sposoby użycia i ograniczenia | `README.md` |
-| Znaczenie biznesowe i kolejność decyzji | `ipbox_algorytm.md` |
-| Deterministyczne reguły podatkowe | `python_helper/` |
-| Wykonywalne invarianty | `tests/unit/` |
-| Kanoniczny raport i decyzja | `tests/llm/oracle.py`, `tests/llm/output_schema.py` |
-| Profile modeli i transport | `tests/llm/models.py` |
-| Przypadki biznesowe | `tests/llm/scenarios/` |
-| Walidacja odpowiedzi | `tests/llm/evaluator.py` |
-| Kasety, fingerprinty i playback | `tests/llm/vcr/` |
-| Procedura testów i nagrywania | `docs/testing.md` |
-| Lokalne komendy jakości | `Makefile` |
-| Polityka GitHub Actions | `scripts/check_workflow_policy.py` |
+| Produkt, sposoby użycia i ograniczenia | [`README.md`](README.md) |
+| Znaczenie biznesowe i kolejność decyzji | [`ipbox_algorytm.md`](ipbox_algorytm.md) |
+| Publiczna fasada deterministycznych reguł | [`python_helper/ipbox_calculator.py`](python_helper/ipbox_calculator.py) |
+| Konfiguracja testów i progów jakości | [`pyproject.toml`](pyproject.toml) |
+| Kanoniczny raport i decyzja | [`tests/llm/oracle.py`](tests/llm/oracle.py), [`tests/llm/output_schema.py`](tests/llm/output_schema.py) |
+| Profile modeli i transport | [`tests/llm/models.py`](tests/llm/models.py) |
+| Walidacja odpowiedzi | [`tests/llm/evaluator.py`](tests/llm/evaluator.py) |
+| Konfiguracja i zapis VCR | [`tests/llm/vcr/config.py`](tests/llm/vcr/config.py), [`tests/llm/vcr/recorder.py`](tests/llm/vcr/recorder.py) |
+| Procedura testów, scenariuszy i nagrywania | [`docs/testing.md`](docs/testing.md) |
+| Lokalne komendy jakości | [`Makefile`](Makefile) |
+| Polityka GitHub Actions | [`scripts/check_workflow_policy.py`](scripts/check_workflow_policy.py) |
 
 `AGENTS.md` opisuje konsekwencje operacyjne i kieruje do właścicieli. Nie duplikuj tutaj pełnych kontraktów, list modeli, liczników testów ani definicji workflow.
 
@@ -73,7 +72,7 @@ Zmiana kontraktu wymaga spójnej aktualizacji jego właściciela, implementacji,
 8. Uruchom test celowany i pełną bramkę.
 9. Sprawdź CI oraz komentarze reviewerów przed deklaracją gotowości.
 
-Nie zmieniaj wygenerowanych kaset, manifestów, hashy ani fingerprintów ręcznie. Używaj skryptów opisanych w `docs/testing.md`.
+Nie zmieniaj wygenerowanych kaset, manifestów, hashy ani fingerprintów ręcznie. Używaj skryptów opisanych w [`docs/testing.md`](docs/testing.md).
 
 ## Komendy weryfikacyjne
 
@@ -101,7 +100,7 @@ make verify    # pełna macierz VCR w trybie offline
 make full      # test + verify
 ```
 
-Płatne nagrywanie, zależności sieciowe i integracje zewnętrzne mają osobne preconditions w `docs/testing.md`. Brak sekretu lub zgody oznacza bezpieczne pominięcie, nie obejście zabezpieczenia.
+Płatne nagrywanie, zależności sieciowe i integracje zewnętrzne mają osobne preconditions w [`docs/testing.md`](docs/testing.md). Brak sekretu lub zgody oznacza bezpieczne pominięcie, nie obejście zabezpieczenia.
 
 ## Kryterium zakończenia
 
