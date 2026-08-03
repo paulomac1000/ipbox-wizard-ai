@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 permissions:
-  contents: read
+  contents: write
   checks: write
 
 concurrency:
@@ -15,7 +15,32 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  cleanup-stale-branches:
+    if: github.event_name == 'pull_request' && github.head_ref == 'automation/cleanup-stale-ipbox-branches'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Delete stale repository branches
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          branches=(
+            "automation/final-ipbox-audit"
+            "fix/openai-review-follow-up"
+            "fix/post-review-contracts"
+            "test/review-followups"
+          )
+          for branch in "${branches[@]}"; do
+            echo "Deleting ${branch}"
+            gh api --method DELETE "repos/${GITHUB_REPOSITORY}/git/refs/heads/${branch}"
+          done
+          echo "Deleting temporary cleanup branch"
+          gh api --method DELETE \
+            "repos/${GITHUB_REPOSITORY}/git/refs/heads/automation/cleanup-stale-ipbox-branches"
+
   deterministic:
+    if: github.head_ref != 'automation/cleanup-stale-ipbox-branches'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     strategy:
