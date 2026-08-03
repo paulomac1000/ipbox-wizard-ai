@@ -1,9 +1,10 @@
-.PHONY: quality test record verify
+.PHONY: quality test record verify full
 
 quality:
 	ruff format --check .
 	ruff check .
 	python -m compileall -q python_helper tests scripts
+	python scripts/check_workflow_policy.py
 	for script in scripts/*.sh; do bash -n "$$script"; done
 
 test: quality
@@ -15,5 +16,9 @@ record: test
 	./scripts/record_all_models.sh
 
 verify:
-	./scripts/verify_all_models.sh
-	python scripts/benchmark_report.py
+	@unset OPENROUTER_API_KEY; \
+	python scripts/vcr_precommit.py --all-models; \
+	python scripts/benchmark_report.py; \
+	VCR_MODE=playback ./scripts/verify_all_models.sh
+
+full: test verify
