@@ -6,8 +6,8 @@ status: active
 rigor: operational
 owners: [repository-maintainers]
 verification: Uruchom make full, sprawdź scripts/check_workflow_policy.py i porównaj zmianę z kanonicznym kontraktem domenowym.
-upstream: [AGENTS.md, ipbox_algorytm.md, Makefile, docs/testing.md]
-downstream: [README.md]
+upstream: [README.md, AGENTS.md, ipbox_algorytm.md, Makefile, docs/testing.md]
+downstream: [AGENTS.md, README.md]
 review_triggers: [zmiana komend jakości, zmiana architektury testów, zmiana VCR, zmiana polityki CI]
 ---
 
