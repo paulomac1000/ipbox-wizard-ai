@@ -19,9 +19,7 @@ def _load_workflow(relative: str) -> dict[str, Any]:
 
 def _active_requirement_lines(text: str) -> set[str]:
     return {
-        line.split("#", 1)[0].strip()
-        for line in text.splitlines()
-        if line.split("#", 1)[0].strip()
+        line.split("#", 1)[0].strip() for line in text.splitlines() if line.split("#", 1)[0].strip()
     }
 
 
