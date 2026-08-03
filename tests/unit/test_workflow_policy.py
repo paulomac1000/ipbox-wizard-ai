@@ -52,6 +52,7 @@ jobs:
         "${{ secrets.SOME_TOKEN }}",
         "${{ secrets['SOME_TOKEN'] }}",
         '${{ secrets["SOME_TOKEN"] }}',
+        "${{ toJSON(secrets) }}",
     ),
 )
 def test_policy_rejects_secret_in_pull_request_workflow(
