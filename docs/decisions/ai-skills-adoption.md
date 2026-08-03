@@ -6,7 +6,7 @@ status: evolving
 rigor: operational
 owners: [repository-maintainers]
 verification: Uruchom make full, python scripts/check_workflow_policy.py oraz przypięte upstreamowe validatory w Deterministic CI; sprawdź GitHub Actions na dokładnym SHA i uzyskaj niezależne review.
-upstream: [https://github.com/paulomac1000/ai-skills/tree/1caa380151bdcf3285c9f9e59bdaf7b618e4bb16]
+upstream: [https://github.com/paulomac1000/ai-skills/tree/a22bd71900e0b4615e1c1da71892bb89b2fe58d5]
 downstream: [AGENTS.md, docs/agent-tax-analysis.md, docs/agent-development.md, Makefile, requirements.txt, requirements-test.txt, .github/workflows/deterministic-ci.yml, .github/workflows/llm-benchmark.yml, tests/unit/test_ai_skills_adoption.py]
 review_triggers: [nowa wersja ai-skills, zmiana przypiętej rewizji, zmiana profilu repozytorium, zmiana CI, zmiana AGENTS.md, dodanie publikacji artefaktów]
 ---
@@ -15,7 +15,7 @@ review_triggers: [nowa wersja ai-skills, zmiana przypiętej rewizji, zmiana prof
 
 ## Decyzja
 
-Repozytorium adaptuje wymagania trzech skills z `paulomac1000/ai-skills` na dokładnej rewizji `1caa380151bdcf3285c9f9e59bdaf7b618e4bb16`:
+Repozytorium adaptuje wymagania trzech skills z `paulomac1000/ai-skills` na dokładnej rewizji `a22bd71900e0b4615e1c1da71892bb89b2fe58d5`:
 
 - `ci-cd-architect` 1.2.0;
 - `afds-doc-writer` 1.2.0;
@@ -79,7 +79,7 @@ Największe ryzyka to błędna reguła podatkowa, niejawne założenie, wyciek d
 
 ### Ruchomy branch nie jest pinem
 
-Pierwsza adaptacja wskazywała wcześniejszy commit brancha. Branch następnie otrzymał kolejne poprawki validatora, w tym utwardzenie parsowania dowodów komend i jawny kontrakt `PyYAML>=6.0.3,<7`. Traktowanie nazwy brancha jako wersji prowadziłoby do niedeterministycznej adopcji.
+Pierwsza adaptacja wskazywała wcześniejszy commit brancha. Branch następnie otrzymał kolejne poprawki validatora, w tym modularizację reguł dokumentu, dowodów Python/shell, walidacji drzewa i obsługi platformy Codex oraz jawny kontrakt `PyYAML>=6.0.3,<7`. Traktowanie nazwy brancha jako wersji prowadziłoby do niedeterministycznej adopcji.
 
 Decyzja: przypinamy aktualny, dokładny commit, zapisujemy go w kontrakcie i sprawdzamy w CI przed uruchomieniem narzędzi.
 
