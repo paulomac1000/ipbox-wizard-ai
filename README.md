@@ -134,7 +134,7 @@ Formularz znajduje się tutaj:
 https://github.com/paulomac1000/ipbox-wizard-ai/issues/new?template=new-tax-case.yml
 ```
 
-Nie umieszczaj w Issue dokumentów źródłowych ani danych pozwalających zidentyfikować podatnika. Publikacja wymaga wyraźnej zgody użytkownika.
+Nie umieszczaj w Issue dokumentów źródłowych ani danych pozwalających zidentyfikować podatnika. Publikacja wymaga jawnego polecenia użytkownika oraz dodatkowej zgody na publikację zanonimizowanego Issue.
 
 ## Uruchomienie lokalne
 
@@ -148,8 +148,8 @@ cd ipbox-wizard-ai
 py -3.12 -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
-pip install -r requirements.txt -r requirements-test.txt
-pytest -q
+python -m pip install -r requirements.txt -r requirements-test.txt
+make full
 ```
 
 Gdy PowerShell blokuje aktywację środowiska:
@@ -167,20 +167,19 @@ cd ipbox-wizard-ai
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip
-pip install -r requirements.txt -r requirements-test.txt
-pytest -q
+python -m pip install -r requirements.txt -r requirements-test.txt
+make full
 ```
 
 ### Pełna bramka jakości
 
+`Makefile` jest kanonicznym właścicielem lokalnych bramek. Pełną bezpłatną weryfikację, łącznie ze statycznym bezpieczeństwem i playbackiem offline, uruchamia:
+
 ```bash
-ruff format --check .
-ruff check .
-python -m compileall -q python_helper tests scripts
-pytest tests/unit --cov=python_helper --cov-report=term-missing --cov-fail-under=90
-pytest -q
-bash scripts/verify_all_models.sh
+make full
 ```
+
+Szczegółowe składowe `make quality`, `make test` i `make verify` są zdefiniowane w [`Makefile`](Makefile) i opisane w [`docs/testing.md`](docs/testing.md). Nie utrzymuj równoległej listy komend jako alternatywnej pełnej bramki.
 
 Nagrywanie nowych kaset LLM jest płatne i wymaga świadomego uruchomienia, klucza API oraz limitów kosztu. Zwykła praca i CI korzystają z odtwarzania offline.
 
