@@ -12,7 +12,10 @@ import yaml
 
 _FULL_SHA = re.compile(r"^[0-9a-f]{40}$")
 _EXPRESSION_REFERENCE = re.compile(r"\$\{\{")
-_SECRET_REFERENCE = re.compile(r"\$\{\{\s*secrets\s*(?:\.|\[)", re.IGNORECASE)
+_SECRET_CONTEXT_REFERENCE = re.compile(
+    r"\$\{\{(?:(?!\}\}).)*\bsecrets\b(?:(?!\}\}).)*\}\}",
+    re.IGNORECASE | re.DOTALL,
+)
 _WRITE_PERMISSION = re.compile(r"(^|-)write$")
 _WORKFLOW_SUFFIXES = {".yml", ".yaml"}
 _MUTABLE_RUNNERS = {"ubuntu-latest", "windows-latest", "macos-latest"}
@@ -212,7 +215,7 @@ def audit_workflow(path: Path) -> list[Finding]:
         for index, step in enumerate(steps, start=1):
             findings.extend(_action_findings(path, str(job_name), index, step))
 
-    if "pull_request" in event_names and _SECRET_REFERENCE.search(raw_text):
+    if "pull_request" in event_names and _SECRET_CONTEXT_REFERENCE.search(raw_text):
         findings.append(
             Finding(path, "pull-request workflows must not reference repository secrets")
         )
