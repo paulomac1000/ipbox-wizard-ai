@@ -132,6 +132,15 @@ def test_makefile_remains_the_canonical_full_quality_gate() -> None:
     assert "ruff format --check ." not in testing
 
 
+def test_windows_full_gate_documents_posix_prerequisites() -> None:
+    readme = _read("README.md")
+
+    assert "Czysty PowerShell" in readme
+    assert "GNU Make" in readme
+    assert "Bash" in readme
+    assert "WSL" in readme
+
+
 def test_changelog_records_the_adoption_contract() -> None:
     changelog = _read("CHANGELOG.md")
 
