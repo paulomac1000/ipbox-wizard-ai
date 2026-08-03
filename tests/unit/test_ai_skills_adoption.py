@@ -4,7 +4,7 @@ from typing import Any
 import yaml
 
 _REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
-_AI_SKILLS_REVISION = "a22bd71900e0b4615e1c1da71892bb89b2fe58d5"
+_AI_SKILLS_REVISION = "ff2f7bb62e34fbb759f93f4127e07c1b6542caba"
 
 
 def _read(relative: str) -> str:
