@@ -132,13 +132,23 @@ def test_makefile_remains_the_canonical_full_quality_gate() -> None:
     assert "ruff format --check ." not in testing
 
 
-def test_windows_full_gate_documents_posix_prerequisites() -> None:
+def test_windows_full_gate_creates_the_environment_inside_wsl() -> None:
     readme = _read("README.md")
+    windows = readme.split("### Windows — WSL", 1)[1].split("### macOS i Linux", 1)[0]
 
-    assert "Czysty PowerShell" in readme
-    assert "GNU Make" in readme
-    assert "Bash" in readme
-    assert "WSL" in readme
+    assert "Czysty PowerShell" in windows
+    assert "GNU Make" in windows
+    assert "Bash" in windows
+    assert "WSL" in windows
+    assert "Activate.ps1" not in windows
+
+    venv_index = windows.index("python3 -m venv .venv")
+    activation_index = windows.index("source .venv/bin/activate")
+    install_index = windows.index(
+        "python -m pip install -r requirements.txt -r requirements-test.txt"
+    )
+    gate_index = windows.index("make full")
+    assert venv_index < activation_index < install_index < gate_index
 
 
 def test_changelog_records_the_adoption_contract() -> None:
