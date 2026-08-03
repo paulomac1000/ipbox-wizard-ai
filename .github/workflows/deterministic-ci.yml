@@ -50,7 +50,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: paulomac1000/ai-skills
-          ref: 5fdd72d8cbd06e7358d4f585f7cd06cbd43d82f2
+          ref: 1caa380151bdcf3285c9f9e59bdaf7b618e4bb16
           path: .ai-skills-source
           fetch-depth: 1
           persist-credentials: false
@@ -61,7 +61,7 @@ jobs:
           set -euo pipefail
           mkdir -p reports
           test "$(git -C .ai-skills-source rev-parse HEAD)" = \
-            "5fdd72d8cbd06e7358d4f585f7cd06cbd43d82f2"
+            "1caa380151bdcf3285c9f9e59bdaf7b618e4bb16"
           rm -rf "$RUNNER_TEMP/ai-skills"
           mv .ai-skills-source "$RUNNER_TEMP/ai-skills"
           ai_skills="$RUNNER_TEMP/ai-skills"
