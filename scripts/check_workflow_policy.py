@@ -66,6 +66,7 @@ def _permission_findings(
     permissions: Any,
     *,
     scope: str,
+    allowed_read_scopes: frozenset[str] | None = None,
 ) -> list[Finding]:
     findings: list[Finding] = []
     if permissions is None:
@@ -91,6 +92,18 @@ def _permission_findings(
             )
         elif normalized not in {"read", "none"}:
             findings.append(Finding(path, f"{scope} has unsupported permission {name}: {access}"))
+        elif (
+            normalized == "read"
+            and allowed_read_scopes is not None
+            and name not in allowed_read_scopes
+        ):
+            allowed = ", ".join(sorted(allowed_read_scopes)) or "none"
+            findings.append(
+                Finding(
+                    path,
+                    f"{scope} grants {name}: read; allowed read scopes are: {allowed}",
+                )
+            )
     return findings
 
 
@@ -175,7 +188,16 @@ def audit_workflow(path: Path) -> list[Finding]:
     if "pull_request_target" in event_names:
         findings.append(Finding(path, "pull_request_target is forbidden for repository code"))
 
-    findings.extend(_permission_findings(path, document.get("permissions"), scope="workflow"))
+    pull_request_workflow = "pull_request" in event_names
+    allowed_read_scopes = frozenset({"contents"}) if pull_request_workflow else None
+    findings.extend(
+        _permission_findings(
+            path,
+            document.get("permissions"),
+            scope="workflow",
+            allowed_read_scopes=allowed_read_scopes,
+        )
+    )
 
     concurrency = document.get("concurrency")
     if not isinstance(concurrency, dict) or not concurrency.get("group"):
@@ -209,6 +231,7 @@ def audit_workflow(path: Path) -> list[Finding]:
                     path,
                     job.get("permissions"),
                     scope=f"job {job_name!r}",
+                    allowed_read_scopes=allowed_read_scopes,
                 )
             )
 
@@ -219,7 +242,7 @@ def audit_workflow(path: Path) -> list[Finding]:
         for index, step in enumerate(steps, start=1):
             findings.extend(_action_findings(path, str(job_name), index, step))
 
-    if "pull_request" in event_names and _SECRET_CONTEXT_REFERENCE.search(raw_text):
+    if pull_request_workflow and _SECRET_CONTEXT_REFERENCE.search(raw_text):
         findings.append(
             Finding(path, "pull-request workflows must not reference repository secrets")
         )
