@@ -7,7 +7,7 @@ rigor: operational
 owners: [repository-maintainers]
 verification: Uruchom make full, python scripts/check_workflow_policy.py oraz przypięte upstreamowe validatory w Deterministic CI; sprawdź GitHub Actions na dokładnym SHA i uzyskaj niezależne review.
 upstream: [https://github.com/paulomac1000/ai-skills/tree/1caa380151bdcf3285c9f9e59bdaf7b618e4bb16]
-downstream: [AGENTS.md, docs/agent-tax-analysis.md, docs/agent-development.md, Makefile, requirements.txt, requirements-test.txt, .github/workflows/deterministic-ci.yml, .github/workflows/llm-benchmark.yml]
+downstream: [AGENTS.md, docs/agent-tax-analysis.md, docs/agent-development.md, Makefile, requirements.txt, requirements-test.txt, .github/workflows/deterministic-ci.yml, .github/workflows/llm-benchmark.yml, tests/unit/test_ai_skills_adoption.py]
 review_triggers: [nowa wersja ai-skills, zmiana przypiętej rewizji, zmiana profilu repozytorium, zmiana CI, zmiana AGENTS.md, dodanie publikacji artefaktów]
 ---
 
