@@ -11,7 +11,8 @@ from typing import Any
 import yaml
 
 _FULL_SHA = re.compile(r"^[0-9a-f]{40}$")
-_SECRET_REFERENCE = re.compile(r"\$\{\{\s*secrets\.", re.IGNORECASE)
+_EXPRESSION_REFERENCE = re.compile(r"\$\{\{")
+_SECRET_REFERENCE = re.compile(r"\$\{\{\s*secrets\s*(?:\.|\[)", re.IGNORECASE)
 _WRITE_PERMISSION = re.compile(r"(^|-)write$")
 _WORKFLOW_SUFFIXES = {".yml", ".yaml"}
 _MUTABLE_RUNNERS = {"ubuntu-latest", "windows-latest", "macos-latest"}
@@ -35,9 +36,15 @@ def _event_names(events: Any) -> tuple[set[str], str | None]:
     if isinstance(events, str):
         return {events}, None
     if isinstance(events, dict):
-        return {str(name) for name in events}, None
+        names = {str(name) for name in events}
+        if not names:
+            return set(), "workflow must declare events"
+        return names, None
     if isinstance(events, list) and all(isinstance(name, str) for name in events):
-        return set(events), None
+        names = set(events)
+        if not names:
+            return set(), "workflow must declare events"
+        return names, None
     if events is None:
         return set(), "workflow must declare events"
     return set(), "workflow events must be a string, list of strings, or mapping"
@@ -133,6 +140,17 @@ def _action_findings(path: Path, job_name: str, step_index: int, step: Any) -> l
     return findings
 
 
+def _runner_findings(path: Path, job_name: str, runs_on: Any) -> list[Finding]:
+    scope = f"job {job_name!r}"
+    if not isinstance(runs_on, str) or not runs_on.strip():
+        return [Finding(path, f"{scope} runs-on must be a non-empty literal string")]
+    if _EXPRESSION_REFERENCE.search(runs_on):
+        return [Finding(path, f"{scope} runs-on expressions are forbidden; pin a concrete runner")]
+    if runs_on in _MUTABLE_RUNNERS:
+        return [Finding(path, f"{scope} must pin a concrete runner instead of {runs_on}")]
+    return []
+
+
 def audit_workflow(path: Path) -> list[Finding]:
     try:
         raw_text = path.read_text(encoding="utf-8")
@@ -177,11 +195,7 @@ def audit_workflow(path: Path) -> list[Finding]:
             continue
         if not _positive_int(job.get("timeout-minutes")):
             findings.append(Finding(path, f"job {job_name!r} needs positive timeout-minutes"))
-        runs_on = job.get("runs-on")
-        if runs_on in _MUTABLE_RUNNERS:
-            findings.append(
-                Finding(path, f"job {job_name!r} must pin a concrete runner instead of {runs_on}")
-            )
+        findings.extend(_runner_findings(path, str(job_name), job.get("runs-on")))
         if "permissions" in job:
             findings.extend(
                 _permission_findings(
