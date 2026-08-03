@@ -46,6 +46,57 @@ jobs:
     assert any("pin a concrete runner" in message for message in messages)
 
 
+@pytest.mark.parametrize("permissions", ("read-all", "none"))
+def test_policy_rejects_permission_shorthands(
+    tmp_path: Path,
+    permissions: str,
+) -> None:
+    workflow = tmp_path / "permissions.yml"
+    workflow.write_text(
+        f"""
+name: permissions
+on: workflow_dispatch
+permissions: {permissions}
+concurrency:
+  group: permissions
+  cancel-in-progress: true
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - run: echo test
+""".lstrip(),
+        encoding="utf-8",
+    )
+
+    messages = _messages(workflow)
+    assert any("must be an explicit mapping" in message for message in messages)
+
+
+def test_policy_accepts_empty_permission_mapping(tmp_path: Path) -> None:
+    workflow = tmp_path / "no-permissions.yml"
+    workflow.write_text(
+        """
+name: no-permissions
+on: workflow_dispatch
+permissions: {}
+concurrency:
+  group: no-permissions
+  cancel-in-progress: true
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - run: echo test
+""".lstrip(),
+        encoding="utf-8",
+    )
+
+    assert _messages(workflow) == []
+
+
 @pytest.mark.parametrize(
     "secret_reference",
     (
