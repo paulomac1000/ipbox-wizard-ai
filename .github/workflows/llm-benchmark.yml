@@ -67,7 +67,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: paulomac1000/ai-skills
-          ref: 9757a0b19803731d6974b797092032a0b0739a46
+          ref: a43c61902af015dfe7b830e281c7a87f9ac8e420
           path: .ai-skills-source
           fetch-depth: 1
           persist-credentials: false
@@ -94,7 +94,7 @@ jobs:
         run: |
           set -euo pipefail
           test "$(git -C .ai-skills-source rev-parse HEAD)" = \
-            "9757a0b19803731d6974b797092032a0b0739a46"
+            "a43c61902af015dfe7b830e281c7a87f9ac8e420"
           rm -rf "$RUNNER_TEMP/ai-skills"
           mv .ai-skills-source "$RUNNER_TEMP/ai-skills"
           workflow_policy="$RUNNER_TEMP/ai-skills/skills/ci-cd-architect/tools/check_github_actions_policy.py"
