@@ -85,9 +85,7 @@ def _policy_mirror_assertions(commands: list[str], policy_root: str) -> int:
         'check_github_actions_policy_impl.py"'
     )
     wrapper_check = 'cmp scripts/check_workflow_policy.py "$workflow_policy"'
-    implementation_check = (
-        'cmp scripts/check_workflow_policy_impl.py "$workflow_policy_impl"'
-    )
+    implementation_check = 'cmp scripts/check_workflow_policy_impl.py "$workflow_policy_impl"'
     policy_index, _ = _command_with_prefix(commands, 'python "$workflow_policy" .')
 
     for command in (
