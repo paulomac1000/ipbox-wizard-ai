@@ -255,10 +255,20 @@ jobs:
     assert any(expected_message in message for message in _messages(workflow))
 
 
-def test_policy_rejects_mutable_docker_action(tmp_path: Path) -> None:
+@pytest.mark.parametrize(
+    "uses",
+    (
+        "docker://alpine:3.20",
+        "docker://alpine@sha256:not-a-digest",
+    ),
+)
+def test_policy_rejects_mutable_or_malformed_docker_action(
+    tmp_path: Path,
+    uses: str,
+) -> None:
     workflow = tmp_path / "docker.yml"
     workflow.write_text(
-        """
+        f"""
 name: docker
 on: workflow_dispatch
 permissions:
@@ -271,10 +281,36 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
-      - uses: docker://alpine:3.20
+      - uses: {uses}
 """.lstrip(),
         encoding="utf-8",
     )
 
     messages = _messages(workflow)
-    assert any("immutable sha256 digest" in message for message in messages)
+    assert any("exact sha256 digest" in message for message in messages)
+
+
+def test_policy_rejects_duplicate_yaml_keys(tmp_path: Path) -> None:
+    workflow = tmp_path / "duplicate.yml"
+    workflow.write_text(
+        """
+name: duplicate
+on: workflow_dispatch
+permissions:
+  contents: read
+permissions:
+  contents: write
+concurrency:
+  group: duplicate
+  cancel-in-progress: true
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - run: echo test
+""".lstrip(),
+        encoding="utf-8",
+    )
+
+    assert any("duplicate key" in message for message in _messages(workflow))
