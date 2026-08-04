@@ -95,7 +95,7 @@ def _read_workflow(path: Path, repository_root: Path) -> tuple[str | None, str |
     """Read a bounded, stable workflow without following replaced path components."""
     try:
         root = repository_root.resolve(strict=True)
-        candidate = path.absolute()
+        candidate = Path(os.path.normpath(path.absolute()))
         candidate.relative_to(root)
         descriptor, snapshot = _open_stable(
             candidate,
