@@ -55,7 +55,7 @@ jobs:
           fetch-depth: 1
           persist-credentials: false
 
-      - name: Validate adopted AI skills
+      - name: Validate integrated AI skills
         if: matrix.python-version == '3.12'
         run: |
           set -euo pipefail
