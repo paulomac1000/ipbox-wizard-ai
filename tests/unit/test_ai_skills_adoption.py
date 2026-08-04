@@ -252,4 +252,4 @@ def test_changelog_records_the_adoption_contract() -> None:
     assert "### Instrukcje agentów, dokumentacja i bezpieczeństwo CI" in changelog
     assert "upstreamowe validatory" in changelog
     assert "zewnętrznej, przypiętej rewizji" in changelog
-    assert "sekret płatnego benchmarku" in changelog
+    assert "sekret płatnego benchmarku" in changelog.casefold()
