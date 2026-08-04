@@ -210,6 +210,15 @@ def test_dependencies_match_upstream_runtime_contract_without_decision_document(
     assert not (_REPOSITORY_ROOT / "docs/decisions/ai-skills-adoption.md").exists()
 
 
+def test_provider_specific_openai_guide_stays_removed() -> None:
+    readme = _read("README.md")
+    benchmark = _read("docs/model-diversity-benchmark.md")
+
+    assert not (_REPOSITORY_ROOT / "docs/openai-model-family.md").exists()
+    assert "openai-model-family.md" not in readme
+    assert "openai-model-family.md" not in benchmark
+
+
 def test_makefile_remains_the_canonical_full_quality_gate() -> None:
     readme = _read("README.md")
     testing = _read("docs/testing.md")
@@ -249,6 +258,8 @@ def test_windows_full_gate_creates_the_environment_inside_wsl() -> None:
 def test_changelog_records_the_adoption_contract() -> None:
     changelog = _read("CHANGELOG.md")
 
+    assert "## 0.3 — 4 sierpnia 2026" in changelog
+    assert "## Unreleased" not in changelog
     assert "### Instrukcje agentów, dokumentacja i bezpieczeństwo CI" in changelog
     assert "upstreamowe validatory" in changelog
     assert "zewnętrznej, przypiętej rewizji" in changelog
