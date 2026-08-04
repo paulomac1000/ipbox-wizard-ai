@@ -68,7 +68,7 @@ jobs:
           workflow_policy="$ai_skills/skills/ci-cd-architect/tools/check_github_actions_policy.py"
           workflow_policy_impl="$ai_skills/skills/ci-cd-architect/tools/check_github_actions_policy_impl.py"
           cmp scripts/check_workflow_policy.py "$workflow_policy"
-          cmp scripts/check_workflow_policy_impl.py "$workflow_policy_impl"
+          cmp scripts/check_github_actions_policy_impl.py "$workflow_policy_impl"
           python "$workflow_policy" . 2>&1 | tee reports/workflow-policy.txt
           python "$ai_skills/skills/agents-md-architect/tools/audit_agents_md.py" \
             --strict \
