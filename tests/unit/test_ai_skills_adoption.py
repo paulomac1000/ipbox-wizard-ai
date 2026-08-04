@@ -89,10 +89,7 @@ def test_deterministic_ci_runs_pinned_upstream_validators_outside_repository() -
     sha_check = f'test "$(git -C .ai-skills-source rev-parse HEAD)" = "{_AI_SKILLS_REVISION}"'
     move_command = 'mv .ai-skills-source "$RUNNER_TEMP/ai-skills"'
     assignment = 'ai_skills="$RUNNER_TEMP/ai-skills"'
-    policy_assignment = (
-        'workflow_policy="$ai_skills/skills/ci-cd-architect/tools/'
-        'check_github_actions_policy.py"'
-    )
+    policy_assignment = 'workflow_policy="$ai_skills/skills/ci-cd-architect/tools/check_github_actions_policy.py"'
     mirror_check = 'cmp scripts/check_workflow_policy.py "$workflow_policy"'
     policy_index, policy = _command_with_prefix(commands, 'python "$workflow_policy" .')
     audit_index, audit = _command_with_prefix(
@@ -216,6 +213,7 @@ def test_makefile_remains_the_canonical_full_quality_gate() -> None:
     readme = _read("README.md")
     testing = _read("docs/testing.md")
     makefile = _read("Makefile")
+    pyproject = _read("pyproject.toml")
 
     assert "full: test verify" in makefile
     assert "`Makefile` jest kanonicznym właścicielem" in readme
@@ -224,6 +222,7 @@ def test_makefile_remains_the_canonical_full_quality_gate() -> None:
     assert "make full" in testing
     assert "ruff format --check ." not in readme
     assert "ruff format --check ." not in testing
+    assert 'extend-exclude = ["scripts/check_workflow_policy.py"]' in pyproject
 
 
 def test_windows_full_gate_creates_the_environment_inside_wsl() -> None:
