@@ -1,10 +1,14 @@
+import sys
 from pathlib import Path
 
 import pytest
 
-from scripts.check_workflow_policy import audit_repository, audit_workflow
-
 _REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
+_SCRIPTS = _REPOSITORY_ROOT / "scripts"
+if str(_SCRIPTS) not in sys.path:
+    sys.path.insert(0, str(_SCRIPTS))
+
+from check_workflow_policy import audit_repository, audit_workflow  # noqa: E402
 
 
 def _messages(workflow: Path) -> list[str]:
