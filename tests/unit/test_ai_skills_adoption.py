@@ -86,6 +86,7 @@ def _policy_mirror_assertions(commands: list[str], policy_root: str) -> int:
     )
     wrapper_check = 'cmp scripts/check_workflow_policy.py "$workflow_policy"'
     implementation_check = 'cmp scripts/check_github_actions_policy_impl.py "$workflow_policy_impl"'
+    mirror_index, _ = _command_with_prefix(commands, "python scripts/check_workflow_policy.py .")
     policy_index, _ = _command_with_prefix(commands, 'python "$workflow_policy" .')
 
     for command in (
@@ -100,6 +101,7 @@ def _policy_mirror_assertions(commands: list[str], policy_root: str) -> int:
         < commands.index(implementation_assignment)
         < commands.index(wrapper_check)
         < commands.index(implementation_check)
+        < mirror_index
         < policy_index
     )
     return policy_index
@@ -153,11 +155,6 @@ def test_deterministic_ci_runs_pinned_upstream_validators_outside_repository() -
     assert "docs/agent-development.md" in afds
     assert "docs/agent-tax-analysis.md" in afds
     assert "docs/decisions/" not in afds
-
-    run_scripts = "\n".join(
-        str(step.get("run", "")) for step in steps if isinstance(step.get("run", ""), str)
-    )
-    assert "python scripts/check_workflow_policy.py" not in run_scripts
     assert not any(step.get("name") == "Validate workflow policy" for step in steps)
 
 
