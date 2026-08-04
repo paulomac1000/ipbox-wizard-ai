@@ -1,16 +1,26 @@
-"""Validate repository-specific GitHub Actions security and reliability policy."""
+#!/usr/bin/env python3
+"""Validate GitHub Actions workflows from an untrusted repository tree."""
 
 from __future__ import annotations
 
 import argparse
+import os
 import re
+import stat
+from collections.abc import Iterator
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
 import yaml
 
+MAX_WORKFLOW_FILES = 128
+MAX_WORKFLOW_BYTES = 256 * 1024
+MAX_TOTAL_BYTES = 2 * 1024 * 1024
+
 _FULL_SHA = re.compile(r"^[0-9a-f]{40}$")
+_DOCKER_DIGEST = re.compile(r"^.+@sha256:[0-9a-f]{64}$")
+_ACTION_NAME = re.compile(r"^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)*$")
 _EXPRESSION_REFERENCE = re.compile(r"\$\{\{")
 _SECRET_CONTEXT_REFERENCE = re.compile(
     r"\$\{\{(?:(?!\}\}).)*\bsecrets\b(?:(?!\}\}).)*\}\}",
@@ -19,6 +29,45 @@ _SECRET_CONTEXT_REFERENCE = re.compile(
 _WRITE_PERMISSION = re.compile(r"(^|-)write$")
 _WORKFLOW_SUFFIXES = {".yml", ".yaml"}
 _MUTABLE_RUNNERS = {"ubuntu-latest", "windows-latest", "macos-latest"}
+
+
+class _UniqueKeyLoader(yaml.SafeLoader):
+    """Safe YAML loader that rejects duplicate mapping keys."""
+
+
+def _construct_unique_mapping(
+    loader: _UniqueKeyLoader,
+    node: yaml.MappingNode,
+    deep: bool = False,
+) -> dict[Any, Any]:
+    loader.flatten_mapping(node)
+    mapping: dict[Any, Any] = {}
+    for key_node, value_node in node.value:
+        key = loader.construct_object(key_node, deep=deep)
+        try:
+            duplicate = key in mapping
+        except TypeError as exc:
+            raise yaml.constructor.ConstructorError(
+                "while constructing a mapping",
+                node.start_mark,
+                "found an unhashable mapping key",
+                key_node.start_mark,
+            ) from exc
+        if duplicate:
+            raise yaml.constructor.ConstructorError(
+                "while constructing a mapping",
+                node.start_mark,
+                f"found duplicate key {key!r}",
+                key_node.start_mark,
+            )
+        mapping[key] = loader.construct_object(value_node, deep=deep)
+    return mapping
+
+
+_UniqueKeyLoader.add_constructor(
+    yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
+    _construct_unique_mapping,
+)
 
 
 @dataclass(frozen=True)
@@ -30,7 +79,7 @@ class Finding:
         return f"{self.path.as_posix()}: {self.message}"
 
 
-def _events(document: dict[str, Any]) -> Any:
+def _events(document: dict[Any, Any]) -> Any:
     """Return the workflow event declaration despite YAML 1.1 parsing `on` as bool."""
     return document.get("on", document.get(True))
 
@@ -39,22 +88,20 @@ def _event_names(events: Any) -> tuple[set[str], str | None]:
     if isinstance(events, str):
         return {events}, None
     if isinstance(events, dict):
-        names = {str(name) for name in events}
-        if not names:
+        if not events:
             return set(), "workflow must declare events"
-        return names, None
-    if isinstance(events, list) and all(isinstance(name, str) for name in events):
-        names = set(events)
-        if not names:
+        if not all(isinstance(name, str) and name for name in events):
+            return set(), "workflow event names must be non-empty strings"
+        return set(events), None
+    if isinstance(events, list):
+        if not events:
             return set(), "workflow must declare events"
-        return names, None
+        if not all(isinstance(name, str) and name for name in events):
+            return set(), "workflow event list must contain non-empty strings"
+        return set(events), None
     if events is None:
         return set(), "workflow must declare events"
     return set(), "workflow events must be a string, list of strings, or mapping"
-
-
-def _is_false(value: Any) -> bool:
-    return value is False or (isinstance(value, str) and value.lower() == "false")
 
 
 def _positive_int(value: Any) -> bool:
@@ -68,7 +115,6 @@ def _permission_findings(
     scope: str,
     allowed_read_scopes: frozenset[str] | None = None,
 ) -> list[Finding]:
-    findings: list[Finding] = []
     if permissions is None:
         return [Finding(path, f"{scope} must declare explicit permissions")]
     if not isinstance(permissions, dict):
@@ -79,23 +125,26 @@ def _permission_findings(
             )
         ]
 
+    findings: list[Finding] = []
     for name, access in permissions.items():
         if not isinstance(name, str) or not isinstance(access, str):
-            findings.append(
-                Finding(path, f"{scope} permission names and access values must be strings")
-            )
+            findings.append(Finding(path, f"{scope} permission names and access values must be strings"))
             continue
-        normalized = access.lower()
-        if _WRITE_PERMISSION.search(normalized):
+        normalized_name = name.casefold()
+        normalized_access = access.casefold()
+        if _WRITE_PERMISSION.search(normalized_access):
             findings.append(
-                Finding(path, f"{scope} grants {name}: {access}; this repository has no write job")
+                Finding(
+                    path,
+                    f"{scope} grants {name}: {access}; this policy permits no write scope",
+                )
             )
-        elif normalized not in {"read", "none"}:
+        elif normalized_access not in {"read", "none"}:
             findings.append(Finding(path, f"{scope} has unsupported permission {name}: {access}"))
         elif (
-            normalized == "read"
+            normalized_access == "read"
             and allowed_read_scopes is not None
-            and name not in allowed_read_scopes
+            and normalized_name not in allowed_read_scopes
         ):
             allowed = ", ".join(sorted(allowed_read_scopes)) or "none"
             findings.append(
@@ -107,54 +156,67 @@ def _permission_findings(
     return findings
 
 
-def _external_action_finding(path: Path, label: str, uses: Any) -> list[Finding]:
+def _external_action_findings(path: Path, label: str, uses: Any) -> list[Finding]:
     if not isinstance(uses, str):
         return [Finding(path, f"{label} has non-string uses value")]
     if uses.startswith("./"):
         return []
     if uses.startswith("docker://"):
         image = uses.removeprefix("docker://")
-        if "@sha256:" not in image:
-            return [Finding(path, f"{label} Docker action must use an immutable sha256 digest")]
+        if not _DOCKER_DIGEST.fullmatch(image):
+            return [
+                Finding(
+                    path,
+                    f"{label} Docker action must use an exact sha256 digest",
+                )
+            ]
         return []
     if "@" not in uses:
         return [Finding(path, f"{label} action {uses!r} has no immutable revision")]
+
     action, revision = uses.rsplit("@", 1)
+    findings: list[Finding] = []
+    if not _ACTION_NAME.fullmatch(action):
+        findings.append(Finding(path, f"{label} action {action!r} has invalid owner/repository syntax"))
     if not _FULL_SHA.fullmatch(revision):
-        return [Finding(path, f"{label} action {action!r} must use a full 40-character SHA")]
-    return []
+        findings.append(Finding(path, f"{label} action {action!r} must use a full 40-character SHA"))
+    return findings
 
 
-def _action_findings(path: Path, job_name: str, step_index: int, step: Any) -> list[Finding]:
+def _action_findings(
+    path: Path,
+    job_name: str,
+    step_index: int,
+    step: Any,
+) -> list[Finding]:
     if not isinstance(step, dict) or "uses" not in step:
         return []
 
     uses = step["uses"]
     label = f"job {job_name!r} step {step_index}"
-    findings = _external_action_finding(path, label, uses)
+    findings = _external_action_findings(path, label, uses)
     if not isinstance(uses, str):
         return findings
 
     action = uses.rsplit("@", 1)[0]
     with_block = step.get("with")
     if action == "actions/checkout" and (
-        not isinstance(with_block, dict) or not _is_false(with_block.get("persist-credentials"))
+        not isinstance(with_block, dict) or with_block.get("persist-credentials") is not False
     ):
-        findings.append(
-            Finding(path, f"{label} actions/checkout must set persist-credentials: false")
-        )
+        findings.append(Finding(path, f"{label} actions/checkout must set persist-credentials: false"))
 
     if action == "actions/upload-artifact":
         if not isinstance(with_block, dict):
             findings.append(Finding(path, f"{label} upload-artifact requires a with mapping"))
         else:
             if not _positive_int(with_block.get("retention-days")):
-                findings.append(
-                    Finding(path, f"{label} upload-artifact needs positive retention-days")
-                )
+                findings.append(Finding(path, f"{label} upload-artifact needs positive retention-days"))
             if with_block.get("if-no-files-found") not in {"error", "warn", "ignore"}:
                 findings.append(
-                    Finding(path, f"{label} upload-artifact needs explicit if-no-files-found")
+                    Finding(
+                        path,
+                        f"{label} upload-artifact needs explicit if-no-files-found",
+                    )
                 )
 
     return findings
@@ -165,17 +227,83 @@ def _runner_findings(path: Path, job_name: str, runs_on: Any) -> list[Finding]:
     if not isinstance(runs_on, str) or not runs_on.strip():
         return [Finding(path, f"{scope} runs-on must be a non-empty literal string")]
     if _EXPRESSION_REFERENCE.search(runs_on):
-        return [Finding(path, f"{scope} runs-on expressions are forbidden; pin a concrete runner")]
+        return [
+            Finding(
+                path,
+                f"{scope} runs-on expressions are forbidden; pin a concrete runner",
+            )
+        ]
     if runs_on in _MUTABLE_RUNNERS:
         return [Finding(path, f"{scope} must pin a concrete runner instead of {runs_on}")]
     return []
 
 
-def audit_workflow(path: Path) -> list[Finding]:
+def _scalar_strings(value: Any) -> Iterator[str]:
+    if isinstance(value, str):
+        yield value
+    elif isinstance(value, dict):
+        for key, item in value.items():
+            yield from _scalar_strings(key)
+            yield from _scalar_strings(item)
+    elif isinstance(value, list):
+        for item in value:
+            yield from _scalar_strings(item)
+
+
+def _read_workflow(path: Path, repository_root: Path) -> tuple[str | None, str | None]:
     try:
-        raw_text = path.read_text(encoding="utf-8")
-        document = yaml.safe_load(raw_text)
-    except (OSError, UnicodeError, yaml.YAMLError) as exc:
+        root = repository_root.resolve(strict=True)
+        resolved = path.resolve(strict=True)
+        resolved.relative_to(root)
+        relative = path.relative_to(repository_root)
+        current = root
+        for component in relative.parts:
+            current = current / component
+            mode = current.lstat().st_mode
+            if stat.S_ISLNK(mode):
+                return None, "workflow path must not contain symlinks"
+        file_stat = resolved.stat()
+        if not stat.S_ISREG(file_stat.st_mode):
+            return None, "workflow path must be a regular file"
+        if file_stat.st_size > MAX_WORKFLOW_BYTES:
+            return None, f"workflow exceeds {MAX_WORKFLOW_BYTES} byte limit"
+
+        flags = os.O_RDONLY
+        if hasattr(os, "O_NOFOLLOW"):
+            flags |= os.O_NOFOLLOW
+        descriptor = os.open(resolved, flags)
+        try:
+            opened = os.fstat(descriptor)
+            if not stat.S_ISREG(opened.st_mode):
+                return None, "workflow path must be a regular file"
+            chunks: list[bytes] = []
+            remaining = MAX_WORKFLOW_BYTES + 1
+            while remaining > 0:
+                chunk = os.read(descriptor, min(64 * 1024, remaining))
+                if not chunk:
+                    break
+                chunks.append(chunk)
+                remaining -= len(chunk)
+            payload = b"".join(chunks)
+        finally:
+            os.close(descriptor)
+        if len(payload) > MAX_WORKFLOW_BYTES:
+            return None, f"workflow exceeds {MAX_WORKFLOW_BYTES} byte limit"
+        return payload.decode("utf-8"), None
+    except (OSError, UnicodeError, ValueError) as exc:
+        return None, f"cannot read workflow safely: {exc}"
+
+
+def audit_workflow(path: Path, repository_root: Path | None = None) -> list[Finding]:
+    root = (repository_root or path.parent).resolve()
+    raw_text, read_error = _read_workflow(path, root)
+    if read_error is not None:
+        return [Finding(path, read_error)]
+    assert raw_text is not None
+
+    try:
+        document = yaml.load(raw_text, Loader=_UniqueKeyLoader)
+    except yaml.YAMLError as exc:
         return [Finding(path, f"cannot parse workflow: {exc}")]
 
     if not isinstance(document, dict):
@@ -200,13 +328,14 @@ def audit_workflow(path: Path) -> list[Finding]:
     )
 
     concurrency = document.get("concurrency")
-    if not isinstance(concurrency, dict) or not concurrency.get("group"):
-        findings.append(Finding(path, "workflow must declare a concurrency group"))
-    elif (
-        not _is_false(concurrency.get("cancel-in-progress"))
-        and concurrency.get("cancel-in-progress") is not True
-    ):
-        findings.append(Finding(path, "concurrency cancel-in-progress must be boolean"))
+    if not isinstance(concurrency, dict):
+        findings.append(Finding(path, "workflow must declare concurrency as a mapping"))
+    else:
+        group = concurrency.get("group")
+        if not isinstance(group, str) or not group.strip():
+            findings.append(Finding(path, "workflow must declare a non-empty concurrency group"))
+        if not isinstance(concurrency.get("cancel-in-progress"), bool):
+            findings.append(Finding(path, "concurrency cancel-in-progress must be a boolean"))
 
     jobs = document.get("jobs")
     if not isinstance(jobs, dict) or not jobs:
@@ -217,11 +346,10 @@ def audit_workflow(path: Path) -> list[Finding]:
             findings.append(Finding(path, f"job {job_name!r} must be a mapping"))
             continue
         if "uses" in job:
-            findings.append(
-                Finding(path, f"job {job_name!r} reusable workflow calls are not supported")
-            )
-            findings.extend(_external_action_finding(path, f"job {job_name!r}", job.get("uses")))
+            findings.append(Finding(path, f"job {job_name!r} reusable workflow calls are not supported"))
+            findings.extend(_external_action_findings(path, f"job {job_name!r}", job.get("uses")))
             continue
+
         if not _positive_int(job.get("timeout-minutes")):
             findings.append(Finding(path, f"job {job_name!r} needs positive timeout-minutes"))
         findings.extend(_runner_findings(path, str(job_name), job.get("runs-on")))
@@ -242,30 +370,55 @@ def audit_workflow(path: Path) -> list[Finding]:
         for index, step in enumerate(steps, start=1):
             findings.extend(_action_findings(path, str(job_name), index, step))
 
-    if pull_request_workflow and _SECRET_CONTEXT_REFERENCE.search(raw_text):
-        findings.append(
-            Finding(path, "pull-request workflows must not reference repository secrets")
-        )
+    if pull_request_workflow and any(_SECRET_CONTEXT_REFERENCE.search(value) for value in _scalar_strings(document)):
+        findings.append(Finding(path, "pull-request workflows must not reference repository secrets"))
 
     return findings
 
 
-def workflow_paths(repository_root: Path) -> list[Path]:
+def workflow_paths(repository_root: Path) -> tuple[list[Path], list[Finding]]:
     workflow_dir = repository_root / ".github" / "workflows"
-    if not workflow_dir.is_dir():
-        return []
-    return sorted(
-        path
-        for path in workflow_dir.iterdir()
-        if path.is_file() and path.suffix in _WORKFLOW_SUFFIXES
-    )
+    try:
+        if not workflow_dir.exists():
+            return [], [Finding(repository_root, "no GitHub Actions workflows found")]
+        if workflow_dir.is_symlink() or not workflow_dir.is_dir():
+            return [], [Finding(workflow_dir, "workflow directory must be a regular directory")]
+
+        paths: list[Path] = []
+        findings: list[Finding] = []
+        total_bytes = 0
+        for entry in sorted(workflow_dir.iterdir(), key=lambda item: item.name):
+            if entry.suffix.casefold() not in _WORKFLOW_SUFFIXES:
+                continue
+            if len(paths) >= MAX_WORKFLOW_FILES:
+                findings.append(Finding(workflow_dir, f"workflow count exceeds {MAX_WORKFLOW_FILES}"))
+                break
+            try:
+                item_stat = entry.lstat()
+            except OSError as exc:
+                findings.append(Finding(entry, f"cannot inspect workflow: {exc}"))
+                continue
+            if stat.S_ISLNK(item_stat.st_mode) or not stat.S_ISREG(item_stat.st_mode):
+                findings.append(Finding(entry, "workflow path must be a regular non-symlink file"))
+                continue
+            total_bytes += item_stat.st_size
+            if total_bytes > MAX_TOTAL_BYTES:
+                findings.append(Finding(workflow_dir, f"workflow bytes exceed {MAX_TOTAL_BYTES} total limit"))
+                break
+            paths.append(entry)
+        return paths, findings
+    except OSError as exc:
+        return [], [Finding(workflow_dir, f"cannot enumerate workflows: {exc}")]
 
 
 def audit_repository(repository_root: Path) -> list[Finding]:
-    paths = workflow_paths(repository_root)
-    if not paths:
-        return [Finding(repository_root, "no GitHub Actions workflows found")]
-    return [finding for path in paths for finding in audit_workflow(path)]
+    root = repository_root.resolve()
+    paths, findings = workflow_paths(root)
+    if not paths and not findings:
+        findings.append(Finding(root, "no GitHub Actions workflows found"))
+    for path in paths:
+        findings.extend(audit_workflow(path, root))
+    return findings
 
 
 def main() -> int:
@@ -275,11 +428,11 @@ def main() -> int:
         nargs="?",
         type=Path,
         default=Path.cwd(),
-        help="Repository root (default: current directory)",
+        help="Untrusted repository root to assess (default: current directory)",
     )
     args = parser.parse_args()
 
-    findings = audit_repository(args.repository_root.resolve())
+    findings = audit_repository(args.repository_root)
     if findings:
         for finding in findings:
             print(f"ERROR: {finding.render()}")
