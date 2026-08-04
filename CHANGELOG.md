@@ -88,5 +88,5 @@ Pierwsze wydanie było operacyjnym wizardem Markdown przeznaczonym do pracy z ag
 ### Ograniczenia wydania
 
 - Agent mógł uczestniczyć w interpretacji i arytmetyce, dlatego poprawność zależała w większym stopniu od modelu i ręcznej kontroli.
-- Warstwy przychodu, `W`, MIX i NEXUS nie były jeszcze wystarczająco rozdzielone.
+- Warstwy przychodu, `W`, `MIX` i NEXUS nie były jeszcze wystarczająco rozdzielone.
 - Walidacja danych, odtwarzalność i procedura wydania były znacznie słabsze niż w wersji 0.2.
