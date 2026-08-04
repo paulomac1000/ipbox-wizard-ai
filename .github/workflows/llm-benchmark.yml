@@ -50,7 +50,6 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 90
     env:
-      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
       LLM_PROVIDER: openrouter
       LLM_PAID_RUN_CONFIRMATION: ${{ inputs.confirmation }}
       BENCHMARK_MODEL: ${{ inputs.model }}
@@ -61,6 +60,15 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ github.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Checkout pinned AI skills policy auditor
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: paulomac1000/ai-skills
+          ref: e4e858b29471bf530b8ca46a509425f70b793a90
+          path: .ai-skills-source
           fetch-depth: 1
           persist-credentials: false
 
@@ -82,10 +90,20 @@ jobs:
       - name: Install dependencies
         run: python -m pip install -r requirements.txt -r requirements-test.txt
 
-      - name: Validate workflow policy
-        run: python scripts/check_workflow_policy.py
+      - name: Validate trusted workflow policy
+        run: |
+          set -euo pipefail
+          test "$(git -C .ai-skills-source rev-parse HEAD)" = \
+            "e4e858b29471bf530b8ca46a509425f70b793a90"
+          rm -rf "$RUNNER_TEMP/ai-skills"
+          mv .ai-skills-source "$RUNNER_TEMP/ai-skills"
+          workflow_policy="$RUNNER_TEMP/ai-skills/skills/ci-cd-architect/tools/check_github_actions_policy.py"
+          cmp scripts/check_workflow_policy.py "$workflow_policy"
+          python "$workflow_policy" .
 
       - name: Validate API key and cost guards
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
         run: |
           set -euo pipefail
           python - <<'PY'
@@ -129,6 +147,8 @@ jobs:
           for script in scripts/*.sh; do bash -n "$script"; done
 
       - name: Record cassettes
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
         run: |
           set -euo pipefail
           mkdir -p reports
