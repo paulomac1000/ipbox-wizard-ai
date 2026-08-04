@@ -19,7 +19,7 @@ target-version = "py311"
 line-length = 100
 extend-exclude = [
   "scripts/check_workflow_policy.py",
-  "scripts/check_workflow_policy_impl.py",
+  "scripts/check_github_actions_policy_impl.py",
 ]
 
 [tool.ruff.lint]
