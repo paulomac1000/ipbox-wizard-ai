@@ -226,14 +226,15 @@ def _runner_findings(path: Path, job_name: str, runs_on: Any) -> list[Finding]:
     scope = f"job {job_name!r}"
     if not isinstance(runs_on, str) or not runs_on.strip():
         return [Finding(path, f"{scope} runs-on must be a non-empty literal string")]
-    if _EXPRESSION_REFERENCE.search(runs_on):
+    normalized_runs_on = runs_on.strip()
+    if _EXPRESSION_REFERENCE.search(normalized_runs_on):
         return [
             Finding(
                 path,
                 f"{scope} runs-on expressions are forbidden; pin a concrete runner",
             )
         ]
-    if runs_on in _MUTABLE_RUNNERS:
+    if normalized_runs_on.casefold() in _MUTABLE_RUNNERS:
         return [Finding(path, f"{scope} must pin a concrete runner instead of {runs_on}")]
     return []
 
