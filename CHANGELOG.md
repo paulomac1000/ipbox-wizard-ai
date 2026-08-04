@@ -2,7 +2,7 @@
 
 Najważniejsze zmiany w kolejnych wydaniach projektu. Changelog opisuje możliwości produktu i istotne zmiany kontraktu, a nie historię wszystkich commitów.
 
-## Unreleased
+## 0.3 — 4 sierpnia 2026
 
 ### Instrukcje agentów, dokumentacja i bezpieczeństwo CI
 
