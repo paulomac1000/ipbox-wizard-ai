@@ -286,7 +286,6 @@ Projekt:
 | [`ipbox_algorytm.md`](ipbox_algorytm.md) | Kanoniczny opis algorytmu i bramek decyzyjnych. |
 | [`docs/testing.md`](docs/testing.md) | Testy deterministyczne, VCR, nagrywanie i playback. |
 | [`docs/model-diversity-benchmark.md`](docs/model-diversity-benchmark.md) | Cel i kryteria ośmiorodzinnej macierzy modeli. |
-| [`docs/openai-model-family.md`](docs/openai-model-family.md) | Profil transportowy i zasady GPT-5 Mini. |
 | [`CHANGELOG.md`](CHANGELOG.md) | Najważniejsze zmiany projektu. |
 
 ## Licencja
