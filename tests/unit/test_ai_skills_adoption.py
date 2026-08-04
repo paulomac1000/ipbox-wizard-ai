@@ -85,7 +85,9 @@ def _policy_mirror_assertions(commands: list[str], policy_root: str) -> int:
         'check_github_actions_policy_impl.py"'
     )
     wrapper_check = 'cmp scripts/check_workflow_policy.py "$workflow_policy"'
-    implementation_check = 'cmp scripts/check_workflow_policy_impl.py "$workflow_policy_impl"'
+    implementation_check = (
+        'cmp scripts/check_github_actions_policy_impl.py "$workflow_policy_impl"'
+    )
     policy_index, _ = _command_with_prefix(commands, 'python "$workflow_policy" .')
 
     for command in (
@@ -227,7 +229,7 @@ def test_makefile_remains_the_canonical_full_quality_gate() -> None:
     assert "ruff format --check ." not in readme
     assert "ruff format --check ." not in testing
     assert '"scripts/check_workflow_policy.py"' in pyproject
-    assert '"scripts/check_workflow_policy_impl.py"' in pyproject
+    assert '"scripts/check_github_actions_policy_impl.py"' in pyproject
 
 
 def test_windows_full_gate_creates_the_environment_inside_wsl() -> None:
