@@ -101,6 +101,7 @@ jobs:
           workflow_policy_impl="$RUNNER_TEMP/ai-skills/skills/ci-cd-architect/tools/check_github_actions_policy_impl.py"
           cmp scripts/check_workflow_policy.py "$workflow_policy"
           cmp scripts/check_github_actions_policy_impl.py "$workflow_policy_impl"
+          python scripts/check_workflow_policy.py .
           python "$workflow_policy" .
 
       - name: Validate API key and cost guards
