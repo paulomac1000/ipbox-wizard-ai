@@ -67,7 +67,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: paulomac1000/ai-skills
-          ref: e4e858b29471bf530b8ca46a509425f70b793a90
+          ref: 9757a0b19803731d6974b797092032a0b0739a46
           path: .ai-skills-source
           fetch-depth: 1
           persist-credentials: false
@@ -94,11 +94,13 @@ jobs:
         run: |
           set -euo pipefail
           test "$(git -C .ai-skills-source rev-parse HEAD)" = \
-            "e4e858b29471bf530b8ca46a509425f70b793a90"
+            "9757a0b19803731d6974b797092032a0b0739a46"
           rm -rf "$RUNNER_TEMP/ai-skills"
           mv .ai-skills-source "$RUNNER_TEMP/ai-skills"
           workflow_policy="$RUNNER_TEMP/ai-skills/skills/ci-cd-architect/tools/check_github_actions_policy.py"
+          workflow_policy_impl="$RUNNER_TEMP/ai-skills/skills/ci-cd-architect/tools/check_github_actions_policy_impl.py"
           cmp scripts/check_workflow_policy.py "$workflow_policy"
+          cmp scripts/check_workflow_policy_impl.py "$workflow_policy_impl"
           python "$workflow_policy" .
 
       - name: Validate API key and cost guards
