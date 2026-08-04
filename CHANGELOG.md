@@ -8,7 +8,7 @@ Najważniejsze zmiany w kolejnych wydaniach projektu. Changelog opisuje możliwo
 
 - Przebudowano `AGENTS.md` w kompaktowy router dla profilu safety-critical, rozdzielający analizę rozliczenia, rozwój repozytorium i audyt read-only oraz kierujący do kanonicznych właścicieli kontraktów.
 - Dodano osobne, zarządzane zgodnie z AFDS procedury analizy dokumentów podatnika i rozwoju repozytorium, z jawnym ownership, weryfikacją, bezpiecznym zatrzymaniem i wpływem zmian.
-- Adaptację `ci-cd-architect`, `afds-doc-writer` i `agents-md-architect` przypięto do niezmiennej rewizji upstream; Deterministic CI potwierdza jej SHA i uruchamia oryginalne upstreamowe validatory AGENTS.md oraz AFDS na ocenianym drzewie.
+- Integrację `ci-cd-architect`, `afds-doc-writer` i `agents-md-architect` przypięto do niezmiennej rewizji upstream; Deterministic CI potwierdza jej SHA i uruchamia oryginalne upstreamowe validatory AGENTS.md oraz AFDS na ocenianym drzewie.
 - Polityka GitHub Actions jest wykonywana z zewnętrznej, przypiętej rewizji `ai-skills`; lokalna kopia służy wyłącznie jako mirror diagnostyczny i musi być identyczna bajtowo z zaufanym źródłem.
 - GitHub Actions korzystają z pełnych SHA akcji, konkretnych obrazów runnerów, minimalnych uprawnień i checkoutu bez utrwalania poświadczeń; workflow pull requestu nie może odczytywać sekretów.
 - Dodano wykonywalną politykę workflow, statyczny skan bezpieczeństwa, audyt podatności zależności runtime oraz regresje chroniące pin upstream, izolację validatorów i wymagany kontrakt zależności.
