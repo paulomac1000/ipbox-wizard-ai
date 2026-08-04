@@ -9,6 +9,7 @@ Najważniejsze zmiany w kolejnych wydaniach projektu. Changelog opisuje możliwo
 - Przebudowano `AGENTS.md` w kompaktowy router dla profilu safety-critical, rozdzielający analizę rozliczenia, rozwój repozytorium i audyt read-only oraz kierujący do kanonicznych właścicieli kontraktów.
 - Dodano osobne, zarządzane zgodnie z AFDS procedury analizy dokumentów podatnika i rozwoju repozytorium, z jawnym ownership, weryfikacją, bezpiecznym zatrzymaniem i wpływem zmian.
 - Adaptację `ci-cd-architect`, `afds-doc-writer` i `agents-md-architect` przypięto do niezmiennej rewizji upstream; Deterministic CI potwierdza jej SHA i uruchamia oryginalne upstreamowe validatory AGENTS.md oraz AFDS na ocenianym drzewie.
+- Polityka GitHub Actions jest wykonywana z zewnętrznej, przypiętej rewizji `ai-skills`; lokalna kopia służy wyłącznie jako mirror diagnostyczny i musi być identyczna bajtowo z zaufanym źródłem.
 - GitHub Actions korzystają z pełnych SHA akcji, konkretnych obrazów runnerów, minimalnych uprawnień i checkoutu bez utrwalania poświadczeń; workflow pull requestu nie może odczytywać sekretów.
 - Dodano wykonywalną politykę workflow, statyczny skan bezpieczeństwa, audyt podatności zależności runtime oraz regresje chroniące pin upstream, izolację validatorów i wymagany kontrakt zależności.
 - Uporządkowano lokalne bramki `make quality`, `make test`, `make verify` i `make full`; płatny benchmark pozostaje oddzielony od bezpłatnej walidacji i wymaga jawnego potwierdzenia oraz limitów kosztu.
@@ -26,6 +27,7 @@ Najważniejsze zmiany w kolejnych wydaniach projektu. Changelog opisuje możliwo
 - Dodano `PaidCostGuard` — strażnika kosztów śledzącego limity per-model i całkowity, księgującego koszt każdej odpowiedzi i blokującego kolejne żądania przed warstwą transportu po przekroczeniu.
 - Koszt odpowiedzi z błędem HTTP (np. 500, 503) jest księgowany przed ponownym rzuceniem oryginalnego `HTTPError`. Nieparsowalne odpowiedzi (np. HTML przy 502) aktywują tryb fail-closed i blokują dalsze żądania.
 - Limity budżetowe są propagowane z `record_model.py` do podprocesu pytest, tworząc dwie niezależne warstwy ochrony. Playback pozostaje bezpłatny.
+- Sekret płatnego benchmarku `OPENROUTER_API_KEY` jest przekazywany wyłącznie do kroku walidacji klucza oraz nagrywania kaset; checkout, instalacja, audyty i bezpłatne testy nie dziedziczą go na poziomie joba.
 
 ### Kontrakt workflow i jakość
 
