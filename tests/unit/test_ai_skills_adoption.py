@@ -89,7 +89,9 @@ def test_deterministic_ci_runs_pinned_upstream_validators_outside_repository() -
     sha_check = f'test "$(git -C .ai-skills-source rev-parse HEAD)" = "{_AI_SKILLS_REVISION}"'
     move_command = 'mv .ai-skills-source "$RUNNER_TEMP/ai-skills"'
     assignment = 'ai_skills="$RUNNER_TEMP/ai-skills"'
-    policy_assignment = 'workflow_policy="$ai_skills/skills/ci-cd-architect/tools/check_github_actions_policy.py"'
+    policy_assignment = (
+        'workflow_policy="$ai_skills/skills/ci-cd-architect/tools/check_github_actions_policy.py"'
+    )
     mirror_check = 'cmp scripts/check_workflow_policy.py "$workflow_policy"'
     policy_index, policy = _command_with_prefix(commands, 'python "$workflow_policy" .')
     audit_index, audit = _command_with_prefix(
