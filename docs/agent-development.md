@@ -5,7 +5,7 @@ type: workflow
 status: active
 rigor: operational
 owners: [repository-maintainers]
-verification: Uruchom make full, sprawdź scripts/check_workflow_policy.py i porównaj zmianę z kanonicznym kontraktem domenowym.
+verification: Uruchom make full, a po pushu potwierdź zewnętrzny auditor workflow z przypiętej rewizji ai-skills oraz porównaj zmianę z kanonicznym kontraktem domenowym.
 upstream: [README.md, AGENTS.md, ipbox_algorytm.md, Makefile, docs/testing.md]
 downstream: [AGENTS.md, README.md]
 review_triggers: [zmiana komend jakości, zmiana architektury testów, zmiana VCR, zmiana polityki CI]
@@ -69,8 +69,9 @@ Zmiana ma być minimalna, odtwarzalna, fail-closed i chroniona testem. Agent nie
 3. `actions/checkout` używa `persist-credentials: false`.
 4. Workflow ma minimalne permissions, timeout, concurrency i jawne zachowanie artefaktów.
 5. Kod z niezaufanego pull requestu nie otrzymuje sekretów ani uprawnień zapisu.
-6. Zmiana workflow musi przejść `python scripts/check_workflow_policy.py` oraz testy repozytorium.
-7. Nie publikuj artefaktu, który nie był testowany w publikowanej postaci. To repo obecnie nie ma automatycznego workflow publikacji.
+6. Lokalny `python scripts/check_workflow_policy.py` jest diagnostycznym mirrorem. Akceptacja workflow wymaga identyczności mirrora z auditorem z przypiętej rewizji `ai-skills` oraz wykonania zewnętrznej kopii na ocenianym drzewie przez CI.
+7. Zmiana workflow musi przejść testy repozytorium i zewnętrzny auditor polityki; pull request nie może sam dostarczać autorytatywnej reguły, która go zatwierdza.
+8. Nie publikuj artefaktu, który nie był testowany w publikowanej postaci. To repo obecnie nie ma automatycznego workflow publikacji.
 
 ## Weryfikacja i review
 
@@ -82,7 +83,7 @@ make test
 make verify
 ```
 
-`make full` łączy pełną bezpłatną bramkę i playback offline. Płatne nagrywanie nie jest częścią zwykłej bramki.
+`make full` łączy pełną bezpłatną bramkę i playback offline. Płatne nagrywanie nie jest częścią zwykłej bramki. Lokalna bramka nie zastępuje zewnętrznego sprawdzenia polityki workflow na przypiętej rewizji po wypchnięciu zmian.
 
 Własny review obejmuje:
 
