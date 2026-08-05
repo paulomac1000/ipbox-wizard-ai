@@ -4,7 +4,12 @@ from typing import Any
 import yaml
 
 _REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
-_AI_SKILLS_REVISION = "a43c61902af015dfe7b830e281c7a87f9ac8e420"
+_AI_SKILLS_REVISION = "661ff01a5e70d58d6c94a12545b24647e52063ed"
+_VENDOR_RUNTIME_PATHS = (
+    "vendor/ai-skills/contracts/confined_io.py",
+    "vendor/ai-skills/skills/ci-cd-architect/tools/check_github_actions_policy.py",
+    "vendor/ai-skills/skills/ci-cd-architect/tools/check_github_actions_policy_impl.py",
+)
 
 
 def _read(relative: str) -> str:
@@ -75,35 +80,38 @@ def _checkout_assertions(step: dict[str, Any]) -> None:
     assert checkout_with.get("persist-credentials") is False
 
 
-def _policy_mirror_assertions(commands: list[str], policy_root: str) -> int:
-    policy_assignment = (
-        f'workflow_policy="{policy_root}/skills/ci-cd-architect/tools/'
-        'check_github_actions_policy.py"'
+def _policy_runtime_assertions(commands: list[str], policy_root: str) -> int:
+    assignments = (
+        'vendor_root="vendor/ai-skills"',
+        (
+            f'workflow_policy="{policy_root}/skills/ci-cd-architect/tools/'
+            'check_github_actions_policy.py"'
+        ),
+        (
+            f'workflow_policy_impl="{policy_root}/skills/ci-cd-architect/tools/'
+            'check_github_actions_policy_impl.py"'
+        ),
+        f'confined_io="{policy_root}/contracts/confined_io.py"',
     )
-    implementation_assignment = (
-        f'workflow_policy_impl="{policy_root}/skills/ci-cd-architect/tools/'
-        'check_github_actions_policy_impl.py"'
+    comparisons = (
+        (
+            'cmp "$vendor_root/skills/ci-cd-architect/tools/'
+            'check_github_actions_policy.py" "$workflow_policy"'
+        ),
+        (
+            'cmp "$vendor_root/skills/ci-cd-architect/tools/'
+            'check_github_actions_policy_impl.py" "$workflow_policy_impl"'
+        ),
+        'cmp "$vendor_root/contracts/confined_io.py" "$confined_io"',
     )
-    wrapper_check = 'cmp scripts/check_workflow_policy.py "$workflow_policy"'
-    implementation_check = 'cmp scripts/check_github_actions_policy_impl.py "$workflow_policy_impl"'
-    mirror_index, _ = _command_with_prefix(commands, "python scripts/check_workflow_policy.py .")
+    launcher_index, _ = _command_with_prefix(commands, "python scripts/check_workflow_policy.py .")
     policy_index, _ = _command_with_prefix(commands, 'python "$workflow_policy" .')
 
-    for command in (
-        policy_assignment,
-        implementation_assignment,
-        wrapper_check,
-        implementation_check,
-    ):
+    for command in (*assignments, *comparisons):
         assert command in commands
-    assert (
-        commands.index(policy_assignment)
-        < commands.index(implementation_assignment)
-        < commands.index(wrapper_check)
-        < commands.index(implementation_check)
-        < mirror_index
-        < policy_index
-    )
+    ordered = [commands.index(command) for command in (*assignments, *comparisons)]
+    assert ordered == sorted(ordered)
+    assert ordered[-1] < launcher_index < policy_index
     return policy_index
 
 
@@ -121,7 +129,7 @@ def test_deterministic_ci_runs_pinned_upstream_validators_outside_repository() -
     sha_check = f'test "$(git -C .ai-skills-source rev-parse HEAD)" = "{_AI_SKILLS_REVISION}"'
     move_command = 'mv .ai-skills-source "$RUNNER_TEMP/ai-skills"'
     assignment = 'ai_skills="$RUNNER_TEMP/ai-skills"'
-    policy_index = _policy_mirror_assertions(commands, "$ai_skills")
+    policy_index = _policy_runtime_assertions(commands, "$ai_skills")
     audit_index, audit = _command_with_prefix(
         commands,
         'python "$ai_skills/skills/agents-md-architect/tools/audit_agents_md.py"',
@@ -177,10 +185,12 @@ def test_paid_benchmark_uses_trusted_policy_and_scopes_secret_to_paid_steps() ->
     commands = _shell_commands(script)
     sha_check = f'test "$(git -C .ai-skills-source rev-parse HEAD)" = "{_AI_SKILLS_REVISION}"'
     move_command = 'mv .ai-skills-source "$RUNNER_TEMP/ai-skills"'
-    policy_index = _policy_mirror_assertions(commands, "$RUNNER_TEMP/ai-skills")
+    assignment = 'ai_skills="$RUNNER_TEMP/ai-skills"'
+    policy_index = _policy_runtime_assertions(commands, "$ai_skills")
     assert sha_check in commands
     assert move_command in commands
-    assert commands.index(move_command) < policy_index
+    assert assignment in commands
+    assert commands.index(move_command) < commands.index(assignment) < policy_index
 
     secret_steps: set[str] = set()
     for step in steps:
@@ -200,6 +210,14 @@ def test_paid_benchmark_uses_trusted_policy_and_scopes_secret_to_paid_steps() ->
     assert step_names.index("Deterministic gates before paid calls") < step_names.index(
         "Record cassettes"
     )
+
+
+def test_vendored_policy_runtime_matches_final_upstream_layout() -> None:
+    for relative in _VENDOR_RUNTIME_PATHS:
+        assert (_REPOSITORY_ROOT / relative).is_file()
+
+    assert (_REPOSITORY_ROOT / "scripts/check_workflow_policy.py").is_file()
+    assert not (_REPOSITORY_ROOT / "scripts/check_github_actions_policy_impl.py").exists()
 
 
 def test_dependencies_match_upstream_runtime_contract_without_decision_document() -> None:
@@ -232,8 +250,9 @@ def test_makefile_remains_the_canonical_full_quality_gate() -> None:
     assert "make full" in testing
     assert "ruff format --check ." not in readme
     assert "ruff format --check ." not in testing
-    assert '"scripts/check_workflow_policy.py"' in pyproject
-    assert '"scripts/check_github_actions_policy_impl.py"' in pyproject
+    assert '"scripts/check_workflow_policy.py"' not in pyproject
+    for relative in _VENDOR_RUNTIME_PATHS:
+        assert f'"{relative}"' in pyproject
 
 
 def test_windows_full_gate_creates_the_environment_inside_wsl() -> None:

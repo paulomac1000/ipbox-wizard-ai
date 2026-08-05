@@ -67,7 +67,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: paulomac1000/ai-skills
-          ref: a43c61902af015dfe7b830e281c7a87f9ac8e420
+          ref: 661ff01a5e70d58d6c94a12545b24647e52063ed
           path: .ai-skills-source
           fetch-depth: 1
           persist-credentials: false
@@ -94,13 +94,19 @@ jobs:
         run: |
           set -euo pipefail
           test "$(git -C .ai-skills-source rev-parse HEAD)" = \
-            "a43c61902af015dfe7b830e281c7a87f9ac8e420"
+            "661ff01a5e70d58d6c94a12545b24647e52063ed"
           rm -rf "$RUNNER_TEMP/ai-skills"
           mv .ai-skills-source "$RUNNER_TEMP/ai-skills"
-          workflow_policy="$RUNNER_TEMP/ai-skills/skills/ci-cd-architect/tools/check_github_actions_policy.py"
-          workflow_policy_impl="$RUNNER_TEMP/ai-skills/skills/ci-cd-architect/tools/check_github_actions_policy_impl.py"
-          cmp scripts/check_workflow_policy.py "$workflow_policy"
-          cmp scripts/check_github_actions_policy_impl.py "$workflow_policy_impl"
+          ai_skills="$RUNNER_TEMP/ai-skills"
+          vendor_root="vendor/ai-skills"
+          workflow_policy="$ai_skills/skills/ci-cd-architect/tools/check_github_actions_policy.py"
+          workflow_policy_impl="$ai_skills/skills/ci-cd-architect/tools/check_github_actions_policy_impl.py"
+          confined_io="$ai_skills/contracts/confined_io.py"
+          cmp "$vendor_root/skills/ci-cd-architect/tools/check_github_actions_policy.py" \
+            "$workflow_policy"
+          cmp "$vendor_root/skills/ci-cd-architect/tools/check_github_actions_policy_impl.py" \
+            "$workflow_policy_impl"
+          cmp "$vendor_root/contracts/confined_io.py" "$confined_io"
           python scripts/check_workflow_policy.py .
           python "$workflow_policy" .
 

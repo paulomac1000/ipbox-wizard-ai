@@ -8,11 +8,23 @@ _SCRIPTS = _REPOSITORY_ROOT / "scripts"
 if str(_SCRIPTS) not in sys.path:
     sys.path.insert(0, str(_SCRIPTS))
 
-from check_workflow_policy import audit_repository, audit_workflow  # noqa: E402
+import confined_io  # noqa: E402
+from check_workflow_policy import (  # noqa: E402
+    audit_repository,
+    audit_workflow,
+    read_utf8_bounded,
+)
 
 
 def _messages(workflow: Path) -> list[str]:
     return [finding.message for finding in audit_workflow(workflow)]
+
+
+def test_local_launcher_uses_vendored_confined_reader() -> None:
+    assert read_utf8_bounded is confined_io.read_utf8_bounded
+    assert Path(confined_io.__file__).resolve() == (
+        _REPOSITORY_ROOT / "vendor" / "ai-skills" / "contracts" / "confined_io.py"
+    ).resolve()
 
 
 def test_repository_workflows_follow_policy() -> None:

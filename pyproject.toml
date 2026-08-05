@@ -18,8 +18,9 @@ exclude_lines = ["pragma: no cover", "if __name__", "if TYPE_CHECKING"]
 target-version = "py311"
 line-length = 100
 extend-exclude = [
-  "scripts/check_workflow_policy.py",
-  "scripts/check_github_actions_policy_impl.py",
+  "vendor/ai-skills/contracts/confined_io.py",
+  "vendor/ai-skills/skills/ci-cd-architect/tools/check_github_actions_policy.py",
+  "vendor/ai-skills/skills/ci-cd-architect/tools/check_github_actions_policy_impl.py",
 ]
 
 [tool.ruff.lint]

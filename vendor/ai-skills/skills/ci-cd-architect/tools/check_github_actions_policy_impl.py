@@ -3,11 +3,8 @@
 
 from __future__ import annotations
 
-import argparse
-import os
 import re
-import stat
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -251,53 +248,18 @@ def _scalar_strings(value: Any) -> Iterator[str]:
             yield from _scalar_strings(item)
 
 
-def _read_workflow(path: Path, repository_root: Path) -> tuple[str | None, str | None]:
-    try:
-        root = repository_root.resolve(strict=True)
-        resolved = path.resolve(strict=True)
-        resolved.relative_to(root)
-        relative = path.relative_to(repository_root)
-        current = root
-        for component in relative.parts:
-            current = current / component
-            mode = current.lstat().st_mode
-            if stat.S_ISLNK(mode):
-                return None, "workflow path must not contain symlinks"
-        file_stat = resolved.stat()
-        if not stat.S_ISREG(file_stat.st_mode):
-            return None, "workflow path must be a regular file"
-        if file_stat.st_size > MAX_WORKFLOW_BYTES:
-            return None, f"workflow exceeds {MAX_WORKFLOW_BYTES} byte limit"
-
-        flags = os.O_RDONLY
-        if hasattr(os, "O_NOFOLLOW"):
-            flags |= os.O_NOFOLLOW
-        descriptor = os.open(resolved, flags)
-        try:
-            opened = os.fstat(descriptor)
-            if not stat.S_ISREG(opened.st_mode):
-                return None, "workflow path must be a regular file"
-            chunks: list[bytes] = []
-            remaining = MAX_WORKFLOW_BYTES + 1
-            while remaining > 0:
-                chunk = os.read(descriptor, min(64 * 1024, remaining))
-                if not chunk:
-                    break
-                chunks.append(chunk)
-                remaining -= len(chunk)
-            payload = b"".join(chunks)
-        finally:
-            os.close(descriptor)
-        if len(payload) > MAX_WORKFLOW_BYTES:
-            return None, f"workflow exceeds {MAX_WORKFLOW_BYTES} byte limit"
-        return payload.decode("utf-8"), None
-    except (OSError, UnicodeError, ValueError) as exc:
-        return None, f"cannot read workflow safely: {exc}"
+WorkflowReader = Callable[[Path, Path], tuple[str | None, str | None]]
+WorkflowEnumerator = Callable[[Path], tuple[list[Path], list[Finding]]]
 
 
-def audit_workflow(path: Path, repository_root: Path | None = None) -> list[Finding]:
-    root = (repository_root or path.parent).resolve()
-    raw_text, read_error = _read_workflow(path, root)
+def audit_workflow(
+    path: Path,
+    repository_root: Path,
+    *,
+    reader: WorkflowReader,
+) -> list[Finding]:
+    root = repository_root.resolve()
+    raw_text, read_error = reader(path, root)
     if read_error is not None:
         return [Finding(path, read_error)]
     assert raw_text is not None
@@ -377,71 +339,16 @@ def audit_workflow(path: Path, repository_root: Path | None = None) -> list[Find
     return findings
 
 
-def workflow_paths(repository_root: Path) -> tuple[list[Path], list[Finding]]:
-    workflow_dir = repository_root / ".github" / "workflows"
-    try:
-        if not workflow_dir.exists():
-            return [], [Finding(repository_root, "no GitHub Actions workflows found")]
-        if workflow_dir.is_symlink() or not workflow_dir.is_dir():
-            return [], [Finding(workflow_dir, "workflow directory must be a regular directory")]
-
-        paths: list[Path] = []
-        findings: list[Finding] = []
-        total_bytes = 0
-        for entry in sorted(workflow_dir.iterdir(), key=lambda item: item.name):
-            if entry.suffix.casefold() not in _WORKFLOW_SUFFIXES:
-                continue
-            if len(paths) >= MAX_WORKFLOW_FILES:
-                findings.append(Finding(workflow_dir, f"workflow count exceeds {MAX_WORKFLOW_FILES}"))
-                break
-            try:
-                item_stat = entry.lstat()
-            except OSError as exc:
-                findings.append(Finding(entry, f"cannot inspect workflow: {exc}"))
-                continue
-            if stat.S_ISLNK(item_stat.st_mode) or not stat.S_ISREG(item_stat.st_mode):
-                findings.append(Finding(entry, "workflow path must be a regular non-symlink file"))
-                continue
-            total_bytes += item_stat.st_size
-            if total_bytes > MAX_TOTAL_BYTES:
-                findings.append(Finding(workflow_dir, f"workflow bytes exceed {MAX_TOTAL_BYTES} total limit"))
-                break
-            paths.append(entry)
-        return paths, findings
-    except OSError as exc:
-        return [], [Finding(workflow_dir, f"cannot enumerate workflows: {exc}")]
-
-
-def audit_repository(repository_root: Path) -> list[Finding]:
+def audit_repository(
+    repository_root: Path,
+    *,
+    reader: WorkflowReader,
+    enumerator: WorkflowEnumerator,
+) -> list[Finding]:
     root = repository_root.resolve()
-    paths, findings = workflow_paths(root)
+    paths, findings = enumerator(root)
     if not paths and not findings:
         findings.append(Finding(root, "no GitHub Actions workflows found"))
     for path in paths:
-        findings.extend(audit_workflow(path, root))
+        findings.extend(audit_workflow(path, root, reader=reader))
     return findings
-
-
-def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument(
-        "repository_root",
-        nargs="?",
-        type=Path,
-        default=Path.cwd(),
-        help="Untrusted repository root to assess (default: current directory)",
-    )
-    args = parser.parse_args()
-
-    findings = audit_repository(args.repository_root)
-    if findings:
-        for finding in findings:
-            print(f"ERROR: {finding.render()}")
-        return 1
-
-    print("GitHub Actions policy: PASS")
-    return 0
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())
