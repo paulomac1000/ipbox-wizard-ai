@@ -134,30 +134,35 @@ Formularz znajduje się tutaj:
 https://github.com/paulomac1000/ipbox-wizard-ai/issues/new?template=new-tax-case.yml
 ```
 
-Nie umieszczaj w Issue dokumentów źródłowych ani danych pozwalających zidentyfikować podatnika. Publikacja wymaga wyraźnej zgody użytkownika.
+Nie umieszczaj w Issue dokumentów źródłowych ani danych pozwalających zidentyfikować podatnika. Publikacja wymaga jawnego polecenia użytkownika oraz dodatkowej zgody na publikację zanonimizowanego Issue.
 
 ## Uruchomienie lokalne
 
 Lokalne środowisko jest przydatne do uruchamiania testów, przeglądania kodu i rozwijania algorytmu.
 
-### Windows — PowerShell
+### Windows — WSL
+
+Czysty PowerShell nie uruchamia pełnej bramki, ponieważ repozytorium wymaga GNU Make i Bash do kontroli skryptów oraz playbacku. Na Windows użyj WSL albo równoważnego środowiska POSIX. Całe środowisko Python dla pełnej bramki utwórz **wewnątrz WSL**; nie używaj w WSL wirtualnego środowiska utworzonego przez `py -m venv` w Windows.
+
+Uruchom WSL z PowerShell:
 
 ```powershell
+wsl
+```
+
+Następnie wykonaj cały setup w powłoce WSL:
+
+```bash
 git clone https://github.com/paulomac1000/ipbox-wizard-ai.git
 cd ipbox-wizard-ai
-py -3.12 -m venv .venv
-.\.venv\Scripts\Activate.ps1
+python3 -m venv .venv
+source .venv/bin/activate
 python -m pip install --upgrade pip
-pip install -r requirements.txt -r requirements-test.txt
-pytest -q
+python -m pip install -r requirements.txt -r requirements-test.txt
+make full
 ```
 
-Gdy PowerShell blokuje aktywację środowiska:
-
-```powershell
-Set-ExecutionPolicy -Scope Process Bypass
-.\.venv\Scripts\Activate.ps1
-```
+Jeżeli korzystasz z checkoutu znajdującego się na dysku Windows, nadal utwórz nowe linuksowe `.venv` z poziomu WSL. Środowisko `.venv\Scripts` utworzone w PowerShell nie jest zgodne z Linuksem i nie może być użyte przez pełną bramkę.
 
 ### macOS i Linux
 
@@ -167,20 +172,19 @@ cd ipbox-wizard-ai
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip
-pip install -r requirements.txt -r requirements-test.txt
-pytest -q
+python -m pip install -r requirements.txt -r requirements-test.txt
+make full
 ```
 
 ### Pełna bramka jakości
 
+`Makefile` jest kanonicznym właścicielem lokalnych bramek. Pełną bezpłatną weryfikację, łącznie ze statycznym bezpieczeństwem i playbackiem offline, uruchamia:
+
 ```bash
-ruff format --check .
-ruff check .
-python -m compileall -q python_helper tests scripts
-pytest tests/unit --cov=python_helper --cov-report=term-missing --cov-fail-under=90
-pytest -q
-bash scripts/verify_all_models.sh
+make full
 ```
+
+Szczegółowe składowe `make quality`, `make test` i `make verify` są zdefiniowane w [`Makefile`](Makefile) i opisane w [`docs/testing.md`](docs/testing.md). Nie utrzymuj równoległej listy komend jako alternatywnej pełnej bramki.
 
 Nagrywanie nowych kaset LLM jest płatne i wymaga świadomego uruchomienia, klucza API oraz limitów kosztu. Zwykła praca i CI korzystają z odtwarzania offline.
 
@@ -282,7 +286,6 @@ Projekt:
 | [`ipbox_algorytm.md`](ipbox_algorytm.md) | Kanoniczny opis algorytmu i bramek decyzyjnych. |
 | [`docs/testing.md`](docs/testing.md) | Testy deterministyczne, VCR, nagrywanie i playback. |
 | [`docs/model-diversity-benchmark.md`](docs/model-diversity-benchmark.md) | Cel i kryteria ośmiorodzinnej macierzy modeli. |
-| [`docs/openai-model-family.md`](docs/openai-model-family.md) | Profil transportowy i zasady GPT-5 Mini. |
 | [`CHANGELOG.md`](CHANGELOG.md) | Najważniejsze zmiany projektu. |
 
 ## Licencja

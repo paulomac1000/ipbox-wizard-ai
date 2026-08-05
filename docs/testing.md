@@ -20,22 +20,18 @@ Kolejne historyczne protokoły ujawniły trzy klasy problemów:
 
 ## 2. Bezpłatna bramka
 
+`Makefile` jest kanonicznym właścicielem lokalnych bramek jakości. Nie kopiuj jego komend do innych dokumentów jako alternatywnej „pełnej” procedury.
+
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt -r requirements-test.txt
-
-ruff format --check .
-ruff check .
-python -m compileall -q python_helper tests scripts
-pytest tests/unit \
-  --cov=python_helper \
-  --cov-report=term-missing \
-  --cov-fail-under=90
-pytest -q
-python scripts/check_cassette_policy.py
-for script in scripts/*.sh; do bash -n "$script"; done
+python -m pip install -r requirements.txt -r requirements-test.txt
+make full
 ```
+
+`make full` uruchamia formatowanie, lint, kompilację, politykę workflow, statyczny skan bezpieczeństwa, testy jednostkowe z coverage, pełny bezpłatny suite, politykę kaset, pre-commit VCR, raport benchmarku i kompletny playback offline. Płatne nagrywanie nie jest częścią tej bramki.
+
+Dla krótszej diagnostyki można uruchomić `make quality`, `make test` albo `make verify`, ale tylko `make full` reprezentuje kompletną lokalną bramkę.
 
 Stan referencyjny:
 
@@ -46,15 +42,7 @@ Stan referencyjny:
 - każdy model ma 46/46, a pełny playback przechodzi offline;
 - pusty, częściowy albo nieaktualny katalog kaset nie spełnia merge gate.
 
-Standardowy workflow na Pythonie 3.13 dodatkowo uruchamia:
-
-```bash
-python scripts/benchmark_report.py
-unset OPENROUTER_API_KEY
-./scripts/verify_all_models.sh
-```
-
-PR z pustą, częściową albo nieaktualną macierzą nie może mieć zielonej bramki wydania.
+Workflow na Pythonie 3.13 wykonuje raport i pełny playback offline jako provider-backed odpowiednik części `make verify`. PR z pustą, częściową albo nieaktualną macierzą nie może mieć zielonej bramki wydania.
 
 ## 3. Testy semantyczne, które muszą pozostać
 
@@ -134,7 +122,7 @@ git switch <working-branch>
 git pull --ff-only
 python -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt -r requirements-test.txt
+python -m pip install -r requirements.txt -r requirements-test.txt
 
 cp .env.example .env
 chmod 600 .env
@@ -252,18 +240,10 @@ git diff -- tests/llm/vcr/cassettes/openai_gpt_5_mini
 
 Nie commituj `.env`, `/tmp`, raportów lokalnych, odpowiedzi diagnostycznych ani katalogu odrzuceń.
 
-Końcowa bramka:
+Końcowa lokalna bramka ma jednego właściciela:
 
 ```bash
-ruff format --check .
-ruff check .
-python -m compileall -q python_helper tests scripts
-pytest tests/unit --cov=python_helper --cov-report=term-missing --cov-fail-under=90
-pytest -q
-./scripts/verify_all_models.sh
-python scripts/benchmark_report.py
-python scripts/vcr_precommit.py --all-models
-python scripts/check_cassette_policy.py
+make full
 ```
 
-Po wypchnięciu kaset poczekaj na CI Python 3.11–3.13. Job 3.13 musi wykonać raport i pełny playback offline. Dopiero wtedy można oznaczyć PR jako ready.
+Po wypchnięciu zmian poczekaj na CI Python 3.11–3.13. Job 3.13 musi wykonać raport i pełny playback offline. Przed merge wszystkie wymagane joby muszą być zielone na dokładnym SHA, a aktualne uwagi reviewerów rozwiązane.

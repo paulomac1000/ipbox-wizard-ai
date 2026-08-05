@@ -1,226 +1,109 @@
+<!-- agents-md: layout=single profile=safety-critical language=pl -->
 # AGENTS.md
 
-Instrukcja dla agentów pracujących z repozytorium `ipbox-wizard-ai`.
+Instrukcja operacyjna dla agentów pracujących z `ipbox-wizard-ai`.
 
-Najpierw ustal, **w jakim trybie pracujesz**. Ten sam projekt służy do analizy dokumentów podatnika oraz do rozwoju kodu. Nie mieszaj tych zadań bez wyraźnego polecenia użytkownika.
+## Zakres i pierwszeństwo
 
-## Tryb 1: analiza rozliczenia użytkownika
+Plik obowiązuje w całym repozytorium. Polecenie użytkownika i zasady platformy mają wyższy priorytet. Konflikt między instrukcjami, kodem, testami i dokumentacją zatrzymuje pracę: wskaż źródła konfliktu i ustal kanonicznego właściciela zamiast wybierać wygodniejszą wersję.
 
-Wybierz ten tryb, gdy użytkownik przekazał dokumenty, archiwum ZIP albo link do repozytorium i chce przygotować lub sprawdzić rozliczenie IP Box.
+Repozytorium ma profil `safety-critical`: wspiera analizę podatkową, ale nie składa deklaracji i nie zastępuje doradcy podatkowego. Nie rozszerzaj zadania read-only do zapisu, publikacji, płatnych wywołań ani operacji destrukcyjnych bez wyraźnego polecenia.
 
-### Kolejność pracy
+## Wybierz tryb pracy
 
-1. Przeczytaj `README.md` i `ipbox_algorytm.md`.
-2. Zinwentaryzuj wszystkie dokumenty użytkownika.
-3. Samodzielnie odczytaj PDF, XLSX, CSV i inne załączniki.
-4. Przy każdej istotnej wartości wskaż dokument, stronę, arkusz albo wiersz źródłowy.
-5. Pokaż użytkownikowi wyekstrahowane dane przed finalnym obliczeniem.
-6. Zapytaj o braki. Brak danych nie jest zerem ani korzystnym założeniem.
-7. Przygotuj znormalizowane dane robocze wewnętrznie — użytkownik nie musi pisać YAML-a.
-8. Wykonaj krytyczne obliczenia kodem z `python_helper/`, nie w pamięci modelu.
-9. Porównaj wynik z KPiR, ewidencją IP Box i formularzami PIT.
-10. Oddziel błąd dokumentu, brak danych, decyzję podatkową i możliwy błąd algorytmu.
-11. Nie zmieniaj kodu, testów ani historii Git, chyba że użytkownik wyraźnie zleci rozwój projektu.
-12. Nie zapisuj prywatnych dokumentów ani danych podatnika w repozytorium.
+| Tryb | Kiedy | Przeczytaj przed działaniem |
+|---|---|---|
+| Analiza rozliczenia | Użytkownik przekazuje dokumenty lub dane podatkowe | [`docs/agent-tax-analysis.md`](docs/agent-tax-analysis.md), następnie [`ipbox_algorytm.md`](ipbox_algorytm.md) |
+| Rozwój repozytorium | Użytkownik zleca zmianę kodu, testów, dokumentacji lub CI | [`docs/agent-development.md`](docs/agent-development.md), następnie pliki i testy związane z zadaniem |
+| Audyt read-only | Użytkownik prosi wyłącznie o ocenę | Odpowiedni dokument powyżej; nie twórz brancha, commitów, Issue ani PR |
 
-### Raport pokrycia konkretnego przypadku
+Nie mieszaj analizy danych podatnika z rozwojem kodu bez osobnej, jawnej decyzji użytkownika.
 
-Na końcu analizy podaj dokładnie jeden status:
+## Kanoniczni właściciele
 
-```text
-COVERED_DIRECTLY | COVERED_PARTIALLY | NOT_COVERED
-```
-
-Następnie wskaż:
-
-- testy jednostkowe chroniące istotne reguły;
-- scenariusze z `tests/llm/scenarios/` odtwarzające tę samą ścieżkę biznesową;
-- elementy przypadku bez bezpośredniego odpowiednika;
-- stan kompletności kaset dla wszystkich modeli z `BENCHMARK_MODELS`;
-- wynik playbacku offline.
-
-`COVERED_DIRECTLY` wolno zadeklarować wyłącznie wtedy, gdy łącznie:
-
-1. przypadek ma bezpośredni scenariusz biznesowy;
-2. scenariusz sprawdza ten sam istotny invariant;
-3. kasety wszystkich modeli wymaganych przez bieżącą macierz są kompletne i aktualne;
-4. playback przechodzi bez sekretu i bez sieci.
-
-Nie twierdź, że „dokładnie ten przypadek został potwierdzony przez wszystkie rodziny AI”, jeżeli znalazłeś tylko podobny test albo częściowe pokrycie. W takim przypadku użyj `COVERED_PARTIALLY` i nazwij niepotwierdzone elementy.
-
-### Nowy lub nieobsłużony przypadek
-
-Jeżeli przypadek nie jest pokryty albo ujawnia możliwy błąd:
-
-1. nie kopiuj danych podatnika do repozytorium;
-2. zredukuj problem do minimalnego przykładu syntetycznego;
-3. zachowaj relacje matematyczne, ale zmień kwoty i identyfikatory;
-4. opisz wynik rzeczywisty, oczekiwany i źródło oczekiwania;
-5. ustal, czy problem dotyczy ekstrakcji, danych wejściowych, reguły podatkowej czy implementacji;
-6. poinformuj użytkownika, że przypadek może stać się trwałym testem regresyjnym.
-
-Jeżeli agent ma dostęp do GitHuba, może utworzyć Issue **dopiero po zgodzie użytkownika**. Użyj formularza:
-
-`https://github.com/paulomac1000/ipbox-wizard-ai/issues/new?template=new-tax-case.yml`
-
-Bez dostępu do zapisu przygotuj gotowy tytuł, treść zgłoszenia i powyższy link. Zgłoszenie musi być zanonimizowane i zawierać minimalny przypadek, a nie pełne dokumenty.
-
-Nowy poprawny przypadek jest twardą granicą jakości: po dodaniu regresji algorytm nie może zostać zaakceptowany, jeżeli ten przypadek nie przechodzi.
-
-## Tryb 2: rozwój kodu
-
-Wybierz ten tryb wyłącznie wtedy, gdy użytkownik wyraźnie prosi o zmianę kodu, testów, dokumentacji albo infrastruktury.
-
-### Pierwsze kroki
-
-Przeczytaj kolejno:
-
-1. `README.md` — produkt, sposoby użycia i granice wejścia;
-2. `AGENTS.md` — zasady pracy z kodem;
-3. `ipbox_algorytm.md` — domenowy kontrakt i kolejność decyzji;
-4. pliki związane z zadaniem;
-5. odpowiadające im testy i scenariusze.
-
-Następnie:
-
-1. sprawdź branch, SHA i stan working tree;
-2. uruchom test celowany;
-3. odtwórz problem minimalnym testem regresyjnym;
-4. dopiero potem zmień implementację;
-5. wykonaj code review własnego diffu;
-6. przed zakończeniem uruchom pełną bramkę jakości.
-
-## Misja i granica wejścia
-
-Projekt ma pozostać audytowalnym, fail-closed narzędziem wspierającym przygotowanie i kontrolę danych do rozliczenia IP Box programisty B2B.
-
-Kod przyjmuje znormalizowany YAML/dict. Repozytorium nie zawiera uniwersalnego importera surowych PDF, XLSX, KPiR ani PIT. W trybie rozmowy ekstrakcję wykonuje agent. Kalkulator nie naprawia błędnie odczytanych danych.
-
-Warstwa ekstrakcji musi zachować jawne fakty źródłowe, w tym rok, formę opodatkowania, kwalifikację prawa i faktur, przychód IP/NIE, czas i semantykę `W`, KUP, alokację MIX, dowody NEXUS, składki, ulgi, straty i zaliczki.
-
-## Topologia i źródła prawdy
-
-| Obszar | Odpowiedzialność |
+| Obszar | Właściciel |
 |---|---|
-| `README.md` | główny punkt wejścia dla użytkownika |
-| `ipbox_algorytm.md` | domenowy kontrakt i kolejność decyzji |
-| `python_helper/` | deterministyczna implementacja podatkowa |
-| `tests/unit/` | wykonywalne invarianty i przypadki brzegowe |
-| `tests/llm/oracle.py` | kanoniczny przebieg pełnego raportu |
-| `tests/llm/output_schema.py` | kontrakt raportu i decyzji |
-| `tests/llm/models.py` | kanoniczna macierz modeli i profile transportowe |
-| `tests/llm/scenarios/` | syntetyczne przypadki biznesowe |
-| `tests/llm/evaluator.py` | semantyczna walidacja odpowiedzi modelu |
-| `tests/llm/vcr/` | fingerprinty, kasety, manifesty i playback |
-| `docs/testing.md` | procedura testów, nagrywania i wydania |
+| Produkt, sposoby użycia i ograniczenia | [`README.md`](README.md) |
+| Znaczenie biznesowe i kolejność decyzji | [`ipbox_algorytm.md`](ipbox_algorytm.md) |
+| Publiczna fasada deterministycznych reguł | [`python_helper/ipbox_calculator.py`](python_helper/ipbox_calculator.py) |
+| Konfiguracja testów i progów jakości | [`pyproject.toml`](pyproject.toml) |
+| Kanoniczny raport i decyzja | [`tests/llm/oracle.py`](tests/llm/oracle.py), [`tests/llm/output_schema.py`](tests/llm/output_schema.py) |
+| Profile modeli i transport | [`tests/llm/models.py`](tests/llm/models.py) |
+| Walidacja odpowiedzi | [`tests/llm/evaluator.py`](tests/llm/evaluator.py) |
+| Konfiguracja i zapis VCR | [`tests/llm/vcr/config.py`](tests/llm/vcr/config.py), [`tests/llm/vcr/recorder.py`](tests/llm/vcr/recorder.py) |
+| Procedura testów, scenariuszy i nagrywania | [`docs/testing.md`](docs/testing.md) |
+| Lokalne komendy jakości | [`Makefile`](Makefile) |
+| Polityka GitHub Actions | [`scripts/check_workflow_policy.py`](scripts/check_workflow_policy.py) |
 
-Hierarchia źródeł prawdy:
+`AGENTS.md` opisuje konsekwencje operacyjne i kieruje do właścicieli. Nie duplikuj tutaj pełnych kontraktów, list modeli, liczników testów ani definicji workflow.
 
-1. `ipbox_algorytm.md` — znaczenie biznesowe;
-2. `python_helper/**/*.py` — deterministyczna implementacja;
-3. `tests/unit/` — wykonywalne invarianty;
-4. oracle, schema i evaluator;
-5. scenariusze biznesowe;
-6. dokumentacja pomocnicza.
+## Granice architektury
 
-Sprzeczność między źródłami jest błędem. Ustal prawidłowy kontrakt, a następnie popraw implementację, testy i dokumentację razem.
+- Kwalifikacja przychodu, podział IP/NIE, współczynnik `W`, alokacja MIX i NEXUS są niezależnymi decyzjami.
+- Python ustala liczby, klasyfikacje, `decision_facts`, STOP-y i REVIEW-y. Model nie wykonuje krytycznej arytmetyki ani klasyfikacji podatkowej.
+- Brak danych nie jest zerem, `false`, korzystnym założeniem ani dowodem.
+- STOP zeruje finalne liczby i klasyfikacje zgodnie z kontraktem, ale może pozostawić diagnostykę i bezpieczny podgląd korekty.
+- Opis kosztu może wywołać REVIEW, lecz nie ustala samodzielnie KUP, koszyka ani NEXUS.
+- NEXUS wynosi `min(1, ((A+B) × 1,3) / (A+B+C+D))`; przy `A=B=C=D=0` wynosi `0`.
+- Część dochodu IP poza NEXUS podlega zwykłemu opodatkowaniu.
+- Alokacje muszą zachować każdy grosz i jawną politykę zaokrąglania.
+- Parser nie naprawia brakujących pól ani Markdown fences. Odpowiedź musi przejść wspólną schema i evaluator.
+- Playback nie może wykonywać live requestu. Recorder nie nadpisuje istniejącej kasety.
 
-## Najważniejsze invarianty domenowe
+Zmiana kontraktu wymaga spójnej aktualizacji jego właściciela, implementacji, testów i dokumentacji. Nie utrzymuj równoległych „aktualnych” wersji ani numerowanych wariantów.
 
-### Przychód, W, MIX i NEXUS
+## Granice danych i bezpieczeństwo
 
-- kwalifikacja przychodu, podział IP/NIE, `W`, alokacja MIX i NEXUS są niezależnymi decyzjami;
-- `W` nie jest automatycznym ani uniwersalnym kluczem kosztów MIX;
-- koszt `KUP: false` trafia do `WYKLUCZONE`, z kwotami IP, NIE i NEXUS równymi zero;
-- opis kosztu może wywołać review, ale nie ustala samodzielnie KUP ani koszyka;
-- koszt obniżający dochód IP nie staje się automatycznie NEXUS A/B/C/D;
-- `allocation_source` i `nexus_evidence` są odrębnymi dowodami;
-- NEXUS = `min(1, ((A+B)×1,3)/(A+B+C+D))`;
-- `A=B=C=D=0` oznacza NEXUS `0`;
-- część dochodu IP poza preferencją trafia do zwykłej podstawy;
-- alokacje zachowują każdy grosz i jawną politykę zaokrąglania.
+- Nie commituj dokumentów podatnika, KPiR, PIT, faktur, umów, interpretacji, danych osobowych, sekretów, kluczy API ani surowych raportów użytkownika.
+- Testy, kasety, logi, Issue i komentarze używają wyłącznie danych syntetycznych lub skutecznie zanonimizowanych.
+- Nie kopiuj prywatnych danych do zewnętrznego narzędzia bez zgody i ustalonego zakresu.
+- Płatne wywołania LLM wymagają jawnego polecenia, potwierdzenia przewidzianego przez skrypt oraz dodatnich limitów kosztu.
+- Nie publikuj Issue, PR, komentarza ani artefaktu bez polecenia użytkownika. Przy nowym przypadku podatkowym dodatkowo uzyskaj zgodę na publikację zanonimizowanego Issue.
 
-### Fail-closed i kompletność
+## Zasady zmian
 
-- brak danych nie jest zerem ani korzystnym `true`;
-- rok, flagi i liczby mają ścisłe typy;
-- `STOP_03` wymaga jawnie potwierdzonej kompletności źródeł;
-- dodatnie odliczenie wymaga reguły właściwego roku i dowodu;
-- STOP zeruje finalne liczby i klasyfikacje, ale może pozostawić diagnostykę i bezpieczny podgląd korekty;
-- TEST 1–9 ustala wyłącznie Python.
+1. Ustal branch, dokładny SHA i zakres zadania.
+2. Odczytaj kanonicznego właściciela oraz testy istniejącego zachowania.
+3. Uruchom najmniejszy test odtwarzający problem.
+4. Dodaj minimalną regresję przed poprawką, gdy zmieniasz zachowanie.
+5. Wprowadź najmniejszą spójną zmianę bez osłabiania testów i walidacji.
+6. Zaktualizuj wszystkich konsumentów zmienionego kontraktu.
+7. Wykonaj review własnego diffu, w tym danych, sekretów, kosztów i zachowania fail-closed.
+8. Uruchom test celowany i pełną bramkę.
+9. Sprawdź CI oraz komentarze reviewerów przed deklaracją gotowości.
 
-### LLM i VCR
+Nie zmieniaj wygenerowanych kaset, manifestów, hashy ani fingerprintów ręcznie. Używaj skryptów opisanych w [`docs/testing.md`](docs/testing.md).
 
-- Python ustala wynik, `decision_facts`, STOP-y i REVIEW-y;
-- model nie wykonuje krytycznej arytmetyki ani klasyfikacji podatkowej;
-- model otrzymuje gotową kopertę `expected_decision`;
-- parser nie naprawia Markdown fences ani brakujących pól;
-- odpowiedź musi przejść wspólną lokalną schema i evaluator;
-- playback nigdy nie wykonuje live requestu;
-- recorder nie nadpisuje istniejącej kasety;
-- kaseta powstaje dopiero po schema PASS, semantic PASS i ponownym parsowaniu;
-- substytucja requested/returned model jest błędem;
-- każdy model z `BENCHMARK_MODELS` przechodzi ten sam recorder, pre-commit, raport i playback;
-- `engine_source_hash`, request, scenariusz i harness należą do fingerprintu;
-- profil modelu jest chroniony przez `request_hash`, a nie przez hash silnika podatkowego;
-- kompletna macierz wielu rodzin dowodzi przenośności kontraktu, nie poprawności prawnej każdego odczytu dokumentu.
+## Komendy weryfikacyjne
 
-## Jak wprowadzać zmiany
-
-### Reguła podatkowa lub błąd kalkulatora
-
-1. Najpierw dodaj minimalny test odtwarzający problem.
-2. Popraw kanoniczny moduł w `python_helper/`.
-3. Sprawdź wartości zerowe, graniczne, ujemne i błędne typy.
-4. Zweryfikuj zachowanie do grosza i brak pomieszania przychodu, W, MIX i NEXUS.
-5. Uruchom oracle, evaluator i pełną bramkę.
-6. Odśwież VCR offline przed wykonywaniem płatnych requestów.
-
-### Nowy realny przypadek
-
-1. Zredukuj go do minimalnego syntetycznego scenariusza.
-2. Dodaj test jednostkowy dla nowego invariantu.
-3. Dodaj scenariusz biznesowy, jeżeli wnosi nową ścieżkę procesu.
-4. Zachowaj źródła i uzasadnienia, ale użyj fikcyjnych identyfikatorów i kwot.
-5. Zweryfikuj scenariusz na pełnej macierzy modeli, jeżeli zmienia kontrakt LLM.
-6. W raporcie wskaż dokładne testy i poziom pokrycia.
-
-### Nowy model
-
-1. Dodaj profil bezpośrednio do `MODEL_PROFILES` w `tests/llm/models.py`.
-2. Nie twórz osobnego rejestru kandydatów ani alternatywnych wrapperów.
-3. Użyj standardowego `scripts/record_model.py`.
-4. Dodaj test profilu i requestu.
-5. Nagraj lokalnie komplet 46 kaset.
-6. Uruchom standardowy pre-commit, raport i playback pojedynczego modelu.
-7. Uruchom pełną politykę i playback całej macierzy.
-8. Nie deklaruj pełnego pokrycia przed kompletem kaset.
-
-## Dokumentacja i prywatność
-
-- `README.md` ma być zrozumiały także dla księgowej bez doświadczenia programistycznego;
-- szczegóły VCR i wydania należą głównie do `docs/testing.md`;
-- przykłady poleceń muszą działać na aktualnym drzewie;
-- nie wpisuj ulotnych liczników testów jako trwałego kontraktu;
-- nie commituj dokumentów podatnika, KPiR, PIT-ów, faktur, umów ani interpretacji;
-- nie umieszczaj realnych danych w testach, kasetach, logach, Issue ani komentarzach;
-- raporty robocze z danymi użytkownika nie mogą trafiać do Git.
-
-## Bramka jakości
-
-Najpierw uruchom test celowany. Przed zakończeniem zmiany kodu uruchom:
+Konfiguracja środowiska:
 
 ```bash
-ruff format --check .
-ruff check .
-python -m compileall -q python_helper tests scripts
-pytest tests/unit --cov=python_helper --cov-report=term-missing --cov-fail-under=90
-pytest -q
-python scripts/check_cassette_policy.py
-python scripts/vcr_precommit.py --all-models
-python scripts/benchmark_report.py
-unset OPENROUTER_API_KEY
-./scripts/verify_all_models.sh
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt -r requirements-test.txt
 ```
 
-Po zmianach wykonaj code review diffu, sprawdź komentarze botów, stan CI oraz to, czy instrukcje lokalne odpowiadają rzeczywistym komendom. Nie oznaczaj PR jako gotowy, jeśli macierz VCR jest częściowa lub playback nie przechodzi offline.
+Przykładowy test celowany dla NEXUS i zwykłego opodatkowania:
+
+```bash
+pytest tests/unit/test_nexus_ordinary_tax_and_w_policy.py -q
+```
+
+Bramki repozytorium:
+
+```bash
+make quality   # format, lint, compile, statyczne bezpieczeństwo i polityka workflow
+make test      # quality + unit/coverage + pełny bezpłatny suite + polityka kaset
+make verify    # pełna macierz VCR w trybie offline
+make full      # test + verify
+```
+
+Płatne nagrywanie, zależności sieciowe i integracje zewnętrzne mają osobne preconditions w [`docs/testing.md`](docs/testing.md). Brak sekretu lub zgody oznacza bezpieczne pominięcie, nie obejście zabezpieczenia.
+
+## Kryterium zakończenia
+
+Raport końcowy podaje branch i dokładny SHA, zmienione kontrakty i konsumentów, wykonane komendy z wynikami, niewykonane bramki z powodem oraz ryzyka resztkowe, stan CI i wymagany dalszy review.
+
+Lokalny PASS nie jest dowodem zielonego GitHub Actions, działania płatnej integracji ani niezależnej akceptacji. Nie oznaczaj zmiany jako gotowej, jeżeli wymagana macierz VCR jest częściowa, playback nie przechodzi offline albo istotny konflikt pozostaje nierozstrzygnięty.

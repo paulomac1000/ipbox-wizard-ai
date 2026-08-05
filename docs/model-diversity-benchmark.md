@@ -119,4 +119,4 @@ Syntetyczne scenariusze regresyjne są źródłem prawdy dla tych przypadków. R
 8. Uruchom politykę kaset i playback całej macierzy bez sekretu.
 9. Dopiero po pełnym wyniku zaktualizuj dokumentację i deklarację pokrycia.
 
-Procedurę operacyjną opisują [`docs/testing.md`](testing.md) oraz [`docs/openai-model-family.md`](openai-model-family.md).
+Procedurę operacyjną opisuje [`docs/testing.md`](testing.md).
