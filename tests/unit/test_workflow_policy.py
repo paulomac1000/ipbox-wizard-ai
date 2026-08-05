@@ -22,9 +22,10 @@ def _messages(workflow: Path) -> list[str]:
 
 def test_local_launcher_uses_vendored_confined_reader() -> None:
     assert read_utf8_bounded is confined_io.read_utf8_bounded
-    assert Path(confined_io.__file__).resolve() == (
-        _REPOSITORY_ROOT / "vendor" / "ai-skills" / "contracts" / "confined_io.py"
-    ).resolve()
+    assert (
+        Path(confined_io.__file__).resolve()
+        == (_REPOSITORY_ROOT / "vendor" / "ai-skills" / "contracts" / "confined_io.py").resolve()
+    )
 
 
 def test_repository_workflows_follow_policy() -> None:
