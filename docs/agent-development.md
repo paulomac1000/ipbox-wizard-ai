@@ -69,8 +69,8 @@ Zmiana ma być minimalna, odtwarzalna, fail-closed i chroniona testem. Agent nie
 3. `actions/checkout` używa `persist-credentials: false`.
 4. Workflow ma minimalne permissions, timeout, concurrency i jawne zachowanie artefaktów.
 5. Kod z niezaufanego pull requestu nie otrzymuje sekretów ani uprawnień zapisu.
-6. Lokalny `python scripts/check_workflow_policy.py` jest diagnostycznym launcherem bajtowo zweryfikowanego snapshotu runtime w `vendor/ai-skills`. CI porównuje upstreamowy wrapper, implementację i `contracts/confined_io.py` z finalnym wydaniem `ai-skils`, a następnie uruchamia zewnętrzny auditor z przypiętego commita na ocenianym drzewie.
-7. Zmiana workflow musi przejść testy repozytorium i zewnętrzny auditor polityki; pull request nie może sam dostarczać autorytaty]nej reguły, która go zatwierdza.
+6. Lokalny `python scripts/check_workflow_policy.py` jest diagnostycznym launcherem bajtowo zweryfikowanego snapshotu runtime w `vendor/ai-skills`. CI porównuje upstreamowy wrapper, implementację i `contracts/confined_io.py` z finalnym wydaniem `ai-skills`, a następnie uruchamia zewnętrzny auditor z przypiętego commita na ocenianym drzewie.
+7. Zmiana workflow musi przejść testy repozytorium i zewnętrzny auditor polityki; pull request nie może sam dostarczać autorytatywnej reguły, która go zatwierdza.
 8. Nie publikuj artefaktu, który nie był testowany w publikowanej postaci. To repo obecnie nie ma automatycznego workflow publikacji.
 
 ## Weryfikacja i review
@@ -96,7 +96,7 @@ Własny review obejmuje:
 
 Raport końcowy zawiera:
 
-- branch i dokładn|� SHA;
+- branch i dokładny SHA;
 - zmienione kontrakty oraz ich konsumentów;
 - wykonane komendy i wyniki;
 - pominięte bramki wraz z powodami;
