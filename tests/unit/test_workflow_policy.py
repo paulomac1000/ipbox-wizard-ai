@@ -8,12 +8,13 @@ _SCRIPTS = _REPOSITORY_ROOT / "scripts"
 if str(_SCRIPTS) not in sys.path:
     sys.path.insert(0, str(_SCRIPTS))
 
-import confined_io  # noqa: E402
 from check_workflow_policy import (  # noqa: E402
     audit_repository,
     audit_workflow,
     read_utf8_bounded,
 )
+
+confined_io = sys.modules["confined_io"]
 
 
 def _messages(workflow: Path) -> list[str]:
